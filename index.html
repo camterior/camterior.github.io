@@ -1329,8 +1329,30 @@ const GEAR={
     note:'높이 68cm 하이 테이블. 높은 의자와 같이 써요',href:'https://helinox.com/products/cafe-table',srcName:'헬리녹스 공식'},
   kermit_t:{gtype:'table',top:'bamboo',group:'테이블',name:'커밋 테이블 와이드',model:'Kermit Table Wide',conf:'official',w:533,d:406,h:318,kg:2.3,sw:'#B98A57',
     note:'커밋체어와 높이를 맞춘 원목 테이블. 오크·월넛',href:'https://kermitchair.com/products/oak-table',srcName:'커밋체어 공식'},
+  noga_chair:{gtype:'chair',group:'체어',name:'스노우피크×헬리녹스 노가 체어',model:'LV-510',conf:'official',w:590,d:520,h:700,sh:null,kg:1.4,sw:'#5C6150',
+    note:'두 브랜드 첫 협업 체어(2026년 8월 출시). 크기는 스노우피크 재팬 발표 자료 기준',href:'https://prtimes.jp/main/html/rd/p/000000006.000015083.html',srcName:'스노우피크 재팬 발표'},
+  noga_table:{gtype:'table',top:'black',group:'테이블',name:'스노우피크×헬리녹스 노가 테이블',model:'Noga Table',conf:'official',w:543,d:496,h:400,kg:2.1,sw:'#5C6150',
+    note:'상판을 접으면 깊이 245mm까지 줄어요. 일본 발표 기준 출시가 연기된 상태예요',href:'https://prtimes.jp/main/html/rd/p/000000006.000015083.html',srcName:'스노우피크 재팬 발표'},
+  alu48:{gtype:'box',alu:true,group:'알루미늄 박스',name:'알루텍 클래식 48',model:'Classic 48',conf:'retailer',w:550,d:350,h:250,kg:null,sw:'#C9CDD0',
+    note:'48L. 쌓아서 쓰는 알루미늄 박스. 크기는 판매처 표기 기준',href:'https://www.eisenwolff-online.de/fr/aluminiumbox-classic-48-masse-550x350x250mm-alutec-2',srcName:'판매처 상세'},
+  alu68:{gtype:'box',alu:true,group:'알루미늄 박스',name:'알루텍 클래식 68',model:'Classic 68',conf:'retailer',w:575,d:385,h:375,kg:3.74,sw:'#C9CDD0',
+    note:'68L. 안쪽 550×350×355mm',href:'https://www.galaxus.fr/en/s4/product/alutec-classic-68-storage-container-10393193',srcName:'판매처 상세'},
+  alu93:{gtype:'box',alu:true,group:'알루미늄 박스',name:'알루텍 클래식 93',model:'Classic 93',conf:'retailer',w:775,d:385,h:375,kg:null,sw:'#C9CDD0',
+    note:'93L. 68과 높이·폭이 같아 나란히 두기 좋아요',href:'https://www.galaxus.fr/en/s4/product/alutec-aluminium-box-classic-93-storage-container-10393194',srcName:'판매처 상세'},
+  sfh1200:{gtype:'fan',group:'난방',name:'신일 팬히터 1200',model:'SFH-1200',conf:'retailer',w:455,d:357,h:527,kg:13,sw:'#E8E2D4',
+    note:'등유 9L, 1.46~6.60kW. 리빙쉘·대형 거실형용. 전기 필요. 바람은 앞쪽(화살표)으로 나와요',heat:{type:'front',front:1000,side:300},href:'https://www.kurly.com/goods/1001589194',srcName:'판매처 상세'},
+  sfh300:{gtype:'fan',group:'난방',name:'신일 팬히터 300',model:'SFH-C304DMA',conf:'retailer',w:429,d:299,h:371,kg:7.7,sw:'#B9BDC1',
+    note:'등유 5L, 1.16~3.20kW. 2~3인 텐트용. 인기 모델 900은 공개된 치수가 없어 넣지 않았어요',heat:{type:'front',front:1000,side:300},href:'https://choicemon.com/shinil-fan-heater/',srcName:'비교 자료'},
+  megamat:{gtype:'mat',sleep:true,group:'매트',name:'엑스페드 메가매트 10 LXW',model:'MegaMat LXW',conf:'retailer',w:1970,d:770,h:100,kg:2.6,sw:'#8E2F2F',
+    note:'두께 10cm 자충매트(1인 와이드)',href:'https://www.exped.com/en/products/sleeping-mats/megamat',srcName:'엑스페드 공식'},
+  megamat_duo:{gtype:'mat',sleep:true,group:'매트',name:'엑스페드 메가매트 듀오 10 LW+',model:'MegaMat Duo LW+',conf:'retailer',w:1970,d:1320,h:100,kg:null,sw:'#8E2F2F',
+    note:'2인용. 듀오 M은 183×104cm, 퀸은 203×152cm',href:'https://www.exped.com/en/products/sleeping-mats/megamat-duo',srcName:'엑스페드 공식'},
+  sparrow50:{gtype:'mat',sleep:true,group:'매트',name:'스패로우 그랜드50 더블매트',model:'Grand 50 Double',conf:'retailer',w:2000,d:1300,h:75,kg:5,sw:'#4F5A4A',
+    note:'2인용 자충매트, 펌프 내장. 판매처에 따라 길이를 203cm로 적기도 해요',href:'https://prod.danawa.com/info/?pcode=14848169',srcName:'다나와'},
+  cot_one:{gtype:'cot',sleep:true,group:'야전침대',name:'헬리녹스 코트원 컨버터블',model:'Cot One Convertible',conf:'retailer',w:2110,d:665,h:165,kg:2.67,sw:'#2B2E31',
+    note:'높이 16.5cm(기본). 별매 다리를 끼우면 높아져요',href:'https://varuste.net/en/p144864/helinox-cot-one-convertible',srcName:'판매처 상세'},
 };
-const GEAR_GROUPS=['쉘프컨테이너','마이테이블','테이블','폴딩쉘프','체어','난방'];
+const GEAR_GROUPS=['쉘프컨테이너','알루미늄 박스','마이테이블','테이블','폴딩쉘프','체어','매트','야전침대','난방'];
 const GEAR_ORDER=Object.keys(GEAR);
 const gLink=g=>g.href||(g.src?SRC+g.src:null),gLinkName=g=>g.srcName||'아이엘캠프 상품 상세';
 const GEAR_CAT=Object.fromEntries(Object.entries(GEAR).map(([id,g])=>[id,{kind:'gear',...g,short:g.name,
@@ -1500,7 +1522,7 @@ function checkRules(){
       else if(TW.guys.some(g=>{for(let s=.1;s<.95;s+=.1){if(pointInPoly([g.a[0]+(g.b[0]-g.a[0])*s,g.a[1]+(g.b[1]-g.a[1])*s],T.outer))return true;}return false;}))I.push('타프 스트링이 텐트 위로 지나가요. 출입 동선을 확인하세요');}
     state.pieces.forEach(p=>{TW.poles.forEach(q=>{if(pointInPoly(q.p,p._v)){p._ov=true;W.push(`<b>타프 폴</b> ${pName(p)} 자리에 타프 폴(${q.h/10}cm)이 서요`);}});});
   }
-  if(inner)state.pieces.forEach(p=>{const ib=bbox(inner.poly);if(!bbHit(p._bb,ib))return;
+  if(inner)state.pieces.forEach(p=>{const ib=bbox(inner.poly);if(!bbHit(p._bb,ib)||(CATALOG[p.type]||{}).sleep)return;
     if(satPen(p._v,inner.poly)>3){p._ov=true;W.push(`<b>이너룸</b> ${pName(p)}이 이너룸 자리와 겹쳐요`);}});
   doorZones().forEach(z=>{const zb=bbox(z.poly);const hit=state.pieces.filter(p=>bbHit(p._bb,zb)&&satPen(p._v,z.poly)>3);
     z.blocked=hit.length>0;if(hit.length)I.push(`${z.door.label} 앞 60cm 안에 ${hit.map(pName).join(', ')}`);});
@@ -1603,8 +1625,14 @@ function gearBody(p,fine){const c=CATALOG[p.type],w=c.w,d=c.d;let o='';
     o+=`<rect x="34" y="${bk*.55}" width="${w-68}" height="${d-bk*.55-34}" rx="${c.wood?14:48}" fill="${fab}" stroke="rgba(20,22,20,.55)" stroke-width="5"/>`;
     o+=`<rect x="20" y="0" width="${w-40}" height="${bk}" rx="${bk/2}" fill="${fab}" stroke="rgba(20,22,20,.7)" stroke-width="5"/>`;
     o+=`<path d="M${w*.3},${d*.62} Q${w/2},${d*.7} ${w*.7},${d*.62}" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="6" stroke-linecap="round"/>`;return o;}
-  if(c.gtype==='box'){
-    o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="16" fill="#6B6E68" stroke="#3E403C" stroke-width="5"/><rect x="26" y="26" width="${w-52}" height="${d-52}" rx="10" fill="#7E827B" stroke="#555852" stroke-width="3"/>`;
+  if(c.gtype==='mat'){o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="60" fill="${c.sw}" stroke="rgba(20,22,20,.6)" stroke-width="6"/>`;
+    for(let x=w/8;x<w-10;x+=w/8)o+=`<line x1="${x}" y1="30" x2="${x}" y2="${d-30}" stroke="rgba(255,255,255,.18)" stroke-width="6"/>`;
+    o+=`<rect x="30" y="30" width="${w*.16}" height="${d-60}" rx="40" fill="rgba(255,255,255,.12)"/>`;return o;}
+  if(c.gtype==='cot'){o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="24" fill="#3A3E41" stroke="#16181A" stroke-width="6"/>`;
+    o+=`<rect x="40" y="30" width="${w-80}" height="${d-60}" rx="18" fill="${c.sw}"/>`;
+    [0,w-28].forEach(x=>{o+=`<rect x="${x}" y="-10" width="28" height="${d+20}" rx="10" fill="#9EA3A7"/>`;});return o;}
+  if(c.gtype==='box'){const bf=c.alu?'#C9CDD0':'#6B6E68',bs=c.alu?'#8C9196':'#3E403C',bi=c.alu?'#DADDE0':'#7E827B';
+    o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="16" fill="${bf}" stroke="${bs}" stroke-width="5"/><rect x="26" y="26" width="${w-52}" height="${d-52}" rx="10" fill="${bi}" stroke="${bs}" stroke-width="3"/>`;
     [[0,d/2],[w,d/2]].forEach(([x,y])=>{o+=`<rect x="${x-14}" y="${y-48}" width="28" height="96" rx="12" fill="#C9CDD0" stroke="#7F8489" stroke-width="3"/>`;});return o;}
   const fill=c.top==='steel'?'url(#steelL)':c.top==='black'?'#2B2E31':'url(#bamboo)',stroke=c.top==='bamboo'?'#A07A3C':'#4A4E52';
   if(c.round){const r=w/2;o+=`<circle cx="${r}" cy="${r}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="5"/>`;if(c.top==='bamboo')o+=`<circle cx="${r}" cy="${r}" r="${r}" fill="url(#sheen)" opacity=".5" pointer-events="none"/>`;return o;}
@@ -2325,7 +2353,10 @@ function igt3(THREE){
         shelves.forEach(sh=>grp.add(extrudePoly(THREE,[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(X),sh-4,sh,M.steel)));
         [x0,x1-6].forEach(xx=>grp.add(extrudePoly(THREE,[[xx,y0],[xx+6,y0],[xx+6,y1],[xx,y1]].map(X),shelves[shelves.length-1],Hh-30,M.steel)));}
     }else if(c.kind==='gear'){const h=c.h,w=c.w,d=c.d,R=(x0,y0,x1,y1)=>[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(X);
-      if(c.gtype==='box'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h-8,M.cont));grp.add(extrudePoly(THREE,R(-6,-6,w+6,d+6),h-8,h,M.cont2));}
+      if(c.gtype==='box'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h-8,c.alu?M.alu:M.cont));grp.add(extrudePoly(THREE,R(-6,-6,w+6,d+6),h-8,h,c.alu?M.alu:M.cont2));}
+      else if(c.gtype==='mat'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h,new THREE.MeshStandardMaterial({color:c.sw,roughness:.95})));}
+      else if(c.gtype==='cot'){grp.add(extrudePoly(THREE,R(20,0,w-20,d),h-30,h,new THREE.MeshStandardMaterial({color:c.sw,roughness:.9})));
+        [[20,20],[w-20,20],[20,d-20],[w-20,d-20],[w/2,20],[w/2,d-20]].forEach(q=>grp.add(cyl(THREE,X(q),0,h-30,10,M.dark)));}
       else if(c.gtype==='stove'){const ce=X([w/2,w/2]),mk=(r0,r1,y0,y1,m)=>{const me=new THREE.Mesh(new THREE.CylinderGeometry(mm(r1),mm(r0),mm(y1-y0),32),m);me.position.set(mm(ce[0]),mm((y0+y1)/2),mm(ce[1]));me.castShadow=true;return me;};
         grp.add(mk(w/2,w/2,0,60,M.stove),mk(w/2-20,w/2-20,60,h-170,M.stove),mk(w/2-25,w/2-25,h-170,h-90,M.glow),mk(w/2-20,w/2-60,h-90,h,M.stove));}
       else if(c.gtype==='chair'){const sh=c.sh||Math.round(h*.42),fm=new THREE.MeshStandardMaterial({color:c.sw,roughness:.9}),lm=c.wood?M.bamboo:M.dark,bk=Math.min(110,d*.18);
@@ -2720,7 +2751,7 @@ document.querySelector('.tabs').addEventListener('keydown',e=>{const ks=Object.k
 const CAT_GROUPS=[['IGT 프레임',['reg3','long4','sep2','sep3','sep4']],['IGT 테이블',['mf_reg','mf_long','open_L','open_R','corner_L','corner_R']]]
   .concat(GEAR_GROUPS.map(g=>[g,GEAR_ORDER.filter(t=>CATALOG[t].group===g)]));
 let CAT_F='all';
-function catPreview(t){if(CATALOG[t].gtype==='chair'){const c=CATALOG[t],p=Math.max(c.w,c.d)*.06;return `<svg viewBox="${-p} ${-p} ${c.w+p*2} ${c.d+p*2}" aria-hidden="true">${gearBody({type:t},false)}</svg>`;}
+function catPreview(t){if(['chair','mat','cot'].includes(CATALOG[t].gtype)||CATALOG[t].alu){const c=CATALOG[t],p=Math.max(c.w,c.d)*.06;return `<svg viewBox="${-p} ${-p} ${c.w+p*2} ${c.d+p*2}" aria-hidden="true">${gearBody({type:t},false)}</svg>`;}
   const c=CATALOG[t],b=bbox(c.verts),w=b[1][0]-b[0][0],d=b[1][1]-b[0][1],pad=Math.max(w,d)*.06;
   const fill=c.kind==='gear'?c.sw:c.kind==='frame'?(c.style==='classic'?'#C9CDD0':'#2B2E31'):'#CFA265';
   const stroke=c.kind==='frame'&&c.style!=='classic'?'#16181A':'rgba(26,32,28,.55)';
@@ -2734,7 +2765,7 @@ function renderCatalog(){const chips=document.getElementById('catChips'),el=docu
   chips.innerHTML=[['all','전체']].concat(CAT_GROUPS.map(([g])=>[g,g])).map(([k,l])=>`<button type="button" aria-pressed="${CAT_F===k}" onclick="CAT_F='${k}';renderCatalog()">${l}</button>`).join('');
   const q=(document.getElementById('catQ').value||'').trim().toLowerCase();let html='',n=0;
   CAT_GROUPS.forEach(([g,ids])=>{if(CAT_F!=='all'&&CAT_F!==g)return;
-    const list=ids.filter(t=>{const c=CATALOG[t];return !q||(c.name+' '+c.model+' '+g+' '+(c.note||'')+' '+({stove:'난로 스토브',fan:'팬히터 히터 난로',box:'수납 박스',shelf:'선반 쉘프',table:'테이블',chair:'의자 체어'}[c.gtype]||'')).toLowerCase().includes(q);});if(!list.length)return;
+    const list=ids.filter(t=>{const c=CATALOG[t];return !q||(c.name+' '+c.model+' '+g+' '+(c.note||'')+' '+({stove:'난로 스토브',fan:'팬히터 히터 난로',box:'수납 박스',shelf:'선반 쉘프',table:'테이블',chair:'의자 체어',mat:'매트 자충 에어 침구',cot:'야전침대 코트 침대'}[c.gtype]||'')).toLowerCase().includes(q);});if(!list.length)return;
     html+=`<div class="cat-g">${g}</div>`;
     list.forEach(t=>{const c=CATALOG[t],b=bbox(c.verts),w=Math.round(b[1][0]-b[0][0]),d=Math.round(b[1][1]-b[0][1]);n++;
       const size=c.kind==='gear'?`${c.w}×${c.d}×${c.h}`:`${w}×${d}`;
@@ -2926,14 +2957,16 @@ const GSEC=[
       <dl>${Object.entries(LEGS).map(([h,l])=>`<dt>${l.name}</dt><dd>${h}mm</dd>`).join('')}</dl>
       <p class="nt">입체 보기에서 다리 높이에 맞춰 테이블 높이가 바뀌어요.</p></div>`}])},
   {k:'gear',t:'수납·테이블·선반',img:'img/top.webp',d:'쉘프컨테이너, 마이테이블, 폴딩쉘프, 그리고 스노우피크·헬리녹스·커밋 테이블. 바닥 크기와 상판 높이까지 실제 값이에요. 의자 좌면 높이와 맞춰 고르세요.',
-   items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat&&GEAR[id].gtype!=='chair').map(id=>gearCard(id))},
+   items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat&&!GEAR[id].sleep&&GEAR[id].gtype!=='chair').map(id=>gearCard(id))},
+  {k:'sleep',t:'매트·야전침대',img:'img/night.webp',d:'자충매트와 야전침대. 이너룸 안에 놓아도 경고가 뜨지 않아요. 매트 폭으로 이너룸에 몇 명이 누울 수 있는지 확인해보세요.',
+   items:()=>GEAR_ORDER.filter(id=>GEAR[id].sleep).map(id=>gearCard(id))},
   {k:'chair',t:'체어',img:'img/flatlay.webp',d:'스노우피크·헬리녹스·커밋체어. 펼친 크기와 좌면 높이를 실제 값으로 넣었어요. 좌면이 낮은 로우체어는 낮은 테이블과 맞춰보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='chair').map(id=>gearCard(id))},
   {k:'heat',t:'난방',img:'img/heat.webp',d:'난로와 팬히터를 놓으면 배치 주의사항을 띄워요. 텐트 천·이너룸·가구와 넉넉히 띄우고 꼭 환기하세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].heat).map(id=>gearCard(id))},
 ];
 function gearCard(id){const g=GEAR[id];
-  return {id,q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'?'난로 히터':''}${g.gtype==='chair'?'의자 체어 '+(g.srcName||''):''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
+  return {id,q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'?'난로 히터':''}${g.gtype==='chair'?'의자 체어 '+(g.srcName||''):''}${g.sleep?'매트 침대 야전침대 코트 자충':''}${g.alu?'알루텍 알루미늄 박스 수납':''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
     <div class="gb"><div><h3>${g.name}</h3><span class="md">${g.model}</span></div>
     <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.sh?`<dt>좌면 높이</dt><dd>${fmt(g.sh)}mm</dd>`:''}${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}${g.heat?`<dt>배치</dt><dd class="warn">주의 (설명서 이격 거리)</dd>`:''}</dl>
     ${g.note?`<p class="nt">${g.note}</p>`:''}
