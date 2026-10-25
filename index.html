@@ -794,7 +794,7 @@
     <div class="chips3" aria-hidden="true">
       <div class="spec-chip"><i>⬡</i><div><b>텐트 12종 바닥 도면</b><span>SNOW PEAK · HILLEBERG · HELINOX</span></div></div>
       <div class="spec-chip"><i>▦</i><div><b>IGT 프레임·파츠</b><span>0.5 UNIT GRID · mm</span></div></div>
-      <div class="spec-chip"><i>◎</i><div><b>난로 안전거리</b><span>사방 1,000mm 자동 점검</span></div></div>
+      <div class="spec-chip"><i>◐</i><div><b>3D 미리보기</b><span>낮 · 노을 · 밤 조명</span></div></div>
     </div>
   </div>
   <a class="scrollcue" href="#how" aria-label="아래로">↓</a>
@@ -813,7 +813,7 @@
         <div class="sc-b"><span class="no">02</span><h3>장비를 실제 크기로</h3><p>IGT 프레임 칸에 버너·메쉬를 채우고, 쉘프컨테이너와 폴딩쉘프를 mm 단위로 놓아요.</p>
         <a class="lnk" href="#gear" data-go="gear">장비 제원 보기 →</a></div></article>
       <article class="stepcard reveal"><figure><img src="img/winter.webp" alt="눈 덮인 자작나무 숲, 안에서 불빛이 새어 나오는 텐트" loading="lazy"></figure>
-        <div class="sc-b"><span class="no">03</span><h3>안전거리·3D 확인</h3><p>난로 1m 안에 벽이나 장비가 들어오면 알려줘요. 낮·노을·밤 조명으로 입체 미리보기도 돼요.</p>
+        <div class="sc-b"><span class="no">03</span><h3>점검·3D 확인</h3><p>겹침과 출입구 막힘을 알려주고, 난로를 놓으면 주의사항을 띄워요. 낮·노을·밤 조명으로 입체 미리보기도 돼요.</p>
         <a class="lnk" href="#plan" data-go="plan">추천 세팅부터 →</a></div></article>
     </div>
   </div>
@@ -830,7 +830,7 @@
       <article class="tile t-mm reveal"><svg class="viz ruler-viz" viewBox="0 0 220 90" aria-hidden="true"><line x1="10" y1="20" x2="210" y2="20" stroke-width="1.5" class="grow"/><path d="M10 12v16M210 12v16" stroke-width="1.5"/><rect x="30" y="38" width="150" height="40" rx="6" fill="none" stroke="#7FD1A4" stroke-width="1.5" stroke-dasharray="5 4"/><text x="110" y="64" fill="#7FD1A4" font-family="JetBrains Mono,monospace" font-size="12" text-anchor="middle">846</text></svg>
         <p class="k">IGT · 파츠</p><h3>칸마다 파츠를 채워요</h3><p>프레임 0.5유닛 칸에 버너, 메쉬, 우드 상판을 넣고 이어 붙여요.</p></article>
       <article class="tile t-heat reveal"><div class="ring" aria-hidden="true"><i></i><i></i><b></b></div>
-        <p class="k">SAFETY</p><h3>난로 1m, 바로 알려줘요</h3><p>텐트 벽, 이너룸, 다른 장비가 안전거리 안에 들어오면 경고해요.</p></article>
+        <p class="k">SAFETY</p><h3>난로는 조심해서</h3><p>난로를 놓으면 환기·일산화탄소 경보기 같은 배치 주의사항을 바로 띄워요.</p></article>
       <article class="tile t-3d reveal"><div class="cube" aria-hidden="true"><div><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
         <p class="k">3D</p><h3>입체로 둘러보기</h3><p>앉은 눈높이에서 동선을 미리 확인해요.</p></article>
       <article class="tile t-code reveal"><div class="typed" aria-hidden="true"><span>CAMP-C1Jc1BCsIwEEDRu_z1LJJU</span></div>
@@ -1272,7 +1272,7 @@ const CATALOG={
 /* free-standing gear: no mating edges, real footprint + height */
 function circPoly(r,n){const v=[];for(let k=0;k<n;k++){const a=k/n*Math.PI*2;v.push([r+r*Math.cos(a),r+r*Math.sin(a)]);}return v;}
 const gearShape=(w,d)=>shape(rect(w,d),[]);
-const HEAT_NOTE='이격 거리는 플래너 권장값이에요(천·가구에서 1m). 제품 설명서가 우선이에요.';
+const HEAT_NOTE='난로는 텐트 천·이너룸·가구와 넉넉히 띄우고 환기하세요. 이격 거리는 제품 설명서를 따라주세요.';
 const GEAR={
   sc25:{gtype:'box',group:'쉘프컨테이너',name:'쉘프컨테이너 25',model:'UG-025G',conf:'retailer',w:520,d:325,h:210,kg:3.6,sw:'#6B6E68',
     note:'안쪽 405×290×195mm. 같은 크기끼리 쌓을 수 있어요. 올리브 FES-037-OL도 같은 크기',src:'3357'},
@@ -1349,7 +1349,7 @@ function bbox(v){let a=[1e9,1e9],b=[-1e9,-1e9];v.forEach(p=>{a[0]=Math.min(a[0],
 function polyArea(v){return Math.abs(signedArea(v));}
 function pointInPoly(pt,poly){let c=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];
   if(((a[1]>pt[1])!==(b[1]>pt[1]))&&(pt[0]<(b[0]-a[0])*(pt[1]-a[1])/(b[1]-a[1])+a[0]))c=!c;}return c;}
-function heatLocal(c){const h=c.heat;if(!h)return null;
+function heatLocal(c){return null;const h=c.heat;
   if(h.type==='round'){const r=c.w/2,R=r+h.c,v=[];for(let k=0;k<36;k++){const a=k/36*Math.PI*2;v.push([r+R*Math.cos(a),r+R*Math.sin(a)]);}return v;}
   return [[-h.side,-h.side],[c.w+h.side,-h.side],[c.w+h.side,c.d+h.front],[-h.side,c.d+h.front]];}
 function segDist(p,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],L=dx*dx+dy*dy;let t=L?((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L:0;t=Math.max(0,Math.min(1,t));return Math.hypot(p[0]-a[0]-t*dx,p[1]-a[1]-t*dy);}
@@ -1426,19 +1426,10 @@ function checkRules(){
     if(cp.kind==='gear'&&cq.kind!=='gear'){g=P;t=Q;}else if(cq.kind==='gear'&&cp.kind!=='gear'){g=Q;t=P;}
     if(g&&!CATALOG[g.type].heat&&CATALOG[g.type].h<=pieceH(t)-60){g._under=true;I.push(`아래 수납: ${pName(g)}, ${pName(t)} 밑 (높이 ${CATALOG[g.type].h/10} / ${pieceH(t)/10}cm)`);continue;}
     P._ov=Q._ov=true;W.push(`<b>겹침</b> ${pName(P)}와 ${pName(Q)}, 약 ${Math.round(d/10)}cm`);}
-  // heaters: keep 1m from fabric and gear
-  const heaters=state.pieces.filter(p=>p._heat);
-  heaters.forEach(h=>{const c=CATALOG[h.type],hb=bbox(h._heat),dist1=c.heat.type==='round'?'사방 1m':'앞 1m·옆뒤 30cm';
-    const near=state.pieces.filter(q=>q!==h&&bbHit(q._bb,hb)&&satPen(q._v,h._heat)>3);
-    if(near.length){h._ov=true;W.push(`<b>난방 거리</b> ${pName(h)} ${dist1} 안에 ${near.map(pName).join(', ')}`);}
-    const ce=centroid(h._v);
-    if(T.outer){const inTent=allowedPolys(T).some(pl=>pointInPoly(ce,pl));
-      if(inTent){const out=h._heat.filter(v=>!allowedPolys(T).some(pl=>pointInPoly(v,pl))).length;
-        if(out){h._ov=true;W.push(`<b>난방 거리</b> ${pName(h)}에서 텐트 벽까지 약 ${Math.round(polyGap(h._v,T.outer)/10)}cm. ${dist1}는 띄워 주세요`);}
-        I.push(`텐트 안 난방: 환기구를 열고 일산화탄소 경보기를 함께 두세요. 천장까지도 1m 이상 떨어져야 해요`);}
-      else if(satPen(h._heat,T.outer)>3)W.push(`<b>난방 거리</b> ${pName(h)}: 텐트 바깥 천과 1m 안이에요`);}
-    if(inner&&satPen(h._heat,inner.poly)>3){h._ov=true;W.push(`<b>난방 거리</b> ${pName(h)} ${dist1} 안에 이너룸 천이 있어요`);}
-    if(TW&&pointInPoly(ce,TW.fabric))I.push(`${pName(h)}: 타프 아래예요. 타프 천이 난로 위 1m보다 낮지 않은지 확인하세요`);
+  const heaters=state.pieces.filter(p=>CATALOG[p.type].heat);
+  if(heaters.length)I.push('<b>난방 주의</b> 난로는 텐트 천·이너룸·가구와 넉넉히 띄우고, 환기구를 열고 일산화탄소 경보기를 함께 두세요. 이격 거리는 제품 설명서를 따라주세요');
+  heaters.forEach(h=>{const c=CATALOG[h.type],ce=centroid(h._v);
+    if(TW&&pointInPoly(ce,TW.fabric))I.push(`${pName(h)}: 타프 아래예요. 타프 천이 난로에서 충분히 높은지 확인하세요`);
     if(c.gtype==='fan')I.push(`${pName(h)}: 전원(220V)이 필요해요. 파워뱅크나 전기 사이트를 챙기세요`);});
   state.pieces.forEach(p=>{const c=CATALOG[p.type];if(c.kind!=='frame')return;
     ['top','bottom'].forEach(en=>{const k=edgeKids(p,en).filter(q=>!['tray','h020'].includes(CATALOG[q.type].kind));
@@ -2016,7 +2007,7 @@ function updateSpec(){const W=document.getElementById('sWarn'),B=document.getEle
   const T0=TENTS[tent.id];
   if(T0.outer||tarp.id){const b=sceneBox(true);S.innerHTML=`<div class="site"><span>필요한 사이트 크기<br>${tarp.id?'타프 펙까지, ':''}텐트 스트링 제외</span><b>${((b[1][0]-b[0][0])/1000).toFixed(1)} × ${((b[1][1]-b[0][1])/1000).toFixed(1)} m</b></div>`;}
   else S.innerHTML='';
-  if(!state.pieces.length){W.innerHTML=(lastWarn.length?`<div class="warnBox">${lastWarn.join('<br>')}</div>`:'')+(lastInfo.length?`<div class="infoBox">${lastInfo.join('<br>')}</div>`:'')+`<p class="help">테이블과 장비를 놓으면 겹침, 이너룸 침범, 출입구 막힘, 난로 안전거리를 여기서 알려줘요.</p>`;B.innerHTML='';return;}
+  if(!state.pieces.length){W.innerHTML=(lastWarn.length?`<div class="warnBox">${lastWarn.join('<br>')}</div>`:'')+(lastInfo.length?`<div class="infoBox">${lastInfo.join('<br>')}</div>`:'')+`<p class="help">테이블과 장비를 놓으면 겹침, 이너룸 침범, 출입구 막힘을 알려주고, 난로를 놓으면 주의사항을 띄워요.</p>`;B.innerHTML='';return;}
   W.innerHTML=(lastWarn.length?`<div class="warnBox">${lastWarn.join('<br>')}</div>`:`<div class="okBox">겹치거나 텐트를 벗어난 조각이 없어요.</div>`)+(lastInfo.length?`<div class="infoBox">${lastInfo.join('<br>')}</div>`:'');
   const T=TENTS[tent.id],inner=tentInner(),bom=new Map();const add=(m,n,c)=>{const v=bom.get(m)||{n,c,q:0};v.q++;bom.set(m,v);};
   if(T.outer)add(T.model,T.name,'retailer');if(inner&&inner.model)add(inner.model,'이너룸','retailer');
@@ -2183,7 +2174,7 @@ function build3D(THREE,OrbitControls){
     const lamp=new THREE.PointLight('#FFB867',0,0,2);lamp.position.set(mm(lp[0]),1.7,mm(lp[1]));lamp.castShadow=true;lamp.shadow.mapSize.set(512,512);lamp.shadow.bias=-.002;scene.add(lamp);
     const lm=new THREE.Mesh(new THREE.CylinderGeometry(.055,.065,.17,14),new THREE.MeshStandardMaterial({color:'#FFE2B0',emissive:'#FFB257',emissiveIntensity:0,roughness:.4}));lm.position.copy(lamp.position);lm.position.y-=.12;scene.add(lm);
     const cord=new THREE.Mesh(new THREE.CylinderGeometry(.004,.004,.45,4),new THREE.MeshStandardMaterial({color:'#2A2622'}));cord.position.set(lm.position.x,lm.position.y+.3,lm.position.z);scene.add(cord);
-    const heats=state.pieces.filter(p=>p._heat).map(p=>{const c=centroid(p._v),L=new THREE.PointLight('#FF7A30',0,0,2);L.position.set(mm(c[0]),mm(CATALOG[p.type].h)*.7,mm(c[1]));scene.add(L);return L;});
+    const heats=state.pieces.filter(p=>CATALOG[p.type].heat).map(p=>{const c=centroid(p._v),L=new THREE.PointLight('#FF7A30',0,0,2);L.position.set(mm(c[0]),mm(CATALOG[p.type].h)*.7,mm(c[1]));scene.add(L);return L;});
     V3.lights={lamp,lm,heats};}
 
   view3('orbit');setTOD(V3.tod||'day');
@@ -2693,7 +2684,7 @@ function renderCatalog(){const chips=document.getElementById('catChips'),el=docu
     list.forEach(t=>{const c=CATALOG[t],b=bbox(c.verts),w=Math.round(b[1][0]-b[0][0]),d=Math.round(b[1][1]-b[0][1]);n++;
       const size=c.kind==='gear'?`${c.w}×${c.d}×${c.h}`:`${w}×${d}`;
       html+=`<button type="button" class="pc" onclick="catAdd('${t}')" aria-label="${esc(c.name)} 놓기"><span class="pv">${catPreview(t)}</span>
-        <span><span class="pn">${esc(c.name)}${isWeak(c.conf)?' *':''}</span><br><span class="pm">${esc(c.model)} · ${size}mm${c.heat?' · <span class="pw">안전거리 1m</span>':''}</span></span></button>`;});});
+        <span><span class="pn">${esc(c.name)}${isWeak(c.conf)?' *':''}</span><br><span class="pm">${esc(c.model)} · ${size}mm${c.heat?' · <span class="pw">배치 주의</span>':''}</span></span></button>`;});});
   el.innerHTML=html||`<div class="cat-empty">‘${esc(q)}’에 맞는 장비가 없어요. 이름 일부나 모델명으로 찾아보세요.</div>`;}
 function catAdd(t){addMain(t);if(matchMedia('(max-width:860px)').matches)document.getElementById('board').scrollIntoView({behavior:'smooth',block:'center'});}
 (function v15boot(){const f=document.getElementById('factIgt');if(f)f.innerHTML=(ORDER.length+SLOT_ITEMS.length+Object.keys(RACKS).length)+'<span>종</span>';
@@ -2881,13 +2872,13 @@ const GSEC=[
       <p class="nt">입체 보기에서 다리 높이에 맞춰 테이블 높이가 바뀌어요.</p></div>`}])},
   {k:'gear',t:'수납·테이블·선반',img:'img/top.webp',d:'쉘프컨테이너, 마이테이블, 폴딩쉘프. 바닥 크기와 높이까지 실제 값이에요.',
    items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat).map(id=>gearCard(id))},
-  {k:'heat',t:'난방',img:'img/heat.webp',d:'난로와 팬히터는 놓는 순간 1m 안전거리를 그려 벽·이너룸·장비와 겹치면 경고해요.',
+  {k:'heat',t:'난방',img:'img/heat.webp',d:'난로와 팬히터를 놓으면 배치 주의사항을 띄워요. 텐트 천·이너룸·가구와 넉넉히 띄우고 꼭 환기하세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].heat).map(id=>gearCard(id))},
 ];
 function gearCard(id){const g=GEAR[id];
   return {id,q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'?'난로 히터':''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
     <div class="gb"><div><h3>${g.name}</h3><span class="md">${g.model}</span></div>
-    <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}${g.heat?`<dt>안전거리</dt><dd class="warn">${g.heat.type==='round'?'사방 '+fmt(g.heat.c):'앞 '+fmt(g.heat.front)+' · 옆 '+fmt(g.heat.side)}mm</dd>`:''}</dl>
+    <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}${g.heat?`<dt>배치</dt><dd class="warn">주의 (설명서 이격 거리)</dd>`:''}</dl>
     ${g.note?`<p class="nt">${g.note}</p>`:''}
     <div class="ga"><button type="button" onclick="gearUse('item','${id}')">배치에 놓기</button>${g.src?`<a href="${SRC+g.src}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};}
 let GEAR_F='all';
@@ -2983,6 +2974,11 @@ fitView=function(){const [hw,hh]=hostSize();if(!hw)return;if(hw>=600)return _fit
   bd.addEventListener('touchmove',e=>{e.preventDefault();},{passive:false});
   ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>{if(e.target&&e.target.closest&&e.target.closest('#board'))e.preventDefault();},{passive:false}));
   bd.addEventListener('contextmenu',e=>e.preventDefault());})();
+
+/* v19.2 난로를 놓으면 짧은 주의 문구 */
+const _addMain=addMain;
+addMain=function(t,...a){const r=_addMain(t,...a);if(CATALOG[t]&&CATALOG[t].heat)setTimeout(()=>{const el=document.getElementById('hint');if(!el)return;
+  el.textContent='🔥 난로는 텐트 천·이너룸과 넉넉히 띄우고 환기하세요';el.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>{el.style.display='none';el.textContent=HINT0;},3200);},400);return r;};
 
 </script>
 </body>
