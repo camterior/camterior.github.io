@@ -1,0 +1,16 @@
+{
+  "name": "캠테리어 · 캠핑 인테리어 플래너",
+  "short_name": "캠테리어",
+  "description": "텐트 도면 위에 IGT·선반·난로를 실제 크기로 배치해보는 캠핑 인테리어 플래너",
+  "lang": "ko",
+  "start_url": "./#intro",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F4F4EF",
+  "theme_color": "#0C1813",
+  "icons": [
+    {"src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
