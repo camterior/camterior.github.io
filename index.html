@@ -2932,6 +2932,58 @@ function gearUse(kind,id){go('plan');afterPaint(()=>{
   if('serviceWorker' in navigator&&!IN_CLAUDE&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
 
+/* ---------- v19.1 touch gestures: one finger = move piece / pan, two fingers = zoom ----------
+   Each gesture follows only its own pointer, stops on pointercancel, and yields to a pinch.
+   On touch, a tap near a small piece grabs it (26px tolerance). */
+const TOUCH_TOL=26;
+function trackPointer(e,onMove,onEnd){const id=e.pointerId,seq=gestSeq;let done=false;
+  const fin=(ev,cancel)=>{if(done)return;done=true;removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',cn);onEnd(ev,cancel||seq!==gestSeq);};
+  const mv=ev=>{if(ev.pointerId!==id)return;if(seq!==gestSeq||PT.size>1){fin(ev,true);return;}onMove(ev);};
+  const up=ev=>{if(ev.pointerId===id)fin(ev,false);};const cn=ev=>{if(ev.pointerId===id)fin(ev,true);};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',cn);}
+const multiTouch=e=>e.pointerType!=='mouse'&&PT.size>1;
+function toWorld(ev){const r=document.getElementById('svgHost').getBoundingClientRect();return [viewX+(ev.clientX-r.left)/SCALE,viewY+(ev.clientY-r.top)/SCALE];}
+function nearPiece(e){const w=toWorld(e),tol=TOUCH_TOL/SCALE;let best=null,bd=Infinity;
+  state.pieces.forEach(p=>{if(!p._v)return;let d=pointInPoly(w,p._v)?0:Infinity;
+    if(d)for(let k=0;k<p._v.length;k++)d=Math.min(d,segDist(w,p._v[k],p._v[(k+1)%p._v.length]));
+    if(d<bd){bd=d;best=rootOf(p).uid;}});
+  return bd<=tol?best:null;}
+startPan=function(e,onClick){if(e.button>0||multiTouch(e))return;
+  if(e.pointerType!=='mouse'&&!onClick){const hit=nearPiece(e);if(hit!=null){startDrag(e,hit);return;}}
+  const sx=e.clientX,sy=e.clientY,vx0=viewX,vy0=viewY,svg=document.querySelector('#svgHost svg');let moved=false;
+  trackPointer(e,ev=>{if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<4)return;moved=true;viewX=vx0-(ev.clientX-sx)/SCALE;viewY=vy0-(ev.clientY-sy)/SCALE;setViewBox();},
+    (ev,cancel)=>{if(cancel){if(moved)render();return;}
+      if(moved){justDragged=true;setTimeout(()=>justDragged=false,80);render();}else if(onClick)onClick();else if(sel!=null){sel=null;render();}});};
+startDrag=function(e,rootUid){if(e.button>0||multiTouch(e))return;e.stopPropagation();
+  drag={rootUid,sx:e.clientX,sy:e.clientY,moved:false};const g=document.getElementById('isl-'+rootUid);let raf=0,lx=0,ly=0;
+  trackPointer(e,ev=>{if(!drag)return;const dx=ev.clientX-drag.sx,dy=ev.clientY-drag.sy;if(!drag.moved&&Math.hypot(dx,dy)<6)return;drag.moved=true;g&&g.classList.add('drag');
+      lx=dx;ly=dy;if(!raf)raf=requestAnimationFrame(()=>{raf=0;g&&g.setAttribute('transform',`translate(${(lx/SCALE).toFixed(2)} ${(ly/SCALE).toFixed(2)})`);});},
+    (ev,cancel)=>{if(raf)cancelAnimationFrame(raf);const d=drag;drag=null;if(!d)return;
+      if(cancel){if(g){g.removeAttribute('transform');g.classList.remove('drag');}return;}
+      if(d.moved){const r=byId(d.rootUid);r.ox=snap((r.ox||0)+(ev.clientX-d.sx)/SCALE);r.oy=snap((r.oy||0)+(ev.clientY-d.sy)/SCALE);sel=d.rootUid;
+        justDragged=true;setTimeout(()=>justDragged=false,80);render();}
+      else if(sel!==d.rootUid){sel=d.rootUid;justDragged=true;setTimeout(()=>justDragged=false,80);render();}});};
+tarpDown=function(e){if(e.button>0||multiTouch(e))return;
+  if(sel!=='tarp'){const hit=e.pointerType!=='mouse'?nearPiece(e):null;if(hit!=null){startDrag(e,hit);return;}startPan(e,()=>{sel='tarp';render();});return;}
+  const sx=e.clientX,sy=e.clientY,g=document.getElementById('tarpG');let moved=false;
+  trackPointer(e,ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;if(!moved&&Math.hypot(dx,dy)<6)return;moved=true;g.setAttribute('transform',`translate(${(dx/SCALE).toFixed(1)} ${(dy/SCALE).toFixed(1)})`);},
+    (ev,cancel)=>{if(cancel){g&&g.removeAttribute('transform');return;}
+      if(moved){tarp.x+=(ev.clientX-sx)/SCALE;tarp.y+=(ev.clientY-sy)/SCALE;justDragged=true;setTimeout(()=>justDragged=false,80);render();}});};
+const _rotDown=rotDown;
+rotDown=function(e,uid){if(multiTouch(e))return;_rotDown(e,uid);};
+/* phones: fit to the tent and gear only (the tarp runs off-screen; drag to see it) so pieces are big enough to grab */
+const _fitView=fitView;
+fitView=function(){const [hw,hh]=hostSize();if(!hw)return;if(hw>=600)return _fitView();
+  const T=TENTS[tent.id];let pts=[];if(T.outer)pts=pts.concat(T.outer);
+  state.pieces.forEach(p=>{if(p._v)pts=pts.concat(p._v);});
+  if(!pts.length)return _fitView();const b=bbox(pts),m=18,bottom=64,w=b[1][0]-b[0][0],h=b[1][1]-b[0][1];
+  SCALE=Math.min((hw-2*m)/w,(hh-2*m-bottom)/h);viewX=(b[0][0]+b[1][0])/2-hw/SCALE/2;viewY=(b[0][1]+b[1][1])/2-(hh-bottom)/SCALE/2;};
+/* iOS: keep the page / app sheet from scrolling or zooming while a finger is on the board */
+(function(){const bd=document.getElementById('board');if(!bd)return;
+  bd.addEventListener('touchmove',e=>{e.preventDefault();},{passive:false});
+  ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>{if(e.target&&e.target.closest&&e.target.closest('#board'))e.preventDefault();},{passive:false}));
+  bd.addEventListener('contextmenu',e=>e.preventDefault());})();
+
 </script>
 </body>
 </html>
