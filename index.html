@@ -763,6 +763,10 @@
   #v-hub .hub-band{margin-top:0}
   .site-foot{position:relative;z-index:2}
   body[data-view="plan"] .site-foot{display:none}
+  /* v19.3 배치판: 페이지(밝은 미색)와 구분되는 세이지 그린 바닥 */
+  .ws .board{background:#C8D2C4;box-shadow:inset 0 0 0 2px rgba(31,77,58,.28),inset 0 10px 24px -14px rgba(14,30,20,.35)}
+  .ws .stage{border-color:#9FB09A}
+  .ws .scalebar{color:#1F2D24}
 </style>
 </head>
 <body data-view="intro">
@@ -1635,7 +1639,7 @@ function gridLayer(vw,vh){const k=1/SCALE;let d1='',d2='';
   const x0=Math.floor(viewX/100)*100,x1=viewX+vw,y0=Math.floor(viewY/100)*100,y1=viewY+vh,minor=100*SCALE>=7;
   for(let x=x0;x<=x1;x+=100){if(x%1000===0)d2+=`M${x} ${viewY}V${y1}`;else if(minor)d1+=`M${x} ${viewY}V${y1}`;}
   for(let y=y0;y<=y1;y+=100){if(y%1000===0)d2+=`M${viewX} ${y}H${x1}`;else if(minor)d1+=`M${viewX} ${y}H${x1}`;}
-  return `<path d="${d1}" stroke="#ECEAE4" stroke-width="${k}" fill="none" pointer-events="none"/><path d="${d2}" stroke="#DEDBD2" stroke-width="${k}" fill="none" pointer-events="none"/>`;}
+  return `<path d="${d1}" stroke="rgba(255,255,255,.38)" stroke-width="${k}" fill="none" pointer-events="none"/><path d="${d2}" stroke="rgba(255,255,255,.75)" stroke-width="${1.4*k}" fill="none" pointer-events="none"/>`;}
 
 /* =====================================================================
    7. RENDER
@@ -1708,7 +1712,7 @@ function buildSVG(size){
     <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="rgba(255,250,235,.16)"/><stop offset=".55" stop-color="rgba(255,250,235,0)"/></linearGradient>
     <pattern id="hatch" width="${9*k}" height="${9*k}" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="${9*k}" height="${9*k}" fill="rgba(212,203,184,.55)"/><line x1="0" y1="0" x2="0" y2="${9*k}" stroke="rgba(31,36,33,.16)" stroke-width="${1.2*k}"/></pattern>
   </defs>`;
-  let body=`<rect x="-100000" y="-100000" width="200000" height="200000" fill="#FBFBF9" onpointerdown="startPan(event)"/>`;
+  let body=`<rect x="-100000" y="-100000" width="200000" height="200000" fill="#C8D2C4" onpointerdown="startPan(event)"/>`;
   body+=gridLayer(vw,vh)+tentLayer()+tarpLayer();
   state.pieces.filter(p=>p._heat).forEach(p=>{const c=CATALOG[p.type],ce=centroid(p._v);
     body+=`<polygon points="${pts(p._heat)}" fill="${p._ov?'rgba(142,47,56,.10)':'rgba(200,100,46,.07)'}" stroke="#C8642E" stroke-opacity=".7" stroke-width="${1.3*k}" stroke-dasharray="${6*k} ${4*k}" pointer-events="none"/>`;
