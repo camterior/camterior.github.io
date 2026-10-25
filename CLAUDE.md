@@ -20,5 +20,6 @@
 - 푸시 전 직접 검사: `node scripts/smoke.js` (playwright 필요).
 
 ## 참고
-- 이 저장소의 `index.html`은 빌드 결과물입니다. 원본(플래너 v18 + 탭 껍데기 `shell.html`·`tabs.css`·`tabs.js` + `build.py`)은 작업 세션에 있습니다. 원본이 없을 때는 `index.html`을 직접 고칩니다.
+- 루트 `index.html`은 빌드 결과물입니다. 원본은 `src/`에 있어요: 플래너 `planner-v18.html` + 탭 껍데기 `shell.html`·`tabs.css`·`tabs.js`.
+- 빌드: `cd src && python3 build.py` → `src/site/index.html`을 루트로 복사. Claude 페이지용 `camterior.artifact.html`도 같이 나옵니다.
 - 답변과 커밋 메시지는 한글로.

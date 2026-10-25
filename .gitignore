@@ -1,2 +1,9 @@
 node_modules/
 _site/
+
+# 빌드 산출물
+src/site/
+src/img
+src/assets
+src/*.artifact.html
+src/*-standalone.html
