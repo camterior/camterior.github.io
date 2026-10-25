@@ -1062,11 +1062,28 @@ const GEAR={
     note:'등유 대류형 난로, 6.77kW. 크기는 제조사 카탈로그 기준',heat:{type:'round',c:1000},src:'7033'},
   camp5000:{gtype:'fan',group:'난방',name:'파세코 캠프 5000 팬히터',model:'CAMP-5000',conf:'retailer',w:474,d:322,h:440,kg:null,sw:'#2E3134',
     note:'등유 팬히터, 1.1~5.0kW, 연료 7L, 전기 26W 필요. 바람은 앞쪽(화살표)으로 나와요',heat:{type:'front',front:1000,side:300},src:null},
+  sp_low30:{gtype:'chair',group:'체어',name:'스노우피크 로우체어 30',model:'LV-091',conf:'official',w:580,d:650,h:860,sh:300,kg:3.6,sw:'#6E6250',
+    note:'좌면 높이 30cm 로우체어. 크기는 스노우피크 재팬 공식 기준',href:'https://ec.snowpeak.co.jp/item/SNP0116A0238',srcName:'스노우피크 재팬'},
+  sp_lowshort:{gtype:'chair',group:'체어',name:'스노우피크 로우체어 쇼트',model:'LV-093',conf:'official',w:579,d:650,h:691,sh:300,kg:3.4,sw:'#D6CFBF',
+    note:'로우체어 30보다 등받이가 낮아 시야가 트여요',href:'https://www.snowpeak.com/products/gray-low-beach-chair-short',srcName:'스노우피크 공식'},
+  sp_fd:{gtype:'chair',group:'체어',name:'스노우피크 FD체어',model:'LV-077',conf:'retailer',w:595,d:580,h:840,sh:460,kg:null,sw:'#6E7176',
+    note:'좌면 46cm로 높은 테이블(IGT 다리 660mm 등)과 어울려요',src:'3349'},
+  sp_take:{gtype:'chair',group:'체어',name:'스노우피크 테이크체어',model:'LV-085',conf:'official',w:630,d:549,h:749,sh:null,kg:3.0,sw:'#CFA265',
+    note:'대나무 팔걸이 체어. 크기는 스노우피크 공식(미국) 기준',href:'https://www.snowpeak.com/products/take-bamboo-chair-short-lv-085',srcName:'스노우피크 공식'},
+  hx_one:{gtype:'chair',group:'체어',name:'헬리녹스 체어원',model:'Chair One',conf:'official',w:525,d:510,h:650,sh:225,kg:0.89,sw:'#2B2E31',
+    note:'국내 판매 중인 체어원(RE)은 52×57×71cm로 조금 커요',href:'https://helinox.com/products/chair-one',srcName:'헬리녹스 공식'},
+  hx_zero:{gtype:'chair',group:'체어',name:'헬리녹스 체어제로',model:'Chair Zero',conf:'official',w:505,d:460,h:640,sh:null,kg:0.51,sw:'#3A3D40',
+    note:'510g 초경량. 백패킹·미니멀 캠핑용',href:'https://helinox.com/products/chair-zero',srcName:'헬리녹스 공식'},
+  hx_sunset:{gtype:'chair',group:'체어',name:'헬리녹스 선셋체어',model:'Sunset Chair',conf:'official',w:590,d:710,h:970,sh:null,kg:1.47,sw:'#3E4A3C',
+    note:'머리까지 받쳐주는 하이백. 국내 판매 중인 선셋체어(RE)는 63×74×97cm',href:'https://helinox.com/products/sunset-chair',srcName:'헬리녹스 공식'},
+  kermit:{gtype:'chair',group:'체어',name:'커밋체어 클래식 오크',model:'Kermit Chair',conf:'derived',w:483,d:560,h:584,sh:318,kg:2.5,sw:'#B98A57',wood:true,
+    note:'폭·좌면 높이·등받이 높이는 공식 값, 깊이는 사진 비율로 추정했어요. 와이드는 폭 533mm',href:'https://kermitchair.com/products/classic-oak',srcName:'커밋체어 공식'},
 };
-const GEAR_GROUPS=['쉘프컨테이너','마이테이블','폴딩쉘프','난방'];
+const GEAR_GROUPS=['쉘프컨테이너','마이테이블','폴딩쉘프','체어','난방'];
 const GEAR_ORDER=Object.keys(GEAR);
+const gLink=g=>g.href||(g.src?SRC+g.src:null),gLinkName=g=>g.srcName||'아이엘캠프 상품 상세';
 const GEAR_CAT=Object.fromEntries(Object.entries(GEAR).map(([id,g])=>[id,{kind:'gear',...g,short:g.name,
-  spec:`${g.w}×${g.d}×${g.h}mm${g.kg?', '+g.kg+'kg':''}`,...(g.gtype==='stove'?shape(circPoly(g.w/2,28),[]):gearShape(g.w,g.d))}]));
+  spec:`${g.w}×${g.d}×${g.h}mm${g.sh?', 좌면 '+g.sh+'mm':''}${g.kg?', '+g.kg+'kg':''}`,...(g.gtype==='stove'?shape(circPoly(g.w/2,28),[]):gearShape(g.w,g.d))}]));
 const GROUPS=['IGT 프레임','세퍼레이트 IGT','멀티펑션','오픈멀티펑션','코너테이블','슬라이드 트레이','행거'];
 const ORDER=['reg3','long4','sep2','sep3','sep4','mf_reg','mf_long','open_L','open_R','corner_L','corner_R','slide_h','slide_hl','h020'];
 Object.assign(CATALOG,GEAR_CAT);
@@ -1339,6 +1356,11 @@ function gearBody(p,fine){const c=CATALOG[p.type],w=c.w,d=c.d;let o='';
     o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="26" fill="#2E3134" stroke="#151617" stroke-width="5"/><rect x="40" y="36" width="${w-80}" height="${d*.42}" rx="12" fill="#3E4246"/>`;
     for(let x=40;x<=w-40;x+=26)o+=`<line x1="${x}" y1="${d-70}" x2="${x}" y2="${d-12}" stroke="#7F8489" stroke-width="7"/>`;
     o+=`<path d="M${w/2-60},${d+40}L${w/2},${d+120}L${w/2+60},${d+40}" fill="none" stroke="${COL.maple}" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>`;return o;}
+  if(c.gtype==='chair'){const leg=c.wood?'#8A6238':'#26292B',fab=c.sw,bk=Math.min(110,d*.18);
+    [[22,22],[w-22,22],[22,d-22],[w-22,d-22]].forEach(([x,y])=>{o+=`<circle cx="${x}" cy="${y}" r="20" fill="${leg}"/>`;});
+    o+=`<rect x="34" y="${bk*.55}" width="${w-68}" height="${d-bk*.55-34}" rx="${c.wood?14:48}" fill="${fab}" stroke="rgba(20,22,20,.55)" stroke-width="5"/>`;
+    o+=`<rect x="20" y="0" width="${w-40}" height="${bk}" rx="${bk/2}" fill="${fab}" stroke="rgba(20,22,20,.7)" stroke-width="5"/>`;
+    o+=`<path d="M${w*.3},${d*.62} Q${w/2},${d*.7} ${w*.7},${d*.62}" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="6" stroke-linecap="round"/>`;return o;}
   if(c.gtype==='box'){
     o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="16" fill="#6B6E68" stroke="#3E403C" stroke-width="5"/><rect x="26" y="26" width="${w-52}" height="${d-52}" rx="10" fill="#7E827B" stroke="#555852" stroke-width="3"/>`;
     [[0,d/2],[w,d/2]].forEach(([x,y])=>{o+=`<rect x="${x-14}" y="${y-48}" width="28" height="96" rx="12" fill="#C9CDD0" stroke="#7F8489" stroke-width="3"/>`;});return o;}
@@ -1779,7 +1801,7 @@ function renderSel(){const el=document.getElementById('selPanel');
   if(c.kind==='gear'){el.innerHTML=`<div class="selbox"><h3>${c.name}${badge(c.conf)}</h3><p>${c.model}, ${c.spec}. ${c.note}${c.heat?'. '+HEAT_NOTE:''}</p>
     <div class="btnrow"><button class="btn small" onclick="onRotate(${r.uid},-15)">⟲ 15°</button><button class="btn small" onclick="onRotate(${r.uid},15)">⟳ 15°</button>
     <button class="btn small" onclick="onRotate(${r.uid},90)">90° 돌리기</button><button class="btn small" onclick="onZ(${r.uid})">맨 위로</button>
-    <button class="btn small danger" onclick="killSet(${r.uid});render()">빼기</button></div>${c.src?`<p class="muted" style="margin-top:8px"><a href="${SRC}${c.src}" target="_blank" rel="noopener">아이엘캠프 상품 상세</a></p>`:''}</div>`;return;}
+    <button class="btn small danger" onclick="killSet(${r.uid});render()">빼기</button></div>${gLink(c)?`<p class="muted" style="margin-top:8px"><a href="${gLink(c)}" target="_blank" rel="noopener">${gLinkName(c)}</a></p>`:''}</div>`;return;}
   el.innerHTML=`<div class="selbox"><h3>${c.name} 세트</h3><p>조각 ${isl.length}개, 바닥 ${Math.round(r._foot[0]/10)}×${Math.round(r._foot[1]/10)}cm. 변의 동그라미를 눌러 이어 붙여요.${HALF*SCALE<22&&isl.some(p=>CATALOG[p.type].kind==='frame')?' 프레임 칸에 상판을 넣으려면 확대하세요.':''}</p>
     <div class="btnrow"><button class="btn small" onclick="onRotate(${r.uid},-15)">⟲ 15°</button><button class="btn small" onclick="onRotate(${r.uid},15)">⟳ 15°</button>
     <button class="btn small" onclick="onRotate(${r.uid},90)">90° 돌리기</button><button class="btn small" onclick="onZ(${r.uid})">맨 위로</button>
@@ -2063,6 +2085,10 @@ function igt3(THREE){
       if(c.gtype==='box'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h-8,M.cont));grp.add(extrudePoly(THREE,R(-6,-6,w+6,d+6),h-8,h,M.cont2));}
       else if(c.gtype==='stove'){const ce=X([w/2,w/2]),mk=(r0,r1,y0,y1,m)=>{const me=new THREE.Mesh(new THREE.CylinderGeometry(mm(r1),mm(r0),mm(y1-y0),32),m);me.position.set(mm(ce[0]),mm((y0+y1)/2),mm(ce[1]));me.castShadow=true;return me;};
         grp.add(mk(w/2,w/2,0,60,M.stove),mk(w/2-20,w/2-20,60,h-170,M.stove),mk(w/2-25,w/2-25,h-170,h-90,M.glow),mk(w/2-20,w/2-60,h-90,h,M.stove));}
+      else if(c.gtype==='chair'){const sh=c.sh||Math.round(h*.42),fm=new THREE.MeshStandardMaterial({color:c.sw,roughness:.9}),lm=c.wood?M.bamboo:M.dark,bk=Math.min(110,d*.18);
+        grp.add(extrudePoly(THREE,R(30,bk,w-30,d-30),sh-30,sh,fm));
+        grp.add(extrudePoly(THREE,R(20,0,w-20,bk*.6),sh,h,fm));
+        [[30,30],[w-30,30],[30,d-30],[w-30,d-30]].forEach(q=>grp.add(cyl(THREE,X(q),0,sh-30,c.wood?16:9,lm)));}
       else if(c.gtype==='fan'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h,M.fan));grp.add(extrudePoly(THREE,R(30,d-4,w-30,d+4),40,h*.5,M.grillF));}
       else{const topM=c.top==='steel'?M.steel:c.top==='black'?M.dark:M.bamboo;
         grp.add(extrudePoly(THREE,R(c.gtype==='shelf'?10:0,0,c.gtype==='shelf'?w-10:w,d),h-22,h,topM));
@@ -2448,7 +2474,8 @@ document.querySelector('.tabs').addEventListener('keydown',e=>{const ks=Object.k
 const CAT_GROUPS=[['IGT 프레임',['reg3','long4','sep2','sep3','sep4']],['IGT 테이블',['mf_reg','mf_long','open_L','open_R','corner_L','corner_R']]]
   .concat(GEAR_GROUPS.map(g=>[g,GEAR_ORDER.filter(t=>CATALOG[t].group===g)]));
 let CAT_F='all';
-function catPreview(t){const c=CATALOG[t],b=bbox(c.verts),w=b[1][0]-b[0][0],d=b[1][1]-b[0][1],pad=Math.max(w,d)*.06;
+function catPreview(t){if(CATALOG[t].gtype==='chair'){const c=CATALOG[t],p=Math.max(c.w,c.d)*.06;return `<svg viewBox="${-p} ${-p} ${c.w+p*2} ${c.d+p*2}" aria-hidden="true">${gearBody({type:t},false)}</svg>`;}
+  const c=CATALOG[t],b=bbox(c.verts),w=b[1][0]-b[0][0],d=b[1][1]-b[0][1],pad=Math.max(w,d)*.06;
   const fill=c.kind==='gear'?c.sw:c.kind==='frame'?(c.style==='classic'?'#C9CDD0':'#2B2E31'):'#CFA265';
   const stroke=c.kind==='frame'&&c.style!=='classic'?'#16181A':'rgba(26,32,28,.55)';
   let inner='';
@@ -2461,7 +2488,7 @@ function renderCatalog(){const chips=document.getElementById('catChips'),el=docu
   chips.innerHTML=[['all','전체']].concat(CAT_GROUPS.map(([g])=>[g,g])).map(([k,l])=>`<button type="button" aria-pressed="${CAT_F===k}" onclick="CAT_F='${k}';renderCatalog()">${l}</button>`).join('');
   const q=(document.getElementById('catQ').value||'').trim().toLowerCase();let html='',n=0;
   CAT_GROUPS.forEach(([g,ids])=>{if(CAT_F!=='all'&&CAT_F!==g)return;
-    const list=ids.filter(t=>{const c=CATALOG[t];return !q||(c.name+' '+c.model+' '+g+' '+(c.note||'')+' '+({stove:'난로 스토브',fan:'팬히터 히터 난로',box:'수납 박스',shelf:'선반 쉘프',table:'테이블'}[c.gtype]||'')).toLowerCase().includes(q);});if(!list.length)return;
+    const list=ids.filter(t=>{const c=CATALOG[t];return !q||(c.name+' '+c.model+' '+g+' '+(c.note||'')+' '+({stove:'난로 스토브',fan:'팬히터 히터 난로',box:'수납 박스',shelf:'선반 쉘프',table:'테이블',chair:'의자 체어'}[c.gtype]||'')).toLowerCase().includes(q);});if(!list.length)return;
     html+=`<div class="cat-g">${g}</div>`;
     list.forEach(t=>{const c=CATALOG[t],b=bbox(c.verts),w=Math.round(b[1][0]-b[0][0]),d=Math.round(b[1][1]-b[0][1]);n++;
       const size=c.kind==='gear'?`${c.w}×${c.d}×${c.h}`:`${w}×${d}`;

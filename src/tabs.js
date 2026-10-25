@@ -71,16 +71,18 @@ const GSEC=[
       <dl>${Object.entries(LEGS).map(([h,l])=>`<dt>${l.name}</dt><dd>${h}mm</dd>`).join('')}</dl>
       <p class="nt">입체 보기에서 다리 높이에 맞춰 테이블 높이가 바뀌어요.</p></div>`}])},
   {k:'gear',t:'수납·테이블·선반',img:'img/top.webp',d:'쉘프컨테이너, 마이테이블, 폴딩쉘프. 바닥 크기와 높이까지 실제 값이에요.',
-   items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat).map(id=>gearCard(id))},
+   items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat&&GEAR[id].gtype!=='chair').map(id=>gearCard(id))},
+  {k:'chair',t:'체어',img:'img/flatlay.webp',d:'스노우피크·헬리녹스·커밋체어. 펼친 크기와 좌면 높이를 실제 값으로 넣었어요. 좌면이 낮은 로우체어는 낮은 테이블과 맞춰보세요.',
+   items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='chair').map(id=>gearCard(id))},
   {k:'heat',t:'난방',img:'img/heat.webp',d:'난로와 팬히터를 놓으면 배치 주의사항을 띄워요. 텐트 천·이너룸·가구와 넉넉히 띄우고 꼭 환기하세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].heat).map(id=>gearCard(id))},
 ];
 function gearCard(id){const g=GEAR[id];
-  return {id,q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'?'난로 히터':''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
+  return {id,q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'?'난로 히터':''}${g.gtype==='chair'?'의자 체어 '+(g.srcName||''):''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
     <div class="gb"><div><h3>${g.name}</h3><span class="md">${g.model}</span></div>
-    <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}${g.heat?`<dt>배치</dt><dd class="warn">주의 (설명서 이격 거리)</dd>`:''}</dl>
+    <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.sh?`<dt>좌면 높이</dt><dd>${fmt(g.sh)}mm</dd>`:''}${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}${g.heat?`<dt>배치</dt><dd class="warn">주의 (설명서 이격 거리)</dd>`:''}</dl>
     ${g.note?`<p class="nt">${g.note}</p>`:''}
-    <div class="ga"><button type="button" onclick="gearUse('item','${id}')">배치에 놓기</button>${g.src?`<a href="${SRC+g.src}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};}
+    <div class="ga"><button type="button" onclick="gearUse('item','${id}')">배치에 놓기</button>${gLink(g)?`<a href="${gLink(g)}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};}
 let GEAR_F='all';
 function renderGear(){const nav=document.getElementById('gearNav'),body=document.getElementById('gearBody');if(!body)return;
   const q=(document.getElementById('gearQ').value||'').trim().toLowerCase();
