@@ -70,7 +70,7 @@ const GSEC=[
       <div class="gb"><div><h3>IGT 다리</h3><span class="md">${Object.values(LEGS).map(l=>l.model).join(' · ')}</span></div>
       <dl>${Object.entries(LEGS).map(([h,l])=>`<dt>${l.name}</dt><dd>${h}mm</dd>`).join('')}</dl>
       <p class="nt">입체 보기에서 다리 높이에 맞춰 테이블 높이가 바뀌어요.</p></div>`}])},
-  {k:'gear',t:'수납·테이블·선반',img:'img/top.webp',d:'쉘프컨테이너, 마이테이블, 폴딩쉘프. 바닥 크기와 높이까지 실제 값이에요.',
+  {k:'gear',t:'수납·테이블·선반',img:'img/top.webp',d:'쉘프컨테이너, 마이테이블, 폴딩쉘프, 그리고 스노우피크·헬리녹스·커밋 테이블. 바닥 크기와 상판 높이까지 실제 값이에요. 의자 좌면 높이와 맞춰 고르세요.',
    items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat&&GEAR[id].gtype!=='chair').map(id=>gearCard(id))},
   {k:'chair',t:'체어',img:'img/flatlay.webp',d:'스노우피크·헬리녹스·커밋체어. 펼친 크기와 좌면 높이를 실제 값으로 넣었어요. 좌면이 낮은 로우체어는 낮은 테이블과 맞춰보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='chair').map(id=>gearCard(id))},

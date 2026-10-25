@@ -1309,12 +1309,32 @@ const GEAR={
     note:'머리까지 받쳐주는 하이백. 국내 판매 중인 선셋체어(RE)는 63×74×97cm',href:'https://helinox.com/products/sunset-chair',srcName:'헬리녹스 공식'},
   kermit:{gtype:'chair',group:'체어',name:'커밋체어 클래식 오크',model:'Kermit Chair',conf:'derived',w:483,d:560,h:584,sh:318,kg:2.5,sw:'#B98A57',wood:true,
     note:'폭·좌면 높이·등받이 높이는 공식 값, 깊이는 사진 비율로 추정했어요. 와이드는 폭 533mm',href:'https://kermitchair.com/products/classic-oak',srcName:'커밋체어 공식'},
+  sp_oat:{gtype:'table',top:'bamboo',group:'테이블',name:'스노우피크 원액션테이블 (하이)',model:'LV-010TR',conf:'official',w:900,d:720,h:660,kg:10,sw:'#CFA265',
+    note:'펼치면 다리가 한 번에 서는 대나무 테이블. 상판 높이 66cm로 FD체어처럼 높은 의자와 맞아요. Light Bamboo(LV-010TL)도 같은 크기',href:'https://ec.snowpeak.co.jp/item/SNP0119A0258',srcName:'스노우피크 재팬'},
+  sp_oat_l:{gtype:'table',top:'bamboo',group:'테이블',name:'스노우피크 원액션테이블 롱',model:'LV-015TR',conf:'official',w:1215,d:720,h:660,kg:13,sw:'#CFA265',
+    note:'원액션테이블(하이)의 긴 버전. 4~6인용. Light Bamboo(LV-015TL)도 같은 크기',href:'https://ec.snowpeak.co.jp/item/SNP0119A0259',srcName:'스노우피크 재팬'},
+  sp_oat_low:{gtype:'table',top:'bamboo',group:'테이블',name:'스노우피크 원액션 로우테이블',model:'LV-100TR',conf:'official',w:846,d:496,h:400,kg:5.5,sw:'#CFA265',
+    note:'상판 높이 40cm로 로우체어와 맞아요. 바닥 크기가 IGT 프레임과 같아요',href:'https://ec.snowpeak.co.jp/item/SNP0119A0266',srcName:'스노우피크 재팬'},
+  sp_chabu:{gtype:'table',top:'bamboo',round:true,group:'테이블',name:'스노우피크 싱글액션테이블 로우 M',model:'LV-071TR',conf:'official',w:650,d:650,h:210,kg:3.8,sw:'#CFA265',
+    note:'지름 65cm 원형 좌식 테이블(일본명 원액션 차부다이 M). 바닥에 앉거나 그라운드 체어와 써요',href:'https://ec.snowpeak.co.jp/snowpeak/ja/p/130989',srcName:'스노우피크 재팬'},
+  sp_kitchen:{gtype:'table',top:'steel',group:'테이블',name:'스노우피크 스테인리스 키친테이블',model:'LV-310',conf:'official',w:1175,d:545,h:1100,kg:15.5,sw:'#B9BDC1',
+    note:'서서 요리하는 키친 테이블. 높이 1,100mm는 위쪽 프레임까지 잰 값이에요',href:'https://www.snowpeak.co.uk/products/stainless-kitchen-table-lv-310',srcName:'스노우피크 공식(영국)'},
+  hx_t1:{gtype:'table',top:'black',group:'테이블',name:'헬리녹스 테이블원 하드탑',model:'Table One Hard Top',conf:'official',w:590,d:400,h:380,kg:0.82,sw:'#2B2E31',
+    note:'체어원과 짝인 기본형. 2026 버전은 크기가 조금 다를 수 있어요',href:'https://helinox.com/products/table-one-hard-top',srcName:'헬리녹스 공식'},
+  hx_t1l:{gtype:'table',top:'black',group:'테이블',name:'헬리녹스 테이블원 하드탑 라지',model:'Table One Hard Top L',conf:'official',w:750,d:570,h:490,kg:1.42,sw:'#2B2E31',
+    note:'2~4인용 큰 상판',href:'https://helinox.com/products/table-one-hard-top-large',srcName:'헬리녹스 공식'},
+  hx_t0lt:{gtype:'table',top:'black',group:'테이블',name:'헬리녹스 테이블 제로 LT',model:'Table Zero LT',conf:'official',w:495,d:310,h:300,kg:0.24,sw:'#3A3D40',
+    note:'237g 초경량 천 상판. 최대 10kg',href:'https://helinox.com/products/table-zero-lt',srcName:'헬리녹스 공식'},
+  hx_cafe:{gtype:'table',top:'black',group:'테이블',name:'헬리녹스 카페테이블',model:'Café Table',conf:'official',w:600,d:600,h:680,kg:2.63,sw:'#2B2E31',
+    note:'높이 68cm 하이 테이블. 높은 의자와 같이 써요',href:'https://helinox.com/products/cafe-table',srcName:'헬리녹스 공식'},
+  kermit_t:{gtype:'table',top:'bamboo',group:'테이블',name:'커밋 테이블 와이드',model:'Kermit Table Wide',conf:'official',w:533,d:406,h:318,kg:2.3,sw:'#B98A57',
+    note:'커밋체어와 높이를 맞춘 원목 테이블. 오크·월넛',href:'https://kermitchair.com/products/oak-table',srcName:'커밋체어 공식'},
 };
-const GEAR_GROUPS=['쉘프컨테이너','마이테이블','폴딩쉘프','체어','난방'];
+const GEAR_GROUPS=['쉘프컨테이너','마이테이블','테이블','폴딩쉘프','체어','난방'];
 const GEAR_ORDER=Object.keys(GEAR);
 const gLink=g=>g.href||(g.src?SRC+g.src:null),gLinkName=g=>g.srcName||'아이엘캠프 상품 상세';
 const GEAR_CAT=Object.fromEntries(Object.entries(GEAR).map(([id,g])=>[id,{kind:'gear',...g,short:g.name,
-  spec:`${g.w}×${g.d}×${g.h}mm${g.sh?', 좌면 '+g.sh+'mm':''}${g.kg?', '+g.kg+'kg':''}`,...(g.gtype==='stove'?shape(circPoly(g.w/2,28),[]):gearShape(g.w,g.d))}]));
+  spec:`${g.w}×${g.d}×${g.h}mm${g.sh?', 좌면 '+g.sh+'mm':''}${g.kg?', '+g.kg+'kg':''}`,...(g.gtype==='stove'||g.round?shape(circPoly(g.w/2,28),[]):gearShape(g.w,g.d))}]));
 const GROUPS=['IGT 프레임','세퍼레이트 IGT','멀티펑션','오픈멀티펑션','코너테이블','슬라이드 트레이','행거'];
 const ORDER=['reg3','long4','sep2','sep3','sep4','mf_reg','mf_long','open_L','open_R','corner_L','corner_R','slide_h','slide_hl','h020'];
 Object.assign(CATALOG,GEAR_CAT);
@@ -1587,6 +1607,7 @@ function gearBody(p,fine){const c=CATALOG[p.type],w=c.w,d=c.d;let o='';
     o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="16" fill="#6B6E68" stroke="#3E403C" stroke-width="5"/><rect x="26" y="26" width="${w-52}" height="${d-52}" rx="10" fill="#7E827B" stroke="#555852" stroke-width="3"/>`;
     [[0,d/2],[w,d/2]].forEach(([x,y])=>{o+=`<rect x="${x-14}" y="${y-48}" width="28" height="96" rx="12" fill="#C9CDD0" stroke="#7F8489" stroke-width="3"/>`;});return o;}
   const fill=c.top==='steel'?'url(#steelL)':c.top==='black'?'#2B2E31':'url(#bamboo)',stroke=c.top==='bamboo'?'#A07A3C':'#4A4E52';
+  if(c.round){const r=w/2;o+=`<circle cx="${r}" cy="${r}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="5"/>`;if(c.top==='bamboo')o+=`<circle cx="${r}" cy="${r}" r="${r}" fill="url(#sheen)" opacity=".5" pointer-events="none"/>`;return o;}
   if(c.gtype==='shelf'){[0,w-30].forEach(x=>{o+=`<rect x="${x}" y="-6" width="30" height="${d+12}" rx="8" fill="#9EA3A7" stroke="#6E7378" stroke-width="3"/>`;});}
   o+=`<rect x="${c.gtype==='shelf'?18:0}" y="0" width="${c.gtype==='shelf'?w-36:w}" height="${d}" rx="20" fill="${fill}" stroke="${stroke}" stroke-width="5"/>`;
   if(c.top==='bamboo')o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="20" fill="url(#sheen)" opacity=".5" pointer-events="none"/>`;
@@ -2312,6 +2333,9 @@ function igt3(THREE){
         grp.add(extrudePoly(THREE,R(20,0,w-20,bk*.6),sh,h,fm));
         [[30,30],[w-30,30],[30,d-30],[w-30,d-30]].forEach(q=>grp.add(cyl(THREE,X(q),0,sh-30,c.wood?16:9,lm)));}
       else if(c.gtype==='fan'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h,M.fan));grp.add(extrudePoly(THREE,R(30,d-4,w-30,d+4),40,h*.5,M.grillF));}
+      else if(c.round){const topM=c.top==='steel'?M.steel:c.top==='black'?M.dark:M.bamboo,ce=X([w/2,w/2]),me=new THREE.Mesh(new THREE.CylinderGeometry(mm(w/2),mm(w/2),mm(22),40),topM);
+        me.position.set(mm(ce[0]),mm(h-11),mm(ce[1]));me.castShadow=true;grp.add(me);
+        [[w*.25,w*.25],[w*.75,w*.25],[w*.25,w*.75],[w*.75,w*.75]].forEach(q=>grp.add(cyl(THREE,X(q),0,h-22,10,M.leg)));}
       else{const topM=c.top==='steel'?M.steel:c.top==='black'?M.dark:M.bamboo;
         grp.add(extrudePoly(THREE,R(c.gtype==='shelf'?10:0,0,c.gtype==='shelf'?w-10:w,d),h-22,h,topM));
         if(c.gtype==='shelf')[[0,24],[w-24,w]].forEach(([a,b])=>grp.add(extrudePoly(THREE,R(a,10,b,d-10),0,h-22,M.leg)));
@@ -2703,7 +2727,7 @@ function catPreview(t){if(CATALOG[t].gtype==='chair'){const c=CATALOG[t],p=Math.
   let inner='';
   if(c.kind==='frame'){const u=c.units;for(let k=1;k<u*2;k++){const x=b[0][0]+w*k/(u*2);inner+=`<line x1="${x}" y1="${b[0][1]+d*.18}" x2="${x}" y2="${b[1][1]-d*.18}" stroke="${c.style==='classic'?'rgba(26,32,28,.25)':'rgba(255,255,255,.25)'}" stroke-width="${w/160}"/>`;}}
   if(c.heat)inner+=`<circle cx="${b[0][0]+w/2}" cy="${b[0][1]+d/2}" r="${Math.min(w,d)*.16}" fill="#C8642E"/>`;
-  const shapeEl=c.gtype==='stove'?`<circle cx="${b[0][0]+w/2}" cy="${b[0][1]+d/2}" r="${w/2}" fill="${fill}" stroke="${stroke}" stroke-width="${w/90}"/>`
+  const shapeEl=c.gtype==='stove'||c.round?`<circle cx="${b[0][0]+w/2}" cy="${b[0][1]+d/2}" r="${w/2}" fill="${fill}" stroke="${stroke}" stroke-width="${w/90}"/>`
     :`<polygon points="${pts(c.verts)}" fill="${fill}" stroke="${stroke}" stroke-width="${Math.max(w,d)/110}" stroke-linejoin="round"/>`;
   return `<svg viewBox="${b[0][0]-pad} ${b[0][1]-pad} ${w+pad*2} ${d+pad*2}" aria-hidden="true">${shapeEl}${inner}</svg>`;}
 function renderCatalog(){const chips=document.getElementById('catChips'),el=document.getElementById('catalog');if(!el)return;
@@ -2901,7 +2925,7 @@ const GSEC=[
       <div class="gb"><div><h3>IGT 다리</h3><span class="md">${Object.values(LEGS).map(l=>l.model).join(' · ')}</span></div>
       <dl>${Object.entries(LEGS).map(([h,l])=>`<dt>${l.name}</dt><dd>${h}mm</dd>`).join('')}</dl>
       <p class="nt">입체 보기에서 다리 높이에 맞춰 테이블 높이가 바뀌어요.</p></div>`}])},
-  {k:'gear',t:'수납·테이블·선반',img:'img/top.webp',d:'쉘프컨테이너, 마이테이블, 폴딩쉘프. 바닥 크기와 높이까지 실제 값이에요.',
+  {k:'gear',t:'수납·테이블·선반',img:'img/top.webp',d:'쉘프컨테이너, 마이테이블, 폴딩쉘프, 그리고 스노우피크·헬리녹스·커밋 테이블. 바닥 크기와 상판 높이까지 실제 값이에요. 의자 좌면 높이와 맞춰 고르세요.',
    items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat&&GEAR[id].gtype!=='chair').map(id=>gearCard(id))},
   {k:'chair',t:'체어',img:'img/flatlay.webp',d:'스노우피크·헬리녹스·커밋체어. 펼친 크기와 좌면 높이를 실제 값으로 넣었어요. 좌면이 낮은 로우체어는 낮은 테이블과 맞춰보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='chair').map(id=>gearCard(id))},
