@@ -131,6 +131,10 @@
   .hc-b .go{font-family:var(--mono);font-size:12.5px;color:#FFB48F;margin-top:4px}
   @media (max-width:980px){.hubgrid{grid-template-columns:1fr 1fr}.hubcard.big{grid-column:1/-1;grid-row:auto;min-height:380px}}
   @media (max-width:640px){.hubgrid{grid-template-columns:1fr}.hubcard{min-height:220px}}
+  .flow3 li.soon{opacity:.5;border-style:dashed}
+  .hubgrid.two{grid-template-columns:1.35fr 1fr;grid-template-rows:none}
+  .hubgrid.two .hubcard,.hubgrid.two .hubcard.big{grid-row:auto;min-height:440px}
+  @media (max-width:640px){.hubgrid.two{grid-template-columns:1fr}.hubgrid.two .hubcard,.hubgrid.two .hubcard.big{min-height:300px}}
   #v-hub .hub-band{margin-top:0}
   .site-foot{position:relative;z-index:2}
   body[data-view="plan"] .site-foot{display:none}

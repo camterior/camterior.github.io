@@ -760,6 +760,10 @@
   .hc-b .go{font-family:var(--mono);font-size:12.5px;color:#FFB48F;margin-top:4px}
   @media (max-width:980px){.hubgrid{grid-template-columns:1fr 1fr}.hubcard.big{grid-column:1/-1;grid-row:auto;min-height:380px}}
   @media (max-width:640px){.hubgrid{grid-template-columns:1fr}.hubcard{min-height:220px}}
+  .flow3 li.soon{opacity:.5;border-style:dashed}
+  .hubgrid.two{grid-template-columns:1.35fr 1fr;grid-template-rows:none}
+  .hubgrid.two .hubcard,.hubgrid.two .hubcard.big{grid-row:auto;min-height:440px}
+  @media (max-width:640px){.hubgrid.two{grid-template-columns:1fr}.hubgrid.two .hubcard,.hubgrid.two .hubcard.big{min-height:300px}}
   #v-hub .hub-band{margin-top:0}
   .site-foot{position:relative;z-index:2}
   body[data-view="plan"] .site-foot{display:none}
@@ -978,19 +982,15 @@
     <img src="img/dawn.webp" alt="" aria-hidden="true">
     <div class="wrap vh-in">
       <p class="eyebrow">Camping hub</p>
-      <h1 id="hubTitle">예약부터 배치, 기록까지<br>이어서 써요</h1>
-      <p>홍중이 만든 캠핑 도구들이에요. 예약이 열리는 시각을 잡고, 캠테리어로 배치를 짜고, 다녀와서 기록으로 남겨요.</p>
+      <h1 id="hubTitle">예약부터 배치까지<br>이어서 써요</h1>
+      <p>홍중이 만든 캠핑 도구들이에요. CARO로 예약이 열리는 시각을 잡고, 캠테리어로 그 사이트에 맞춰 배치를 짜요.</p>
     </div>
   </header>
   <div class="wrap">
-    <ol class="flow3" aria-label="캠핑 준비 흐름"><li><b>예약</b><span>CARO</span></li><li><b>배치</b><span>캠테리어</span></li><li><b>챙김</b><span>준비물</span></li><li><b>기록</b><span>캠핑 로그</span></li></ol>
-    <div class="hubgrid">
+    <ol class="flow3" aria-label="캠핑 준비 흐름"><li><b>예약</b><span>CARO</span></li><li><b>배치</b><span>캠테리어</span></li><li class="soon"><b>챙김</b><span>준비 중</span></li><li class="soon"><b>기록</b><span>준비 중</span></li></ol>
+    <div class="hubgrid two">
       <a class="hubcard big" href="https://caro-camp.github.io/" target="_blank" rel="noopener">
         <img src="img/caro-hero.webp" alt="" loading="lazy"><div class="hc-b"><span class="tag">웹앱 · 누구나</span><h2>CARO</h2><p>캠핑장 예약이 <b>열리는 시각</b>을 날짜별로 찾아 캘린더 알림으로 걸어줘요. 캠핏·땡큐캠핑·숲나들e 등 900여 곳.</p><span class="go">caro-camp.github.io ↗</span></div></a>
-      <a class="hubcard" href="https://claude.ai/artifact/UHx2KEg3Shy4RDqkyKnB17" target="_blank" rel="noopener">
-        <img src="img/caro-lantern.webp" alt="" loading="lazy"><div class="hc-b"><span class="tag">Claude 페이지</span><h2>캠핑 챙김</h2><p>출발 전 준비물 체크리스트. 계절·인원에 맞춰 빠진 것 없이 챙겨요.</p><span class="go">열기 ↗</span></div></a>
-      <a class="hubcard" href="https://claude.ai/artifact/S6oYTw6PBYR2PefcjZJSAk" target="_blank" rel="noopener">
-        <img src="img/winter.webp" alt="" loading="lazy"><div class="hc-b"><span class="tag">Claude 페이지</span><h2>2026 캠핑 로그</h2><p>올해 다녀온 캠핑장과 날씨, 함께한 장비를 한 장에 모아요.</p><span class="go">열기 ↗</span></div></a>
       <a class="hubcard" href="https://claude.ai/artifact/Hs7t6BE96BRWWebJK8Skxc" target="_blank" rel="noopener">
         <img src="img/autumn.webp" alt="" loading="lazy"><div class="hc-b"><span class="tag">Claude 로그인</span><h2>캠테리어 함께 쓰기</h2><p>배치를 계정에 저장하고, 모두의 배치와 ‘계획 vs 실제’ 후기를 올릴 수 있는 버전이에요.</p><span class="go">열기 ↗</span></div></a>
     </div>
