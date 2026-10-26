@@ -1151,6 +1151,7 @@ TENTS.merak_pro={name:'메락 Pro.',model:'TP-940',size:[620,450,210],weight:'18
     frames:[{a:[2200,0],b:[2200,4500],label:'C프레임'},{a:[4000,0],b:[4000,4500],label:''}],
     inners:{},innerDefault:null,innerNote:'전용 이너룸은 국내 판매처에 없어요. 다른 이너 텐트는 직접 입력으로 넣어보세요.',
     doors:[{a:[2400,0],b:[3800,0],label:'출입문',zone:true,est:true},{a:[3800,4500],b:[2400,4500],label:'출입문',zone:true,est:true}],
+    windows:[{a:[0,1150],b:[0,3350],label:'창문'},{a:[6200,1150],b:[6200,3350],label:'창문'}],
     living:[3100,2250]};
 TENTS.none={name:'텐트 없음',model:'',none:true,outer:null,frames:[],inners:{},innerDefault:null,doors:[],living:[0,0]};
 /* 3D shell profiles: [x-scale, y-scale, height fraction] toward the floor centroid */
@@ -1714,6 +1715,13 @@ function tentLayer(){
     const vert=Math.abs(n[0])>.7,txt=`${d.label}${d.est?' (폭 추정)':''}`;
     if(vert){const tp=[m[0]+n[0]*14*k,m[1]];o+=`<text transform="translate(${tp[0]} ${tp[1]}) rotate(${n[0]<0?-90:90})" text-anchor="middle" font-size="${11.5*k}" fill="${COL.maple}" font-weight="600">${txt}</text>`;}
     else{const tp=[m[0],m[1]+n[1]*14*k+(n[1]<0?0:9*k)];o+=`<text x="${tp[0]}" y="${tp[1]}" text-anchor="middle" font-size="${11.5*k}" fill="${COL.maple}" font-weight="600">${txt}</text>`;}});
+  // windows (문 아님)
+  (T.windows||[]).forEach(d=>{const m=[(d.a[0]+d.b[0])/2,(d.a[1]+d.b[1])/2],WC='#4F7FA3';
+    o+=`<line x1="${d.a[0]}" y1="${d.a[1]}" x2="${d.b[0]}" y2="${d.b[1]}" stroke="${WC}" stroke-width="${4*k}" stroke-dasharray="${6*k} ${3*k}" stroke-linecap="round"/>`;
+    const L=dist(d.a,d.b);let n=[-(d.b[1]-d.a[1])/L,(d.b[0]-d.a[0])/L];if(pointInPoly([m[0]+n[0]*20,m[1]+n[1]*20],T.outer))n=[-n[0],-n[1]];
+    const vert=Math.abs(n[0])>.7,txt=d.label||'창문';
+    if(vert){const tp=[m[0]+n[0]*14*k,m[1]];o+=`<text transform="translate(${tp[0]} ${tp[1]}) rotate(${n[0]<0?-90:90})" text-anchor="middle" font-size="${11.5*k}" fill="${WC}" font-weight="600">${txt}</text>`;}
+    else{const tp=[m[0],m[1]+n[1]*14*k+(n[1]<0?0:9*k)];o+=`<text x="${tp[0]}" y="${tp[1]}" text-anchor="middle" font-size="${11.5*k}" fill="${WC}" font-weight="600">${txt}</text>`;}});
   // dimension lines
   const y=ob[0][1]-44*k,x=ob[1][0]+50*k,t=5*k;
   o+=`<path d="M${ob[0][0]},${y-t}V${y+t}M${ob[0][0]},${y}H${ob[1][0]}M${ob[1][0]},${y-t}V${y+t}" stroke="${COL.ink2}" stroke-width="${k}" fill="none"/>`;
