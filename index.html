@@ -3154,7 +3154,7 @@ JSON만 출력: {"tent":"텐트 id 또는 null","items":[{"type":"장비 id","co
 - 사용자 글에 없는 장비는 절대 추가하지 마. 띄어쓰기·오타가 있어도 (=별칭)을 보고 맞춰 (예: 스탠마이테이블=mytable_s).
 - 수량이 없으면 1. 같은 id는 count로 합쳐. 목록에 없으면 unknown에 원래 이름 그대로.
 - zone: 사용자가 말한 위치를 따름. 가운데/중앙=center, 벽쪽=wall, 오른쪽(끝)=right, 왼쪽=left, 위쪽/뒤쪽=top, 아래쪽/앞쪽=bottom, 이너룸/침실=inner. 말이 없으면 매트·코트=inner, IGT·선반·박스=wall, 체어·테이블·난로=center.
-- [결합] 목록의 멀티펑션·코너·오픈멀티펑션은 혼자 두지 말고 IGT 프레임 항목의 attach에 넣어. "T자/T모양"이면 shape "T", 일자/옆으로 이으면 "line". IGT를 말하지 않았으면 reg3을 하나 만들어 붙여.
+- [결합] 목록의 멀티펑션·코너·오픈멀티펑션은 혼자 두지 말고 IGT 프레임 항목의 attach에 넣어. "T자/T모양"(IGT 긴 변에 직각)이면 shape "T", 일자로 길게 이으면(IGT 끝에 연결) "line". 말이 없으면 "line". IGT를 말하지 않았으면 reg3을 하나 만들어 붙여.
 - [IGT 칸] 목록(버너·트레이·상판·수납)은 장비가 아니라 IGT 프레임 칸에 끼우는 파츠라 IGT 항목의 slots에 넣어. 슬라이드 트레이는 attach(shape line).
 - leg: IGT 다리 높이(300/400/660/830)를 말하면 IGT 항목에 넣어. 없으면 생략.
 - 텐트를 말하지 않으면 null.
@@ -3238,12 +3238,12 @@ function aiBuild(it){
       const longs=c.edges.filter(e=>e.long),shorts=c.edges.filter(e=>!e.long);
       // 빈 긴 변을 먼저: 트레이는 다른 결합이 없는 변, 멀티펑션은 아무것도 없는 변
       const busy=e=>edgeKids(root,e.name).filter(k=>tray?CATALOG[k.type].kind!=='tray':true).length;
-      const tries=(a.shape==='T'?longs:longs.concat(shorts)).slice().sort((x,y)=>busy(x)-busy(y));
+      const tries=(a.shape==='T'?longs:tray?longs:shorts.concat(longs)).slice().sort((x,y)=>busy(x)-busy(y));
       for(const pe of tries){if(!canTake(root,pe,a.type))continue;
         const ok=ac.edges.filter(ce2=>mateKind(pe.types,ce2.types));if(!ok.length)continue;
         const len=e=>{const v=ac.verts;return dist(v[e.i],v[e.j]);};
         ok.sort((x,y)=>a.shape==='T'?len(x)-len(y):len(y)-len(x));
-        let m=ok[0].name;if(a.shape!=='T'&&ok.some(e=>e.name===OPP[pe.name]))m=OPP[pe.name];
+        let m=ok[0].name;const op=ok.find(e=>e.name===OPP[pe.name]);if(a.shape!=='T'&&op&&Math.abs(len(op)-len(ok[0]))<1)m=op.name;
         const q=newPiece(a.type,{parent:root.uid,pEdge:pe.name,mEdge:m});set.push(q);if(pe.long)distributeLong(root,pe.name);
         if(!clash(q))return;set.pop();if(pe.long)distributeLong(root,pe.name);}
       over.push(a.type);});
