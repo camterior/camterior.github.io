@@ -71,6 +71,10 @@ AI_CARD = '''<div class="aiset" id="aiset" aria-labelledby="aiTitle">
   <textarea id="aiIn" rows="3" maxlength="600" placeholder="예: 랜드록, IGT 롱 1개, 폴딩쉘프 2개, 헬리녹스 체어원 2개, 메가매트 듀오, 옴니 230"></textarea>
   <div class="ai-row"><button class="btn primary" id="aiGo" type="button" onclick="aiRun()">✨ AI로 세팅하기</button><span class="ai-st" id="aiSt" role="status" aria-live="polite"></span>
     <p class="ai-priv">적은 내용은 추천을 위해 Google Gemini로 보내져요. 이름·연락처 같은 개인정보는 적지 마세요.</p></div>
+  <div class="ai-meta"><span class="ai-left" id="aiLeft"></span>
+    <details class="ai-codebox"><summary>초대 코드가 있어요</summary>
+      <form class="ai-coderow" onsubmit="event.preventDefault();aiCodeSave()"><label class="sr-only" for="aiCode">초대 코드</label><input id="aiCode" type="text" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="초대 코드"><button class="btn small" type="submit">적용</button></form>
+      <p class="ai-codemsg" id="aiCodeMsg" role="status" aria-live="polite"></p></details></div>
   <div class="ai-out" id="aiOut" hidden></div>
 </div>'''
 _pm = '<div class="presets" id="presets"></div>'

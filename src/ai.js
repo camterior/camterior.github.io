@@ -86,13 +86,27 @@ function aiLocal(text){
   return res;}
 
 /* --- AI 호출 --- */
+const AI_CODE_KEY='camterior.aiCode';
+const aiCode=()=>{try{return localStorage.getItem(AI_CODE_KEY)||'';}catch(e){return '';}};
+const aiSetCode=v=>{try{v?localStorage.setItem(AI_CODE_KEY,v):localStorage.removeItem(AI_CODE_KEY);}catch(e){}};
+async function aiPost(body,ms){const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),ms);
+  try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,body:JSON.stringify(body)});
+    const d=await r.json().catch(()=>({}));return {ok:r.ok,d};}
+  catch(e){return {ok:false,d:{error:e.name==='AbortError'?'timeout':'network'}};}finally{clearTimeout(to);}}
 async function aiAsk(text){
-  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),25000);
-  try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,
-      body:JSON.stringify({system:aiSystem(),prompt:'내 장비: '+text})});
-    const d=await r.json().catch(()=>({}));if(!r.ok||!d.text)return {fail:d.error==='limit'?'limit':'error'};
-    const o=JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim());return {ok:o};}
-  catch(e){return {fail:'error'};}finally{clearTimeout(to);}}
+  const {ok,d}=await aiPost({system:aiSystem(),prompt:'내 장비: '+text,code:aiCode()||undefined},30000);
+  aiShowLeft(d);
+  if(!ok||!d.text)return {fail:d.error||'server',status:d.status};
+  try{return {ok:JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim())};}catch(e){return {fail:'parse'};}}
+function aiShowLeft(d){const el=document.getElementById('aiLeft');if(!el||d==null||d.left==null)return;
+  el.textContent=`오늘 남은 AI ${d.left}/${d.limit}회${d.vip?' · 초대 코드 적용':''}`;}
+async function aiCheckLeft(){const {d}=await aiPost({check:true,code:aiCode()||undefined},8000);aiShowLeft(d);return d;}
+async function aiCodeSave(){const inp=document.getElementById('aiCode'),v=(inp.value||'').trim().slice(0,40);aiSetCode(v);
+  const d=await aiCheckLeft(),m=document.getElementById('aiCodeMsg');
+  if(v&&d&&d.vip===false)aiSetCode('');
+  if(m)m.textContent=!v?'코드를 지웠어요':d&&d.vip?'초대 코드가 적용됐어요':'맞지 않는 코드예요';}
+const AI_FAIL={quota:'오늘 쓸 수 있는 AI 횟수를 다 써서',limit:'오늘 AI 사용량이 많아서',timeout:'AI 응답이 늦어서',network:'인터넷 연결이 안 돼서',
+  model:'AI 모델 설정에 문제가 있어서',key:'AI 키 설정에 문제가 있어서',parse:'AI 답을 읽지 못해서'};
 
 function aiClean(o){const ids=new Set(aiIds()),exts=new Set(AI_EXTS),out={tent:null,items:[],unknown:[],tip:''};
   if(o&&typeof o.tent==='string'&&TENTS[o.tent]&&o.tent!=='none')out.tent=o.tent;
@@ -206,7 +220,7 @@ async function aiRun(){
     res.unknown=res.unknown.filter(u=>{const l=aiLocal(u);if(!l.items.length)return true;
       l.items.forEach(x=>{if(x.slots&&x.slots.length||x.attach&&x.attach.length){let f=res.items.find(i=>AI_ROOTS.includes(i.type));if(f){f.slots=(f.slots||[]).concat(x.slots||[]);f.attach=(f.attach||[]).concat(x.attach||[]);return;}}
         if(x.type==='reg3'&&(x.slots||x.attach))return;const same=res.items.find(i=>i.type===x.type);if(same)return;res.items.push({type:x.type,count:x.count,zone:null});});return false;});if(!res.items.length&&!res.tent){const l=aiLocal(text);if(l.items.length){res=l;via='local';}}}
-  else{res=aiLocal(text);via=r.fail==='limit'?'limit':'local';}
+  else{res=aiLocal(text);via=r.fail;}
   btn.disabled=false;
   if(!res.items.length&&!res.tent){st.textContent='';box.hidden=false;
     box.innerHTML=`<p class="ai-warn">목록에서 맞는 장비를 못 찾았어요. ‘장비 제원’ 탭의 이름으로 적어보세요 (예: 폴딩쉘프, IGT 롱, 체어원).</p>`;return;}
@@ -214,7 +228,7 @@ async function aiRun(){
   st.textContent=via==='ai'?'세팅했어요. 끌어서 다듬어 보세요':'기본 자동 배치로 세팅했어요';
   const nm=id=>aiEsc(CATALOG[id].name),ZN={center:'가운데',wall:'벽쪽',inner:'이너룸',left:'왼쪽',right:'오른쪽',top:'위쪽',bottom:'아래쪽'};
   let h='';
-  if(via!=='ai')h+=`<p class="ai-note">${via==='limit'?'오늘 AI 사용량이 많아서':'AI 연결이 안 돼서'} 이름이 같은 장비만 찾아 놓았어요.</p>`;
+  if(via!=='ai')h+=`<p class="ai-note">${AI_FAIL[via]||'AI 연결이 안 돼서'} 이름이 같은 장비만 찾아 놓았어요.${via==='quota'?' 초대 코드가 있으면 더 쓸 수 있어요.':''} <span class="ai-code-tag">(${aiEsc(via)})</span></p>`;
   h+=`<ul class="ai-got">${res.tent?`<li class="ai-tent">⛺ ${aiEsc(aiTentName(res.tent))}</li>`:''}${res.items.map(it=>`<li>${nm(it.type)}${it.attach&&it.attach.length?' + '+Object.entries(it.attach.reduce((m,a)=>{const k=nm(a.type)+(a.shape==='T'?' (T자)':'');m[k]=(m[k]||0)+1;return m;},{})).map(([k,n])=>k+(n>1?' ×'+n:'')).join(' + '):''}${it.count>1?` <b>×${it.count}</b>`:''}${it.slots&&it.slots.length?' · 칸: '+it.slots.map(sl=>aiEsc(aiSlotName(sl.id))+(sl.count>1?' ×'+sl.count:'')).join(', '):''}${it.leg?` · ${it.leg}다리`:''}${it.zone&&it.zone!==aiZone(it.type)?` · ${ZN[it.zone]}`:''}</li>`).join('')}</ul>`;
   if(aiApply.over&&aiApply.over.length)h+=`<p class="ai-warn">자리가 모자라 IGT에 못 붙인 파츠: ${[...new Set(aiApply.over)].map(id=>aiEsc(CATALOG[id]?CATALOG[id].name:aiSlotName(id))).join(', ')}</p>`;
   if(miss.length)h+=`<p class="ai-warn">자리가 모자라 텐트 밖 오른쪽에 둔 장비: ${[...new Set(miss)].map(nm).join(', ')}</p>`;
@@ -222,3 +236,8 @@ async function aiRun(){
   if(res.tip)h+=`<p class="ai-tip">💡 ${aiEsc(res.tip)}</p>`;
   box.innerHTML=h;box.hidden=false;
   const b=document.getElementById('board');if(b&&b.scrollIntoView&&innerWidth<900)setTimeout(()=>b.scrollIntoView({behavior:'smooth',block:'start'}),400);}
+
+/* 초대 코드 칸 채우기 + 남은 횟수 (내부 구성 탭을 처음 열 때 한 번) */
+(function(){let done=false;const init=()=>{if(done)return;const c=document.getElementById('aiCode');if(!c)return;done=true;c.value=aiCode();aiCheckLeft();};
+  addEventListener('hashchange',()=>{if(location.hash==='#plan')init();});if(location.hash==='#plan')setTimeout(init,500);
+  document.addEventListener('focusin',e=>{if(e.target&&e.target.id==='aiIn')init();});})();

@@ -774,7 +774,10 @@
 </style>
 <style>
 /* ===== AI 세팅 추천 ===== */
-.aiset{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:16px;margin-bottom:22px;display:grid;gap:12px}
+.aiset{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:16px;margin-bottom:22px;display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+.aiset>*{min-width:0}
+.aiset .ai-codebox{flex:1 1 100%;min-width:0;max-width:100%}
+.aiset .ai-meta>*{min-width:0}
 .aiset .ai-head{display:flex;gap:12px;align-items:flex-start}
 .aiset .ai-badge{flex:none;font-weight:700;font-size:13px;letter-spacing:.02em;color:#fff;background:var(--moss);border-radius:999px;padding:5px 10px}
 .aiset h3{margin:0 0 4px;font-size:17px;line-height:1.35;color:var(--ink)}
@@ -793,7 +796,14 @@
 .aiset .ai-warn{color:var(--maple)}
 .aiset .ai-note{color:var(--ochre)}
 .aiset .ai-tip{color:var(--ink-2)}
-@media (min-width:900px){.aiset{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);align-items:start}.aiset .ai-head{grid-row:span 2}.aiset .ai-out{grid-column:1/-1}}
+.aiset .ai-meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;font-size:13px;color:var(--ink-2)}
+.aiset .ai-codebox summary{cursor:pointer;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;min-height:32px;display:flex;align-items:center}
+.aiset .ai-coderow{display:flex;gap:8px;margin-top:6px;width:100%;box-sizing:border-box}
+.aiset .ai-coderow .btn{flex:none}
+.aiset .ai-coderow input{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:16px;background:var(--paper-2);color:var(--ink)}
+.aiset .ai-codemsg{margin:4px 0 0;font-size:13px;color:var(--ink-2)}
+.aiset .ai-code-tag{color:var(--ink-3);font-size:12px}
+@media (min-width:900px){.aiset{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);align-items:start}.aiset .ai-head{grid-row:span 2}.aiset .ai-out,.aiset .ai-meta{grid-column:1/-1}}
 </style>
 
 </head>
@@ -896,6 +906,10 @@
   <textarea id="aiIn" rows="3" maxlength="600" placeholder="예: 랜드록, IGT 롱 1개, 폴딩쉘프 2개, 헬리녹스 체어원 2개, 메가매트 듀오, 옴니 230"></textarea>
   <div class="ai-row"><button class="btn primary" id="aiGo" type="button" onclick="aiRun()">✨ AI로 세팅하기</button><span class="ai-st" id="aiSt" role="status" aria-live="polite"></span>
     <p class="ai-priv">적은 내용은 추천을 위해 Google Gemini로 보내져요. 이름·연락처 같은 개인정보는 적지 마세요.</p></div>
+  <div class="ai-meta"><span class="ai-left" id="aiLeft"></span>
+    <details class="ai-codebox"><summary>초대 코드가 있어요</summary>
+      <form class="ai-coderow" onsubmit="event.preventDefault();aiCodeSave()"><label class="sr-only" for="aiCode">초대 코드</label><input id="aiCode" type="text" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="초대 코드"><button class="btn small" type="submit">적용</button></form>
+      <p class="ai-codemsg" id="aiCodeMsg" role="status" aria-live="polite"></p></details></div>
   <div class="ai-out" id="aiOut" hidden></div>
 </div>
 <div class="ws" aria-label="배치 작업 공간">
@@ -3198,13 +3212,27 @@ function aiLocal(text){
   return res;}
 
 /* --- AI 호출 --- */
+const AI_CODE_KEY='camterior.aiCode';
+const aiCode=()=>{try{return localStorage.getItem(AI_CODE_KEY)||'';}catch(e){return '';}};
+const aiSetCode=v=>{try{v?localStorage.setItem(AI_CODE_KEY,v):localStorage.removeItem(AI_CODE_KEY);}catch(e){}};
+async function aiPost(body,ms){const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),ms);
+  try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,body:JSON.stringify(body)});
+    const d=await r.json().catch(()=>({}));return {ok:r.ok,d};}
+  catch(e){return {ok:false,d:{error:e.name==='AbortError'?'timeout':'network'}};}finally{clearTimeout(to);}}
 async function aiAsk(text){
-  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),25000);
-  try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,
-      body:JSON.stringify({system:aiSystem(),prompt:'내 장비: '+text})});
-    const d=await r.json().catch(()=>({}));if(!r.ok||!d.text)return {fail:d.error==='limit'?'limit':'error'};
-    const o=JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim());return {ok:o};}
-  catch(e){return {fail:'error'};}finally{clearTimeout(to);}}
+  const {ok,d}=await aiPost({system:aiSystem(),prompt:'내 장비: '+text,code:aiCode()||undefined},30000);
+  aiShowLeft(d);
+  if(!ok||!d.text)return {fail:d.error||'server',status:d.status};
+  try{return {ok:JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim())};}catch(e){return {fail:'parse'};}}
+function aiShowLeft(d){const el=document.getElementById('aiLeft');if(!el||d==null||d.left==null)return;
+  el.textContent=`오늘 남은 AI ${d.left}/${d.limit}회${d.vip?' · 초대 코드 적용':''}`;}
+async function aiCheckLeft(){const {d}=await aiPost({check:true,code:aiCode()||undefined},8000);aiShowLeft(d);return d;}
+async function aiCodeSave(){const inp=document.getElementById('aiCode'),v=(inp.value||'').trim().slice(0,40);aiSetCode(v);
+  const d=await aiCheckLeft(),m=document.getElementById('aiCodeMsg');
+  if(v&&d&&d.vip===false)aiSetCode('');
+  if(m)m.textContent=!v?'코드를 지웠어요':d&&d.vip?'초대 코드가 적용됐어요':'맞지 않는 코드예요';}
+const AI_FAIL={quota:'오늘 쓸 수 있는 AI 횟수를 다 써서',limit:'오늘 AI 사용량이 많아서',timeout:'AI 응답이 늦어서',network:'인터넷 연결이 안 돼서',
+  model:'AI 모델 설정에 문제가 있어서',key:'AI 키 설정에 문제가 있어서',parse:'AI 답을 읽지 못해서'};
 
 function aiClean(o){const ids=new Set(aiIds()),exts=new Set(AI_EXTS),out={tent:null,items:[],unknown:[],tip:''};
   if(o&&typeof o.tent==='string'&&TENTS[o.tent]&&o.tent!=='none')out.tent=o.tent;
@@ -3318,7 +3346,7 @@ async function aiRun(){
     res.unknown=res.unknown.filter(u=>{const l=aiLocal(u);if(!l.items.length)return true;
       l.items.forEach(x=>{if(x.slots&&x.slots.length||x.attach&&x.attach.length){let f=res.items.find(i=>AI_ROOTS.includes(i.type));if(f){f.slots=(f.slots||[]).concat(x.slots||[]);f.attach=(f.attach||[]).concat(x.attach||[]);return;}}
         if(x.type==='reg3'&&(x.slots||x.attach))return;const same=res.items.find(i=>i.type===x.type);if(same)return;res.items.push({type:x.type,count:x.count,zone:null});});return false;});if(!res.items.length&&!res.tent){const l=aiLocal(text);if(l.items.length){res=l;via='local';}}}
-  else{res=aiLocal(text);via=r.fail==='limit'?'limit':'local';}
+  else{res=aiLocal(text);via=r.fail;}
   btn.disabled=false;
   if(!res.items.length&&!res.tent){st.textContent='';box.hidden=false;
     box.innerHTML=`<p class="ai-warn">목록에서 맞는 장비를 못 찾았어요. ‘장비 제원’ 탭의 이름으로 적어보세요 (예: 폴딩쉘프, IGT 롱, 체어원).</p>`;return;}
@@ -3326,7 +3354,7 @@ async function aiRun(){
   st.textContent=via==='ai'?'세팅했어요. 끌어서 다듬어 보세요':'기본 자동 배치로 세팅했어요';
   const nm=id=>aiEsc(CATALOG[id].name),ZN={center:'가운데',wall:'벽쪽',inner:'이너룸',left:'왼쪽',right:'오른쪽',top:'위쪽',bottom:'아래쪽'};
   let h='';
-  if(via!=='ai')h+=`<p class="ai-note">${via==='limit'?'오늘 AI 사용량이 많아서':'AI 연결이 안 돼서'} 이름이 같은 장비만 찾아 놓았어요.</p>`;
+  if(via!=='ai')h+=`<p class="ai-note">${AI_FAIL[via]||'AI 연결이 안 돼서'} 이름이 같은 장비만 찾아 놓았어요.${via==='quota'?' 초대 코드가 있으면 더 쓸 수 있어요.':''} <span class="ai-code-tag">(${aiEsc(via)})</span></p>`;
   h+=`<ul class="ai-got">${res.tent?`<li class="ai-tent">⛺ ${aiEsc(aiTentName(res.tent))}</li>`:''}${res.items.map(it=>`<li>${nm(it.type)}${it.attach&&it.attach.length?' + '+Object.entries(it.attach.reduce((m,a)=>{const k=nm(a.type)+(a.shape==='T'?' (T자)':'');m[k]=(m[k]||0)+1;return m;},{})).map(([k,n])=>k+(n>1?' ×'+n:'')).join(' + '):''}${it.count>1?` <b>×${it.count}</b>`:''}${it.slots&&it.slots.length?' · 칸: '+it.slots.map(sl=>aiEsc(aiSlotName(sl.id))+(sl.count>1?' ×'+sl.count:'')).join(', '):''}${it.leg?` · ${it.leg}다리`:''}${it.zone&&it.zone!==aiZone(it.type)?` · ${ZN[it.zone]}`:''}</li>`).join('')}</ul>`;
   if(aiApply.over&&aiApply.over.length)h+=`<p class="ai-warn">자리가 모자라 IGT에 못 붙인 파츠: ${[...new Set(aiApply.over)].map(id=>aiEsc(CATALOG[id]?CATALOG[id].name:aiSlotName(id))).join(', ')}</p>`;
   if(miss.length)h+=`<p class="ai-warn">자리가 모자라 텐트 밖 오른쪽에 둔 장비: ${[...new Set(miss)].map(nm).join(', ')}</p>`;
@@ -3334,6 +3362,11 @@ async function aiRun(){
   if(res.tip)h+=`<p class="ai-tip">💡 ${aiEsc(res.tip)}</p>`;
   box.innerHTML=h;box.hidden=false;
   const b=document.getElementById('board');if(b&&b.scrollIntoView&&innerWidth<900)setTimeout(()=>b.scrollIntoView({behavior:'smooth',block:'start'}),400);}
+
+/* 초대 코드 칸 채우기 + 남은 횟수 (내부 구성 탭을 처음 열 때 한 번) */
+(function(){let done=false;const init=()=>{if(done)return;const c=document.getElementById('aiCode');if(!c)return;done=true;c.value=aiCode();aiCheckLeft();};
+  addEventListener('hashchange',()=>{if(location.hash==='#plan')init();});if(location.hash==='#plan')setTimeout(init,500);
+  document.addEventListener('focusin',e=>{if(e.target&&e.target.id==='aiIn')init();});})();
 
 </script>
 </body>
