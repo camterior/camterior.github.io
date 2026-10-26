@@ -53,17 +53,29 @@ META = '''<meta name="description" content="캠테리어(CAMTERIOR) — 텐트 �
 <meta property="og:image" content="img/intro.webp">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.webmanifest">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net https://camterior-ai.ghdwnd2.workers.dev; worker-src 'self'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="no-referrer">'''
 head = head.replace('<meta name="viewport" content="width=device-width, initial-scale=1">',
                     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' + META)
-head = head.replace('</head>', (HERE / 'tabs.css').read_text(encoding='utf-8') + '\n</head>')
+head = head.replace('</head>', (HERE / 'tabs.css').read_text(encoding='utf-8') + '\n' + (HERE / 'ai.css').read_text(encoding='utf-8') + '\n</head>')
 
 # --- body text renames
 def rename(s):
     return (s.replace('캠프 배치도', '캠테리어').replace("'IRON_CAMP'", "'CAMTERIOR'"))
 
 journal = journal.replace('class="night rv-band"', 'class="night rv-band hub-band"')
+# AI 세팅 추천 카드 (추천 세팅 아래)
+AI_CARD = '''<div class="aiset" id="aiset" aria-labelledby="aiTitle">
+  <div class="ai-head"><span class="ai-badge">✨ AI</span><div><h3 id="aiTitle">내 장비만 적으면 자동으로 세팅해요</h3><p>텐트·테이블·체어를 적으면 캠테리어 목록에서 찾아 바닥에 놓아드려요. 놓인 뒤엔 끌어서 다듬으면 돼요.</p></div></div>
+  <label class="sr-only" for="aiIn">가진 장비</label>
+  <textarea id="aiIn" rows="3" maxlength="600" placeholder="예: 랜드록, IGT 롱 1개, 폴딩쉘프 2개, 헬리녹스 체어원 2개, 메가매트 듀오, 옴니 230"></textarea>
+  <div class="ai-row"><button class="btn primary" id="aiGo" type="button" onclick="aiRun()">✨ AI로 세팅하기</button><span class="ai-st" id="aiSt" role="status" aria-live="polite"></span>
+    <p class="ai-priv">적은 내용은 추천을 위해 Google Gemini로 보내져요. 이름·연락처 같은 개인정보는 적지 마세요.</p></div>
+  <div class="ai-out" id="aiOut" hidden></div>
+</div>'''
+_pm = '<div class="presets" id="presets"></div>'
+assert ws.count(_pm) == 1, 'presets marker'
+ws = ws.replace(_pm, _pm + '\n' + AI_CARD)
 markup = (HERE / 'shell.html').read_text(encoding='utf-8')
 markup = (markup.replace('{{MARQUEE}}', marquee).replace('{{FEATURES}}', features)
           .replace('{{WORKSPACE}}', ws).replace('{{JOURNAL}}', journal).replace('{{COMMONS}}', commons))
@@ -104,6 +116,7 @@ js = js.replace("온라인으로 공유된 페이지에서 쓰고 볼 수 있어
 js = js.replace("모두의 배치는 공유된 페이지에서 로그인하면 쓸 수 있어요. 지금은 공유 코드를 써주세요.",
                 "모두의 배치는 캠핑 허브 탭의 ‘Claude 함께 쓰기’ 버전에서 올릴 수 있어요. 여기서는 공유 링크를 써주세요.")
 tail = (HERE / 'tabs.js').read_text(encoding='utf-8')
+tail += '\n' + (HERE / 'ai.js').read_text(encoding='utf-8')
 js = js.replace('</script>\n</body>', '</script>\n<script>\n' + tail + '\n</script>\n</body>')
 assert '<script>\n' + tail in js, 'tail not injected'
 

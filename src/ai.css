@@ -1,0 +1,23 @@
+<style>
+/* ===== AI 세팅 추천 ===== */
+.aiset{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:16px;margin-bottom:22px;display:grid;gap:12px}
+.aiset .ai-head{display:flex;gap:12px;align-items:flex-start}
+.aiset .ai-badge{flex:none;font-weight:700;font-size:13px;letter-spacing:.02em;color:#fff;background:var(--moss);border-radius:999px;padding:5px 10px}
+.aiset h3{margin:0 0 4px;font-size:17px;line-height:1.35;color:var(--ink)}
+.aiset .ai-head p{margin:0;color:var(--ink-2);font-size:14px;line-height:1.5}
+.aiset textarea{width:100%;box-sizing:border-box;min-height:84px;resize:vertical;border:1px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:16px;line-height:1.5;color:var(--ink);background:var(--paper-2)}
+.aiset textarea:focus{outline:2px solid var(--moss);outline-offset:1px;background:var(--surface)}
+.aiset .ai-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.aiset .ai-row .btn{min-height:44px}
+.aiset .ai-st{color:var(--ink-2);font-size:14px}
+.aiset .ai-priv{margin:0;color:var(--ink-3);font-size:12.5px;line-height:1.5}
+.aiset .ai-out{border-top:1px dashed var(--line);padding-top:12px;display:grid;gap:8px}
+.aiset .ai-out p{margin:0;font-size:14px;line-height:1.5}
+.aiset .ai-got{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.aiset .ai-got li{font-size:13.5px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;background:var(--paper-2);color:var(--ink)}
+.aiset .ai-got li.ai-tent{background:var(--moss);border-color:var(--moss);color:#fff}
+.aiset .ai-warn{color:var(--maple)}
+.aiset .ai-note{color:var(--ochre)}
+.aiset .ai-tip{color:var(--ink-2)}
+@media (min-width:900px){.aiset{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);align-items:start}.aiset .ai-head{grid-row:span 2}.aiset .ai-out{grid-column:1/-1}}
+</style>
