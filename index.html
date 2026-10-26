@@ -3224,7 +3224,8 @@ async function aiAsk(text){
   aiShowLeft(d);
   if(!ok||!d.text)return {fail:d.error||'server',status:d.status};
   try{return {ok:JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim())};}catch(e){return {fail:'parse'};}}
-function aiShowLeft(d){const el=document.getElementById('aiLeft');if(!el||d==null||d.left==null)return;
+let aiLeftNow=null;
+function aiShowLeft(d){if(d&&d.left!=null)aiLeftNow=d.left;const el=document.getElementById('aiLeft');if(!el||d==null||d.left==null)return;
   el.textContent=`오늘 남은 AI ${d.left}/${d.limit}회${d.vip?' · 초대 코드 적용':''}`;}
 async function aiCheckLeft(){const {d}=await aiPost({check:true,code:aiCode()||undefined},8000);aiShowLeft(d);return d;}
 async function aiCodeSave(){const inp=document.getElementById('aiCode'),v=(inp.value||'').trim().slice(0,40);aiSetCode(v);
@@ -3338,9 +3339,12 @@ async function aiRun(){
   const inp=document.getElementById('aiIn'),btn=document.getElementById('aiGo'),st=document.getElementById('aiSt'),box=document.getElementById('aiOut');
   const text=(inp.value||'').trim().slice(0,600);
   if(text.length<2){st.textContent='가진 장비를 먼저 적어주세요';inp.focus();return;}
+  const quotaMsg=()=>{st.textContent='';box.hidden=false;box.innerHTML=`<p class="ai-note">오늘 쓸 수 있는 AI 횟수를 다 썼어요. 지금 배치는 그대로 두었어요. 내일 다시 쓰거나, 초대 코드가 있으면 넣어주세요.</p>`;};
+  if(aiLeftNow===0){quotaMsg();return;}
   if(state.pieces.length&&!confirm('지금 놓인 장비를 지우고 AI 세팅으로 바꿀까요? 되돌리기(↶)로 돌아갈 수 있어요.'))return;
   btn.disabled=true;st.textContent='AI가 장비를 찾는 중…';box.hidden=true;
   let r=await aiAsk(text),res,via='ai';
+  if(r.fail==='quota'){btn.disabled=false;quotaMsg();return;} // 횟수 소진: 배치를 바꾸지 않음
   if(r.ok){res=aiClean(r.ok);
     // AI가 모른다고 한 이름도 별칭으로 한 번 더 찾아보기
     res.unknown=res.unknown.filter(u=>{const l=aiLocal(u);if(!l.items.length)return true;
