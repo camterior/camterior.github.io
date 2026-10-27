@@ -1242,7 +1242,10 @@ const T2={
   add(id,o){const H=o.size[2]*10;TENTS[id]=Object.assign({frames:[],inners:{},innerDefault:null,windows:[],h3d:H,inH3:Math.max(1200,H-250),
     color:'#8F806C',prof:T2.PROF.tunnel},o);if(o.inners&&Object.keys(o.inners).length&&o.innerDefault===undefined)TENTS[id].innerDefault=Object.keys(o.inners)[0];
     if(!o.living){const b=bbox(TENTS[id].outer);TENTS[id].living=[Math.round(b[0][0]+(b[1][0]-b[0][0])*.32),Math.round((b[0][1]+b[1][1])/2)];}T2.ids.push(id);},
-  ids:[]
+  ids:[],
+  // 다각형에서 앞(x 최소)·뒤(x 최대) 변 고르기
+  edge(o,which){let best=0,bv=which==='rear'?-1e9:1e9;o.forEach((v,i)=>{const w=o[(i+1)%o.length],mx=(v[0]+w[0])/2;if(which==='rear'?mx>bv:mx<bv){bv=mx;best=i;}});return [o[best],o[(best+1)%o.length]];},
+  door(o,which,label,zone){const [A,B]=T2.edge(o,which);return {a:L2(A,B,.15),b:L2(A,B,.85),label,zone};}
 };
 const IL='https://www.ilcamp.co.kr/product/detail.html?product_no=',A247='https://247outdoor.co.kr/product/detail.html?product_no=',
   CDY='https://coody.co.kr/product/detail.html?product_no=',OLM='https://outdoorlandmark.co.kr/product/detail.html?product_no=';
@@ -1319,16 +1322,15 @@ cdyBox('cd_90dock','9.0 도킹 쉘터','9.0 Car Docking',250,360,220,'27kg','2�
 {const D=4600,o=T2.poly(8,D,2300,2300);
 T2.add('cd_aurora',{brand:'쿠디',name:'오로라 돔 5M',model:'Aurora Dome',size:[500,500,250],weight:'71kg (포장)',cap:'6–8명',href:CDY+'102',srcName:CDYN,
   est:'쿠디 공식 제원(모서리 500cm, 벽-벽 460cm 팔각형, 높이 250cm)으로 그렸어요. 출입문 3곳 중 2곳만 표시했어요.',outer:o,innerNote:'바닥 일체형 에어 돔이에요.',
-  doors:[{a:L2(o[0],o[1],.15),b:L2(o[0],o[1],.85),label:'출입문',zone:true},{a:L2(o[4],o[5],.15),b:L2(o[4],o[5],.85),label:'출입문',zone:false}],
-  living:[2300,2300],color:'#E3D9C4',prof:T2.PROF.dome});}
+  doors:[T2.door(o,'front','출입문',true),T2.door(o,'rear','출입문',false)],living:[2300,2300],color:'#E3D9C4',prof:T2.PROF.dome});}
 {const D=3800,o=T2.poly(8,D,1900,1900);
 T2.add('cd_bestona',{brand:'쿠디',name:'베스토나',model:'Bestona',size:[380,380,255],weight:'55kg (포장)',cap:'4–6명',href:CDY+'204',srcName:CDYN,
   est:'쿠디 공식 제원(380×380cm 팔각 돔, 높이 255cm)으로 그렸어요.',outer:o,innerNote:'바닥 일체형 에어 돔이에요.',
-  doors:[{a:L2(o[0],o[1],.15),b:L2(o[0],o[1],.85),label:'출입문',zone:true}],living:[1900,1900],color:'#E3D9C4',prof:T2.PROF.dome});}
+  doors:[T2.door(o,'front','출입문',true)],living:[1900,1900],color:'#E3D9C4',prof:T2.PROF.dome});}
 {const D=3000,o=T2.poly(8,D,1500,1500);
 T2.add('cd_havena',{brand:'쿠디',name:'하베나',model:'Havena',size:[300,300,235],weight:'30.5kg',cap:'2–3명',href:CDY+'205',srcName:CDYN,
   est:'쿠디 공식 제원(본체 300×300cm, 높이 235cm)으로 그렸어요. 일체형 타프(약 7m)는 평면에 넣지 않았어요.',outer:o,innerNote:'바닥 일체형이에요. 앞쪽 일체형 타프 아래가 리빙이에요.',
-  doors:[{a:L2(o[0],o[1],.15),b:L2(o[0],o[1],.85),label:'출입문',zone:true}],living:[1500,1500],color:'#D3C6AA',prof:T2.PROF.dome});}
+  doors:[T2.door(o,'front','출입문',true)],living:[1500,1500],color:'#D3C6AA',prof:T2.PROF.dome});}
 
 /* ===== 스노우라인 ===== */
 {const L=6800,W=3400,o=T2.tun(L,W,700,2500,700,2500);
