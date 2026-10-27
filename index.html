@@ -1447,9 +1447,168 @@ T2.add('ck_oakdome_l',{brand:'캠핑칸',name:'오크돔 L',model:'Oak Dome L',s
   doors:[{a:[0,1000],b:[0,2300],label:'전면 도어',zone:true},{a:[4260,1000],b:[4260,2300],label:'후면 도어',zone:false}],windows:[{a:[1300,0],b:[2900,0],label:'아치 창'},{a:[1300,3300],b:[2900,3300],label:'아치 창'}],
   living:[2130,1650],color:'#9C8B6E',prof:T2.PROF.tunnel});}
 
+/* ===== 미니멀웍스 · 제인아츠 (제이디아웃도어 상품 상세, 2026-10-28 확인) ===== */
+const JD='https://jdoutdoor.co.kr/product/detail.html?product_no=',JDN='제이디아웃도어 상품 상세';
+T2.PROF.tipi=[[1,1,0],[.67,.67,.33],[.34,.34,.66],[.04,.04,1]];
+T2.PROF.ridge=[[1,1,0],[.86,.66,.36],[.7,.33,.7],[.52,.05,1]];
+// 쉘터G 계열 팔각: L=도어~도어, W=측면~측면(꼭짓점), f=도어쪽 평변, b=도어쪽 볼록 깊이
+function mwG(L,W,f,b){return [[0,W/2],[b,(W-f)/2],[L/2,0],[L-b,(W-f)/2],[L,W/2],[L-b,(W+f)/2],[L/2,W],[b,(W+f)/2]].map(q=>q.map(Math.round));}
+// 뾰족한 끝(꼭짓점 i)을 가로지르는 출입문
+function tipDoor(o,i,label,zone){const n=o.length,A=o[i],P=o[(i-1+n)%n],N=o[(i+1)%n];return {a:L2(A,P,.6),b:L2(A,N,.6),label,zone};}
+// 로로·우타형: 앞 평변 Wf → 최대폭 W(xm~xr) → 뒤 평변 Wr
+function zaShape(L,W,Wf,Wr,xm,xr){return [[0,(W-Wf)/2],[xm,0],[xr,0],[L,(W-Wr)/2],[L,(W+Wr)/2],[xr,W],[xm,W],[0,(W+Wf)/2]].map(q=>q.map(Math.round));}
+// 양쪽 전실 백패킹 텐트: D=전실 포함 길이, v=전실 깊이, i=끝이 좁아지는 양
+function bpShape(D,W,v,i){return [[0,i],[v,0],[D-v,0],[D,i],[D,W-i],[D-v,W],[v,W],[0,W-i]];}
+const MWC='#4B514A',ZAC='#B39A76';
+function gWin(o){return [{a:L2(o[1],o[2],.45),b:L2(o[1],o[2],.85),label:'벤틸'},{a:L2(o[7],o[6],.45),b:L2(o[7],o[6],.85),label:'벤틸'}];}
+function gDoors(o){return [{a:L2(o[0],o[1],.75),b:L2(o[0],o[7],.75),label:'전면 도어',zone:true},{a:L2(o[4],o[3],.75),b:L2(o[4],o[5],.75),label:'후면 도어',zone:true}];}
+{const L=4000,W=4000,o=mwG(L,W,3500,400);
+T2.add('mw_shelter_gm',{brand:'미니멀웍스',name:'쉘터GM',model:'Shelter GM',size:[400,400,210],weight:'15.6kg',cap:'판매처 미표기',href:JD+'1627',srcName:JDN,
+  est:'제이디아웃도어 제원(400×400×210cm 에어프레임)과 같은 쉘터G 계열 평면도(GHE 팔각)를 맞춰 그렸어요. 베스티블·포치는 판매처 도면 크기 그대로예요.',outer:o,innerNote:NOFLOOR,
+  doors:gDoors(o),windows:gWin(o),
+  canopy:[[400,250],[-300,400],[-2000,650],[-2000,3350],[-300,3600],[400,3750]],canopyLabel:'베스티블 달기 (350×240cm, 별매)',canopyName:'베스티블',canopyH:1850,canopyWall:true,
+  canopy2:[[3600,300],[5100,1000],[5100,3000],[3600,3700]],canopy2Label:'포치 달기 (340×150cm, 지붕만)',canopy2Name:'포치',canopy2H:2000,
+  living:[2000,2000],h3d:2100,inH3:1900,color:MWC,prof:T2.PROF.dome});}
+{const L=4000,W=3800,o=mwG(L,W,3250,400);
+T2.add('mw_shelter_ghe',{brand:'미니멀웍스',name:'쉘터GHE',model:'Shelter GHE T/C',size:[400,380,185],weight:'13kg',cap:'판매처 미표기',href:JD+'1633',srcName:JDN,drawn:true,
+  est:'판매처 바닥 도면(도어~도어 400cm, 측면 380cm, 도어쪽 평변 325cm)으로 그렸어요. 양쪽 도어예요.',outer:o,innerNote:NOFLOOR,
+  doors:gDoors(o),windows:gWin(o),living:[2000,1900],color:'#C9C3B4',prof:T2.PROF.dome});}
+{const L=4000,W=3800,o=mwG(L,W,3250,400);
+T2.add('mw_shelter_ge',{brand:'미니멀웍스',name:'쉘터GE',model:'Shelter GE',size:[400,380,185],weight:'8.7kg',cap:'판매처 미표기',href:JD+'1533',srcName:JDN,drawn:true,
+  est:'판매처 바닥 도면(GHE와 같은 팔각, 400×380cm)으로 그렸어요. 나일론 버전이에요.',outer:o,innerNote:NOFLOOR,
+  doors:gDoors(o),windows:gWin(o),living:[2000,1900],color:MWC,prof:T2.PROF.dome});}
+{const L=3000,W=3500,o=mwG(L,W,3000,300);
+T2.add('mw_shelter_g2',{brand:'미니멀웍스',name:'쉘터G 2.0',model:'Shelter G 2.0',size:[300,350,170],weight:'6.6kg',cap:'판매처 미표기',href:JD+'1426',srcName:JDN,drawn:true,
+  est:'판매처 도면(입구 300cm, 가운데 350cm, 길이 300cm)으로 그렸어요.',outer:o,innerNote:NOFLOOR,doors:gDoors(o),living:[1500,1750],color:MWC,prof:T2.PROF.dome});}
+{const L=3000,W=3500,o=mwG(L,W,3000,300);
+T2.add('mw_shelter_gh',{brand:'미니멀웍스',name:'쉘터GH',model:'Shelter GH T/C',size:[300,350,170],weight:'11.2kg',cap:'판매처 미표기',href:JD+'1014',srcName:JDN,
+  est:'판매처 비교 이미지의 크기(350×300×170cm)에 쉘터G 2.0 평면을 맞췄어요.',outer:o,innerNote:NOFLOOR,doors:gDoors(o),living:[1500,1750],color:'#C9C3B4',prof:T2.PROF.dome});}
+{const L=2800,W=2640,o=mwG(L,W,2200,480);
+T2.add('mw_shelter_gair',{brand:'미니멀웍스',name:'쉘터G 에어',model:'Shelter G AIR',size:[288,260,124],weight:'2.1kg',cap:'2명',href:JD+'1651',srcName:JDN,drawn:true,
+  est:'판매처 바닥면 도면(도어축 280cm, 측면 264cm, 평변 220cm)으로 그렸어요.',outer:o,innerNote:NOFLOOR,doors:gDoors(o),living:[1400,1320],color:'#9DB5B2',prof:T2.PROF.dome});}
+{const L=4650,W=4650,o=mwG(L,W,3800,400);
+T2.add('mw_agora',{brand:'미니멀웍스',name:'아고라',model:'Agora',size:[465,465,220],weight:'14.5kg',cap:'판매처 미표기',href:JD+'1044',srcName:JDN,
+  est:'판매처 제원(465×465×220cm, 메쉬 도어 2개)에 쉘터G 계열 팔각 평면을 맞췄어요. 바닥 도면은 공개되지 않았어요.',outer:o,innerNote:NOFLOOR,doors:gDoors(o),living:[2325,2325],color:MWC,prof:T2.PROF.dome});}
+{const D=5400,o=T2.poly(12,D,D/2,D/2);
+T2.add('mw_bigball',{brand:'미니멀웍스',name:'빅볼R',model:'Big Ball R',size:[550,550,230],weight:'18kg',cap:'판매처 미표기',href:JD+'1146',srcName:JDN,drawn:true,
+  est:'판매처 도면(550×550cm 12각 돔, 높이 230cm)으로 그렸어요. 뒤쪽 도어 위치는 사진으로 추정했어요.',outer:o,innerNote:'바닥 일체형 돔이에요.',
+  doors:[T2.door(o,'front','출입문',true),T2.door(o,'rear','출입문',false)],living:[D/2,D/2],color:'#D9823F',prof:T2.PROF.dome});}
+{const sp=(id,name,model,L,W,H,t,kg,no,color,extra)=>{const o=[[0,W/2],[t,0],[L-t,0],[L,W/2],[L-t,W],[t,W]];
+  T2.add(id,Object.assign({brand:'미니멀웍스',name,model,size:[L/10,W/10,H],weight:kg,cap:'판매처 미표기',href:JD+no,srcName:JDN,outer:o,innerNote:NOFLOOR,
+    doors:[tipDoor(o,0,'전면 도어',true),tipDoor(o,3,'후면 도어',true)],windows:[{a:[t+300,0],b:[L-t-300,0],label:'롤업 패널'},{a:[t+300,W],b:[L-t-300,W],label:'롤업 패널'}],
+    living:[L/2,W/2],color,prof:T2.PROF.ridge},extra));};
+  sp('mw_superpos','슈퍼포지션','Superposition T/C',5600,4100,235,1550,'17kg','1558','#B49A72',{drawn:true,est:'판매처 바닥 도면(155+250+155cm, 폭 410cm, 양쪽 삼각 도어)으로 그렸어요.'});
+  sp('mw_superpos_p','슈퍼포지션 P','Superposition P',5600,4100,235,1550,'11kg','1566',MWC,{drawn:true,est:'판매처 바닥 도면(155+250+155cm, 폭 410cm)으로 그렸어요. 폴리 버전이에요.'});
+  sp('mw_superpos_solo','슈퍼포지션 솔로','Superposition Solo',5000,2800,195,1400,'10kg','1539','#B49A72',{est:'판매처 크기(500×280×195cm)에 슈퍼포지션 평면 비율을 맞췄어요.'});
+  sp('mw_superpos_solop','슈퍼포지션 솔로 P','Superposition Solo P',5000,2800,195,1400,'판매처 미표기','1574',MWC,{est:'판매처 크기(솔로와 같은 500×280cm)에 슈퍼포지션 평면 비율을 맞췄어요.'});
+  sp('mw_mgx600','슈퍼포지션 MGX-600','MGX-600',6000,4300,230,1650,'14.6kg','1628',MWC,{est:'판매처 제원(600×430×230cm 에어 A형)과 항공 사진으로 평면 비율을 맞췄어요.'});}
+{const L=6500,W=3400,o=T2.tun(L,W,1100,2700,600,2700);
+T2.add('mw_albergue',{brand:'미니멀웍스',name:'올어라운드 알베르게',model:'All-round Albergue',size:[650,340,210],weight:'17kg',cap:'판매처 미표기',href:JD+'1541',srcName:JDN,drawn:true,
+  est:'판매처 바닥 도면(650×340cm, 이너 300×240cm 뒤쪽)으로 그렸어요. 측면 도어 위치는 사진으로 맞췄어요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'300×240',poly:T2.rect(4050,200,6290,3200)}},
+  doors:[T2.front(W,2700,'전면 도어'),T2.side(1700,2900,0),T2.side(1700,2900,W),T2.rear(L,W,2700)],color:MWC});}
+{const L=7600,W=4000,o=[[0,2000],[600,0],[6870,0],[7600,210],[7600,3790],[6870,4000],[600,4000]];
+T2.add('mw_tutti',{brand:'미니멀웍스',name:'투띠',model:'Tutti',size:[760,400,220],weight:'26.6kg',cap:'판매처 미표기',href:JD+'1428',srcName:JDN,drawn:true,
+  est:'판매처 바닥 도면(760×400cm, 입구 400cm, 뒤 358cm, 측면 메쉬도어 2개)으로 그렸어요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'356×195',poly:T2.rect(5000,220,6950,3780),posEst:true}},
+  doors:[tipDoor(o,0,'전면 입구',true),T2.side(2820,4120,0,'메쉬 도어'),T2.side(2820,4120,W,'메쉬 도어')],color:MWC});}
+{const L=5000,W=3000,o=T2.tun(L,W,800,2600,600,2000);
+T2.add('mw_boniato',{brand:'미니멀웍스',name:'보니아또',model:'Boniato',size:[500,300,160],weight:'5.6kg',cap:'최대 4명',href:JD+'1257',srcName:JDN,
+  est:'판매처 제원(500×300×160cm, 입구 260cm, 이너 230×260cm)에 맞춘 터널 평면이에요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'230×260',poly:T2.rect(2550,200,4850,2800),posEst:true}},
+  doors:[T2.front(W,2600,'전면 입구')],color:'#7C5A86',prof:T2.PROF.tunnel});}
+{const mk=(id,name,model,L,W,H,kg,no,extra)=>{const o=T2.rect(0,0,L,W);T2.add(id,Object.assign({brand:'미니멀웍스',name,model,size:[L/10,W/10,H],weight:kg,cap:'2명',href:JD+no,srcName:JDN,outer:o,
+    innerNote:'바닥 일체형 텐트예요.',doors:[{a:[0,W*.25],b:[0,W*.75],label:'출입문',zone:true}],living:[L/2,W/2],color:'#D9823F',prof:T2.PROF.dome},extra));};
+  mk('mw_paprika','파프리카','Paprika',1400,2300,120,'2.2kg','1254',{drawn:true,est:'판매처 바닥면 도면(230×140cm)으로 그렸어요. 긴 변 쪽이 출입문이에요.'});
+  mk('mw_paprika_mg','파프리카 매그넘','Paprika Magnum',1800,2300,130,'2.5kg','971',{drawn:true,est:'판매처 바닥면 도면(230×180cm)으로 그렸어요.'});
+  mk('mw_turtle','로맨틱터틀','Romantic Turtle',1300,2200,105,'1.96kg','108',{est:'판매처 제원(220×130×105cm)으로 그렸어요.',color:'#C8423B'});
+  mk('mw_tangerine','탠저린','Tangerine',960,2330,95,'982g','326',{cap:'1명',est:'판매처 제원(233×96×95cm)으로 그렸어요.'});}
+{const o=[[0,0],[2350,150],[2350,2150],[0,2300]];
+T2.add('mw_mango_ex',{brand:'미니멀웍스',name:'망고 EX',model:'Mango EX',size:[235,230,125],weight:'2.7–3.3kg',cap:'4명',href:JD+'94',srcName:JDN,drawn:true,
+  est:'판매처 바닥 그림(235×230cm, 뒤로 좁아지는 사다리꼴)으로 그렸어요.',outer:o,innerNote:'바닥 일체형 텐트예요.',
+  doors:[{a:[0,450],b:[0,1850],label:'출입문',zone:true}],living:[1175,1150],color:'#D9823F',prof:T2.PROF.dome});}
+{const bp=(id,name,model,D,W,v,i,H,kg,cap,no,inner,est,color,extra)=>{const o=bpShape(D,W,v,i);
+  T2.add(id,Object.assign({brand:'미니멀웍스',name,model,size:[D/10,W/10,H],weight:kg,cap,href:JD+no,srcName:JDN,drawn:true,est,outer:o,
+    inners:{std:{label:'이너텐트',model:'',size:inner[0],poly:T2.rect(...inner[1])}},
+    doors:[tipDoor(o,0,'전실 출입',true),tipDoor(o,3,'전실 출입',true)],living:[D/2,W/2],color:color||'#5E86A8',prof:T2.PROF.dome},extra||{}));};
+  // tipDoor는 꼭짓점 기준이라 백패킹형은 끝 평변 전체를 문으로
+  const endDoors=(o,D)=>[{a:o[0],b:o[7],label:'전실 출입',zone:true},{a:o[3],b:o[4],label:'전실 출입',zone:true}];
+  bp('mw_dp2','디피2','DP2',2600,2250,650,190,117,'1.99kg','2명','1441',['220×130',[650,15,1950,2235]],'판매처 바닥 도면(225×260cm, 양쪽 전실 68cm, 이너 220×130cm)으로 그렸어요.');
+  bp('mw_dp15','디피1.5','DP1.5',2000,2250,500,190,105,'1.72kg','1–2명','1437',['220×100',[500,25,1500,2225]],'판매처 바닥 도면(225×200cm, 양쪽 전실 50cm, 이너 220×100cm)으로 그렸어요.');
+  bp('mw_guava3','구아바3','Guava 3',4000,2700,930,450,137,'3.7kg','3명','1025',['213×260',[935,50,3065,2650]],'판매처 바닥 도면(400×270cm, 이너 213×260cm 가운데)으로 그렸어요.','#D9823F');
+  bp('mw_pomme','폼므','Pomme',3070,2300,800,650,129,'2.9kg','2명','1081',['220×147',[800,50,2270,2250]],'판매처 바닥 도면(307×230cm, 양쪽 전실 80cm, 이너 220×147cm)으로 그렸어요.',MWC);
+  bp('mw_mangosteen','망고스틴','Mangosteen',3200,2350,800,1000,140,'3.5kg','2–3명','234',['145×210',[875,125,2325,2225]],'판매처 바닥 도면(320×235cm, 양쪽 전실 80cm, 이너 145×210cm)으로 그렸어요.','#4CAF50');
+  ['mw_dp2','mw_dp15','mw_guava3','mw_pomme','mw_mangosteen'].forEach(id=>{const T=TENTS[id];T.doors=endDoors(T.outer);});}
+{const L=3800,W=2400,o=T2.tun(L,W,1000,1300,800,600);
+T2.add('mw_goldkiwi',{brand:'미니멀웍스',name:'골드키위',model:'Gold Kiwi',size:[380,240,130],weight:'3.2kg',cap:'2명',href:JD+'1057',srcName:JDN,drawn:true,
+  est:'판매처 이너/바닥 도면(380×240cm, 이너 215×127cm)으로 그렸어요. 양쪽 출입구예요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'215×127',poly:T2.rect(1600,125,2870,2275)}},
+  doors:[T2.front(W,1300,'출입구'),T2.rear(L,W,600,'출입구',true)],color:'#B49A72',prof:T2.PROF.tunnel});}
+{const D=3750,o=T2.poly(8,D,D/2,D/2);
+T2.add('mw_watermelon',{brand:'미니멀웍스',name:'워터멜론',model:'Watermelon',size:[375,375,190],weight:'4kg',cap:'4명',href:JD+'125',srcName:JDN,drawn:true,
+  est:'판매처 바닥 그림(375×375cm 팔각)으로 그렸어요.',outer:o,innerNote:'바닥 일체형 돔이에요.',doors:[T2.door(o,'front','출입문',true)],living:[D/2,D/2],color:'#C8423B',prof:T2.PROF.dome});}
+{const o=[[0,1350],[650,0],[1850,0],[1850,2200],[650,2200]];
+T2.add('mw_el16',{brand:'미니멀웍스',name:'EL 1.6',model:'EL 1.6',size:[220,185,112],weight:'1.13kg',cap:'1–2명',href:JD+'1718',srcName:JDN,drawn:true,
+  est:'판매처 도면(바깥 220×185cm, 이너 218×118cm, 앞 삼각 전실 65cm)으로 그렸어요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'218×118',poly:T2.rect(670,10,1850,2190)}},
+  doors:[tipDoor(o,0,'전실 출입',true)],living:[1250,1100],color:'#AFC0C4',prof:T2.PROF.dome});}
+{const jack=(id,name,model,D,W,H,kg,no)=>{const o=T2.rect(0,0,D,W);T2.add(id,{brand:'미니멀웍스',name,model,size:[D/10,W/10,H],weight:kg,cap:'판매처 미표기',href:JD+no,srcName:JDN,drawn:true,
+    est:`판매처 바닥면 도면(${W/10}×${D/10}cm, 아치 입구 한 면)으로 그렸어요.`,outer:o,innerNote:NOFLOOR,doors:[{a:[0,W*.08],b:[0,W*.92],label:'아치 입구',zone:true}],living:[D/2,W/2],color:'#B49A72',prof:T2.PROF.cabin});};
+  jack('mw_jack_plus','잭 쉘터 플러스','Jack Shelter Plus',2350,3000,190,'2.9kg','931');
+  jack('mw_jack_mini','잭 쉘터 미니','Jack Shelter Mini',2200,2200,165,'1.7kg','934');}
+{const o=[[0,1125],[2250,0],[4500,1125],[4500,3375],[2250,4500],[0,3375]];
+T2.add('mw_mangostation',{brand:'미니멀웍스',name:'망고스테이션 플러스',model:'Mango Station Plus',size:[450,450,220],weight:'9.75kg',cap:'판매처 미표기',href:JD+'429',srcName:JDN,drawn:true,
+  est:'판매처 바닥면 도면(450×450cm 육각)으로 그렸어요. 출입문 위치는 사진으로 추정했어요.',outer:o,innerNote:NOFLOOR,
+  doors:[{a:[0,1400],b:[0,3100],label:'출입문',zone:true}],living:[2250,2250],color:'#D9823F',prof:T2.PROF.dome});}
+{const W=3000,D=2300,o=[[0,0]];for(let k=1;k<12;k++){const a=Math.PI*k/12;o.push([Math.round(D*Math.sin(a)),Math.round(W/2-W/2*Math.cos(a))]);}o.push([0,W]);
+T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glamour Shelter',size:[300,230,150],weight:'2.3kg',cap:'판매처 미표기',href:JD+'102',srcName:JDN,
+  est:'판매처 제원(로우 모드 300×230×150cm 반돔)으로 그렸어요. 앞면 전체가 열려요.',outer:o,innerNote:NOFLOOR,
+  doors:[{a:[0,150],b:[0,2850],label:'개방면',zone:true}],living:[900,1500],color:'#C4B49C',prof:T2.PROF.dome});}
+{const vh=(id,name,L,H,kg,cap,no,color)=>{const D=3050,o=[[0,600],[1525,0],[D,600],[D,L-600],[1525,L],[0,L-600]];
+  T2.add(id,{brand:'미니멀웍스',name,model:name.replace('브이하우스','V-House'),size:[D/10,L/10,H],weight:kg,cap,href:JD+no,srcName:JDN,
+    est:`판매처 제원(${L/10}×305×${H}cm)으로 그렸어요. 앞뒤 긴 면이 패널 2장씩(확장형·일자형)이에요. 끝 경사는 사진 비율이에요.`,outer:o,innerNote:NOFLOOR,
+    doors:[{a:[0,800],b:[0,L/2-100],label:'확장형 패널',zone:true},{a:[0,L/2+100],b:[0,L-800],label:'일자형 패널',zone:true},{a:[D,800],b:[D,L-800],label:'후면 패널',zone:false}],
+    living:[D/2,L/2],color,prof:T2.PROF.cabin});};
+  vh('mw_vhouse_m','브이하우스 M',5400,190,'9.2kg','최대 6명','242','#6F7A5E');
+  vh('mw_vhouse_l','브이하우스 L',7000,205,'11.3kg','최대 8명','964','#6F7A5E');}
+
+/* 제인아츠 */
+{const za=(id,name,model,L,W,H,kg,no,o,extra)=>T2.add(id,Object.assign({brand:'제인아츠',name,model,size:[L/10,W/10,H],weight:kg,cap:'판매처 미표기',href:JD+no,srcName:JDN,drawn:true,outer:o,color:ZAC,prof:T2.PROF.shelter},extra));
+  const lolo=(id,name,model,L,W,Wf,Wr,xm,xr,H,kg,no,iL,iW,est)=>{const o=zaShape(L,W,Wf,Wr,xm,xr),x0=L-iL;
+    za(id,name,model,L,W,H,kg,no,o,{est,inners:{std:{label:'이너텐트',model:'',size:`${iL/10}×${iW/10}`,poly:T2.rect(x0,(W-iW)/2,L-60,(W+iW)/2)}},
+      doors:[T2.front(W,Wf,'전면 입구')],living:[Math.round(x0*.45),W/2]});};
+  lolo('za_lolo','로로','LOLO',5300,4350,3000,3950,2800,4300,285,'17kg','1115',2300,3300,'판매처 평면도(530×435cm, 앞 300cm, 뒤 395cm, 이너 뒤 230cm)로 그렸어요.');
+  lolo('za_lolo_m','로로 M','LOLO M',4200,3500,2450,2800,2400,3400,220,'12.5kg','1516',1750,2600,'판매처 평면도(420×350cm, 앞 245cm, 뒤 280cm, 이너 뒤 175cm)로 그렸어요.');
+  lolo('za_woota_l','우타 T/C L','WOOTA-L T/C',5700,4850,3900,4250,1100,4200,270,'20kg','1452',2500,3600,'판매처 평면도(570×485cm, 앞 390cm, 뒤 425cm, 이너 뒤 250cm)로 그렸어요.');
+  lolo('za_woota_s','우타 T/C S','WOOTA-S T/C',3700,3350,2500,2950,700,2800,200,'11.5kg','1463',1800,2500,'판매처 평면도(370×335cm, 앞 250cm, 뒤 295cm, 이너 뒤 180cm)로 그렸어요.');
+  lolo('za_uka','우카','UKA',2950,2400,1850,2100,1100,2300,145,'8.5kg','1688',1700,1900,'판매처 평면도(295×240cm, 앞 185cm, 뒤 210cm, 이너 170cm)로 그렸어요.');
+  lolo('za_gimorg','기모그 투룸','GIMORG',5450,3150,1600,2850,1500,4600,180,'12kg','1401',2400,2700,'판매처 평면도(545×315cm, 뒤 285cm, 이너 뒤 240cm)로 그렸어요.');
+  lolo('za_roga','로가','ROGA',5950,3000,2250,2300,800,5100,170,'11.5kg','1091',2500,2200,'판매처 평면도(595×300cm, 이너 뒤 250cm)로 그렸어요. 높이는 실내 170cm예요.');
+  const kuku=(id,name,model,L,W,Wf,Wr,xm,xr,H,kg,no,iL,iW,est)=>{const o=zaShape(L,W,Wf,Wr,xm,xr),x1=Math.round(xr+(L-xr)*.4),x0=x1-iL;
+    za(id,name,model,L,W,H,kg,no,o,{est,inners:{std:{label:'이너텐트',model:'',size:`${iL/10}×${iW/10}`,poly:T2.rect(x0,(W-iW)/2,x1,(W+iW)/2)}},
+      doors:[T2.front(W,Wf,'전면 입구'),T2.rear(L,W,Wr,'후면 입구',true)],living:[Math.round(x0*.5),W/2],prof:T2.PROF.tunnel});};
+  kuku('za_kuku1','쿠쿠1','KUKU-1',5400,3200,2050,1900,900,3600,165,'10kg','1381',2650,2500,'판매처 평면도(540×320cm, 이너 265cm)로 그렸어요. 앞뒤로 출입해요.');
+  kuku('za_kuku2','쿠쿠2','KUKU-2',6600,3950,3000,2500,1000,4700,210,'15.5kg','1382',2500,3000,'판매처 평면도(660×395cm, 이너 250cm)로 그렸어요. 앞뒤로 출입해요.');
+  {const o=[[0,625],[1420,0],[3600,400],[6800,625],[6800,3375],[3600,3600],[1420,4000],[0,3375]];
+   za('za_ginga','긴가','GINGA',6800,4000,250,'25kg','1636',o,{est:'판매처 평면도(680×400cm, 앞 275cm, 가운데 320cm, 뒤 275cm, 이너 뒤 250cm)로 그렸어요.',
+     inners:{std:{label:'이너텐트',model:'',size:'250×240',poly:T2.rect(4250,800,6740,3200)}},doors:[T2.front(4000,2750,'전면 입구')],living:[2000,2000]});}
+  const hexT=(id,name,model,D,H,kg,no,est)=>{const R=Math.round(D/2/Math.cos(Math.PI/6)),o=T2.poly(6,D,D/2,R);
+    za(id,name,model,D,2*R,H,kg,no,o,{est,innerNote:NOFLOOR,doors:[T2.door(o,'front','출입문',true)],living:[D/2,R],prof:T2.PROF.tipi});};
+  hexT('za_zeku_m','제쿠 M','ZEKU-M',3800,250,'11.5kg','1094','판매처 평면도(육각, 평변 사이 380cm, 꼭짓점 440cm, 높이 250cm)로 그렸어요.');
+  hexT('za_zeku_l','제쿠 L','ZEKU-L',4700,285,'14kg','1092','판매처 평면도(육각, 평변 사이 470cm, 꼭짓점 540cm, 높이 285cm)로 그렸어요.');
+  const gigi=(id,name,model,L,flat,H,kg,no,est)=>{const t=(L-flat)/2,o=[[0,2000],[t,0],[L-t,0],[L,2000],[L-t,4000],[t,4000]];
+    za(id,name,model,L,4000,H,kg,no,o,{est:est+' 출입문 위치는 사진으로 추정했어요.',innerNote:NOFLOOR,doors:[tipDoor(o,0,'출입문',true)],living:[L/2,2000],prof:T2.PROF.ridge});};
+  gigi('za_gigi1','기기1','GIGI-1',5000,2500,220,'4.5kg','1114','판매처 평면도(500×400cm 육각, 긴 평변 250cm)로 그렸어요.');
+  gigi('za_gigi2','기기2','GIGI-2',7500,5000,220,'7.5kg','1088','판매처 평면도(750×400cm 육각, 긴 평변 500cm)로 그렸어요.');
+  {const D=2800,W=3950,o=[[0,600],[1400,0],[D,600],[D,W-600],[1400,W],[0,W-600]];
+   za('za_okitoma2','오키토마2','OKITOMA-2',D,W,140,'7.5kg','1090',o,{est:'판매처 평면도(395×280cm, 이너 220×130cm)로 그렸어요. 긴 면이 출입구예요.',
+     inners:{std:{label:'이너텐트',model:'',size:'220×130',poly:[[1450,875],[2700,1175],[2700,2775],[1450,3075]]}},
+     doors:[{a:[0,900],b:[0,W-900],label:'출입구',zone:true}],living:[700,W/2],prof:T2.PROF.dome});}
+}
+
 TENT_ORDER.splice(0,TENT_ORDER.length,'landlock','landlock_x','living_shell','living_shell_long_pro','merak_pro','hb_atlas','hb_keron4gt','hx_nona','hx_vtarp','hp_backdoor','hp_cave','hp_mavericks',...T2.ids,'none');
 TENTS.none.brand='';
-const BRANDS=['스노우피크','힐레베르그','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸'];
+const BRANDS=['스노우피크','힐레베르그','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸','미니멀웍스','제인아츠'];
 
 let tent={id:'landlock',inner:'std',canopy:false,custom:{w:200,d:210}};
 
@@ -1744,9 +1903,12 @@ function tentInner(){const T=TENTS[tent.id];if(!T.outer||!tent.inner)return null
   return T.inners[tent.inner]||null;}
 function doorZones(){const T=TENTS[tent.id];if(!T.outer)return [];
   return T.doors.filter(d=>d.zone).map(d=>{const A=d.a,B=d.b,L=dist(A,B);let n=[-(B[1]-A[1])/L,(B[0]-A[0])/L];
-    const m=[(A[0]+B[0])/2,(A[1]+B[1])/2];if(!pointInPoly([m[0]+n[0]*20,m[1]+n[1]*20],T.outer))n=[-n[0],-n[1]];
+    const m=[(A[0]+B[0])/2,(A[1]+B[1])/2],cc=centroid(T.outer);if((cc[0]-m[0])*n[0]+(cc[1]-m[1])*n[1]<0)n=[-n[0],-n[1]];
     return {door:d,poly:[A,B,[B[0]+n[0]*600,B[1]+n[1]*600],[A[0]+n[0]*600,A[1]+n[1]*600]],n};});}
-function allowedPolys(T){return T.outer?[T.outer].concat(tent.canopy&&T.canopy?[T.canopy]:[]):[];}
+// 확장 공간(캐노피·베스티블·포치): 켜진 것만
+function extList(T){const r=[];if(tent.canopy&&T.canopy)r.push({q:T.canopy,name:T.canopyName||'캐노피',h:T.canopyH,wall:T.canopyWall});if(tent.canopy2&&T.canopy2)r.push({q:T.canopy2,name:T.canopy2Name||'확장',h:T.canopy2H,wall:T.canopy2Wall});return r;}
+const extPts=T=>extList(T).flatMap(e=>e.q);
+function allowedPolys(T){return T.outer?[T.outer].concat(extList(T).map(e=>e.q)):[];}
 function setName(r,k){return r._isl.length===1&&CATALOG[r.type].kind==='gear'?CATALOG[r.type].name:`세트 ${k+1}`;}
 function checkRules(){
   const W=[],I=[],T=TENTS[tent.id],inner=tentInner();
@@ -1932,8 +2094,8 @@ const pts=a=>a.map(p=>p[0].toFixed(0)+','+p[1].toFixed(0)).join(' ');
 function tentLayer(){
   const T=TENTS[tent.id],k=1/SCALE,inner=tentInner();let o='';if(!T.outer)return '';
   const ob=bbox(T.outer);const W=ob[1][0]-ob[0][0],H=ob[1][1]-ob[0][1];
-  if(tent.canopy&&T.canopy){o+=`<polygon points="${pts(T.canopy)}" fill="rgba(214,205,186,.32)" stroke="${COL.ink2}" stroke-width="${k}" stroke-dasharray="${7*k} ${5*k}"/>`;
-    const cb=bbox(T.canopy);o+=`<text x="${(cb[0][0]+cb[1][0])/2}" y="${(cb[0][1]+cb[1][1])/2}" text-anchor="middle" font-size="${12*k}" fill="${COL.ink2}">캐노피</text>`;}
+  extList(T).forEach(e=>{o+=`<polygon points="${pts(e.q)}" fill="rgba(214,205,186,.32)" stroke="${COL.ink2}" stroke-width="${k}" stroke-dasharray="${7*k} ${5*k}"/>`;
+    const cb=bbox(e.q);o+=`<text x="${(cb[0][0]+cb[1][0])/2}" y="${(cb[0][1]+cb[1][1])/2}" text-anchor="middle" font-size="${12*k}" fill="${COL.ink2}">${e.name}</text>`;});
   // soft ground shadow + fly
   o+=`<polygon points="${pts(T.outer)}" fill="#E8E2D4" stroke="${COL.ink}" stroke-width="${1.6*k}" stroke-linejoin="round"/>`;
   // living watermark
@@ -2122,7 +2284,7 @@ function updateScalebar(){const s=document.getElementById('scalebar');let m=1000
    8. VIEW — fit, pan, zoom, select, drag
    ===================================================================== */
 function sceneBox(withPieces){const T=TENTS[tent.id];let pts=[];
-  if(T.outer)pts=pts.concat(T.outer,tent.canopy&&T.canopy?T.canopy:[]);
+  if(T.outer)pts=pts.concat(T.outer,extPts(T));
   const tw=tarpWorld();if(tw)pts=pts.concat(tw.fabric,tw.guys.map(g=>g.b));
   if(withPieces)state.pieces.forEach(p=>{if(p._v)pts=pts.concat(p._v);});
   if(!pts.length)pts=[[-2500,-1800],[2500,1800]];return bbox(pts);}
@@ -2284,9 +2446,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(document.getElem
    10. SIDE PANELS
    ===================================================================== */
 function tentThumb(T,inner){if(!T.outer)return `<svg viewBox="0 0 84 56" aria-hidden="true"><rect x="14" y="10" width="56" height="36" rx="3" fill="none" stroke="#8C908A" stroke-width="1.4" stroke-dasharray="4 3"/></svg>`;
-  const b=bbox(T.outer.concat(T.canopy||[]));const w=b[1][0]-b[0][0],h=b[1][1]-b[0][1],pad=150;
+  const b=bbox(T.outer.concat(T.canopy||[],T.canopy2||[]));const w=b[1][0]-b[0][0],h=b[1][1]-b[0][1],pad=150;
   return `<svg viewBox="${b[0][0]-pad} ${b[0][1]-pad} ${w+pad*2} ${h+pad*2}" aria-hidden="true">
-    ${T.canopy?`<polygon points="${pts(T.canopy)}" fill="none" stroke="${COL.ink3||'#8C908A'}" stroke-width="40" stroke-dasharray="80 60"/>`:''}
+    ${[T.canopy,T.canopy2].filter(Boolean).map(c=>`<polygon points="${pts(c)}" fill="none" stroke="${COL.ink3||'#8C908A'}" stroke-width="40" stroke-dasharray="80 60"/>`).join('')}
     <polygon points="${pts(T.outer)}" fill="#E8E2D4" stroke="${COL.ink}" stroke-width="55" stroke-linejoin="round"/>
     ${inner?`<polygon points="${pts(inner.poly)}" fill="rgba(31,36,33,.14)" stroke="none"/>`:''}
     ${T.doors.map(d=>`<line x1="${d.a[0]}" y1="${d.a[1]}" x2="${d.b[0]}" y2="${d.b[1]}" stroke="${COL.maple}" stroke-width="110" stroke-linecap="round"/>`).join('')}</svg>`;}
@@ -2301,7 +2463,7 @@ function renderTarpList(){const el=document.getElementById('tarpList');
   el.innerHTML=[null].concat(TARP_ORDER).map(id=>{const t=id&&TARPS[id];return `<button class="tent" aria-pressed="${tarp.id===id}" onclick="pickTarp(${id?`'${id}'`:'null'})">
     ${tarpThumb(id)}<span><span class="nm">${t?t.name:'타프 없음'}</span><br><span class="md">${t?`${t.model}, ${t.L/10}×${t.W/10}cm`:'텐트만 칠 때'}</span></span></button>`;}).join('');}
 function placeTarpDefault(){const T=TENTS[tent.id],t=TARPS[tarp.id];if(!t)return;
-  if(T.outer){const b=bbox(T.outer.concat(tent.canopy&&T.canopy?T.canopy:[]));tarp.rot=90;tarp.x=b[0][0]-250-t.F[1]/2;tarp.y=centroid(T.outer)[1];}
+  if(T.outer){const b=bbox(T.outer.concat(extPts(T)));tarp.rot=90;tarp.x=b[0][0]-250-t.F[1]/2;tarp.y=centroid(T.outer)[1];}
   else{tarp.rot=0;tarp.x=0;tarp.y=0;}}
 function pickTarp(id){if(tarp.id===id&&id!=null){sel='tarp';render();return;}tarp.id=id;
   if(id){placeTarpDefault();sel='tarp';}else if(sel==='tarp')sel=null;
@@ -2314,11 +2476,12 @@ function renderTarpSpec(){const el=document.getElementById('tarpSpec');const t=T
     <dt>무게</dt><dd>${t.weight}</dd>${t.cap?`<dt>정원</dt><dd>${t.cap}</dd>`:''}
     <dt>출처</dt><dd><a href="${SRC}${t.src}" target="_blank" rel="noopener">아이엘캠프 상품 상세</a></dd>
     ${t.note?`<dt></dt><dd class="muted" style="text-align:left;margin-top:4px">${t.note}</dd>`:''}`;}
-function pickTent(id){if(tent.id===id){if(typeof renderLineup==='function')renderLineup();return;}const T=TENTS[id];tent={id,inner:T.innerDefault,canopy:false,custom:tent.custom};
+function pickTent(id){if(tent.id===id){if(typeof renderLineup==='function')renderLineup();return;}const T=TENTS[id];tent={id,inner:T.innerDefault,canopy:false,canopy2:false,custom:tent.custom};
   if(tarp.id)placeTarpDefault();renderTentList();renderTentOpts();fitView();render();}
 function setInner(v){tent.inner=v;renderTentOpts();render();}
 function setCustom(k,v){const n=Math.max(60,Math.min(600,Math.round(+v||0)));tent.custom[k]=n;renderTentOpts();render();}
 function setCanopy(v){tent.canopy=v;fitView();render();}
+function setCanopy2(v){tent.canopy2=v;fitView();render();}
 function renderTentOpts(){const T=TENTS[tent.id];
   if(!T.outer){document.getElementById('tentOpts').innerHTML='';renderTentSpec();return;}
   let h=`<div class="opt"><span>이너룸</span><div class="seg">`;
@@ -2330,6 +2493,7 @@ function renderTentOpts(){const T=TENTS[tent.id];
   else if(T.innerNote&&!tent.inner)h+=`<p class="muted" style="margin-top:4px">${T.innerNote}</p>`;
   h+=`</div>`;
   if(T.canopy)h+=`<label class="check"><input type="checkbox" ${tent.canopy?'checked':''} onchange="setCanopy(this.checked)">${T.canopyLabel||'캐노피 올리기'}</label>`;
+  if(T.canopy2)h+=`<label class="check"><input type="checkbox" ${tent.canopy2?'checked':''} onchange="setCanopy2(this.checked)">${T.canopy2Label||'확장 달기'}</label>`;
   document.getElementById('tentOpts').innerHTML=h;renderTentSpec();}
 function stageTitle(){const T=TENTS[tent.id],t=TARPS[tarp.id];const names=[T.outer?T.name:null,t?t.name:null].filter(Boolean);
   document.getElementById('stageTitle').innerHTML=`${names.length?names.join(' + '):'빈 사이트'}<span class="s">단위 cm, 바닥 기준</span>`;}
@@ -2581,10 +2745,18 @@ function tent3(THREE,T){
   (T.windows||[]).forEach(d=>{const mix=t=>prof[0].map((x,i)=>x+(prof[1][i]-x)*t),lo=v=>at(v,mix(.35)),hi=v=>at(v,mix(.85));const p=[lo(d.a),hi(d.a),hi(d.b),lo(d.b),lo(d.a)];
     shell.add(lineOf(THREE,p.map(q=>[mm(q[0]),mm(q[2]),mm(q[1])]),'#4F7FA3',1));});
   // living shell canopy
-  if(tent.canopy&&T.canopy){const q=T.canopy;const cg=new THREE.BufferGeometry();
-    cg.setAttribute('position',new THREE.Float32BufferAttribute([...v3(q[0],1700),...v3(q[1],1900),...v3(q[2],1900),...v3(q[3],1700)],3));cg.setIndex([0,1,2,0,2,3]);cg.computeVertexNormals();
-    const cm=new THREE.Mesh(cg,new THREE.MeshStandardMaterial({color:T.color||'#8F806C',side:THREE.DoubleSide,roughness:.95}));cm.castShadow=true;grp.add(cm);
-    const pm=new THREE.MeshStandardMaterial({color:'#B9BDC0',metalness:.5,roughness:.4});grp.add(cyl(THREE,q[1],0,1900,14,pm),cyl(THREE,q[2],0,1900,14,pm));}
+  extList(T).forEach(e=>{const q=e.q,H=e.h||1900,cg=new THREE.BufferGeometry();
+    if(q.length===4&&!e.h){cg.setAttribute('position',new THREE.Float32BufferAttribute([...v3(q[0],1700),...v3(q[1],1900),...v3(q[2],1900),...v3(q[3],1700)],3));cg.setIndex([0,1,2,0,2,3]);}
+    else{// 몸체에 붙은 쪽은 높고 바깥쪽은 낮게. 베스티블처럼 벽이 있으면 바닥까지 벽을 내림
+      const ob=bbox(T.outer),cx=(ob[0][0]+ob[1][0])/2,near=q.map(v=>Math.abs(v[0]-cx)),n0=Math.min(...near),n1=Math.max(...near);
+      const hv=v=>H*(1-.42*(n1>n0?(Math.abs(v[0]-cx)-n0)/(n1-n0):0));const c=centroid(q),pos=[...v3(c,hv(c))],idx=[];
+      q.forEach((v,i)=>{pos.push(...v3(v,hv(v)));idx.push(0,1+i,1+(i+1)%q.length);});
+      if(e.wall)q.forEach((v,i)=>{const w=q[(i+1)%q.length];if(pointInPoly(v,T.outer)||pointInPoly(w,T.outer))return;const k=pos.length/3;pos.push(...v3(v,hv(v)),...v3(w,hv(w)),...v3(w,0),...v3(v,0));idx.push(k,k+1,k+2,k,k+2,k+3);});
+      cg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));cg.setIndex(idx);}
+    cg.computeVertexNormals();
+    const cm=new THREE.Mesh(cg,new THREE.MeshStandardMaterial({color:T.color||'#8F806C',side:THREE.DoubleSide,roughness:.95,transparent:!!e.h,opacity:e.h?.62:1,depthWrite:!e.h}));cm.castShadow=true;grp.add(cm);
+    const pm=new THREE.MeshStandardMaterial({color:'#B9BDC0',metalness:.5,roughness:.4});
+    if(q.length===4&&!e.h)grp.add(cyl(THREE,q[1],0,1900,14,pm),cyl(THREE,q[2],0,1900,14,pm));else{const ob=bbox(T.outer),cx=(ob[0][0]+ob[1][0])/2;const far=[...q].sort((a,b)=>Math.abs(b[0]-cx)-Math.abs(a[0]-cx)).slice(0,2);far.forEach(v=>grp.add(cyl(THREE,v,0,H*.82,14,pm)));}});
   grp.add(shell);V3.tentGroup=shell;V3.tentMat=mat;
   // inner room
   const inner=tentInner();
@@ -2681,7 +2853,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 let DB=null,UID=null,DL=null,mineInDb=false,galleryOn=false,galleryWrite=false,MINE=[],GALLERY=[],GDOCS={},CURRENT_CODE='',undoCode=null;
 
 function planObj(){return {v:1,
-  tent:{id:tent.id,inner:tent.inner,canopy:!!tent.canopy,custom:{w:tent.custom.w,d:tent.custom.d}},
+  tent:{id:tent.id,inner:tent.inner,canopy:!!tent.canopy,canopy2:!!tent.canopy2,custom:{w:tent.custom.w,d:tent.custom.d}},
   tarp:tarp.id?{id:tarp.id,x:Math.round(tarp.x),y:Math.round(tarp.y),r:Math.round(tarp.rot)}:null,
   pieces:state.pieces.map(p=>{const o={u:p.uid,t:p.type};
     if(p.parent!=null){o.p=p.parent;o.pe=p.pEdge;o.me=p.mEdge;if(p.slide)o.s=Math.round(p.slide);}
@@ -2693,7 +2865,7 @@ function parsePlan(o){
   if(!o||o.v!==1||!Array.isArray(o.pieces))throw new Error('배치 형식을 읽을 수 없어요');
   const tid=o.tent&&TENTS[o.tent.id]?o.tent.id:'landlock',T=TENTS[tid],ti=o.tent||{};
   const inner=(ti.inner==='custom'&&T.outer)||ti.inner===null||(ti.inner&&T.inners[ti.inner])?ti.inner:T.innerDefault;
-  const nt={id:tid,inner,canopy:!!ti.canopy&&!!T.canopy,custom:{w:num(ti.custom&&ti.custom.w,60,600,200),d:num(ti.custom&&ti.custom.d,60,600,210)}};
+  const nt={id:tid,inner,canopy:!!ti.canopy&&!!T.canopy,canopy2:!!ti.canopy2&&!!T.canopy2,custom:{w:num(ti.custom&&ti.custom.w,60,600,200),d:num(ti.custom&&ti.custom.d,60,600,210)}};
   const nTarp=o.tarp&&TARPS[o.tarp.id]?{id:o.tarp.id,x:num(o.tarp.x,-1e5,1e5,0),y:num(o.tarp.y,-1e5,1e5,0),rot:num(o.tarp.r,0,359,0)}:{id:null,x:0,y:0,rot:0};
   let list=[],seen=new Set();
   o.pieces.slice(0,200).forEach(q=>{if(!q||!CATALOG[q.t]||!Number.isInteger(q.u)||q.u<1||seen.has(q.u))return;seen.add(q.u);
@@ -2784,7 +2956,7 @@ function planThumbSVG(o){let P;try{P=parsePlan(o);}catch(e){return '';}
     let vw=w+pad*2,vh=h+pad*2;if(vw/vh<4/3)vw=vh*4/3;else vh=vw*3/4;const vx=(b[0][0]+b[1][0])/2-vw/2,vy=(b[0][1]+b[1][1])/2-vh/2,sw=vw/320;
     let g='';
     if(TW){TW.guys.forEach(q=>{g+=`<line x1="${q.a[0]|0}" y1="${q.a[1]|0}" x2="${q.b[0]|0}" y2="${q.b[1]|0}" stroke="#A9ACA6" stroke-width="${sw*.8}"/>`;});}
-    if(T.outer){if(tent.canopy&&T.canopy)g+=`<polygon points="${pts(T.canopy)}" fill="#EFEAE0" stroke="#8C908A" stroke-width="${sw}" stroke-dasharray="${sw*4} ${sw*3}"/>`;
+    if(T.outer){extList(T).forEach(e=>{g+=`<polygon points="${pts(e.q)}" fill="#EFEAE0" stroke="#8C908A" stroke-width="${sw}" stroke-dasharray="${sw*4} ${sw*3}"/>`;});
       g+=`<polygon points="${pts(T.outer)}" fill="#E8E2D4" stroke="#1F2421" stroke-width="${sw*1.4}" stroke-linejoin="round"/>`;
       const inn=tentInner();if(inn)g+=`<polygon points="${pts(inn.poly)}" fill="rgba(31,36,33,.12)" stroke="#575C57" stroke-width="${sw*.8}" stroke-dasharray="${sw*3} ${sw*2}"/>`;
       T.doors.forEach(d=>{g+=`<line x1="${d.a[0]}" y1="${d.a[1]}" x2="${d.b[0]}" y2="${d.b[1]}" stroke="#8E2F38" stroke-width="${sw*3}" stroke-linecap="round"/>`;});}
