@@ -3389,7 +3389,7 @@ function partSvg(w,d,col,deep){const p=Math.max(w,d)*.12;
   return `<svg viewBox="${-p} ${-p} ${w+p*2} ${d+p*2}" aria-hidden="true"><rect width="${w}" height="${d}" rx="${Math.min(w,d)*.06}" fill="${col}" stroke="rgba(26,32,28,.55)" stroke-width="${Math.max(w,d)/90}"/>${deep?`<rect x="${w*.12}" y="${d*.1}" width="${w*.76}" height="${d*.8}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="${Math.max(w,d)/120}" stroke-dasharray="${w/18} ${w/24}"/>`:''}</svg>`;}
 function tentLink(T){return T.href||(T.src?SRC+T.src:null);}
 const GSEC=[
-  {k:'tent',t:'텐트',img:'img/autumn.webp',d:'바닥 도면을 그대로 옮긴 리빙쉘·돔 텐트. 도어 위치와 이너룸까지 그렸어요.',
+  {k:'tent',t:'텐트',img:'img/g-shelter.webp',d:'바닥 도면을 그대로 옮긴 리빙쉘·돔 텐트. 도어 위치와 이너룸까지 그렸어요.',
    items:()=>TENT_ORDER.filter(id=>TENTS[id].outer).map(id=>{const T=TENTS[id],inn=T.inners[T.innerDefault];
      return {id,b:T.brand||'기타',q:`${T.name} ${T.model} ${T.brand}`,html:`<div class="gpv"><span class="bt">${T.brand||''}</span>${T.est?(T.drawn?'<span class="cf ok">공식 도면</span>':'<span class="cf weak">도면 추정</span>'):'<span class="cf ok">판매처 도면</span>'}${tentThumb(T,inn)}</div>
       <div class="gb"><div><h3>${T.name}</h3><span class="md">${T.model}</span></div>
@@ -3422,13 +3422,13 @@ const GSEC=[
       <p class="nt">입체 보기에서 다리 높이에 맞춰 테이블 높이가 바뀌어요.</p></div>`}])},
   {k:'gear',t:'수납·테이블·선반',img:'img/top.webp',d:'쉘프컨테이너, 마이테이블, 폴딩쉘프, 그리고 스노우피크·헬리녹스·커밋 테이블. 바닥 크기와 상판 높이까지 실제 값이에요. 의자 좌면 높이와 맞춰 고르세요.',
    items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat&&!GEAR[id].sleep&&GEAR[id].gtype!=='chair'&&GEAR[id].gtype!=='fridge').map(id=>gearCard(id))},
-  {k:'sleep',t:'매트·야전침대',img:'img/night.webp',d:'자충매트와 야전침대. 이너룸 안에 놓아도 경고가 뜨지 않아요. 매트 폭으로 이너룸에 몇 명이 누울 수 있는지 확인해보세요.',
+  {k:'sleep',t:'매트·야전침대',img:'img/g-sleep.webp',d:'자충매트와 야전침대. 이너룸 안에 놓아도 경고가 뜨지 않아요. 매트 폭으로 이너룸에 몇 명이 누울 수 있는지 확인해보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].sleep).map(id=>gearCard(id))},
-  {k:'chair',t:'체어',img:'img/flatlay.webp',d:'스노우피크·헬리녹스·커밋체어. 펼친 크기와 좌면 높이를 실제 값으로 넣었어요. 좌면이 낮은 로우체어는 낮은 테이블과 맞춰보세요.',
+  {k:'chair',t:'체어',img:'img/g-chair.webp',d:'스노우피크·헬리녹스·커밋체어. 펼친 크기와 좌면 높이를 실제 값으로 넣었어요. 좌면이 낮은 로우체어는 낮은 테이블과 맞춰보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='chair').map(id=>gearCard(id))},
   {k:'heat',t:'난방',img:'img/heat.webp',d:'팬히터·가스난로·화목난로의 크기예요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].heat).map(id=>gearCard(id))},
-  {k:'cool',t:'냉장고',img:'img/top.webp',d:'캠핑용 컴프레서 냉장고. 바닥 크기와 높이를 실제 값으로 넣었어요. 테이블 아래 공간에 들어가는지 확인해보세요.',
+  {k:'cool',t:'냉장고',img:'img/g-cool.webp',d:'캠핑용 컴프레서 냉장고. 바닥 크기와 높이를 실제 값으로 넣었어요. 테이블 아래 공간에 들어가는지 확인해보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='fridge').map(id=>gearCard(id))},
 ];
 function gearCard(id){const g=GEAR[id];
