@@ -66,14 +66,14 @@ def rename(s):
 journal = journal.replace('class="night rv-band"', 'class="night rv-band hub-band"')
 # AI 세팅 추천 카드 (추천 세팅 아래)
 AI_CARD = '''<div class="aiset" id="aiset" aria-labelledby="aiTitle">
-  <div class="ai-head"><span class="ai-badge">✨ AI</span><div><h3 id="aiTitle">내 장비만 적으면 자동으로 세팅해요</h3><p>텐트·테이블·체어를 적으면 캠테리어 목록에서 찾아 바닥에 놓아드려요. 놓인 뒤엔 끌어서 다듬으면 돼요.</p></div></div>
+  <div class="ai-head"><span class="ai-badge">✨ AI</span><div><h3 id="aiTitle">내 장비 적으면 자동 배치</h3></div></div>
   <label class="sr-only" for="aiIn">가진 장비</label>
-  <textarea id="aiIn" rows="3" maxlength="600" placeholder="예: 랜드록, IGT 롱 1개, 폴딩쉘프 2개, 헬리녹스 체어원 2개, 메가매트 듀오, 옴니 230"></textarea>
+  <textarea id="aiIn" rows="3" maxlength="600" placeholder="예: 랜드록, IGT 롱, 폴딩쉘프 2개, 체어원 2개, 옴니 230"></textarea>
   <div class="ai-row"><button class="btn primary" id="aiGo" type="button" onclick="aiRun()">✨ AI로 세팅하기</button><span class="ai-st" id="aiSt" role="status" aria-live="polite"></span>
-    <p class="ai-priv">적은 내용은 추천을 위해 Google Gemini로 보내져요. 이름·연락처 같은 개인정보는 적지 마세요.</p></div>
+    <p class="ai-priv">Google Gemini로 보내져요 · 개인정보는 적지 마세요</p></div>
   <div class="ai-out" id="aiOut" hidden></div>
 </div>'''
-_pm = '<div class="presets" id="presets"></div>'
+_pm = '<div class="presets" id="presets" hidden></div>'
 assert ws.count(_pm) == 1, 'presets marker'
 ws = ws.replace(_pm, _pm + '\n' + AI_CARD)
 markup = (HERE / 'shell.html').read_text(encoding='utf-8')

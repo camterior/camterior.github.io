@@ -41,32 +41,32 @@ function tentLink(T){return T.href||(T.src?SRC+T.src:null);}
 const GSEC=[
   {k:'tent',t:'텐트',img:'img/autumn.webp',d:'바닥 도면을 그대로 옮긴 리빙쉘·돔 텐트. 도어 위치와 이너룸까지 그렸어요.',
    items:()=>TENT_ORDER.filter(id=>TENTS[id].outer).map(id=>{const T=TENTS[id],inn=T.inners[T.innerDefault];
-     return {id,q:`${T.name} ${T.model} ${T.brand}`,html:`<div class="gpv"><span class="bt">${T.brand||''}</span>${T.est?(T.drawn?'<span class="cf ok">공식 도면</span>':'<span class="cf weak">도면 추정</span>'):'<span class="cf ok">판매처 도면</span>'}${tentThumb(T,inn)}</div>
+     return {id,b:T.brand||'기타',q:`${T.name} ${T.model} ${T.brand}`,html:`<div class="gpv"><span class="bt">${T.brand||''}</span>${T.est?(T.drawn?'<span class="cf ok">공식 도면</span>':'<span class="cf weak">도면 추정</span>'):'<span class="cf ok">판매처 도면</span>'}${tentThumb(T,inn)}</div>
       <div class="gb"><div><h3>${T.name}</h3><span class="md">${T.model}</span></div>
       <dl><dt>크기 (가로×세로×높이)</dt><dd>${T.size[0]}×${T.size[1]}×${T.size[2]}cm</dd><dt>바닥 면적</dt><dd>${tentArea(T).toFixed(1)}㎡</dd>
       <dt>정원</dt><dd>${T.cap}</dd><dt>무게</dt><dd>${T.weight}</dd>${inn?`<dt>${inn.label}</dt><dd>${inn.size||'도면 표기'}</dd>`:''}<dt>도어</dt><dd>${T.doors.length}곳</dd></dl>
       <div class="ga"><button type="button" onclick="gearUse('tent','${id}')">이 텐트로 배치</button>${tentLink(T)?`<a href="${tentLink(T)}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};})},
   {k:'tarp',t:'타프',img:'img/tarp.webp',d:'펙과 스트링까지 포함한 설영 면적으로 필요한 사이트 크기를 계산해요.',
-   items:()=>TARP_ORDER.map(id=>{const t=TARPS[id];return {id,q:`${t.name} ${t.model} 타프`,html:`<div class="gpv"><span class="bt">스노우피크</span><span class="cf">판매처</span>${tarpThumb(id)}</div>
+   items:()=>TARP_ORDER.map(id=>{const t=TARPS[id];return {id,b:'스노우피크',q:`${t.name} ${t.model} 타프`,html:`<div class="gpv"><span class="bt">스노우피크</span><span class="cf">판매처</span>${tarpThumb(id)}</div>
       <div class="gb"><div><h3>${t.name}</h3><span class="md">${t.model}</span></div>
       <dl><dt>원단 크기</dt><dd>${fmt(t.L)}×${fmt(t.W)}mm</dd><dt>설영 면적</dt><dd>${(t.F[0]/1000).toFixed(1)}×${(t.F[1]/1000).toFixed(1)}m</dd><dt>폴</dt><dd>${t.poles.map(p=>fmt(p)).join(' / ')}mm</dd><dt>무게</dt><dd>${t.weight}</dd>${t.cap?`<dt>정원</dt><dd>${t.cap}</dd>`:''}</dl>
       ${t.note?`<p class="nt">${t.note}</p>`:''}
       <div class="ga"><button type="button" onclick="gearUse('tarp','${id}')">이 타프로 배치</button>${t.src?`<a href="${SRC+t.src}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};})},
   {k:'igt',t:'IGT 프레임·테이블',img:'img/igt.webp',d:'0.5유닛(124mm) 단위로 이어 붙는 아이언 그릴 테이블 시스템. 프레임과 확장 테이블의 실제 윤곽이에요.',
    items:()=>Object.keys(CATALOG).filter(k=>CATALOG[k].kind!=='gear').map(id=>{const c=CATALOG[id],b=bbox(c.verts),w=Math.round(b[1][0]-b[0][0]),d=Math.round(b[1][1]-b[0][1]);
-     return {id,q:`${c.name} ${c.model} ${c.group} igt`,html:`<div class="gpv"><span class="bt">${c.group}</span>${confBadge(c.conf)}${catPreview(id)}</div>
+     return {id,b:c.group,q:`${c.name} ${c.model} ${c.group} igt`,html:`<div class="gpv"><span class="bt">${c.group}</span>${confBadge(c.conf)}${catPreview(id)}</div>
       <div class="gb"><div><h3>${c.name}</h3><span class="md">${c.model}</span></div>
       <dl><dt>외곽</dt><dd>${fmt(w)}×${fmt(d)}mm</dd><dt>규격 표기</dt><dd>${c.spec}</dd>${c.units?`<dt>유닛</dt><dd>${c.units}유닛 · 칸 ${c.units*2}개</dd>`:''}</dl>
       <div class="ga"><button type="button" onclick="gearUse('item','${id}')">배치에 놓기</button></div></div>`};})},
   {k:'parts',t:'IGT 파츠',img:'img/flatlay.webp',d:'프레임 칸에 끼우는 상판·수납·화기와 행잉랙, 다리 높이. 배치 화면에서 IGT를 고른 뒤 ‘파츠·붙이기’로 넣어요.',
-   items:()=>SLOT_ITEMS.map(p=>({id:p.id,q:`${p.name} ${p.model} ${p.grp} 파츠`,html:`<div class="gpv"><span class="bt">${p.grp}</span>${confBadge(p.conf)}${partSvg(p.w,p.d,PARTS_COL[p.draw]||'#B9BDC1',p.deep)}</div>
+   items:()=>SLOT_ITEMS.map(p=>({id:p.id,b:p.grp,q:`${p.name} ${p.model} ${p.grp} 파츠`,html:`<div class="gpv"><span class="bt">${p.grp}</span>${confBadge(p.conf)}${partSvg(p.w,p.d,PARTS_COL[p.draw]||'#B9BDC1',p.deep)}</div>
       <div class="gb"><div><h3>${p.name}</h3><span class="md">${p.model}</span></div>
       <dl><dt>크기</dt><dd>${p.w}×${p.d}mm</dd><dt>차지하는 칸</dt><dd>${p.halves===1?'하프 1칸':`${p.halves/2}유닛 (${p.halves}칸)`}</dd></dl>
       <div class="ga"><button type="button" onclick="gearUse('parts','${p.id}')">IGT에 넣으러 가기</button></div></div>`}))
-     .concat(Object.entries(RACKS).map(([m,r])=>({id:m,q:`${r.name} ${m} 행잉랙`,html:`<div class="gpv"><span class="bt">행잉랙</span>${confBadge(r.conf)}${partSvg(r.w,r.d,'#2B2E31')}</div>
+     .concat(Object.entries(RACKS).map(([m,r])=>({id:m,b:'행잉랙',q:`${r.name} ${m} 행잉랙`,html:`<div class="gpv"><span class="bt">행잉랙</span>${confBadge(r.conf)}${partSvg(r.w,r.d,'#2B2E31')}</div>
       <div class="gb"><div><h3>${r.name}</h3><span class="md">${m}</span></div><dl><dt>크기</dt><dd>${r.w}×${r.d}mm</dd><dt>맞는 다리</dt><dd>${r.legs}</dd></dl>
       <div class="ga"><button type="button" onclick="gearUse('parts','${m}')">IGT에 걸러 가기</button></div></div>`})))
-     .concat([{id:'legs',q:'igt 다리 높이 300 400 660 830',html:`<div class="gpv"><span class="bt">다리</span><span class="cf ok">공식</span><svg viewBox="0 0 220 120" aria-hidden="true">${Object.keys(LEGS).map((h,i)=>`<rect x="${20+i*52}" y="${110-h/8}" width="10" height="${h/8}" rx="3" fill="#2B2E31"/><text x="${25+i*52}" y="${104-h/8}" text-anchor="middle" font-size="11" fill="#575C57">${h}</text>`).join('')}</svg></div>
+     .concat([{id:'legs',b:'다리',q:'igt 다리 높이 300 400 660 830',html:`<div class="gpv"><span class="bt">다리</span><span class="cf ok">공식</span><svg viewBox="0 0 220 120" aria-hidden="true">${Object.keys(LEGS).map((h,i)=>`<rect x="${20+i*52}" y="${110-h/8}" width="10" height="${h/8}" rx="3" fill="#2B2E31"/><text x="${25+i*52}" y="${104-h/8}" text-anchor="middle" font-size="11" fill="#575C57">${h}</text>`).join('')}</svg></div>
       <div class="gb"><div><h3>IGT 다리</h3><span class="md">${Object.values(LEGS).map(l=>l.model).join(' · ')}</span></div>
       <dl>${Object.entries(LEGS).map(([h,l])=>`<dt>${l.name}</dt><dd>${h}mm</dd>`).join('')}</dl>
       <p class="nt">입체 보기에서 다리 높이에 맞춰 테이블 높이가 바뀌어요.</p></div>`}])},
@@ -82,12 +82,14 @@ const GSEC=[
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='fridge').map(id=>gearCard(id))},
 ];
 function gearCard(id){const g=GEAR[id];
-  return {id,q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'||g.gtype==='wood'?'난로 히터 화목난로 장작':''}${g.gtype==='fridge'?'냉장고 쿨러 아이스박스':''}${g.gtype==='chair'?'의자 체어 '+(g.srcName||''):''}${g.sleep?'매트 침대 야전침대 코트 자충':''}${g.alu?'알루텍 알루미늄 박스 수납':''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
+  return {id,b:gearBrand(g),q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'||g.gtype==='wood'?'난로 히터 화목난로 장작':''}${g.gtype==='fridge'?'냉장고 쿨러 아이스박스':''}${g.gtype==='chair'?'의자 체어 '+(g.srcName||''):''}${g.sleep?'매트 침대 야전침대 코트 자충':''}${g.alu?'알루텍 알루미늄 박스 수납':''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
     <div class="gb"><div><h3>${g.name}</h3><span class="md">${g.model}</span></div>
     <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.sh?`<dt>좌면 높이</dt><dd>${fmt(g.sh)}mm</dd>`:''}${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}</dl>
     ${g.note?`<p class="nt">${g.note}</p>`:''}
     <div class="ga"><button type="button" onclick="gearUse('item','${id}')">배치에 놓기</button>${gLink(g)?`<a href="${gLink(g)}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};}
-let GEAR_F='all';
+const GBRANDS=['스노우피크','헬리녹스','커밋','토요토미','파세코','신일','엑스페드','스패로우','도메틱','알루텍','코베아'];
+function gearBrand(g){const n=g.name||'';return GBRANDS.find(b=>n.startsWith(b))||'스노우피크';}
+let GEAR_F='all';const G_OPEN=new Set();
 function renderGear(){const nav=document.getElementById('gearNav'),body=document.getElementById('gearBody');if(!body)return;
   const q=(document.getElementById('gearQ').value||'').trim().toLowerCase();
   const secs=GSEC.map(s=>({...s,list:s.items().filter(it=>!q||it.q.toLowerCase().includes(q))}));
@@ -95,9 +97,14 @@ function renderGear(){const nav=document.getElementById('gearNav'),body=document
     .map(([k,t,n])=>`<button type="button" aria-pressed="${GEAR_F===k}" onclick="GEAR_F='${k}';renderGear();window.scrollTo({top:document.querySelector('.gnav').offsetTop-56,behavior:'smooth'})">${t}<small>${n}</small></button>`).join('');
   let html='';
   secs.forEach(s=>{if(GEAR_F!=='all'&&GEAR_F!==s.k)return;if(!s.list.length)return;
-    html+=`<section class="gsec" id="g-${s.k}">${!q?`<div class="gbanner"><img src="${s.img}" alt="" loading="lazy"><div><h2>${s.t} <small style="font-family:var(--mono);font-size:14px;opacity:.7">${s.list.length}</small></h2><p>${s.d}</p></div></div>`:`<div class="ghead"><h2>${s.t}</h2><span>${s.list.length}</span></div>`}
-      <div class="ggrid">${s.list.map(it=>`<article class="gcard">${it.html}</article>`).join('')}</div></section>`;});
-  body.innerHTML=html||`<div class="gempty">‘${esc(q)}’에 맞는 장비가 없어요. 이름 일부나 모델명으로 찾아보세요.</div>`;
+    const groups=new Map();s.list.forEach(it=>{const b=it.b||'기타';if(!groups.has(b))groups.set(b,[]);groups.get(b).push(it);});
+    const solo=GEAR_F===s.k&&groups.size===1;
+    html+=`<section class="gsec" id="g-${s.k}"><div class="ghead"><img src="${s.img}" alt="" loading="lazy"><h2>${s.t}</h2><span>${s.list.length}</span></div>
+      ${[...groups].map(([b,items])=>{const key=s.k+'|'+b,open=q||solo||G_OPEN.has(key);
+        return `<details class="gbrand" data-k="${esc(key)}"${open?' open':''}><summary><b>${esc(b)}</b><span>${items.length}</span></summary>
+        <div class="ggrid">${items.map(it=>`<article class="gcard">${it.html}</article>`).join('')}</div></details>`;}).join('')}</section>`;});
+  body.innerHTML=html||`<div class="gempty">‘${esc(q)}’에 맞는 장비가 없어요.</div>`;
+  if(!q)body.querySelectorAll('details.gbrand').forEach(d=>d.addEventListener('toggle',()=>{d.open?G_OPEN.add(d.dataset.k):G_OPEN.delete(d.dataset.k);}));
   const st=document.getElementById('gearStats');
   if(st&&!st.dataset.done){st.dataset.done=1;st.innerHTML=GSEC.map(s=>`<span><b>${s.items().length}</b>${s.t}</span>`).join('');}}
 function gearUse(kind,id){go('plan');afterPaint(()=>{
@@ -109,15 +116,60 @@ function gearUse(kind,id){go('plan');afterPaint(()=>{
     const h=document.getElementById('hint');if(h){h.textContent='IGT를 누르고 ‘파츠·붙이기’로 칸을 채워요';h.hidden=false;}}});}
 
 /* ---------- share link (GitHub 판) ---------- */
-(function shareLink(){if(IN_CLAUDE)return;
-  const row=document.querySelector('#step5 .btnrow');if(row){const b=document.createElement('button');b.className='btn small';b.type='button';b.textContent='공유 링크 복사';
-    b.onclick=async()=>{const c=CURRENT_CODE||await encodePlan(planObj());const url=location.origin+location.pathname+'?p='+encodeURIComponent(c)+'#plan';
-      try{if(navigator.share&&matchMedia('(pointer:coarse)').matches){await navigator.share({title:'캠테리어 배치',url});setStatus('공유했어요.');return;}}catch(e){if(e&&e.name==='AbortError')return;}
-      try{await navigator.clipboard.writeText(url);setStatus('링크를 복사했어요. 받은 사람이 열면 이 배치가 그대로 보여요.');}catch(e){const box=document.getElementById('codeOut');document.getElementById('codeWrap').hidden=false;box.value=url;box.select();setStatus('링크를 위 칸에서 복사해 주세요.');}};
-    row.prepend(b);}
+async function shareLinkGo(){if(IN_CLAUDE){copyCode();return;}
+  const c=CURRENT_CODE||await encodePlan(planObj());const url=location.origin+location.pathname+'?p='+encodeURIComponent(c)+'#plan';
+  try{if(navigator.share&&matchMedia('(pointer:coarse)').matches){await navigator.share({title:'캠테리어 배치',url});setStatus('공유했어요.');return;}}catch(e){if(e&&e.name==='AbortError')return;}
+  try{await navigator.clipboard.writeText(url);setStatus('링크를 복사했어요. 받은 사람이 열면 이 배치가 그대로 보여요.');}catch(e){const box=document.getElementById('codeOut');document.getElementById('codeWrap').hidden=false;box.value=url;box.select();setStatus('링크를 위 칸에서 복사해 주세요.');}}
+(function shareLink(){if(IN_CLAUDE){const l=document.getElementById('ssLink');if(l)l.hidden=true;return;}
   const p=new URLSearchParams(location.search).get('p');
   if(p&&/^CAMP-/.test(p)){setTimeout(async()=>{const ok=await loadPlanCode(p,'공유 링크로 받은 배치');history.replaceState(null,'',location.pathname+'#plan');if(ok)go('plan',{noHash:true});},250);}
 })();
+
+/* ---------- 2026-10-27 간소화: 저장 시트, 접는 목록 ---------- */
+function openSave(){const sh=document.getElementById('saveSheet');if(!sh)return;
+  ['codeWrap','importWrap'].forEach(id=>{const e=document.getElementById(id);if(e)e.hidden=true;});
+  document.getElementById('sheetSt').innerHTML='';sh.classList.add('open');
+  setTimeout(()=>{if(!matchMedia('(pointer:coarse)').matches)document.getElementById('saveName').focus();},60);}
+function closeSave(){document.getElementById('saveSheet')?.classList.remove('open');}
+addEventListener('keydown',e=>{if(e.key==='Escape')closeSave();});
+const _setStatus=setStatus;
+setStatus=function(...a){_setStatus(...a);const sh=document.getElementById('sheetSt'),st=document.getElementById('saveStatus');if(sh&&st)sh.innerHTML=st.innerHTML;};
+const _startFresh=startFresh;startFresh=async function(){await _startFresh();closeSave();};
+const _loadPlanCode2=loadPlanCode;loadPlanCode=async function(...a){const ok=await _loadPlanCode2(...a);if(ok)closeSave();return ok;};
+const _renderMine=renderMine;renderMine=function(){_renderMine();const e=document.querySelector('#myList .empty');if(e)e.textContent='아직 없어요. 위의 저장하기를 눌러보세요.';};
+
+/* 텐트 목록: 브랜드별 접기 + 찾기 */
+const T_OPEN=new Set();
+const tentBtn=id=>{const T=TENTS[id];return `<button class="tent" aria-pressed="${id===tent.id}" onclick="pickTent('${id}')">
+  ${tentThumb(T,T.inners[T.innerDefault])}<span><span class="nm">${T.name}${T.est&&!T.drawn?'<span class="bdg est">도면 추정</span>':''}</span><br><span class="md">${T.outer?`${T.model}, ${T.size[0]}×${T.size[1]}cm`:'타프나 테이블만 놓을 때'}</span></span></button>`;};
+renderTentList=function(){const el=document.getElementById('tentList');if(!el)return;
+  const q=((document.getElementById('tentQ')||{}).value||'').trim().toLowerCase();
+  const hit=id=>{const T=TENTS[id];return !q||`${T.name} ${T.model} ${T.brand||''}`.toLowerCase().includes(q);};
+  let html='';
+  BRANDS.forEach(b=>{const ids=TENT_ORDER.filter(id=>TENTS[id].brand===b&&hit(id));if(!ids.length)return;
+    const open=!!q||T_OPEN.has(b),cur=ids.includes(tent.id);
+    html+=`<details class="fold" data-k="${esc(b)}"${open?' open':''}><summary><b>${esc(b)}</b>${cur?`<em>${esc(TENTS[tent.id].name)}</em>`:''}<span>${ids.length}</span></summary><div class="fold-in">${ids.map(tentBtn).join('')}</div></details>`;});
+  const rest=TENT_ORDER.filter(id=>!TENTS[id].brand&&hit(id));if(rest.length)html+=`<div class="fold-rest">${rest.map(tentBtn).join('')}</div>`;
+  el.innerHTML=html||`<div class="cat-empty">‘${esc(q)}’에 맞는 텐트가 없어요.</div>`;
+  if(!q)el.querySelectorAll('details.fold').forEach(d=>d.addEventListener('toggle',()=>{d.open?T_OPEN.add(d.dataset.k):T_OPEN.delete(d.dataset.k);}));
+  if(typeof renderLineup==='function')renderLineup();};
+/* 장비 목록: 분류별 접기 + 찾기 */
+const C_OPEN=new Set();
+renderCatalog=function(){const el=document.getElementById('catalog');if(!el)return;
+  const q=(document.getElementById('catQ').value||'').trim().toLowerCase();let html='';
+  CAT_GROUPS.forEach(([g,ids])=>{
+    const list=ids.filter(t=>{const c=CATALOG[t];return !q||(c.name+' '+c.model+' '+g+' '+(c.note||'')+' '+({stove:'난로 스토브',fan:'팬히터 히터 난로',wood:'화목난로 장작 난로',fridge:'냉장고 쿨러',box:'수납 박스',shelf:'선반 쉘프',table:'테이블',chair:'의자 체어',mat:'매트 자충 에어 침구',cot:'야전침대 코트 침대'}[c.gtype]||'')).toLowerCase().includes(q);});if(!list.length)return;
+    const open=!!q||C_OPEN.has(g);
+    html+=`<details class="fold" data-k="${esc(g)}"${open?' open':''}><summary><b>${esc(g)}</b><span>${list.length}</span></summary><div class="fold-in catalog-in">`;
+    list.forEach(t=>{const c=CATALOG[t],b=bbox(c.verts),w=Math.round(b[1][0]-b[0][0]),d=Math.round(b[1][1]-b[0][1]);
+      const size=c.kind==='gear'?`${c.w}×${c.d}×${c.h}`:`${w}×${d}`;
+      html+=`<button type="button" class="pc" onclick="catAdd('${t}')" aria-label="${esc(c.name)} 놓기"><span class="pv">${catPreview(t)}</span>
+        <span><span class="pn">${esc(c.name)}</span><br><span class="pm">${size}mm</span></span></button>`;});
+    html+='</div></details>';});
+  el.innerHTML=html||`<div class="cat-empty">‘${esc(q)}’에 맞는 장비가 없어요.</div>`;
+  if(!q)el.querySelectorAll('details.fold').forEach(d=>d.addEventListener('toggle',()=>{d.open?C_OPEN.add(d.dataset.k):C_OPEN.delete(d.dataset.k);}));};
+renderTentList();renderCatalog();renderMine();
+(function introCounts(){const n=document.getElementById('nTent');if(n)n.textContent=Math.floor(TENT_ORDER.filter(id=>TENTS[id].outer).length/10)*10;})();
 
 /* ---------- boot ---------- */
 (function camteriorBoot(){
