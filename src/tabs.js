@@ -71,16 +71,18 @@ const GSEC=[
       <dl>${Object.entries(LEGS).map(([h,l])=>`<dt>${l.name}</dt><dd>${h}mm</dd>`).join('')}</dl>
       <p class="nt">입체 보기에서 다리 높이에 맞춰 테이블 높이가 바뀌어요.</p></div>`}])},
   {k:'gear',t:'수납·테이블·선반',img:'img/top.webp',d:'쉘프컨테이너, 마이테이블, 폴딩쉘프, 그리고 스노우피크·헬리녹스·커밋 테이블. 바닥 크기와 상판 높이까지 실제 값이에요. 의자 좌면 높이와 맞춰 고르세요.',
-   items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat&&!GEAR[id].sleep&&GEAR[id].gtype!=='chair').map(id=>gearCard(id))},
+   items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat&&!GEAR[id].sleep&&GEAR[id].gtype!=='chair'&&GEAR[id].gtype!=='fridge').map(id=>gearCard(id))},
   {k:'sleep',t:'매트·야전침대',img:'img/night.webp',d:'자충매트와 야전침대. 이너룸 안에 놓아도 경고가 뜨지 않아요. 매트 폭으로 이너룸에 몇 명이 누울 수 있는지 확인해보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].sleep).map(id=>gearCard(id))},
   {k:'chair',t:'체어',img:'img/flatlay.webp',d:'스노우피크·헬리녹스·커밋체어. 펼친 크기와 좌면 높이를 실제 값으로 넣었어요. 좌면이 낮은 로우체어는 낮은 테이블과 맞춰보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='chair').map(id=>gearCard(id))},
   {k:'heat',t:'난방',img:'img/heat.webp',d:'팬히터·가스난로·화목난로의 크기예요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].heat).map(id=>gearCard(id))},
+  {k:'cool',t:'냉장고',img:'img/top.webp',d:'캠핑용 컴프레서 냉장고. 바닥 크기와 높이를 실제 값으로 넣었어요. 테이블 아래 공간에 들어가는지 확인해보세요.',
+   items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='fridge').map(id=>gearCard(id))},
 ];
 function gearCard(id){const g=GEAR[id];
-  return {id,q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'?'난로 히터':''}${g.gtype==='chair'?'의자 체어 '+(g.srcName||''):''}${g.sleep?'매트 침대 야전침대 코트 자충':''}${g.alu?'알루텍 알루미늄 박스 수납':''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
+  return {id,q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'||g.gtype==='wood'?'난로 히터 화목난로 장작':''}${g.gtype==='fridge'?'냉장고 쿨러 아이스박스':''}${g.gtype==='chair'?'의자 체어 '+(g.srcName||''):''}${g.sleep?'매트 침대 야전침대 코트 자충':''}${g.alu?'알루텍 알루미늄 박스 수납':''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
     <div class="gb"><div><h3>${g.name}</h3><span class="md">${g.model}</span></div>
     <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.sh?`<dt>좌면 높이</dt><dd>${fmt(g.sh)}mm</dd>`:''}${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}</dl>
     ${g.note?`<p class="nt">${g.note}</p>`:''}
