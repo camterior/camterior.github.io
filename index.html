@@ -178,6 +178,7 @@
   .item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:3px;cursor:pointer;border:1px solid transparent}
   .item:hover{background:#fff;border-color:var(--line)}
   .item .isw{width:34px;height:24px;border-radius:3px;flex:none;border:1px solid rgba(31,36,33,.2)}
+  .item .emap{width:84px;height:64px;flex:none;background:#EEF0EA;border-radius:10px}
   .item .txt{flex:1;min-width:0}
   .item .n{font-size:14px;font-weight:500}
   .item .d{font-size:12px;color:var(--ink-2)}
@@ -2007,6 +2008,15 @@ function zoomToRoot(uid,force){const r=byId(uid);if(!r||!r._bbox)return;computeA
     viewX=mx-hw/SCALE/2;viewY=my-hh/SCALE/2;setViewBox();if(u<1)zoomRaf=requestAnimationFrame(step);else render();};
   zoomRaf=requestAnimationFrame(step);}
 let partsRoot=null;
+/* 붙일 자리를 그림으로: 세트 전체를 화면 방향 그대로 작게 그리고, 붙일 변만 주황색으로 */
+function edgeMap(isl,p,e){const A=p._v[e.i],B=p._v[e.j],M=[(A[0]+B[0])/2,(A[1]+B[1])/2],C=centroid(p._v);
+  let nx=-(B[1]-A[1]),ny=B[0]-A[0];const L=Math.hypot(nx,ny)||1;nx/=L;ny/=L;if((M[0]-C[0])*nx+(M[1]-C[1])*ny<0){nx=-nx;ny=-ny;}
+  const dir=Math.abs(nx)>Math.abs(ny)?(nx>0?'오른쪽':'왼쪽'):(ny>0?'아래쪽':'위쪽');
+  const bb=bbox(isl.flatMap(q=>q._v)),w=bb[1][0]-bb[0][0],h=bb[1][1]-bb[0][1],pad=Math.max(w,h)*.22,k=Math.max(w,h)/60;
+  const vb=[bb[0][0]-pad,bb[0][1]-pad,w+pad*2,h+pad*2].map(n=>n.toFixed(0)).join(' ');
+  const polys=isl.map(q=>`<polygon points="${pts(q._v)}" fill="${q===p?'#5B6159':'#C9CCC4'}" stroke="#fff" stroke-width="${k*.6}"/>`).join('');
+  const ar=Math.max(w,h)*.09,T=[M[0]+nx*ar*1.5,M[1]+ny*ar*1.5];
+  return {dir,svg:`<svg class="emap" viewBox="${vb}" aria-hidden="true">${polys}<line x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}" stroke="#E8572A" stroke-width="${k*3.2}" stroke-linecap="round"/><circle cx="${T[0]}" cy="${T[1]}" r="${ar*.62}" fill="#E8572A"/><path d="M${T[0]-ar*.3} ${T[1]}h${ar*.6}M${T[0]} ${T[1]-ar*.3}v${ar*.6}" stroke="#fff" stroke-width="${k*1.6}" stroke-linecap="round"/></svg>`};}
 function openParts(uid){const r=byId(uid);if(!r)return;partsRoot=uid;const isl=orderPieces().filter(p=>rootOf(p).uid===uid);let html='';
   const frames=isl.filter(p=>CATALOG[p.type].kind==='frame');
   frames.forEach((p,fi)=>{const c=CATALOG[p.type],H=c.units*2;
@@ -2019,7 +2029,7 @@ function openParts(uid){const r=byId(uid);if(!r)return;partsRoot=uid;const isl=o
   // open edges as big buttons
   const edges=[];isl.forEach(p=>{const c=CATALOG[p.type];if(c.kind==='tray'||c.kind==='h020'||c.kind==='gear')return;c.edges.forEach(e=>{if(edgeOpen(p,e))edges.push([p,e]);});});
   if(edges.length){html+=`<div class="mgroup">옆에 이어 붙이기</div>`;
-    edges.forEach(([p,e])=>{html+=`<div class="item" onclick="openAdd(${p.uid},'${e.name}')"><span class="isw" style="background:${edgeColor(e)}"></span><div class="txt"><div class="n">${CATALOG[p.type].short||CATALOG[p.type].name}의 ${e.label}</div><div class="d">눌러서 붙일 조각 고르기</div></div><span class="u">＋</span></div>`;});}
+    edges.forEach(([p,e])=>{const m=edgeMap(isl,p,e);html+=`<div class="item edgeitem" onclick="openAdd(${p.uid},'${e.name}')">${m.svg}<div class="txt"><div class="n">${m.dir} ${e.label}</div><div class="d">${CATALOG[p.type].short||CATALOG[p.type].name} · 주황색 자리에 붙어요</div></div><span class="u">＋</span></div>`;});}
   const kids=isl.filter(p=>p.parent!=null);
   if(kids.length){html+=`<div class="mgroup">붙어 있는 조각</div>`;
     kids.forEach(p=>{const c=CATALOG[p.type],cy=cycleOptions(p).length>1;html+=`<div class="item" style="cursor:default"><span class="isw" style="background:${c.kind==='frame'?SW[c.style]:SW.bamboo}"></span><div class="txt"><div class="n">${c.name}</div><div class="d">${c.model}</div></div>
@@ -2213,7 +2223,8 @@ function onSlot(e,uid,i){e.stopPropagation();if(justDragged)return;if(rootOf(byI
 function onRack(e,uid){e.stopPropagation();if(justDragged)return;openRack(uid);}
 function onSwap(e,uid){e.stopPropagation();if(justDragged)return;swapRail(uid);}
 function openAdd(parentUid,pEdge){pending={parentUid,pEdge};const par=byId(parentUid),e=edgeOf(par.type,pEdge);
-  let html=`<div class="mnote">${CATALOG[par.type].name}의 ${e.label}에 맞는 조각만 보여요.</div>`,any=false;
+  const isl=state.pieces.filter(q=>rootOf(q).uid===rootOf(par).uid&&q._v),m=edgeMap(isl,par,e);
+  let html=`<div class="item edgeitem" style="cursor:default">${m.svg}<div class="txt"><div class="n">${m.dir} ${e.label}</div><div class="d">여기에 맞는 조각만 보여요</div></div></div>`,any=false;
   GROUPS.forEach(g=>{const list=ORDER.filter(t=>CATALOG[t].group===g&&CATALOG[t].edges.some(ce=>mateKind(e.types,ce.types)));if(!list.length)return;
     html+=`<div class="mgroup">${g}</div>`;
     list.forEach(t=>{const kinds=[...new Set(CATALOG[t].edges.map(ce=>mateKind(e.types,ce.types)).filter(Boolean))];
@@ -2260,7 +2271,7 @@ function openRack(uid){const p=byId(uid),c=CATALOG[p.type];pending={rackUid:uid}
     [[-1,'왼쪽 끝'],[0,'가운데'],[1,'오른쪽 끝']].forEach(([pos,lab])=>{html+=`<div class="item${fits?'':' dis'}" ${fits?`onclick="setRack('${id}',${pos})"`:''}><span class="isw" style="background:#fff;border:2px dashed ${COL.ai}"></span><div class="txt"><div class="n">${lab}</div><div class="d">${r.w}×${r.d}mm, ${r.legs}${fits?'':', 이 프레임엔 길이 부족'}</div></div></div>`;});});
   showModal(`${c.short} 행잉랙`,html);}
 function setRack(id,pos){const pr=partsRoot;queueMicrotask(()=>{if(pr!=null&&byId(pr))openParts(pr);});const p=byId(pending.rackUid);p.rack=id?{id,pos:pos||0}:null;closeModal();render();}
-function showModal(t,h){document.getElementById('mTitle').textContent=t;document.getElementById('mList').innerHTML=h;document.getElementById('scrim').classList.add('open');}
+function showModal(t,h){document.getElementById('mTitle').textContent=t;document.getElementById('mList').innerHTML=h;document.getElementById('scrim').classList.add('open');const md=document.querySelector('#scrim .modal');if(md)md.scrollTop=0;}
 function closeModal(){partsRoot=null;document.getElementById('scrim').classList.remove('open');}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(document.getElementById('view3d').classList.contains('open'))close3D();else if(document.getElementById('scrim').classList.contains('open'))closeModal();else closeStory();}
   const free=!document.getElementById('scrim').classList.contains('open')&&(document.activeElement===document.body||document.activeElement.closest&&document.activeElement.closest('.dock'));
