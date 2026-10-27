@@ -37,7 +37,7 @@ commons = '\n'.join(L[i_cm:i_ft]).rstrip()
 rest = '\n'.join(L[i_rest:])
 
 # --- strip inline images from reused sections -> files
-features = features.replace('<h3>난로 1m, 바로 알려줘요</h3><p>텐트 벽, 이너룸, 다른 장비가 안전거리 안에 들어오면 경고해요.</p>', '<h3>난로는 조심해서</h3><p>난로를 놓으면 환기·일산화탄소 경보기 같은 배치 주의사항을 바로 띄워요.</p>')
+features = features.replace('<h3>난로 1m, 바로 알려줘요</h3><p>텐트 벽, 이너룸, 다른 장비가 안전거리 안에 들어오면 경고해요.</p>', '<h3>난방까지 한 번에</h3><p>팬히터·화목난로도 실제 크기로 놓아보고, 전원이 필요한 장비는 따로 알려줘요.</p>')
 features = re.sub(r'src="data:image/webp;base64,[^"]+"', 'src="img/top.webp"', features)
 journal = re.sub(r'src="data:image/webp;base64,[^"]+"', 'src="img/night.webp"', journal)
 
@@ -87,15 +87,19 @@ js = js.replace("function heatLocal(c){const h=c.heat;if(!h)return null;", "func
 m = re.search(r"  // heaters: keep 1m from fabric and gear\n.*?\n(  state\.pieces\.forEach\(p=>\{const c=CATALOG\[p\.type\];if\(c\.kind!=='frame'\)return;)", js, re.S)
 assert m, 'heater block'
 js = js[:m.start()] + ("  const heaters=state.pieces.filter(p=>CATALOG[p.type].heat);\n"
-  "  if(heaters.length)I.push('" + HEAT_I + "');\n"
   "  heaters.forEach(h=>{const c=CATALOG[h.type],ce=centroid(h._v);\n"
-  "    if(TW&&pointInPoly(ce,TW.fabric))I.push(`${pName(h)}: 타프 아래예요. 타프 천이 난로에서 충분히 높은지 확인하세요`);\n"
   "    if(c.gtype==='fan')I.push(`${pName(h)}: 전원(220V)이 필요해요. 파워뱅크나 전기 사이트를 챙기세요`);});\n") + js[m.start(1):]
 for a,b in [("const heats=state.pieces.filter(p=>p._heat)","const heats=state.pieces.filter(p=>CATALOG[p.type].heat)"),
-            ("출입구 막힘, 난로 안전거리를 여기서 알려줘요","출입구 막힘을 알려주고, 난로를 놓으면 주의사항을 띄워요"),
-            ("' · <span class=\"pw\">안전거리 1m</span>'","' · <span class=\"pw\">배치 주의</span>'")]:
+            ("출입구 막힘, 난로 안전거리를 여기서 알려줘요","출입구 막힘과 겹침을 여기서 알려줘요"),
+            ("' · <span class=\"pw\">안전거리 1m</span>'","''")]:
     assert js.count(a)==1, a; js=js.replace(a,b)
-js = re.sub(r"const HEAT_NOTE='[^']*';", "const HEAT_NOTE='난로는 텐트 천·이너룸·가구와 넉넉히 띄우고 환기하세요. 이격 거리는 제품 설명서를 따라주세요.';", js)
+js = re.sub(r"const HEAT_NOTE='[^']*';", "const HEAT_NOTE='';", js)
+# 2026-10-27 난방 안전거리 표시 완전 삭제 (평면도 링·문구·제원 표기)
+for a,b in [("html+=`<p class=\"muted\" style=\"margin-top:10px\">${HEAT_NOTE}</p>`;",""),
+            ("${c.heat?'. '+HEAT_NOTE:''}","")]:
+    assert js.count(a)==1, a; js=js.replace(a,b)
+js = re.sub(r"  state\.pieces\.filter\(p=>p\._heat\)\.forEach\(p=>\{const c=CATALOG\[p\.type\],ce=centroid\(p\._v\);\n.*?난방 안전거리.*?\n", "", js, count=1, flags=re.S)
+assert '난방 안전거리' not in js
 # v19.3 배치판을 페이지와 다른 톤(세이지 그린 바닥)으로
 GROUND = '#C8D2C4'
 for a, b in [('height="200000" fill="#FBFBF9" onpointerdown="startPan(event)"', f'height="200000" fill="{GROUND}" onpointerdown="startPan(event)"'),

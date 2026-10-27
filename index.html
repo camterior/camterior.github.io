@@ -862,7 +862,7 @@
       <article class="tile t-mm reveal"><svg class="viz ruler-viz" viewBox="0 0 220 90" aria-hidden="true"><line x1="10" y1="20" x2="210" y2="20" stroke-width="1.5" class="grow"/><path d="M10 12v16M210 12v16" stroke-width="1.5"/><rect x="30" y="38" width="150" height="40" rx="6" fill="none" stroke="#7FD1A4" stroke-width="1.5" stroke-dasharray="5 4"/><text x="110" y="64" fill="#7FD1A4" font-family="JetBrains Mono,monospace" font-size="12" text-anchor="middle">846</text></svg>
         <p class="k">IGT · 파츠</p><h3>칸마다 파츠를 채워요</h3><p>프레임 0.5유닛 칸에 버너, 메쉬, 우드 상판을 넣고 이어 붙여요.</p></article>
       <article class="tile t-heat reveal"><div class="ring" aria-hidden="true"><i></i><i></i><b></b></div>
-        <p class="k">SAFETY</p><h3>난로는 조심해서</h3><p>난로를 놓으면 환기·일산화탄소 경보기 같은 배치 주의사항을 바로 띄워요.</p></article>
+        <p class="k">SAFETY</p><h3>난방까지 한 번에</h3><p>팬히터·화목난로도 실제 크기로 놓아보고, 전원이 필요한 장비는 따로 알려줘요.</p></article>
       <article class="tile t-3d reveal"><div class="cube" aria-hidden="true"><div><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
         <p class="k">3D</p><h3>입체로 둘러보기</h3><p>앉은 눈높이에서 동선을 미리 확인해요.</p></article>
       <article class="tile t-code reveal"><div class="typed" aria-hidden="true"><span>CAMP-C1Jc1BCsIwEEDRu_z1LJJU</span></div>
@@ -1222,9 +1222,191 @@ TENTS.hp_mavericks={brand:'하임플래닛',name:'매버릭',model:'Mavericks',s
   outer:MAV,frames:[],inners:{},innerDefault:null,innerNote:'이너 없이 쓰는 대형 에어 돔이에요.',
   doors:[{a:lerp2(MAV[8],MAV[9],.15),b:lerp2(MAV[8],MAV[9],.85),label:'출입문',zone:true},{a:lerp2(MAV[6],MAV[7],.15),b:lerp2(MAV[6],MAV[7],.85),label:'출입문',zone:false}],
   living:[1950,2050],h3d:2340,inH3:2000,color:'#E6E3DC',prof:[[1,1,0],[.96,.96,.45],[.75,.75,.84],[.32,.32,1]]};
-TENT_ORDER.splice(0,TENT_ORDER.length,'landlock','landlock_x','living_shell','living_shell_long_pro','merak_pro','hb_atlas','hb_keron4gt','hx_nona','hx_vtarp','hp_backdoor','hp_cave','hp_mavericks','none');
+/*TENTS2*/
+/* ---- 2026-10 텐트 추가 (36종): 판매처 치수·도면 기준. 도면이 없는 건 크기에 맞춘 추정 ---- */
+const T2={
+  // 앞뒤 끝이 좁아지는 터널형: L,W(mm), cf/cr = 앞/뒤 좁아지는 길이, ef/er = 앞/뒤 끝 폭
+  tun(L,W,cf,ef,cr,er){const p=[];
+    if(cf>0)p.push([0,(W-ef)/2],[cf,0]);else p.push([0,0]);
+    if(cr>0)p.push([L-cr,0],[L,(W-er)/2],[L,(W+er)/2],[L-cr,W]);else p.push([L,0],[L,W]);
+    if(cf>0)p.push([cf,W],[0,(W+ef)/2]);else p.push([0,W]);return p.map(q=>q.map(Math.round));},
+  box(L,W,c){return T2.tun(L,W,c,W-2*c,c,W-2*c);},
+  // 벽-벽 거리 D인 n각형 (변 하나가 앞쪽 x=0에 오게)
+  poly(n,D,cx,cy){const R=D/2/Math.cos(Math.PI/n);return ngon(n,R,Math.PI+Math.PI/n,cx,cy);},
+  rect(x0,y0,x1,y1){return [[x0,y0],[x1,y0],[x1,y1],[x0,y1]];},
+  front(W,ef,label){const a=(W-ef)/2;return {a:[0,a+ef*0.1],b:[0,a+ef*0.9],label:label||'출입문',zone:true};},
+  rear(L,W,er,label,zone){const a=(W-er)/2;return {a:[L,a+er*0.1],b:[L,a+er*0.9],label:label||'뒤쪽 출입',zone:!!zone};},
+  side(x0,x1,y,label,zone){return {a:[x0,y],b:[x1,y],label:label||'측면 도어',zone:zone!==false};},
+  PROF:{tunnel:[[1,1,0],[.97,.9,.5],[.88,.55,.86],[.74,.16,1]],dome:[[1,1,0],[.97,.97,.38],[.8,.8,.76],[.4,.4,1]],
+        cabin:[[1,1,0],[.99,.99,.55],[.95,.95,.85],[.84,.8,1]],shelter:[[1,1,0],[.96,.9,.48],[.84,.58,.86],[.62,.18,1]]},
+  add(id,o){const H=o.size[2]*10;TENTS[id]=Object.assign({frames:[],inners:{},innerDefault:null,windows:[],h3d:H,inH3:Math.max(1200,H-250),
+    color:'#8F806C',prof:T2.PROF.tunnel},o);if(o.inners&&Object.keys(o.inners).length&&o.innerDefault===undefined)TENTS[id].innerDefault=Object.keys(o.inners)[0];
+    if(!o.living){const b=bbox(TENTS[id].outer);TENTS[id].living=[Math.round(b[0][0]+(b[1][0]-b[0][0])*.32),Math.round((b[0][1]+b[1][1])/2)];}T2.ids.push(id);},
+  ids:[]
+};
+const IL='https://www.ilcamp.co.kr/product/detail.html?product_no=',A247='https://247outdoor.co.kr/product/detail.html?product_no=',
+  CDY='https://coody.co.kr/product/detail.html?product_no=',OLM='https://outdoorlandmark.co.kr/product/detail.html?product_no=';
+const NOFLOOR='바닥이 없는 쉘터예요. 이너텐트는 직접 입력으로 넣어보세요.',NOINNER='이너텐트 크기가 공개되지 않았어요. 직접 입력으로 넣어보세요.';
+
+/* ===== 스노우피크 ===== */
+{const L=8850,W=5100,o=[[0,2550],[1500,0],[7350,0],[8850,2550],[7350,5100],[1500,5100]];
+T2.add('sp_landstation_l',{brand:'스노우피크',name:'랜드스테이션 L',model:'TP-820',size:[885,510,210],weight:'8.2kg',cap:'6명 (클로즈) · 8명 (오픈)',src:4118,
+  est:'설치 크기 885×510cm에 맞춘 육각 평면이에요. 패널을 열고 닫는 타프 쉘터라 바닥이 없어요.',outer:o,innerNote:NOFLOOR,
+  doors:[{a:L2(o[0],o[1],.2),b:L2(o[0],o[1],.8),label:'출입 패널',zone:true},{a:L2(o[3],o[4],.2),b:L2(o[3],o[4],.8),label:'출입 패널',zone:false}],
+  living:[4425,2550],color:'#8B7F6E',prof:T2.PROF.shelter});}
+{const o=[[0,2300],[1250,0],[6050,0],[7300,2300],[6050,4600],[1250,4600]];
+T2.add('sp_landstation_m',{brand:'스노우피크',name:'랜드스테이션 M Pro.air',model:'TP-815',size:[730,460,210],weight:'6.7kg',cap:'판매처 미표기',src:6885,
+  est:'설치 크기 730×460cm에 맞춘 육각 평면이에요. 바닥이 없는 타프 쉘터예요.',outer:o,innerNote:NOFLOOR,
+  doors:[{a:L2(o[0],o[1],.2),b:L2(o[0],o[1],.8),label:'출입 패널',zone:true},{a:L2(o[3],o[4],.2),b:L2(o[3],o[4],.8),label:'출입 패널',zone:false}],
+  living:[3650,2300],color:'#8B7F6E',prof:T2.PROF.shelter});}
+{const L=7000,W=4500,o=T2.tun(L,W,900,2600,600,3150);
+T2.add('sp_riegel',{brand:'스노우피크',name:'리겔 Pro.',model:'TP-950',size:[700,450,225],weight:'30kg (프레임 포함)',cap:'4명',src:7042,drawn:true,
+  est:'아이엘캠프 상세 평면도(700×450cm, 이너 210×315cm, 실내 높이 225cm)로 그렸어요. 앞쪽 모서리 각도는 도면 비율이에요.',outer:o,
+  frames:[{a:[2300,0],b:[2300,W],label:'C프레임'},{a:[4400,0],b:[4400,W],label:''}],
+  inners:{std:{label:'이너룸',model:'',size:'210×315',poly:T2.rect(4600,675,6700,3825)}},
+  doors:[T2.front(W,2600,'전면 도어'),T2.side(1200,2200,0),T2.side(1200,2200,W)],living:[2200,2250],h3d:2250,inH3:1800});}
+{const L=5200,W=3800,o=T2.tun(L,W,600,2600,600,2600);
+T2.add('sp_cumulus',{brand:'스노우피크',name:'에어로 큐뮬러스쉘',model:'TP-480',size:[520,380,200],weight:'약 24kg',cap:'판매처 미표기',src:7906,
+  est:'설치 크기 520×380cm에 맞춘 평면이에요. 에어 프레임 쉘터라 끝 모양은 추정이에요.',outer:o,innerNote:NOINNER,
+  doors:[T2.front(W,2600,'전면 도어'),T2.rear(L,W,2600,'후면 도어')],color:'#D9D4C7',prof:T2.PROF.cabin});}
+{const o=[[0,1100],[1900,0],[4750,0],[4900,150],[4900,3100],[4750,3250],[1900,3250],[0,2150]];
+T2.add('sp_dockdome6',{brand:'스노우피크',name:'도크돔 Pro.6',model:'SD-507IV',size:[490,325,180],weight:'판매처 미표기',cap:'6명',src:4011,
+  est:'전체 490×325cm(전실 포함), 이너 300×300cm는 판매처 표기예요. 전실 모양은 추정이에요.',outer:o,
+  inners:{std:{label:'이너',model:'',size:'300×300',poly:T2.rect(1950,125,4850,3125)}},
+  doors:[{a:[0,1250],b:[0,2000],label:'전실 출입',zone:true},T2.side(2200,3200,0,'측면 출입',false)],living:[900,1625],
+  h3d:1800,inH3:1550,color:'#E4DFD3',prof:T2.PROF.dome});}
+{const o=[[0,1000],[1250,0],[3900,0],[4250,350],[4250,3300],[3900,3650],[1250,3650],[0,2650]];
+T2.add('sp_elfield',{brand:'스노우피크',name:'어메니티 엘필드',model:'AD-020',size:[425,365,210],weight:'판매처 미표기',cap:'6명',src:4967,
+  est:'설치 크기 425×365cm에 맞춘 평면이에요. 전실 길이와 이너 위치는 추정이에요.',outer:o,
+  inners:{std:{label:'이너',model:'',size:'약 265×335 (추정)',poly:T2.rect(1300,150,3950,3500),posEst:true}},
+  doors:[{a:[0,1150],b:[0,2500],label:'전실 출입',zone:true}],living:[650,1825],color:'#E1D9C6',prof:T2.PROF.dome});}
+{const o=[[0,900],[1900,0],[4700,0],[5050,350],[5050,2450],[4700,2800],[1900,2800],[0,1900]];
+T2.add('sp_amenity_m',{brand:'스노우피크',name:'어메니티돔 M',model:'SDE-001RH',size:[505,280,150],weight:'8kg',cap:'5명',src:3495,
+  est:'전체 505×280cm(전실 포함), 이너 265×265cm는 판매처 표기예요. 전실 모양은 추정이에요.',outer:o,
+  inners:{std:{label:'이너',model:'',size:'265×265',poly:T2.rect(2100,75,4750,2725)}},
+  doors:[{a:[0,1050],b:[0,1750],label:'전실 출입',zone:true}],living:[950,1400],h3d:1500,inH3:1350,color:'#C9C2B2',prof:T2.PROF.dome});}
+{const L=6200,W=3600,o=T2.tun(L,W,400,2400,200,3000);
+T2.add('sp_landnest',{brand:'스노우피크',name:'랜드네스트 쉘터',model:'TP-262',size:[620,360,210],weight:'판매처 미표기',cap:'판매처 미표기',href:A247+'737',srcName:'247아웃도어 상품 상세',drawn:true,
+  est:'판매처 평면도(620×360cm, 안쪽 공간 220×338cm, 높이 210cm)로 그렸어요. 끝 모서리는 도면 비율이에요.',outer:o,
+  inners:{std:{label:'안쪽 공간',model:'',size:'220×338',poly:T2.rect(3800,110,5980,3490)}},
+  doors:[T2.front(W,2400,'전면 도어'),T2.side(1300,2300,0),T2.side(1300,2300,W)],color:'#8C7B66'});}
+{const L=5800,W=3600,o=T2.tun(L,W,500,2400,300,3100);
+T2.add('sp_tortue',{brand:'스노우피크',name:'토르튜 Pro. 2026',model:'FES-770',size:[580,360,210],weight:'23kg',cap:'3명',href:A247+'758',srcName:'247아웃도어 상품 상세',drawn:true,
+  est:'판매처 평면도(580×360cm, 이너 220×310cm, 이너 높이 160cm)로 그렸어요. 끝 모서리는 도면 비율이에요.',outer:o,
+  inners:{std:{label:'이너룸',model:'',size:'220×310',poly:T2.rect(3480,250,5700,3350)}},
+  doors:[T2.front(W,2400,'전면 도어'),T2.side(1300,2300,0)],color:'#6F5E4C'});}
+
+/* ===== 쿠디 (에어텐트) ===== */
+const CDYN='쿠디 공식몰 상품 상세',CDYE=(s)=>`쿠디 공식 제원(${s})에 맞춘 평면이에요. 에어빔 박스형이라 모서리는 둥글게 줄였어요.`;
+function cdyBox(id,name,model,Lc,Wc,Hc,kg,cap,no,extra){const L=Lc*10,W=Wc*10,o=T2.box(L,W,250);
+  T2.add(id,Object.assign({brand:'쿠디',name,model,size:[Lc,Wc,Hc],weight:kg,cap,href:CDY+no,srcName:CDYN,est:CDYE(`${Lc}×${Wc}×${Hc}cm`),outer:o,
+    innerNote:'바닥 일체형 에어텐트예요. 잠자리는 직접 입력으로 표시해보세요.',
+    doors:[T2.front(W,W-500,'전면 도어'),T2.rear(L,W,W-500,'후면 도어')],color:'#DCCFB6',prof:T2.PROF.cabin},extra||{}));}
+cdyBox('cd_familia','파밀리아 17.2','Familia 17.2',480,360,220,'66kg','4–6명',98,{est:CDYE('480×360×220cm, 바닥 17.2㎡')});
+cdyBox('cd_familia_pro','파밀리아 프로','Familia PRO',480,360,230,'55kg','4–6명',261);
+cdyBox('cd_136','13.6','Familia 13.6',380,360,220,'60kg','4명',97);
+cdyBox('cd_100','10.0','Coody 10.0',340,340,220,'40kg','3–4명',96);
+cdyBox('cd_100_pro','10.0 프로','10.0 PRO',280,360,230,'32kg','2–4명',289,{doors:[T2.side(500,2300,0,'전면 도어'),T2.side(500,2300,3600,'후면 도어',false)]});
+cdyBox('cd_80','8.0','Coody 8.0',320,250,204,'35kg','2–3명',100);
+cdyBox('cd_80_pro','8.0 프로','8.0 PRO',380,320,270,'판매처 미표기','2–3명',343);
+cdyBox('cd_wave','웨이브','Wave',280,250,200,'25kg','2명',99);
+cdyBox('cd_roomy','루미','Roomy',400,320,230,'40kg','3–4명',104);
+cdyBox('cd_hub','허브쉘터','Hub Shelter',360,360,259,'판매처 미표기','4–6명',101,{est:CDYE('바깥 360×360cm, 높이 259cm'),
+  doors:[T2.front(3600,3100),T2.rear(3600,3600,3100,'출입문',true),T2.side(800,2800,0,'출입문'),T2.side(800,2800,3600,'출입문')],innerNote:'바닥 없는 쉘터형이에요. 이너는 직접 입력으로 넣어보세요.'});
+cdyBox('cd_hub_pro','허브쉘터 프로','Hub Shelter PRO',360,380,270,'47kg','4–6명',262,{innerNote:'바닥 없는 쉘터형이에요. 이너는 직접 입력으로 넣어보세요.'});
+cdyBox('cd_90dock','9.0 도킹 쉘터','9.0 Car Docking',250,360,220,'27kg','2–4명',105,{doors:[T2.side(500,2000,0,'측면 도어'),{a:[2500,400],b:[2500,3200],label:'차량 연결부',zone:false}],
+  innerNote:'차량 뒤에 붙이는 도킹 쉘터예요.'});
+{const D=4600,o=T2.poly(8,D,2300,2300);
+T2.add('cd_aurora',{brand:'쿠디',name:'오로라 돔 5M',model:'Aurora Dome',size:[500,500,250],weight:'71kg (포장)',cap:'6–8명',href:CDY+'102',srcName:CDYN,
+  est:'쿠디 공식 제원(모서리 500cm, 벽-벽 460cm 팔각형, 높이 250cm)으로 그렸어요. 출입문 3곳 중 2곳만 표시했어요.',outer:o,innerNote:'바닥 일체형 에어 돔이에요.',
+  doors:[{a:L2(o[0],o[1],.15),b:L2(o[0],o[1],.85),label:'출입문',zone:true},{a:L2(o[4],o[5],.15),b:L2(o[4],o[5],.85),label:'출입문',zone:false}],
+  living:[2300,2300],color:'#E3D9C4',prof:T2.PROF.dome});}
+{const D=3800,o=T2.poly(8,D,1900,1900);
+T2.add('cd_bestona',{brand:'쿠디',name:'베스토나',model:'Bestona',size:[380,380,255],weight:'55kg (포장)',cap:'4–6명',href:CDY+'204',srcName:CDYN,
+  est:'쿠디 공식 제원(380×380cm 팔각 돔, 높이 255cm)으로 그렸어요.',outer:o,innerNote:'바닥 일체형 에어 돔이에요.',
+  doors:[{a:L2(o[0],o[1],.15),b:L2(o[0],o[1],.85),label:'출입문',zone:true}],living:[1900,1900],color:'#E3D9C4',prof:T2.PROF.dome});}
+{const D=3000,o=T2.poly(8,D,1500,1500);
+T2.add('cd_havena',{brand:'쿠디',name:'하베나',model:'Havena',size:[300,300,235],weight:'30.5kg',cap:'2–3명',href:CDY+'205',srcName:CDYN,
+  est:'쿠디 공식 제원(본체 300×300cm, 높이 235cm)으로 그렸어요. 일체형 타프(약 7m)는 평면에 넣지 않았어요.',outer:o,innerNote:'바닥 일체형이에요. 앞쪽 일체형 타프 아래가 리빙이에요.',
+  doors:[{a:L2(o[0],o[1],.15),b:L2(o[0],o[1],.85),label:'출입문',zone:true}],living:[1500,1500],color:'#D3C6AA',prof:T2.PROF.dome});}
+
+/* ===== 스노우라인 ===== */
+{const L=6800,W=3400,o=T2.tun(L,W,700,2500,700,2500);
+T2.add('sl_saturn',{brand:'스노우라인',name:'새턴 2룸 DX',model:'SNF5ULT004',size:[680,340,210],weight:'24.5kg',cap:'4명',href:OC+'7303',srcName:'오캠프 상품 상세',drawn:true,
+  est:'판매처 평면도(680×340cm, 양 끝 폭 250cm, 이너 310×255cm, 이너 높이 185cm)로 그렸어요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'310×255',poly:T2.rect(3500,150,6050,3250)}},
+  doors:[T2.front(W,2500,'전면 도어'),T2.side(1400,2400,0),T2.side(1400,2400,W),T2.rear(L,W,2500)],color:'#C9B79A'});}
+{const L=6100,W=3200,o=T2.tun(L,W,0,W,300,2400);
+T2.add('sl_miracle_screen',{brand:'스노우라인',name:'미라클 스크린텐트',model:'SNF5ULT001',size:[610,320,225],weight:'22kg',cap:'4명',href:OC+'8569',srcName:'오캠프 상품 상세',drawn:true,
+  est:'판매처 평면도(610×320cm, 뒤쪽 폭 240cm, 이너 295×245cm, 이너 높이 185cm)로 그렸어요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'295×245',poly:T2.rect(3350,125,5800,3075)}},
+  doors:[T2.front(W,W,'전면 도어'),T2.side(1200,2400,0),T2.side(1200,2400,W)],color:'#C9B79A'});}
+{const L=5820,W=3300,o=T2.tun(L,W,300,2800,600,2400);
+T2.add('sl_miracle_x',{brand:'스노우라인',name:'미라클 X',model:'SNJ5ULT001',size:[582,330,214],weight:'19.5kg',cap:'4명',href:OLM+'36164',srcName:'아웃도어랜드마크 상품 상세',
+  est:'판매처 제원(582×330×214cm)에 맞춘 평면이에요. 끝 모양은 측면 그림 비율로 추정했어요.',outer:o,innerNote:NOINNER,
+  doors:[T2.front(W,2800,'전면 도어'),T2.side(1200,2300,0),T2.side(1200,2300,W)],color:'#2E2F2C'});}
+
+/* ===== 어반사이드 ===== */
+{const L=6600,W=4800,o=T2.tun(L,W,1200,2400,1200,2400);
+T2.add('us_stego',{brand:'어반사이드',name:'스테고 돔',model:'STEGO DOME',size:[660,480,240],weight:'19kg',cap:'판매처 미표기',href:OC+'18433',srcName:'오캠프 상품 상세',
+  est:'판매처 제원(660×480×240cm)에 맞춘 평면이에요. 바닥 도면이 없어 모양은 추정이에요.',outer:o,innerNote:'이너텐트는 별매예요. 직접 입력으로 넣어보세요.',
+  doors:[T2.front(W,2400,'전면 도어'),T2.rear(L,W,2400)],color:'#5E6553',prof:T2.PROF.dome});}
+{const L=6500,W=4500,o=T2.box(L,W,200);
+T2.add('us_easybunker',{brand:'어반사이드',name:'이지벙커 프로 650',model:'EASY BUNKER PRO 650',size:[650,450,250],weight:'22kg',cap:'6–8명',href:OC+'19894',srcName:'오캠프 상품 상세',drawn:true,
+  est:'판매처 도면(650×450×250cm, 이너 400×250cm, 이너 높이 200cm)으로 그렸어요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'400×250',poly:T2.rect(3800,250,6300,4250)}},
+  doors:[T2.front(W,4100,'전면 도어'),T2.side(1300,2700,0),T2.side(1300,2700,W)],color:'#3B3D3C',prof:T2.PROF.cabin});}
+
+/* ===== 코베아 ===== */
+{const L=6400,W=4000,o=T2.tun(L,W,600,3000,400,3400);
+T2.add('kv_ghost_air',{brand:'코베아',name:'고스트 팬텀 에어',model:'KEC29TO-03',size:[640,400,210],weight:'33kg',cap:'5명',href:OLM+'36345',srcName:'아웃도어랜드마크 상품 상세',drawn:true,
+  est:'판매처 도면(640×400×210cm, 이너 250×380cm, 이너 높이 190cm)으로 그렸어요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'380×250',poly:T2.rect(3600,100,6100,3900)}},
+  doors:[T2.front(W,3000,'전면 도어'),T2.side(1300,2500,0),T2.side(1300,2500,W)],color:'#4F5642'});}
+
+/* ===== 노스피크 ===== */
+{const L=5900,W=3000,o=T2.tun(L,W,600,2500,600,2500);
+T2.add('np_atlantic',{brand:'노스피크',name:'아틀란틱 오션',model:'Atlantic Ocean',size:[590,300,177],weight:'19.5kg',cap:'4명',href:OLM+'34541',srcName:'아웃도어랜드마크 상품 상세',drawn:true,
+  est:'판매처 평면도(590×300cm, 이너 225×280cm, 높이 177cm)로 그렸어요. 끝 모서리는 도면 비율이에요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'225×280',poly:T2.rect(3050,100,5300,2900)}},
+  doors:[T2.front(W,2500,'전면 도어'),T2.side(1400,2350,0),T2.side(1400,2350,W)],h3d:1770,inH3:1600,color:'#3A3B3E'});}
+{const o=[[0,200],[2050,200],[2050,-1200],[3450,-1200],[3450,100],[5800,100],[5800,3400],[3450,3400],[3450,3500],[2050,3500],[2050,3300],[0,3300]];
+T2.add('np_indiana',{brand:'노스피크',name:'인디아나',model:'Indiana',size:[580,330,215],weight:'29kg',cap:'5명',href:OLM+'34537',srcName:'아웃도어랜드마크 상품 상세',drawn:true,
+  est:'판매처 평면도(580cm 길이: 앞 205 + 가운데 140 + 뒤 235cm, 폭 310~350cm, 옆 전실 140×120cm, 이너 210×320cm)로 그렸어요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'210×320',poly:T2.rect(3600,150,5700,3350)}},
+  doors:[T2.front(3100,2600,'전면 도어'),{a:[2200,-1200],b:[3300,-1200],label:'측면 전실 출입',zone:true}],living:[1500,1750],color:'#DDD5C4'});}
+
+/* ===== 도쿄크래프트 ===== */
+{const L=6000,W=3000,o=[[0,300],[300,0],[4500,0],[6000,550],[6000,2450],[4500,3000],[300,3000],[0,2700]];
+T2.add('tc_wing',{brand:'도쿄크래프트',name:'윙',model:'Wing',size:[600,300,210],weight:'23kg',cap:'4명',href:OLM+'36837',srcName:'아웃도어랜드마크 상품 상세',drawn:true,
+  est:'판매처 도면(600×300×210cm, 사다리꼴 이너 275→180×210cm, 이너 높이 195cm)으로 그렸어요. 뒤쪽 좁아지는 각도는 도면 비율이에요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'275→180 × 210',poly:[[3800,125],[5900,600],[5900,2400],[3800,2875]]}},
+  doors:[T2.front(W,2400,'전면 도어'),T2.side(1300,2500,0)],color:'#2C2D2B'});}
+
+/* ===== 반고 ===== */
+{const L=5900,W=3350,o=T2.tun(L,W,200,2950,400,2700);
+T2.add('vg_airhive500',{brand:'반고',name:'에어하이브 500 V2',model:'Airhive 500 V2',size:[590,335,200],weight:'18kg',cap:'5명',href:OLM+'36834',srcName:'아웃도어랜드마크 상품 상세',drawn:true,
+  est:'판매처 평면도(590×335×200cm, 앞 355 + 이너 231cm, 이너 폭 300cm, 이너 높이 185cm)로 그렸어요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'231×300',poly:T2.rect(3250,175,5480,3175)}},
+  doors:[T2.front(W,2950,'전면 도어'),T2.side(1300,2400,0),T2.side(1300,2400,W),T2.rear(L,W,2700)],color:'#2B2C2E',prof:T2.PROF.cabin});}
+
+/* ===== 몬테라 ===== */
+{const o=[[0,1775],[1100,0],[3300,0],[4400,1775],[3300,3550],[1100,3550]];
+T2.add('mt_mars',{brand:'몬테라',name:'마스 돔 쉘터',model:'Mars Dome',size:[440,355,210],weight:'16.5kg',cap:'4–5명',href:A247+'788',srcName:'247아웃도어 상품 상세',
+  est:'판매처 제원(440×355×210cm, 육각 그라운드시트 415×332cm)에 맞춘 육각 평면이에요.',outer:o,innerNote:'이너 없이 쓰는 돔 쉘터예요.',
+  doors:[{a:L2(o[5],o[0],.2),b:L2(o[5],o[0],.8),label:'전면 포치',zone:true},{a:L2(o[2],o[3],.2),b:L2(o[2],o[3],.8),label:'후면 도어',zone:false}],
+  living:[2200,1775],color:'#59604B',prof:T2.PROF.dome});}
+
+/* ===== 캠핑칸 ===== */
+{const o=[[0,600],[630,0],[3630,0],[4260,600],[4260,2700],[3630,3300],[630,3300],[0,2700]];
+T2.add('ck_oakdome_l',{brand:'캠핑칸',name:'오크돔 L',model:'Oak Dome L',size:[426,330,200],weight:'17kg (스킨)',cap:'5–6명',href:A247+'715',srcName:'247아웃도어 상품 상세',
+  est:'판매처 제원(330×300×200cm, 앞뒤 63cm 확장)에 맞춘 평면이에요.',outer:o,innerNote:NOINNER,
+  doors:[{a:[0,1000],b:[0,2300],label:'전면 도어',zone:true},{a:[4260,1000],b:[4260,2300],label:'후면 도어',zone:false},T2.side(1300,2700,0,'측면 창·도어',false)],
+  living:[2130,1650],color:'#9C8B6E',prof:T2.PROF.tunnel});}
+
+TENT_ORDER.splice(0,TENT_ORDER.length,'landlock','landlock_x','living_shell','living_shell_long_pro','merak_pro','hb_atlas','hb_keron4gt','hx_nona','hx_vtarp','hp_backdoor','hp_cave','hp_mavericks',...T2.ids,'none');
 TENTS.none.brand='';
-const BRANDS=['스노우피크','힐레베르그','헬리녹스','하임플래닛'];
+const BRANDS=['스노우피크','힐레베르그','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸'];
 
 let tent={id:'landlock',inner:'std',canopy:false,custom:{w:200,d:210}};
 
@@ -1309,7 +1491,7 @@ const CATALOG={
 /* free-standing gear: no mating edges, real footprint + height */
 function circPoly(r,n){const v=[];for(let k=0;k<n;k++){const a=k/n*Math.PI*2;v.push([r+r*Math.cos(a),r+r*Math.sin(a)]);}return v;}
 const gearShape=(w,d)=>shape(rect(w,d),[]);
-const HEAT_NOTE='난로는 텐트 천·이너룸·가구와 넉넉히 띄우고 환기하세요. 이격 거리는 제품 설명서를 따라주세요.';
+const HEAT_NOTE='';
 const GEAR={
   sc25:{gtype:'box',group:'쉘프컨테이너',name:'쉘프컨테이너 25',model:'UG-025G',conf:'retailer',w:520,d:325,h:210,kg:3.6,sw:'#6B6E68',
     note:'안쪽 405×290×195mm. 같은 크기끼리 쌓을 수 있어요. 올리브 FES-037-OL도 같은 크기',src:'3357'},
@@ -1523,9 +1705,7 @@ function checkRules(){
     if(g&&!CATALOG[g.type].heat&&CATALOG[g.type].h<=pieceH(t)-60){g._under=true;I.push(`아래 수납: ${pName(g)}, ${pName(t)} 밑 (높이 ${CATALOG[g.type].h/10} / ${pieceH(t)/10}cm)`);continue;}
     P._ov=Q._ov=true;W.push(`<b>겹침</b> ${pName(P)}와 ${pName(Q)}, 약 ${Math.round(d/10)}cm`);}
   const heaters=state.pieces.filter(p=>CATALOG[p.type].heat);
-  if(heaters.length)I.push('<b>난방 주의</b> 난로는 텐트 천·이너룸·가구와 넉넉히 띄우고, 환기구를 열고 일산화탄소 경보기를 함께 두세요. 이격 거리는 제품 설명서를 따라주세요');
   heaters.forEach(h=>{const c=CATALOG[h.type],ce=centroid(h._v);
-    if(TW&&pointInPoly(ce,TW.fabric))I.push(`${pName(h)}: 타프 아래예요. 타프 천이 난로에서 충분히 높은지 확인하세요`);
     if(c.gtype==='fan')I.push(`${pName(h)}: 전원(220V)이 필요해요. 파워뱅크나 전기 사이트를 챙기세요`);});
   state.pieces.forEach(p=>{const c=CATALOG[p.type];if(c.kind!=='frame')return;
     ['top','bottom'].forEach(en=>{const k=edgeKids(p,en).filter(q=>!['tray','h020'].includes(CATALOG[q.type].kind));
@@ -1825,10 +2005,6 @@ function buildSVG(size){
   </defs>`;
   let body=`<rect x="-100000" y="-100000" width="200000" height="200000" fill="#C8D2C4" onpointerdown="startPan(event)"/>`;
   body+=gridLayer(vw,vh)+tentLayer()+tarpLayer();
-  state.pieces.filter(p=>p._heat).forEach(p=>{const c=CATALOG[p.type],ce=centroid(p._v);
-    body+=`<polygon points="${pts(p._heat)}" fill="${p._ov?'rgba(142,47,56,.10)':'rgba(200,100,46,.07)'}" stroke="#C8642E" stroke-opacity=".7" stroke-width="${1.3*k}" stroke-dasharray="${6*k} ${4*k}" pointer-events="none"/>`;
-    const lp=c.heat.type==='round'?[ce[0],p._bb[0][1]-c.heat.c+16*k]:applyT(p._T,[c.w/2,c.d+c.heat.front-10*k]);
-    body+=`<text x="${lp[0].toFixed(0)}" y="${lp[1].toFixed(0)}" text-anchor="middle" font-size="${10.5*k}" fill="#A04F22" font-weight="600" pointer-events="none">난방 안전거리 ${c.heat.type==='round'?'1m':'앞 1m'}</text>`;});
   const roots=state.pieces.filter(p=>p.parent==null).sort((a,b)=>(a.z||0)-(b.z||0));
   let top='';
   roots.forEach(r=>{
@@ -1962,7 +2138,7 @@ function openAddMain(){let html=`<div class="mnote">처음 놓을 조각을 골�
   showModal('테이블 추가',html);}
 function openAddGear(){let html=`<div class="mnote">따로 서는 장비예요. 리빙 가운데에 놓이고, 끌어서 옮기고 패널에서 돌려요. IGT보다 낮은 장비는 테이블 아래에 넣을 수 있어요.</div>`;
   GEAR_GROUPS.forEach(g=>{html+=`<div class="mgroup">${g}</div>`;GEAR_ORDER.filter(t=>CATALOG[t].group===g).forEach(t=>{html+=itemHtml(t,`addMain('${t}')`);});});
-  html+=`<p class="muted" style="margin-top:10px">${HEAT_NOTE}</p>`;showModal('선반·난로 추가',html);}
+  showModal('선반·난로 추가',html);}
 function newPiece(type,extra){const c=CATALOG[type];const p={uid:uidSeq++,type,parent:null,pEdge:null,mEdge:null,...extra};if(c.kind==='frame')p.slots=Array(c.units*2).fill(null);return p;}
 function addMain(type){const T=TENTS[tent.id],c=centroid(CATALOG[type].verts),n=state.pieces.filter(p=>p.parent==null).length;
   let L=T.outer?T.living:(tarp.id?[tarp.x,tarp.y]:[0,0]);const [hw,hh]=hostSize(),vc=[viewX+hw/SCALE/2,viewY+hh/SCALE/2];
@@ -2109,7 +2285,7 @@ function renderSel(){const el=document.getElementById('selPanel');
   const r=typeof sel==='number'?byId(sel):null;
   if(!r){el.innerHTML=state.pieces.length?`<p class="muted">세트를 누르면 회전·삭제 버튼과 변마다 붙이기 표시가 나와요.</p>`:'';return;}
   const isl=state.pieces.filter(p=>rootOf(p).uid===r.uid),c=CATALOG[r.type];
-  if(c.kind==='gear'){el.innerHTML=`<div class="selbox"><h3>${c.name}${badge(c.conf)}</h3><p>${c.model}, ${c.spec}. ${c.note}${c.heat?'. '+HEAT_NOTE:''}</p>
+  if(c.kind==='gear'){el.innerHTML=`<div class="selbox"><h3>${c.name}${badge(c.conf)}</h3><p>${c.model}, ${c.spec}. ${c.note}</p>
     <div class="btnrow"><button class="btn small" onclick="onRotate(${r.uid},-15)">⟲ 15°</button><button class="btn small" onclick="onRotate(${r.uid},15)">⟳ 15°</button>
     <button class="btn small" onclick="onRotate(${r.uid},90)">90° 돌리기</button><button class="btn small" onclick="onZ(${r.uid})">맨 위로</button>
     <button class="btn small danger" onclick="killSet(${r.uid});render()">빼기</button></div>${gLink(c)?`<p class="muted" style="margin-top:8px"><a href="${gLink(c)}" target="_blank" rel="noopener">${gLinkName(c)}</a></p>`:''}</div>`;return;}
@@ -2122,7 +2298,7 @@ function updateSpec(){const W=document.getElementById('sWarn'),B=document.getEle
   const T0=TENTS[tent.id];
   if(T0.outer||tarp.id){const b=sceneBox(true);S.innerHTML=`<div class="site"><span>필요한 사이트 크기<br>${tarp.id?'타프 펙까지, ':''}텐트 스트링 제외</span><b>${((b[1][0]-b[0][0])/1000).toFixed(1)} × ${((b[1][1]-b[0][1])/1000).toFixed(1)} m</b></div>`;}
   else S.innerHTML='';
-  if(!state.pieces.length){W.innerHTML=(lastWarn.length?`<div class="warnBox">${lastWarn.join('<br>')}</div>`:'')+(lastInfo.length?`<div class="infoBox">${lastInfo.join('<br>')}</div>`:'')+`<p class="help">테이블과 장비를 놓으면 겹침, 이너룸 침범, 출입구 막힘을 알려주고, 난로를 놓으면 주의사항을 띄워요.</p>`;B.innerHTML='';return;}
+  if(!state.pieces.length){W.innerHTML=(lastWarn.length?`<div class="warnBox">${lastWarn.join('<br>')}</div>`:'')+(lastInfo.length?`<div class="infoBox">${lastInfo.join('<br>')}</div>`:'')+`<p class="help">테이블과 장비를 놓으면 겹침, 이너룸 침범, 출입구 막힘과 겹침을 여기서 알려줘요.</p>`;B.innerHTML='';return;}
   W.innerHTML=(lastWarn.length?`<div class="warnBox">${lastWarn.join('<br>')}</div>`:`<div class="okBox">겹치거나 텐트를 벗어난 조각이 없어요.</div>`)+(lastInfo.length?`<div class="infoBox">${lastInfo.join('<br>')}</div>`:'');
   const T=TENTS[tent.id],inner=tentInner(),bom=new Map();const add=(m,n,c)=>{const v=bom.get(m)||{n,c,q:0};v.q++;bom.set(m,v);};
   if(T.outer)add(T.model,T.name,'retailer');if(inner&&inner.model)add(inner.model,'이너룸','retailer');
@@ -2810,7 +2986,7 @@ function renderCatalog(){const chips=document.getElementById('catChips'),el=docu
     list.forEach(t=>{const c=CATALOG[t],b=bbox(c.verts),w=Math.round(b[1][0]-b[0][0]),d=Math.round(b[1][1]-b[0][1]);n++;
       const size=c.kind==='gear'?`${c.w}×${c.d}×${c.h}`:`${w}×${d}`;
       html+=`<button type="button" class="pc" onclick="catAdd('${t}')" aria-label="${esc(c.name)} 놓기"><span class="pv">${catPreview(t)}</span>
-        <span><span class="pn">${esc(c.name)}${isWeak(c.conf)?' *':''}</span><br><span class="pm">${esc(c.model)} · ${size}mm${c.heat?' · <span class="pw">배치 주의</span>':''}</span></span></button>`;});});
+        <span><span class="pn">${esc(c.name)}${isWeak(c.conf)?' *':''}</span><br><span class="pm">${esc(c.model)} · ${size}mm${c.heat?'':''}</span></span></button>`;});});
   el.innerHTML=html||`<div class="cat-empty">‘${esc(q)}’에 맞는 장비가 없어요. 이름 일부나 모델명으로 찾아보세요.</div>`;}
 function catAdd(t){addMain(t);if(matchMedia('(max-width:860px)').matches)document.getElementById('board').scrollIntoView({behavior:'smooth',block:'center'});}
 (function v15boot(){const f=document.getElementById('factIgt');if(f)f.innerHTML=(ORDER.length+SLOT_ITEMS.length+Object.keys(RACKS).length)+'<span>종</span>';
@@ -3002,13 +3178,13 @@ const GSEC=[
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].sleep).map(id=>gearCard(id))},
   {k:'chair',t:'체어',img:'img/flatlay.webp',d:'스노우피크·헬리녹스·커밋체어. 펼친 크기와 좌면 높이를 실제 값으로 넣었어요. 좌면이 낮은 로우체어는 낮은 테이블과 맞춰보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='chair').map(id=>gearCard(id))},
-  {k:'heat',t:'난방',img:'img/heat.webp',d:'난로와 팬히터를 놓으면 배치 주의사항을 띄워요. 텐트 천·이너룸·가구와 넉넉히 띄우고 꼭 환기하세요.',
+  {k:'heat',t:'난방',img:'img/heat.webp',d:'팬히터·가스난로·화목난로의 크기예요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].heat).map(id=>gearCard(id))},
 ];
 function gearCard(id){const g=GEAR[id];
   return {id,q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'?'난로 히터':''}${g.gtype==='chair'?'의자 체어 '+(g.srcName||''):''}${g.sleep?'매트 침대 야전침대 코트 자충':''}${g.alu?'알루텍 알루미늄 박스 수납':''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
     <div class="gb"><div><h3>${g.name}</h3><span class="md">${g.model}</span></div>
-    <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.sh?`<dt>좌면 높이</dt><dd>${fmt(g.sh)}mm</dd>`:''}${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}${g.heat?`<dt>배치</dt><dd class="warn">주의 (설명서 이격 거리)</dd>`:''}</dl>
+    <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.sh?`<dt>좌면 높이</dt><dd>${fmt(g.sh)}mm</dd>`:''}${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}</dl>
     ${g.note?`<p class="nt">${g.note}</p>`:''}
     <div class="ga"><button type="button" onclick="gearUse('item','${id}')">배치에 놓기</button>${gLink(g)?`<a href="${gLink(g)}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};}
 let GEAR_F='all';
