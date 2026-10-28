@@ -61,6 +61,7 @@ JSON만 출력: {"tent":"텐트 id 또는 null","inner":"[이너텐트] id 또�
 - 사용자 글에 없는 장비는 절대 추가하지 마. 띄어쓰기·오타가 있어도 (=별칭)을 보고 맞춰 (예: 스탠마이테이블=mytable_s).
 - '테이블','의자','버너'처럼 브랜드·모델 없는 일반 이름은 아무 제품으로 바꾸지 말고 unknown에.
 - 수량이 없으면 1. 같은 id는 count로 합쳐. 목록에 없으면 unknown에 원래 이름 그대로.
+- 목록에 없는 브랜드·모델은 비슷한 장비로 바꾸지 마. 예: '마운틴리버 야전침대'가 목록에 없으면 코트원으로 바꾸지 말고 unknown에만.
 - zone: 사용자가 말한 위치를 따름. 가운데/중앙=center, 벽쪽=wall, 오른쪽(끝)=right, 왼쪽=left, 위쪽/뒤쪽=top, 아래쪽/앞쪽=bottom, 이너룸/침실=inner. 말이 없으면 매트·코트=inner, IGT·선반·박스=wall, 체어·테이블·난로=center.
 - [결합] 목록의 멀티펑션·코너·오픈멀티펑션은 혼자 두지 말고 IGT 프레임 항목의 attach에 넣어. IGT 앞(긴 변)에 붙여 앞으로 내면 shape "T"(T자/앞에 붙여), 일자로 길게 이으면(IGT 끝에 연결) "line". 말이 없으면 "line". IGT를 말하지 않았으면 reg3을 하나 만들어 붙여.
 - [IGT 칸] 목록(버너·트레이·상판·수납)은 장비가 아니라 IGT 프레임 칸에 끼우는 파츠라 IGT 항목의 slots에 넣어. 슬라이드 트레이는 attach(shape line).
@@ -316,6 +317,10 @@ function aiTidy(res,said,prev,now){const L=aiLocal(said),want={};
   // 글에 없는 IGT를 지어냈고 칸·결합도 없으면 빼기
   const named=new Set(L.items.map(x=>x.type));if(prev)prev.items.forEach(x=>named.add(x.type));
   res.items=res.items.filter(it=>!(AI_ROOTS.includes(it.type)&&!named.has(it.type)&&!(it.slots||[]).length&&!(it.attach||[]).length&&!L.items.some(x=>AI_ROOTS.includes(x.type))));
+  // 목록에 없다고 한 장비를 비슷한 장비로 바꿔 넣었으면 빼기 (같은 종류 이름이 unknown에 있고, 글에서 그 장비 이름을 못 찾을 때)
+  const unk=(res.unknown||[]).map(aiNorm).join('|');
+  if(unk)res.items=res.items.filter(it=>{if(AI_ROOTS.includes(it.type)||named.has(it.type))return true;const c=CATALOG[it.type];
+    const g=[c&&c.group,c&&c.gtype==='chair'&&'체어',c&&c.gtype==='chair'&&'의자',c&&c.gtype==='cot'&&'침대'].filter(Boolean).map(aiNorm);return !g.some(w=>w.length>=2&&unk.includes(w));});
   res.unknown=(res.unknown||[]).filter(u=>!/^(igt|아이지티|타프|텐트|이너|이너텐트|매트|테이블|의자|체어)$/i.test(aiNorm(u)));
   if(added.length&&!(res.added&&res.added.length))res.added=added;
   if(res.inner&&!(prev&&prev.inner===res.inner)&&L.inner!==res.inner)res.inner=L.inner||null;}
