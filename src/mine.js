@@ -55,12 +55,17 @@ async function minePhoto(){const inp=document.getElementById('minePic'),st=docum
       const o=JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim());
       (o.found||[]).forEach(x=>{if(!x||(Array.isArray(o.seen)&&o.seen.length&&!x.why))return;const it=mineByKey(String(x.key||''));if(!it)return;const c=Math.min(8,Math.max(1,+x.count||1)),old=MINE_FOUND.find(y=>y.key===it.key);if(old)old.count=Math.max(old.count,c);else MINE_FOUND.push({...it,count:c,sure:x.sure});});
       (o.unknown||[]).forEach(u=>typeof u==='string'&&u.trim()&&unk.add(u.trim().slice(0,40)));}catch(e){fail='error';}}
+  // AI가 목록에 없다고 한 이름도 장비 제원 이름과 같으면 찾은 장비로 옮김 (예: '스노우피크 플랫버너' → 플랫버너)
+  const bare=t=>aiNorm(String(t).replace(/스노우피크|snow\s*peak/gi,''));
+  [...unk].forEach(u=>{const n=bare(u);if(n.length<2)return;let best=null,bl=0;
+    mineAll().forEach(it=>{const m=bare(it.name);if(m.length<3)return;if((m===n||(it.k!=='tent'&&n.includes(m)))&&m.length>bl){best=it;bl=m.length;}});
+    if(best){unk.delete(u);if(!MINE_FOUND.find(y=>y.key===best.key))MINE_FOUND.push({...best,count:1,sure:'mid'});}});
   btn.disabled=false;if(typeof camEv==='function')camEv('mine-photo','내 장비 사진 인식');
   if(!MINE_FOUND.length&&!unk.size){st.textContent=fail==='limit'?'오늘 AI 사용량이 많아요. 잠시 뒤 다시 해보세요.':fail?'사진 인식은 서버 설정이 끝나면 열려요. 지금은 이름으로 찾아서 넣어 주세요.':'사진에서 장비를 찾지 못했어요. 장비가 크게 보이게 다시 찍어 보세요.';return;}
   st.textContent=`찾은 장비 ${MINE_FOUND.length}가지 · 맞는 것만 체크해서 넣어 주세요`;
   out.innerHTML=(MINE_FOUND.length?`<ul class="mn-found">${MINE_FOUND.map((x,i)=>`<li><label><input type="checkbox" data-i="${i}" ${x.sure==='low'?'':'checked'}><span class="mn-n"><b>${aiEsc(x.name)}</b><small>${aiEsc(x.sec)} · ${x.count}개${x.sure==='low'?' · 확실하지 않음':''}</small></span></label></li>`).join('')}</ul>
     <button type="button" class="btn-dark" onclick="mineTake()">체크한 장비 넣기</button>`:'')+
-    (unk.size?`<div class="ai-unk"><p class="ai-warn">장비 제원에 아직 없는 장비예요. 비슷한 걸로 바꾸지 않았어요.</p><p>${[...unk].map(u=>`<button type="button" class="rq-ask" data-n="${aiEsc(u)}" onclick="reqAsk(this)">${aiEsc(u)} · 추가 요청</button>`).join('')}</p></div>`:'');}
+    (unk.size?`<p class="mn-other">장비 제원에 없어서 뺀 것: ${[...unk].map(aiEsc).join(', ')}</p>`:'');}
 function mineTake(){document.querySelectorAll('#mineRes input[type=checkbox]').forEach(c=>{if(!c.checked)return;const x=MINE_FOUND[+c.dataset.i];MYG[x.key]=Math.max(MYG[x.key]||0,x.count);});
   mineSave();mineRender();document.getElementById('mineRes').innerHTML='';document.getElementById('mineSt').textContent='내 장비에 넣었어요';document.getElementById('minePic').value='';minePicked();}
 let MINE_PREV=[];
