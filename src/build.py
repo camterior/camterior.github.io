@@ -51,7 +51,8 @@ META = '''<meta name="description" content="캠테리어(CAMTERIOR) — 텐트 �
 <meta property="og:title" content="캠테리어 · 캠핑 인테리어 플래너">
 <meta property="og:description" content="텐트 도면 위에 장비를 mm 단위로 먼저 놓아보고 떠나세요.">
 <meta property="og:image" content="img/intro.webp">
-<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/icon-64.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://camterior.goatcounter.com; connect-src 'self' https://cdn.jsdelivr.net https://camterior-ai.ghdwnd2.workers.dev https://camterior.goatcounter.com; worker-src 'self'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="no-referrer">'''
