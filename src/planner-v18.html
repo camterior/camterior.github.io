@@ -3230,7 +3230,7 @@ async function exportPNG(){
     g.fillStyle='#8E2F38';g.fillRect(W-48-120,40,120,4);
     let bar=1000;if(bar*scale<80)bar=2000;g.fillStyle='#1F2421';g.fillRect(48,H+HEAD+14,bar*scale,3);g.fillRect(48,H+HEAD+8,2,12);g.fillRect(48+bar*scale-2,H+HEAD+8,2,12);
     g.font='400 15px Pretendard, sans-serif';g.fillStyle='#575C57';g.fillText(`${bar/1000}m`,58+bar*scale,H+HEAD+22);
-    g.textAlign='right';g.fillText('캠프 배치도 · 규격: 판매처 상품 상세 (2026-10-02 확인), 일부 근사값',W-48,H+HEAD+22);
+    g.textAlign='right';g.fillText('CAMTERIOR · 인스타 @hj_ironcamp · 규격: 판매처·제조사 공개 치수, 일부 근사값',W-48,H+HEAD+22);
     const blob=await new Promise(r=>cv.toBlob(r,'image/png'));await offerFile(`camp-layout-${stamp()}.png`,blob);}
   catch(e){console.error(e);setStatus('이미지를 만들지 못했어요.');}
   finally{URL.revokeObjectURL(url);render();}}
@@ -3395,8 +3395,8 @@ async function exportCard(){
     const T=TENTS[tent.id],t=TARPS[tarp.id],o=planObj(),sb=sceneBox(true);
     g.fillStyle='#FF5A1F';g.beginPath();g.roundRect(PX,64,48,48,13);g.fill();
     g.strokeStyle='#fff';g.lineWidth=4;g.lineJoin='round';g.beginPath();g.moveTo(PX+10,PX+44);g.lineTo(PX+24,74);g.lineTo(PX+38,PX+44);g.closePath();g.stroke();g.beginPath();g.moveTo(PX+24,74);g.lineTo(PX+24,PX+44);g.stroke();
-    g.fillStyle='#fff';g.font=F(800,30);g.fillText('캠프 배치도',PX+64,98);
-    g.fillStyle='#7FD1A4';g.font=F(600,22);g.textAlign='right';g.fillText('IRON_CAMP',W-PX,98);g.textAlign='left';
+    g.fillStyle='#fff';g.font=F(800,30);g.fillText('CAMTERIOR',PX+64,98);
+    g.fillStyle='#7FD1A4';g.font=F(600,22);g.textAlign='right';g.fillText('@hj_ironcamp',W-PX,98);g.textAlign='left';
     const title=(document.getElementById('saveName').value||'').trim()||[T.outer?T.name:null,t?t.name:null].filter(Boolean).join(' + ')||'내 캠핑 배치';
     g.fillStyle='#fff';g.font=F(800,58);g.fillText(title.length>18?title.slice(0,18)+'…':title,PX,200);
     g.fillStyle='#A9B6AE';g.font=F(500,26);g.fillText(`필요한 사이트 ${((sb[1][0]-sb[0][0])/1000).toFixed(1)} × ${((sb[1][1]-sb[0][1])/1000).toFixed(1)} m  ·  장비 ${new Set(state.pieces.filter(p=>p.parent==null).map(p=>p.uid)).size}세트`,PX,252);
