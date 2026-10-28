@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://camterior.goatcounter.com; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://camterior.goatcounter.com https://caro-camp.goatcounter.com; base-uri 'self'; form-action 'none'">
 <title>CAMTERIOR 관리실</title>
 <link rel="icon" href="assets/icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
@@ -96,7 +96,8 @@ label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:cen
 <body>
 <div class="wrap" id="app">
   <header>
-    <div class="brand"><b>CAMTERIOR</b><span>관리실</span></div>
+    <div class="brand"><b id="brandName">CAMTERIOR</b><span>관리실</span></div>
+    <div class="periods sites" role="group" aria-label="서비스"><button type="button" data-s="camterior">캠테리어</button><button type="button" data-s="caro">CARO</button></div>
     <div class="periods" role="group" aria-label="기간">
       <button type="button" data-p="today">오늘</button>
       <button type="button" data-p="7" aria-pressed="true">7일</button>
@@ -109,7 +110,7 @@ label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:cen
     <section>
       <h2>처음 한 번만 연결하면 돼요</h2>
       <ol>
-        <li><a href="https://camterior.goatcounter.com/user/api" target="_blank" rel="noopener">GoatCounter API 화면 열기</a></li>
+        <li><a id="apiLink" href="https://camterior.goatcounter.com/user/api" target="_blank" rel="noopener">GoatCounter API 화면 열기</a></li>
         <li><b>New API key</b>를 누르고 이름은 아무거나(예: 관리실)</li>
         <li>권한은 <b>Read statistics</b>만 체크 → 만들기</li>
         <li>나온 키를 복사해서 아래에 붙여 넣기</li>
@@ -128,18 +129,18 @@ label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:cen
       <div class="err" id="err" hidden></div>
       <div class="tiles" id="tiles">
         <div class="tile"><span class="k">방문자</span><span class="v" id="t-visit">–</span><span class="s" id="t-visit-s">명</span></div>
-        <div class="tile hot"><span class="k">AI 세팅</span><span class="v" id="t-cal">–</span><span class="s" id="t-cal-s">회</span></div>
-        <div class="tile"><span class="k">저장·공유</span><span class="v" id="t-open">–</span><span class="s" id="t-open-s">회</span></div>
+        <div class="tile hot"><span class="k" id="k-cal">AI 세팅</span><span class="v" id="t-cal">–</span><span class="s" id="t-cal-s">회</span></div>
+        <div class="tile"><span class="k" id="k-open">저장·공유</span><span class="v" id="t-open">–</span><span class="s" id="t-open-s">회</span></div>
       </div>
 
       <section>
         <h2>실제로 쓰는지 <small>방문 중 버튼까지 누른 비율</small></h2>
         <div class="flow">
           <div class="step"><span>들어와서 봄</span><span class="bar"><i id="f1" style="width:0"></i></span><span class="n" id="f1n">–</span></div>
-          <div class="step"><span>텐트 고름</span><span class="bar"><i id="f4" style="width:0"></i></span><span class="n" id="f4n">–</span></div>
-          <div class="step cal"><span>AI로 세팅</span><span class="bar"><i id="f2" style="width:0"></i></span><span class="n" id="f2n">–</span></div>
-          <div class="step"><span>입체로 봄</span><span class="bar"><i id="f5" style="width:0"></i></span><span class="n" id="f5n">–</span></div>
-          <div class="step"><span>저장·공유</span><span class="bar"><i id="f3" style="width:0"></i></span><span class="n" id="f3n">–</span></div>
+          <div class="step cam"><span>텐트 고름</span><span class="bar"><i id="f4" style="width:0"></i></span><span class="n" id="f4n">–</span></div>
+          <div class="step cal"><span id="l-f2">AI로 세팅</span><span class="bar"><i id="f2" style="width:0"></i></span><span class="n" id="f2n">–</span></div>
+          <div class="step cam"><span>입체로 봄</span><span class="bar"><i id="f5" style="width:0"></i></span><span class="n" id="f5n">–</span></div>
+          <div class="step"><span id="l-f3">저장·공유</span><span class="bar"><i id="f3" style="width:0"></i></span><span class="n" id="f3n">–</span></div>
         </div>
       </section>
 
@@ -149,10 +150,10 @@ label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:cen
       </section>
 
       <div class="two">
-        <section><h2>많이 고른 텐트</h2><ul class="list" id="tents"><li class="empty">불러오는 중…</li></ul></section>
-        <section><h2>AI가 못 찾은 장비 <small>추가 후보</small></h2><ul class="list" id="unknowns"><li class="empty">불러오는 중…</li></ul></section>
-        <section><h2>저장·공유 방법</h2><ul class="list" id="saves"><li class="empty">불러오는 중…</li></ul></section>
-        <section><h2>이너텐트</h2><ul class="list" id="inners"><li class="empty">불러오는 중…</li></ul></section>
+        <section class="cam"><h2>많이 고른 텐트</h2><ul class="list" id="tents"><li class="empty">불러오는 중…</li></ul></section>
+        <section class="cam"><h2>AI가 못 찾은 장비 <small>추가 후보</small></h2><ul class="list" id="unknowns"><li class="empty">불러오는 중…</li></ul></section>
+        <section class="cam"><h2>저장·공유 방법</h2><ul class="list" id="saves"><li class="empty">불러오는 중…</li></ul></section>
+        <section class="cam"><h2>이너텐트</h2><ul class="list" id="inners"><li class="empty">불러오는 중…</li></ul></section>
         <section><h2>어디서 왔나</h2><ul class="list" id="refs"><li class="empty">불러오는 중…</li></ul></section>
         <section><h2>어떤 기기로</h2><ul class="list" id="sizes"><li class="empty">불러오는 중…</li></ul></section>
         <section><h2>휴대폰 종류</h2><ul class="list" id="systems"><li class="empty">불러오는 중…</li></ul></section>
@@ -163,7 +164,7 @@ label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:cen
         <span id="updated">–</span>
         <span class="row">
           <button type="button" id="reload">새로고침</button>
-          <a class="linkbtn" href="https://camterior.goatcounter.com" target="_blank" rel="noopener">원본 통계</a>
+          <a class="linkbtn" id="rawLink" href="https://camterior.goatcounter.com" target="_blank" rel="noopener">원본 통계</a>
           <button type="button" id="logout">키 지우기</button>
         </span>
       </div>
@@ -174,9 +175,23 @@ label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:cen
 
 <script>
 (function(){
-var API='https://camterior.goatcounter.com/api/v0';
-var LAUNCH=new Date(2026,9,28); // 집계 시작일 (10/28)
-var KEY_ST='camterior-admin-key', P_ST='camterior-admin-period';
+// 캠테리어·CARO 두 서비스를 한 화면에서 (서비스마다 GoatCounter 키 따로)
+var SITES={
+  camterior:{name:'CAMTERIOR',gc:'https://camterior.goatcounter.com',launch:new Date(2026,9,28),key:'camterior-admin-key',
+    k:['AI 세팅','저장·공유'],l:['AI로 세팅','저장·공유']},
+  caro:{name:'CARO',gc:'https://caro-camp.goatcounter.com',launch:new Date(2026,9,27),key:'caro-admin-key',
+    k:['캘린더 추가','예약 이동'],l:['캘린더에 저장','예약 페이지로']}};
+var SITE_ST='cam-admin-site', site=(function(){try{return localStorage.getItem(SITE_ST)}catch(e){return ''}})()||'camterior';
+if(!SITES[site])site='camterior';
+var API,LAUNCH,KEY_ST,P_ST='camterior-admin-period';
+function useSite(){var S=SITES[site];API=S.gc+'/api/v0';LAUNCH=S.launch;KEY_ST=S.key;
+  document.getElementById('brandName').textContent=S.name;document.title=S.name+' 관리실';
+  document.getElementById('apiLink').href=S.gc+'/user/api';document.getElementById('rawLink').href=S.gc;
+  document.getElementById('k-cal').textContent=S.k[0];document.getElementById('k-open').textContent=S.k[1];
+  document.getElementById('l-f2').textContent=S.l[0];document.getElementById('l-f3').textContent=S.l[1];
+  document.querySelectorAll('.cam').forEach(function(e){e.hidden=site!=='camterior'});
+  document.querySelectorAll('.sites button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.s===site))});}
+useSite();
 var $=function(id){return document.getElementById(id)};
 var key='', period='7';
 function sget(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
@@ -297,6 +312,7 @@ async function load(){
     (hits.hits||[]).forEach(function(h){
       var p=(h.path||'').replace(/^\//,''),c=h.count||0,t=h.title||p;
       if(!h.event){visit+=c;return;}
+      if(site==='caro'){if(p==='calendar-add')cal+=c;else if(p==='open-booking')open+=c;return;}
       if(p==='ai-run'||p==='ai-local'||p==='ai-fix')cal+=c;
       else if(SAVE[p]){open+=c;S.push({name:t,count:c});}
       else if(p==='view-3d')v3+=c;
@@ -337,6 +353,8 @@ $('logout').addEventListener('click',function(){key='';sset(KEY_ST,'');view()});
 $('keyform').addEventListener('submit',function(e){e.preventDefault();
   var v=$('key').value.trim(); if(!v) return;
   key=v; $('key').value=''; if($('remember').checked) sset(KEY_ST,v); view();});
+document.querySelectorAll('.sites button').forEach(function(b){b.addEventListener('click',function(){if(b.dataset.s===site)return;
+  site=b.dataset.s;try{localStorage.setItem(SITE_ST,site)}catch(e){}useSite();key=sget(KEY_ST);view();})});
 function view(){ var has=!!key; $('setup').hidden=has; $('dash').hidden=!has; if(has) load(); }
 setPeriod(period); view();
 })();
