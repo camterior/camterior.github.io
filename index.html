@@ -2054,6 +2054,14 @@ const GEAR={
     note:'2인용. 듀오 M은 183×104cm, 퀸은 203×152cm',href:'https://www.exped.com/en/products/sleeping-mats/megamat-duo',srcName:'엑스페드 공식'},
   sparrow50:{gtype:'mat',sleep:true,group:'매트',name:'스패로우 그랜드50 더블매트',model:'Grand 50 Double',conf:'retailer',w:2000,d:1300,h:75,kg:5,sw:'#4F5A4A',
     note:'2인용 자충매트, 펌프 내장. 판매처에 따라 길이를 203cm로 적기도 해요',href:'https://prod.danawa.com/info/?pcode=14848169',srcName:'다나와'},
+  zebec_pro240:{gtype:'mat',sleep:true,group:'매트',name:'제백 에어리스 프로 240',model:'Airless Pro 240×200',conf:'retailer',w:2400,d:2000,h:100,kg:null,sw:'#E6E0D0',
+    note:'바닥 240×200cm, 두께 10cm 에어매트. 2세대, 판매처에서 품절 표시. 이너룸이 작으면 안 들어가요',href:'https://www.ssg.com/item/dealItemView.ssg?itemId=1000680799820',srcName:'SSG 판매 페이지'},
+  zebec_pro260:{gtype:'mat',sleep:true,group:'매트',name:'제백 에어리스 프로 260',model:'Airless Pro 260×200',conf:'retailer',w:2600,d:2000,h:100,kg:null,sw:'#E6E0D0',
+    note:'바닥 260×200cm, 두께 10cm 에어매트. 이너룸이 작으면 안 들어가요',href:'https://www.ssg.com/item/dealItemView.ssg?itemId=1000680799820',srcName:'SSG 판매 페이지'},
+  zebec_pro280:{gtype:'mat',sleep:true,group:'매트',name:'제백 에어리스 프로 280',model:'Airless Pro 280×200',conf:'retailer',w:2800,d:2000,h:100,kg:null,sw:'#E6E0D0',
+    note:'바닥 280×200cm, 두께 10cm 에어매트. 이너룸이 작으면 안 들어가요',href:'https://www.ssg.com/item/dealItemView.ssg?itemId=1000680799820',srcName:'SSG 판매 페이지'},
+  zebec_pro300:{gtype:'mat',sleep:true,group:'매트',name:'제백 에어리스 프로 300',model:'Airless Pro 300×200',conf:'retailer',w:3000,d:2000,h:100,kg:null,sw:'#E6E0D0',
+    note:'바닥 300×200cm, 두께 10cm 에어매트. 이너룸이 작으면 안 들어가요',href:'https://www.ssg.com/item/dealItemView.ssg?itemId=1000680799820',srcName:'SSG 판매 페이지'},
   cot_one:{gtype:'cot',sleep:true,group:'야전침대',name:'헬리녹스 코트원 컨버터블',model:'Cot One Convertible',conf:'retailer',w:2110,d:665,h:165,kg:2.67,sw:'#2B2E31',
     note:'높이 16.5cm(기본). 별매 다리를 끼우면 높아져요',href:'https://varuste.net/en/p144864/helinox-cot-one-convertible',srcName:'판매처 상세'},
   mk_stove:{gtype:'wood',group:'난방',name:'스노우피크 MK스토브',model:'ST-110',conf:'retailer',w:590,d:360,h:480,kg:23.5,sw:'#3A3A38',
@@ -3763,11 +3771,11 @@ function gearCard(id){const g=GEAR[id];
     <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.sh?`<dt>좌면 높이</dt><dd>${fmt(g.sh)}mm</dd>`:''}${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}</dl>
     ${g.note?`<p class="nt">${g.note}</p>`:''}
     <div class="ga"><button type="button" onclick="gearUse('item','${id}')">배치에 놓기</button>${gLink(g)?`<a href="${gLink(g)}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};}
-const GBRANDS=['스노우피크','헬리녹스','커밋','토요토미','파세코','신일','엑스페드','스패로우','도메틱','알루텍','코베아'];
+const GBRANDS=['스노우피크','헬리녹스','커밋','토요토미','파세코','신일','엑스페드','스패로우','도메틱','알루텍','코베아','제백'];
 function gearBrand(g){const n=g.name||'';return GBRANDS.find(b=>n.startsWith(b))||'스노우피크';}
 let GEAR_F='all';const G_OPEN=new Set();
 /* 장비 카드 그림: 힉스필드로 만든 제품 사진풍 그림이 있으면 도형 대신 보여줌 (텐트·타프는 도면 그대로) */
-const GEAR_ART=new Set(["reg3", "long4", "sep2", "sep3", "sep4", "mf_reg", "mf_long", "open_L", "open_R", "corner_L", "corner_R", "slide_h", "slide_hl", "h020", "wood_s", "wood_w", "steel1", "lid_half", "box_half", "mesh_d1", "mesh_s1", "mesh_hd", "mesh_hs", "flat", "seppou", "CK-230", "CK-220", "legs", "sc25", "sc50", "mytable", "mytable_s", "fshelf", "fshelf_l", "fshelf_m", "sp_oat", "sp_oat_l", "sp_oat_low", "sp_chabu", "sp_kitchen", "hx_t1", "hx_t1l", "hx_t0lt", "hx_cafe", "kermit_t", "noga_table", "alu48", "alu68", "alu93", "sp_jikaro", "megamat", "megamat_duo", "sparrow50", "cot_one", "sp_low30", "sp_lowshort", "sp_fd", "sp_take", "hx_one", "hx_zero", "hx_sunset", "kermit", "noga_chair", "omni230", "camp5000", "sfh1200", "sfh300", "mk_stove", "toyotomi_lcl53", "sfh_bh900", "sp_gs1000", "cfx3_35", "cfx3_45", "cfx3_55"]);
+const GEAR_ART=new Set(["zebec_pro240","zebec_pro260","zebec_pro280","zebec_pro300","reg3", "long4", "sep2", "sep3", "sep4", "mf_reg", "mf_long", "open_L", "open_R", "corner_L", "corner_R", "slide_h", "slide_hl", "h020", "wood_s", "wood_w", "steel1", "lid_half", "box_half", "mesh_d1", "mesh_s1", "mesh_hd", "mesh_hs", "flat", "seppou", "CK-230", "CK-220", "legs", "sc25", "sc50", "mytable", "mytable_s", "fshelf", "fshelf_l", "fshelf_m", "sp_oat", "sp_oat_l", "sp_oat_low", "sp_chabu", "sp_kitchen", "hx_t1", "hx_t1l", "hx_t0lt", "hx_cafe", "kermit_t", "noga_table", "alu48", "alu68", "alu93", "sp_jikaro", "megamat", "megamat_duo", "sparrow50", "cot_one", "sp_low30", "sp_lowshort", "sp_fd", "sp_take", "hx_one", "hx_zero", "hx_sunset", "kermit", "noga_chair", "omni230", "camp5000", "sfh1200", "sfh300", "mk_stove", "toyotomi_lcl53", "sfh_bh900", "sp_gs1000", "cfx3_35", "cfx3_45", "cfx3_55"]);
 function gArt(it){if(!GEAR_ART.has(it.id))return it.html;
   return it.html.replace(/<svg[\s\S]*?<\/svg>/,`<img class="gart" src="img/gear/${it.id}.webp" alt="" loading="lazy"><span class="gart-ai">AI 그림</span>`);}
 function renderGear(){const nav=document.getElementById('gearNav'),body=document.getElementById('gearBody');if(!body)return;
@@ -3962,7 +3970,7 @@ const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유�
   flat:['플랫버너'],sp_jikaro:['지카로','지카로테이블','지카로 테이블','ST-050'],sp_gs1000:['강염버너','강염스토브','GS-1000','스노우피크 강염'],seppou:['설봉','그릴버너'],steel1:['원유닛 트레이','1유닛 트레이','스텐트레이','스텐 트레이','스탠트레이'],lid_half:['리드트레이'],box_half:['스텐박스'],
   wood_s:['우드테이블 S','우드 S'],wood_w:['우드테이블 W','우드 W'],mesh_d1:['메쉬트레이 딥'],mesh_s1:['메쉬트레이'],mf_long:['멀티펑션 롱','멀티펑션롱'],open_L:['오픈멀티펑션 L'],open_R:['오픈멀티펑션 R'],corner_L:['코너테이블 L'],corner_R:['코너테이블 R'],
   sp_fd:['FD체어','에프디체어'],hx_one:['체어원','헬리녹스 체어원','헬리녹스체어원'],hx_zero:['체어제로','헬리녹스 체어제로'],omni230:['옴니','옴니230'],camp5000:['파세코 팬히터','캠프5000','파세코'],mk_stove:['MK스토브','화목난로','장작난로'],toyotomi_lcl53:['토요토미 팬히터','LC-L53'],sfh_bh900:['신일 900','신일 팬히터 900'],sfh1200:['신일 1200','신일 팬히터 1200'],cfx3_35:['도메틱 35','CFX3 35'],cfx3_45:['도메틱 45','CFX3 45'],cfx3_55:['도메틱 55','CFX3 55'],
-  megamat_duo:['메가매트 듀오','메가메트 듀오'],megamat:['메가매트','메가메트'],cot_one:['코트원'],sp_oat_low:['원액션 로우'],sp_oat:['원액션테이블'],
+  megamat_duo:['메가매트 듀오','메가메트 듀오'],megamat:['메가매트','메가메트'],zebec_pro240:['에어리스 프로 240','제백 프로 240'],zebec_pro260:['에어리스 프로 260','제백 프로 260','제백 에어매트','에어리스 프로','제백 프로'],zebec_pro280:['에어리스 프로 280','제백 프로 280'],zebec_pro300:['에어리스 프로 300','제백 프로 300'],cot_one:['코트원'],sp_oat_low:['원액션 로우'],sp_oat:['원액션테이블'],
   merak_pro:['메락'],landlock:['랜드락'],living_shell_long_pro:['리빙쉘 롱 프로','리빙쉘롱'],living_shell:['리빙쉘']};
 const AI_INNER_AL={shell_duo:['쉘이너','쉘이너 듀오','쉘 이너'],geoair2:['지오에어','지오 에어','지오에어2','지오 에어2'],godong:['고동','고동텐트','고동 텐트','고동 이너','고동이너텐트']};
 const aiTentName=id=>{const T=TENTS[id];return ((T.brand?T.brand+' ':'')+T.name).trim();};
@@ -4026,7 +4034,7 @@ ${slots}
   return out;}
 
 /* --- AI 없이: 이름 맞추기 --- */
-const aiNorm=s=>String(s).toLowerCase().replace(/[\s·×x\-_,./()]+/g,'');
+const aiNorm=s=>String(s).toLowerCase().replace(/(\d)\s*[x×]\s*(?=\d)/g,'$1').replace(/[\s·×\-_,./()]+/g,'');
 function aiKeys(ids,nameOf,modelOf){const own={},map={};
   ids.forEach(id=>{const nm=nameOf(id),w=nm.split(/\s+/);own[aiNorm(nm)]=id;
     const ks=new Set([aiNorm(modelOf(id)||'')]);(AI_ALIAS[id]||[]).forEach(a=>{const k=aiNorm(a);own[k]=id;ks.add(k);});
