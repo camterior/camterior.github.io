@@ -6,6 +6,7 @@ const MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 앞에서
 const ALLOWED_ORIGINS = ["https://camterior.github.io"];
 const LIMIT_FREE = 10, LIMIT_CODE = 50; // 하루 횟수 (한국 시간 기준)
 const MAX_INPUT_CHARS = 8000;
+const MAX_SYSTEM_CHARS = 20000;
 
 function cors(origin) {
   const ok = ALLOWED_ORIGINS.includes(origin);
@@ -49,7 +50,7 @@ export default {
     if (env.RL && used >= limit) return json({ error: "quota", left: 0, limit, vip }, 429, origin);
 
     const prompt = String(body.prompt || "").slice(0, MAX_INPUT_CHARS);
-    const system = String(body.system || "").slice(0, MAX_INPUT_CHARS);
+    const system = String(body.system || "").slice(0, MAX_SYSTEM_CHARS); // 장비·텐트 목록과 예시가 들어가서 길게
     if (!prompt) return json({ error: "empty" }, 400, origin);
 
     const payload = {
