@@ -4243,7 +4243,12 @@ function aiApply(res){
 
 /* --- 화면 --- */
 /* AI 답 다듬기: 칸 파츠 개수는 글이 기준(지어낸 파츠 빼고, 빠뜨린 파츠 넣고, 두 번 들어간 것 합치기), 글에 없는 이너는 빼기 */
-function aiTidy(res,said,prev,now){const L=aiLocal(said),want={};L.items.forEach(x=>(x.slots||[]).forEach(q=>want[q.id]=(want[q.id]||0)+q.count));
+function aiTidy(res,said,prev,now){const L=aiLocal(said),want={};
+  if(prev&&!res.tent&&prev.tent)res.tent=prev.tent;
+  if(!prev){// 글에 적힌 IGT 종류와 개수를 따르기
+    const lr=L.items.filter(x=>AI_ROOTS.includes(x.type)).map(x=>x.type),ar=res.items.filter(i=>AI_ROOTS.includes(i.type));
+    ar.forEach(i=>{if(!lr.includes(i.type)){const m=lr.find(t=>!res.items.some(j=>j.type===t));if(m)i.type=m;}});
+    L.items.forEach(x=>{if(AI_ROOTS.includes(x.type))return;const it=res.items.find(i=>i.type===x.type);if(it&&x.count>1&&it.count!==x.count)it.count=x.count;});}L.items.forEach(x=>(x.slots||[]).forEach(q=>want[q.id]=(want[q.id]||0)+q.count));
   const prevSlots={};if(prev)prev.items.forEach(it=>(it.slots||[]).forEach(q=>prevSlots[q.id]=(prevSlots[q.id]||0)+q.count));
   const roots=res.items.filter(i=>AI_ROOTS.includes(i.type)),added=[];
   roots.forEach(rt=>{const m={};(rt.slots||[]).forEach(q=>{if(want[q.id]||prevSlots[q.id])m[q.id]=(m[q.id]||0)+q.count;});rt.slots=Object.entries(m).map(([id,count])=>({id,count}));});
