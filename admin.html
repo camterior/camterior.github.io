@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://camterior.goatcounter.com; base-uri 'self'; form-action 'none'">
+<title>CAMTERIOR 관리실</title>
+<link rel="icon" href="assets/icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* 캠테리어 관리실: CARO 관리실과 같은 구성. 요약 숫자 → 사용 흐름 → 일별 막대 → 많이 고른 텐트·AI가 못 찾은 장비 → 유입·기기 */
+:root{
+  --bg:#F3F5F1; --surface:#FFFFFF; --sunk:#EBEFEA; --line:#DFE5DF;
+  --ink:#16241E; --soft:#3E4D46; --muted:#62716A;
+  --forest:#2F5D46; --lantern:#FF5A1F; --lantern-tint:#FFEDE5; --ok:#1E6B44; --warn:#A33A1F;
+  --body:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+  --num:'Bebas Neue','Oswald','Arial Narrow',sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1613; --surface:#17211C; --sunk:#1D2923; --line:#27352E;
+  --ink:#E7EEEA; --soft:#C3D0C9; --muted:#97A79F;
+  --forest:#9ED3B5; --lantern:#F29A55; --lantern-tint:#3A2617; --ok:#8FD6AE; --warn:#F0A08A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1613; --surface:#17211C; --sunk:#1D2923; --line:#27352E;
+  --ink:#E7EEEA; --soft:#C3D0C9; --muted:#97A79F;
+  --forest:#9ED3B5; --lantern:#F29A55; --lantern-tint:#3A2617; --ok:#8FD6AE; --warn:#F0A08A; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:calc(env(safe-area-inset-top,0px) + 16px) calc(env(safe-area-inset-bottom,0px) + 40px)}
+.wrap{max-width:720px;margin:0 auto;display:grid;gap:18px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand b{font-family:var(--num);font-weight:400;font-size:30px;letter-spacing:.06em;color:var(--forest);line-height:1}
+.brand span{font-size:14px;color:var(--muted);font-weight:600}
+.periods{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:999px}
+.periods button{border:0;background:transparent;color:var(--soft);font:600 13px var(--body);padding:7px 12px;border-radius:999px;cursor:pointer}
+.periods button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--lantern);outline-offset:2px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;display:grid;gap:2px;min-width:0}
+.tile .k{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.tile .v{font-family:var(--num);font-size:44px;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.tile.hot .v{color:var(--lantern)}
+.tile .s{font-size:12px;color:var(--muted)}
+section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:12px;min-width:0}
+h2{margin:0;font-size:15px;font-weight:700;text-wrap:balance}
+h2 small{font-weight:500;color:var(--muted);font-size:12.5px;margin-left:6px}
+.flow{display:grid;gap:8px}
+.step{display:grid;grid-template-columns:7.5em 1fr 5.6em;align-items:center;gap:10px;font-size:13.5px}
+.step .bar{height:12px;background:var(--sunk);border-radius:6px;overflow:hidden}
+.step .bar i{display:block;height:100%;background:var(--forest);border-radius:6px;transition:width .5s ease}
+.step.cal .bar i{background:var(--lantern)}
+.step .n{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.step .n em{font-style:normal;color:var(--muted);font-weight:500;font-size:12px;margin-left:3px}
+.chart{overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:300px;height:auto}
+.chart text{fill:var(--muted);font:15px var(--body)}
+.chart .gl{stroke:var(--line)}
+.chart .b{fill:var(--forest)}
+.chart .b.today{fill:var(--lantern)}
+.chart .lbl{fill:var(--ink);font-weight:600}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.list{display:grid;gap:7px;margin:0;padding:0;list-style:none}
+.list li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;font-size:13.5px;align-items:center}
+.list li .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.list li .ct{font-variant-numeric:tabular-nums;font-weight:600}
+.list li .mini{grid-column:1/-1;height:4px;background:var(--sunk);border-radius:2px;overflow:hidden;margin-top:-3px}
+.list li .mini i{display:block;height:100%;background:var(--forest);opacity:.55}
+.empty{color:var(--muted);font-size:13px}
+.status{font-size:12.5px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.status button,.linkbtn{border:1px solid var(--line);background:var(--surface);color:var(--soft);font:600 12.5px var(--body);padding:6px 11px;border-radius:999px;cursor:pointer;text-decoration:none}
+.err{background:var(--lantern-tint);color:var(--warn);border-radius:12px;padding:12px 14px;font-size:13.5px}
+.setup{display:grid;gap:12px}
+.setup ol{margin:0;padding-left:1.3em;display:grid;gap:6px;color:var(--soft);font-size:14px}
+.setup a{color:var(--forest);font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row input[type=password]{flex:1 1 220px;min-width:0;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:11px 12px;font:14px var(--body)}
+.solid{border:0;background:var(--forest);color:var(--surface);font:700 14px var(--body);padding:11px 16px;border-radius:10px;cursor:pointer}
+label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.note{font-size:12px;color:var(--muted);margin:0}
+.busy .tile .v,.busy .step .n{opacity:.35}
+@media (max-width:520px){
+  .tiles{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .tile{padding:12px 10px 10px}.tile .v{font-size:36px}
+  .two{grid-template-columns:1fr}
+  .step{grid-template-columns:6.6em 1fr 5.4em}
+}
+@media (prefers-reduced-motion:reduce){.step .bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header>
+    <div class="brand"><b>CAMTERIOR</b><span>관리실</span></div>
+    <div class="periods" role="group" aria-label="기간">
+      <button type="button" data-p="today">오늘</button>
+      <button type="button" data-p="7" aria-pressed="true">7일</button>
+      <button type="button" data-p="30">30일</button>
+      <button type="button" data-p="all">전체</button>
+    </div>
+  </header>
+
+  <div class="setup" id="setup" hidden>
+    <section>
+      <h2>처음 한 번만 연결하면 돼요</h2>
+      <ol>
+        <li><a href="https://camterior.goatcounter.com/user/api" target="_blank" rel="noopener">GoatCounter API 화면 열기</a></li>
+        <li><b>New API key</b>를 누르고 이름은 아무거나(예: 관리실)</li>
+        <li>권한은 <b>Read statistics</b>만 체크 → 만들기</li>
+        <li>나온 키를 복사해서 아래에 붙여 넣기</li>
+      </ol>
+      <form class="row" id="keyform" autocomplete="off">
+        <input type="password" id="key" placeholder="API 키 붙여 넣기" aria-label="GoatCounter API 키">
+        <button class="solid" type="submit">연결</button>
+      </form>
+      <label class="chk"><input type="checkbox" id="remember" checked> 이 기기에 기억하기</label>
+      <p class="note">키는 이 휴대폰 브라우저에만 저장되고, GoatCounter에만 보내져요. 앱 코드나 GitHub에는 올라가지 않아요.</p>
+    </section>
+  </div>
+
+  <div id="dash" hidden>
+    <div style="display:grid;gap:18px">
+      <div class="err" id="err" hidden></div>
+      <div class="tiles" id="tiles">
+        <div class="tile"><span class="k">방문자</span><span class="v" id="t-visit">–</span><span class="s" id="t-visit-s">명</span></div>
+        <div class="tile hot"><span class="k">AI 세팅</span><span class="v" id="t-cal">–</span><span class="s" id="t-cal-s">회</span></div>
+        <div class="tile"><span class="k">저장·공유</span><span class="v" id="t-open">–</span><span class="s" id="t-open-s">회</span></div>
+      </div>
+
+      <section>
+        <h2>실제로 쓰는지 <small>방문 중 버튼까지 누른 비율</small></h2>
+        <div class="flow">
+          <div class="step"><span>들어와서 봄</span><span class="bar"><i id="f1" style="width:0"></i></span><span class="n" id="f1n">–</span></div>
+          <div class="step"><span>텐트 고름</span><span class="bar"><i id="f4" style="width:0"></i></span><span class="n" id="f4n">–</span></div>
+          <div class="step cal"><span>AI로 세팅</span><span class="bar"><i id="f2" style="width:0"></i></span><span class="n" id="f2n">–</span></div>
+          <div class="step"><span>입체로 봄</span><span class="bar"><i id="f5" style="width:0"></i></span><span class="n" id="f5n">–</span></div>
+          <div class="step"><span>저장·공유</span><span class="bar"><i id="f3" style="width:0"></i></span><span class="n" id="f3n">–</span></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>날짜별 방문 <small id="chart-sub"></small></h2>
+        <div class="chart" id="chart"><p class="empty">불러오는 중…</p></div>
+      </section>
+
+      <div class="two">
+        <section><h2>많이 고른 텐트</h2><ul class="list" id="tents"><li class="empty">불러오는 중…</li></ul></section>
+        <section><h2>AI가 못 찾은 장비 <small>추가 후보</small></h2><ul class="list" id="unknowns"><li class="empty">불러오는 중…</li></ul></section>
+        <section><h2>저장·공유 방법</h2><ul class="list" id="saves"><li class="empty">불러오는 중…</li></ul></section>
+        <section><h2>이너텐트</h2><ul class="list" id="inners"><li class="empty">불러오는 중…</li></ul></section>
+        <section><h2>어디서 왔나</h2><ul class="list" id="refs"><li class="empty">불러오는 중…</li></ul></section>
+        <section><h2>어떤 기기로</h2><ul class="list" id="sizes"><li class="empty">불러오는 중…</li></ul></section>
+        <section><h2>휴대폰 종류</h2><ul class="list" id="systems"><li class="empty">불러오는 중…</li></ul></section>
+        <section><h2>지역</h2><ul class="list" id="locs"><li class="empty">불러오는 중…</li></ul></section>
+      </div>
+
+      <div class="status">
+        <span id="updated">–</span>
+        <span class="row">
+          <button type="button" id="reload">새로고침</button>
+          <a class="linkbtn" href="https://camterior.goatcounter.com" target="_blank" rel="noopener">원본 통계</a>
+          <button type="button" id="logout">키 지우기</button>
+        </span>
+      </div>
+      <p class="note">광고 차단·IP 숨기기를 켠 사람은 빠져서 실제보다 조금 적게 나와요. 같은 사람이 하루에 여러 번 와도 방문자는 1명으로 세요.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+var API='https://camterior.goatcounter.com/api/v0';
+var LAUNCH=new Date(2026,9,28); // 집계 시작일 (10/28)
+var KEY_ST='camterior-admin-key', P_ST='camterior-admin-period';
+var $=function(id){return document.getElementById(id)};
+var key='', period='7';
+function sget(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
+function sset(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k)}catch(e){}}
+key=sget(KEY_ST); period=sget(P_ST)||'7';
+
+function fmt(n){return (n||0).toLocaleString('ko-KR')}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function hourFloor(d){d=new Date(d);d.setMinutes(0,0,0);return d}
+function range(){
+  var end=hourFloor(Date.now()+3600e3), s=new Date(); s.setHours(0,0,0,0);
+  if(period==='7') s.setDate(s.getDate()-6);
+  else if(period==='30') s.setDate(s.getDate()-29);
+  else if(period==='all') s=new Date(LAUNCH);
+  if(s<LAUNCH) s=new Date(LAUNCH);
+  return {start:s,end:end};
+}
+function q(r,extra){return '?start='+encodeURIComponent(r.start.toISOString())+'&end='+encodeURIComponent(r.end.toISOString())+(extra||'')}
+var sleep=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
+function get(path){
+  return fetch(API+path,{headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'}}).then(function(r){
+    if(r.status===401) throw {code:'key'};
+    if(r.status===403) throw {code:'perm'};
+    if(r.status===429) throw {code:'rate'};
+    if(!r.ok) throw {code:'http',status:r.status};
+    return r.json();
+  },function(){throw {code:'net'}});
+}
+
+// 이름 한글로
+function refName(n){
+  var s=(n||'').toLowerCase();
+  if(!s||s==='(unknown)'||s==='(no data)') return '직접 접속 · 홈 화면 앱';
+  if(s.indexOf('instagram')>=0||s==='l.instagram.com') return '인스타그램';
+  if(s.indexOf('cafe.naver')>=0) return '네이버 카페';
+  if(s.indexOf('blog.naver')>=0) return '네이버 블로그';
+  if(s.indexOf('naver')>=0) return '네이버';
+  if(s.indexOf('kakao')>=0) return '카카오톡';
+  if(s.indexOf('google')>=0) return '구글';
+  if(s.indexOf('daum')>=0) return '다음';
+  if(s.indexOf('facebook')>=0||s.indexOf('fb.')>=0) return '페이스북';
+  if(s.indexOf('threads')>=0) return '스레드';
+  if(s.indexOf('youtube')>=0) return '유튜브';
+  if(s.indexOf('github')>=0) return 'GitHub';
+  return n;
+}
+var SIZE={phone:'휴대폰',largephone:'큰 휴대폰',tablet:'태블릿',desktop:'PC',desktophd:'큰 PC 화면',unknown:'알 수 없음'};
+function sizeName(st){return SIZE[st.id]||SIZE[(st.name||'').toLowerCase()]||st.name||'알 수 없음'}
+function sysName(n){var s=(n||'').toLowerCase();
+  if(s.indexOf('ios')>=0||s.indexOf('iphone')>=0) return '아이폰 (iOS)';
+  if(s.indexOf('android')>=0) return '안드로이드';
+  if(s.indexOf('windows')>=0) return '윈도우 PC';
+  if(s.indexOf('mac')>=0) return '맥';
+  if(!s||s==='(unknown)') return '알 수 없음';
+  return n;}
+var LOC={KR:'한국',US:'미국',JP:'일본',CN:'중국',TW:'대만',VN:'베트남',DE:'독일',GB:'영국',CA:'캐나다',AU:'호주',SG:'싱가포르',HK:'홍콩',TH:'태국',PH:'필리핀'};
+function locName(st){var c=(st.id||'').slice(0,2).toUpperCase();return LOC[c]||st.name||'알 수 없음'}
+
+function merge(stats,nameFn){
+  var m={},order=[];
+  (stats||[]).forEach(function(st){var k=nameFn(st);if(!(k in m)){m[k]=0;order.push(k)}m[k]+=st.count||0});
+  return order.map(function(k){return {name:k,count:m[k]}}).sort(function(a,b){return b.count-a.count});
+}
+function renderList(id,items){
+  var el=$(id);
+  if(!items.length){el.innerHTML='<li class="empty">아직 기록이 없어요</li>';return}
+  var max=items[0].count||1;
+  el.innerHTML=items.slice(0,6).map(function(it){
+    return '<li><span class="nm">'+esc(it.name)+'</span><span class="ct">'+fmt(it.count)+'</span><span class="mini"><i style="width:'+Math.max(4,Math.round(it.count/max*100))+'%"></i></span></li>';
+  }).join('');
+}
+function pct(a,b){return b?Math.round(a/b*1000)/10:0}
+function renderFlow(v,c,o){
+  $('f1').style.width=v?'100%':'0';$('f1n').innerHTML=fmt(v)+'<em>명</em>';
+  $('f2').style.width=pct(c,v)+'%';$('f2n').innerHTML=fmt(c)+'<em>'+pct(c,v)+'%</em>';
+  $('f3').style.width=pct(o,v)+'%';$('f3n').innerHTML=fmt(o)+'<em>'+pct(o,v)+'%</em>';
+}
+function renderChart(stats,r){
+  var days=[],m={};
+  (stats||[]).forEach(function(s){m[s.day]=(m[s.day]||0)+(s.daily||0)});
+  for(var d=new Date(r.start);d<r.end;d.setDate(d.getDate()+1)){
+    var k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    days.push({k:k,m:d.getMonth()+1,d:d.getDate(),v:m[k]||0});
+  }
+  if(!days.length){$('chart').innerHTML='<p class="empty">아직 기록이 없어요</p>';return}
+  var W=640,H=230,L=36,R=8,T=24,B=30,cw=(W-L-R)/days.length,max=Math.max.apply(null,days.map(function(x){return x.v}));
+  var top=max<=4?4:Math.ceil(max/4)*4, y=function(v){return T+(H-T-B)*(1-v/top)};
+  var out='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="날짜별 방문 막대그래프">';
+  [0,top/2,top].forEach(function(t){out+='<line class="gl" x1="'+L+'" x2="'+(W-R)+'" y1="'+y(t)+'" y2="'+y(t)+'"/><text x="'+(L-6)+'" y="'+(y(t)+4)+'" text-anchor="end">'+fmt(t)+'</text>'});
+  var every=Math.ceil(days.length/10), todayK=days[days.length-1].k;
+  days.forEach(function(x,i){
+    var bw=Math.max(2,Math.min(36,cw*.62)),bx=L+cw*i+(cw-bw)/2,by=y(x.v),bh=Math.max(x.v?2:0,y(0)-by);
+    out+='<rect class="b'+(x.k===todayK?' today':'')+'" x="'+bx.toFixed(1)+'" y="'+(y(0)-bh).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+bh.toFixed(1)+'" rx="3"><title>'+x.m+'/'+x.d+' '+fmt(x.v)+'명</title></rect>';
+    if(x.v&&days.length<=14) out+='<text class="lbl" x="'+(bx+bw/2)+'" y="'+(y(0)-bh-5)+'" text-anchor="middle">'+fmt(x.v)+'</text>';
+    if(i%every===0||i===days.length-1) out+='<text x="'+(bx+bw/2)+'" y="'+(H-8)+'" text-anchor="middle">'+x.m+'/'+x.d+'</text>';
+  });
+  $('chart').innerHTML=out+'</svg>';
+  $('chart-sub').textContent='주황 = 오늘';
+}
+function showErr(e){
+  var msg={key:'키가 맞지 않아요. 아래 "키 지우기"를 누르고 GoatCounter에서 새 API 키를 만들어 다시 넣어 주세요.',
+    perm:'이 키에는 통계를 읽을 권한이 없어요. GoatCounter에서 키를 만들 때 "Read statistics"를 체크해 주세요.',
+    rate:'요청이 너무 잦아요. 10초쯤 뒤에 새로고침을 눌러 주세요.',
+    net:'GoatCounter에 연결하지 못했어요. 인터넷 연결을 확인하고 새로고침을 눌러 주세요.'}[e&&e.code]||('통계를 불러오지 못했어요 (오류 '+((e&&e.status)||'?')+'). 잠시 뒤 새로고침해 주세요.');
+  $('err').textContent=msg;$('err').hidden=false;
+}
+
+var loading=false;
+async function load(){
+  if(loading||!key) return; loading=true;
+  $('err').hidden=true; $('app').classList.add('busy');
+  var r=range();
+  try{
+    var tot=await get('/stats/total'+q(r)); await sleep(280);
+    var hits=await get('/stats/hits'+q(r,'&limit=200')); await sleep(280);
+    var visit=0,cal=0,open=0,tentN=0,v3=0,T=[],U=[],S=[],I=[];
+    var SAVE={'save':1,'share-link':1,'export-card':1,'export-png':1,'copy-code':1};
+    (hits.hits||[]).forEach(function(h){
+      var p=(h.path||'').replace(/^\//,''),c=h.count||0,t=h.title||p;
+      if(!h.event){visit+=c;return;}
+      if(p==='ai-run'||p==='ai-local'||p==='ai-fix')cal+=c;
+      else if(SAVE[p]){open+=c;S.push({name:t,count:c});}
+      else if(p==='view-3d')v3+=c;
+      else if(p.indexOf('tent/')===0){tentN+=c;T.push({name:t,count:c});}
+      else if(p.indexOf('ai-unknown/')===0)U.push({name:t,count:c});
+      else if(p.indexOf('inner/')===0)I.push({name:t,count:c});
+    });
+    var by=function(a,b){return b.count-a.count};
+    renderList('tents',T.sort(by));renderList('unknowns',U.sort(by));renderList('saves',S.sort(by));renderList('inners',I.sort(by));
+    $('f4').style.width=pct(tentN,visit)+'%';$('f4n').innerHTML=fmt(tentN)+'<em>'+pct(tentN,visit)+'%</em>';
+    $('f5').style.width=pct(v3,visit)+'%';$('f5n').innerHTML=fmt(v3)+'<em>'+pct(v3,visit)+'%</em>';
+    if(!visit&&tot.total) visit=Math.max(0,tot.total-(tot.total_events||0));
+    $('t-visit').textContent=fmt(visit);$('t-cal').textContent=fmt(cal);$('t-open').textContent=fmt(open);
+    $('t-visit-s').textContent='명';$('t-cal-s').textContent='회 · 방문의 '+pct(cal,visit)+'%';$('t-open-s').textContent='회 · 방문의 '+pct(open,visit)+'%';
+    renderFlow(visit,cal,open);
+    renderChart(tot.stats,r);
+    var refs=await get('/stats/toprefs'+q(r,'&limit=20')); await sleep(280);
+    renderList('refs',merge(refs.stats,function(s){return refName(s.name||s.id)}));
+    var sz=await get('/stats/sizes'+q(r)); await sleep(280);
+    renderList('sizes',merge(sz.stats,sizeName));
+    var sy=await get('/stats/systems'+q(r,'&limit=20')); await sleep(280);
+    renderList('systems',merge(sy.stats,function(s){return sysName(s.name)}));
+    var lc=await get('/stats/locations'+q(r,'&limit=20'));
+    renderList('locs',merge(lc.stats,locName));
+    var n=new Date();
+    $('updated').textContent='업데이트 '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')+' · '+(r.start.getMonth()+1)+'/'+r.start.getDate()+'부터';
+  }catch(e){ showErr(e); }
+  finally{ loading=false; $('app').classList.remove('busy'); }
+}
+
+function setPeriod(p){
+  period=p; sset(P_ST,p);
+  document.querySelectorAll('.periods button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.p===p))});
+}
+document.querySelectorAll('.periods button').forEach(function(b){b.addEventListener('click',function(){setPeriod(b.dataset.p);load()})});
+$('reload').addEventListener('click',load);
+$('logout').addEventListener('click',function(){key='';sset(KEY_ST,'');view()});
+$('keyform').addEventListener('submit',function(e){e.preventDefault();
+  var v=$('key').value.trim(); if(!v) return;
+  key=v; $('key').value=''; if($('remember').checked) sset(KEY_ST,v); view();});
+function view(){ var has=!!key; $('setup').hidden=has; $('dash').hidden=!has; if(has) load(); }
+setPeriod(period); view();
+})();
+</script>
+</body>
+</html>

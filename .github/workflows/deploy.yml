@@ -26,7 +26,7 @@ jobs:
       - name: 배포할 파일만 모으기
         run: |
           mkdir _site
-          cp -r index.html sw.js manifest.webmanifest robots.txt .nojekyll img assets _site/
+          cp -r index.html admin.html sw.js manifest.webmanifest robots.txt .nojekyll img assets _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

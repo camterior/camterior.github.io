@@ -53,7 +53,7 @@ META = '''<meta name="description" content="캠테리어(CAMTERIOR) — 텐트 �
 <meta property="og:image" content="img/intro.webp">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.webmanifest">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net https://camterior-ai.ghdwnd2.workers.dev; worker-src 'self'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://camterior.goatcounter.com; connect-src 'self' https://cdn.jsdelivr.net https://camterior-ai.ghdwnd2.workers.dev https://camterior.goatcounter.com; worker-src 'self'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="no-referrer">'''
 head = head.replace('<meta name="viewport" content="width=device-width, initial-scale=1">',
                     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' + META)
@@ -128,6 +128,9 @@ js = js.replace('</script>\n</body>', '</script>\n<script>\n' + tail + '\n</scri
 assert '<script>\n' + tail in js, 'tail not injected'
 
 page = head + '\n<body data-view="intro">\n' + markup + '\n' + js
+GC = '<script data-goatcounter="https://camterior.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>\n'
+assert page.count('</body>') == 1
+page = page.replace('</body>', GC + '</body>')
 assert 'data:image/webp;base64' not in page
 
 out = HERE / 'site'
@@ -151,6 +154,7 @@ for f in sorted((HERE / 'img').iterdir(), key=lambda p: -len(p.name)):
 art = art.replace('const GEAR_ART=new Set(', 'const GEAR_ART=new Set([]);const _GEAR_ART_SITE=(', 1)
 art = art.replace('url(assets/pretendard.woff2)', 'url(' + datauri(HERE / 'assets/pretendard.woff2', 'font/woff2') + ')')
 art = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\n?', '', art)
+art = art.replace(GC, '')
 art = re.sub(r'<link rel="(icon|manifest)"[^>]*>\n?', '', art)
 art = re.sub(r'<meta property="og:[^>]*>\n?', '', art)
 art = art.replace('<!DOCTYPE html>\n<html lang="ko">\n<head>\n', '').replace('</head>\n<body data-view="intro">', '<div data-art="1"></div>')

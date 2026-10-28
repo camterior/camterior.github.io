@@ -253,3 +253,16 @@ fitView=function(){const [hw,hh]=hostSize();if(!hw)return;if(hw>=600)return _fit
 const _addMain=addMain;
 addMain=function(t,...a){const r=_addMain(t,...a);if(CATALOG[t]&&CATALOG[t].heat)setTimeout(()=>{const el=document.getElementById('hint');if(!el)return;
   el.textContent='🔥 난로는 텐트 천·이너룸과 넉넉히 띄우고 환기하세요';el.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>{el.style.display='none';el.textContent=HINT0;},3200);},400);return r;};
+
+/* 사용 집계 (GoatCounter, 쿠키 없음): 관리실(admin.html)에서 봄. 이름·장비 글자는 안 보내고, 목록에 없던 장비 이름만 보냄 */
+function camEv(path,title){try{if(window.goatcounter&&goatcounter.count)goatcounter.count({path:path,title:title||path,event:true});}catch(e){}}
+(function(){const wrap=(name,ev)=>{const f=window[name];if(typeof f!=='function')return;window[name]=function(...a){try{ev(...a);}catch(e){}return f.apply(this,a);};};
+  wrap('open3D',()=>camEv('view-3d','입체 보기'));
+  wrap('saveMine',()=>camEv('save','내 배치 저장'));
+  wrap('shareLinkGo',()=>camEv('share-link','링크 보내기'));
+  wrap('exportCard',()=>camEv('export-card','사진 카드'));
+  wrap('exportPNG',()=>camEv('export-png','평면도 이미지'));
+  wrap('copyCode',()=>camEv('copy-code','코드 복사'));
+  wrap('pickTent',id=>{if(TENTS[id]&&id!=='none'&&id!==tent.id)camEv('tent/'+id,aiTentName?aiTentName(id):TENTS[id].name);});
+  wrap('setInner',v=>{if(typeof v==='string'&&v.startsWith('p:')&&INNER_PRESETS[v.slice(2)])camEv('inner/'+v.slice(2),INNER_PRESETS[v.slice(2)].name);});
+})();

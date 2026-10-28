@@ -10,7 +10,7 @@
 <meta property="og:image" content="img/intro.webp">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.webmanifest">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net https://camterior-ai.ghdwnd2.workers.dev; worker-src 'self'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://camterior.goatcounter.com; connect-src 'self' https://cdn.jsdelivr.net https://camterior-ai.ghdwnd2.workers.dev https://camterior.goatcounter.com; worker-src 'self'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <title>캠테리어 · 캠핑 인테리어 플래너</title>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -3926,6 +3926,19 @@ const _addMain=addMain;
 addMain=function(t,...a){const r=_addMain(t,...a);if(CATALOG[t]&&CATALOG[t].heat)setTimeout(()=>{const el=document.getElementById('hint');if(!el)return;
   el.textContent='🔥 난로는 텐트 천·이너룸과 넉넉히 띄우고 환기하세요';el.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>{el.style.display='none';el.textContent=HINT0;},3200);},400);return r;};
 
+/* 사용 집계 (GoatCounter, 쿠키 없음): 관리실(admin.html)에서 봄. 이름·장비 글자는 안 보내고, 목록에 없던 장비 이름만 보냄 */
+function camEv(path,title){try{if(window.goatcounter&&goatcounter.count)goatcounter.count({path:path,title:title||path,event:true});}catch(e){}}
+(function(){const wrap=(name,ev)=>{const f=window[name];if(typeof f!=='function')return;window[name]=function(...a){try{ev(...a);}catch(e){}return f.apply(this,a);};};
+  wrap('open3D',()=>camEv('view-3d','입체 보기'));
+  wrap('saveMine',()=>camEv('save','내 배치 저장'));
+  wrap('shareLinkGo',()=>camEv('share-link','링크 보내기'));
+  wrap('exportCard',()=>camEv('export-card','사진 카드'));
+  wrap('exportPNG',()=>camEv('export-png','평면도 이미지'));
+  wrap('copyCode',()=>camEv('copy-code','코드 복사'));
+  wrap('pickTent',id=>{if(TENTS[id]&&id!=='none'&&id!==tent.id)camEv('tent/'+id,aiTentName?aiTentName(id):TENTS[id].name);});
+  wrap('setInner',v=>{if(typeof v==='string'&&v.startsWith('p:')&&INNER_PRESETS[v.slice(2)])camEv('inner/'+v.slice(2),INNER_PRESETS[v.slice(2)].name);});
+})();
+
 /* =====================================================================
    캠테리어 AI 세팅 추천 (1단계: 장비 글 → 자동 배치)
    - 사용자가 적은 장비·위치 설명을 AI(Gemini, Cloudflare 중계)가 카탈로그 id로 바꿔줌
@@ -4234,6 +4247,8 @@ async function aiRun(){
   btn.disabled=false;
   if(!res.items.length&&!res.tent){st.textContent='';box.hidden=false;
     box.innerHTML=`<p class="ai-warn">목록에서 맞는 장비를 못 찾았어요. ‘장비 제원’ 탭의 이름으로 적어보세요 (예: 폴딩쉘프, IGT 롱, 체어원).</p>`;return;}
+  if(typeof camEv==='function'){camEv(fix?'ai-fix':via==='ai'?'ai-run':'ai-local',fix?'AI 고치기':via==='ai'?'AI 세팅':'AI 대신 이름 맞추기');
+    res.unknown.slice(0,5).forEach(u=>{const n=String(u).replace(/[\n\r/]/g,' ').trim().slice(0,30);if(n)camEv('ai-unknown/'+encodeURIComponent(n),n);});}
   const miss=aiApply(res);AI_CHAT.last=res;AI_CHAT.said=(AI_CHAT.said+' '+text).slice(-1200);
   AI_CHAT.log.push({who:'ai',t:res.tip||(fix?'고쳤어요.':'세팅했어요.')});aiChatUI();
   st.textContent=via==='ai'?'세팅했어요. 끌어서 다듬어 보세요':'기본 자동 배치로 세팅했어요';
@@ -4249,5 +4264,6 @@ async function aiRun(){
   const b=document.getElementById('board');if(b&&b.scrollIntoView&&innerWidth<900)setTimeout(()=>b.scrollIntoView({behavior:'smooth',block:'start'}),400);}
 
 </script>
+<script data-goatcounter="https://camterior.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

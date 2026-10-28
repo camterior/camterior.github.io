@@ -306,6 +306,8 @@ async function aiRun(){
   btn.disabled=false;
   if(!res.items.length&&!res.tent){st.textContent='';box.hidden=false;
     box.innerHTML=`<p class="ai-warn">목록에서 맞는 장비를 못 찾았어요. ‘장비 제원’ 탭의 이름으로 적어보세요 (예: 폴딩쉘프, IGT 롱, 체어원).</p>`;return;}
+  if(typeof camEv==='function'){camEv(fix?'ai-fix':via==='ai'?'ai-run':'ai-local',fix?'AI 고치기':via==='ai'?'AI 세팅':'AI 대신 이름 맞추기');
+    res.unknown.slice(0,5).forEach(u=>{const n=String(u).replace(/[\n\r/]/g,' ').trim().slice(0,30);if(n)camEv('ai-unknown/'+encodeURIComponent(n),n);});}
   const miss=aiApply(res);AI_CHAT.last=res;AI_CHAT.said=(AI_CHAT.said+' '+text).slice(-1200);
   AI_CHAT.log.push({who:'ai',t:res.tip||(fix?'고쳤어요.':'세팅했어요.')});aiChatUI();
   st.textContent=via==='ai'?'세팅했어요. 끌어서 다듬어 보세요':'기본 자동 배치로 세팅했어요';
