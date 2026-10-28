@@ -864,6 +864,8 @@
 @media (min-width:900px){.aiset{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);align-items:start}.aiset .ai-head{grid-row:span 2}.aiset .ai-out{grid-column:1/-1}}
 </style>
 
+#aiIn::placeholder{color:#9A9E98;opacity:1}
+
 </head>
 <body data-view="intro">
 <a class="skip" href="#main">본문으로 건너뛰기</a>
@@ -920,7 +922,7 @@
 <div class="aiset" id="aiset" aria-labelledby="aiTitle">
   <div class="ai-head"><span class="ai-badge">✨ AI</span><div><h3 id="aiTitle">내 장비 적으면 자동 배치</h3></div></div>
   <label class="sr-only" for="aiIn">가진 장비</label>
-  <textarea id="aiIn" rows="3" maxlength="600" placeholder="예: 랜드록, IGT 롱, 폴딩쉘프 2개, 체어원 2개, 옴니 230"></textarea>
+  <textarea id="aiIn" rows="3" maxlength="600" placeholder="예: 랜드록, IGT 롱에 플랫버너, 원액션테이블 롱, FD체어 4개"></textarea>
   <div class="ai-row"><button class="btn primary" id="aiGo" type="button" onclick="aiRun()">✨ AI로 세팅하기</button><span class="ai-st" id="aiSt" role="status" aria-live="polite"></span>
     <p class="ai-priv">Google Gemini로 보내져요 · 개인정보는 적지 마세요</p></div>
   <div class="ai-out" id="aiOut" hidden></div>

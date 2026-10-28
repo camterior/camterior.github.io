@@ -68,7 +68,7 @@ journal = journal.replace('class="night rv-band"', 'class="night rv-band hub-ban
 AI_CARD = '''<div class="aiset" id="aiset" aria-labelledby="aiTitle">
   <div class="ai-head"><span class="ai-badge">✨ AI</span><div><h3 id="aiTitle">내 장비 적으면 자동 배치</h3></div></div>
   <label class="sr-only" for="aiIn">가진 장비</label>
-  <textarea id="aiIn" rows="3" maxlength="600" placeholder="예: 랜드록, IGT 롱, 폴딩쉘프 2개, 체어원 2개, 옴니 230"></textarea>
+  <textarea id="aiIn" rows="3" maxlength="600" placeholder="예: 랜드록, IGT 롱에 플랫버너, 원액션테이블 롱, FD체어 4개"></textarea>
   <div class="ai-row"><button class="btn primary" id="aiGo" type="button" onclick="aiRun()">✨ AI로 세팅하기</button><span class="ai-st" id="aiSt" role="status" aria-live="polite"></span>
     <p class="ai-priv">Google Gemini로 보내져요 · 개인정보는 적지 마세요</p></div>
   <div class="ai-out" id="aiOut" hidden></div>
