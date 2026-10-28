@@ -99,7 +99,9 @@ function renderGear(){const nav=document.getElementById('gearNav'),body=document
     .map(([k,t,n])=>`<button type="button" aria-pressed="${GEAR_F===k}" onclick="GEAR_F='${k}';renderGear();window.scrollTo({top:document.querySelector('.gnav').offsetTop-56,behavior:'smooth'})">${t}<small>${n}</small></button>`).join('');
   let html='';
   secs.forEach(s=>{if(GEAR_F!=='all'&&GEAR_F!==s.k)return;if(!s.list.length)return;
-    const groups=new Map();s.list.forEach(it=>{const b=it.b||'기타';if(!groups.has(b))groups.set(b,[]);groups.get(b).push(it);});
+    let groups=new Map();s.list.forEach(it=>{const b=it.b||'기타';if(!groups.has(b))groups.set(b,[]);groups.get(b).push(it);});
+    if(s.k==='tent'){const {main,minor}=tentBrandOrder(),g2=new Map();main.forEach(b=>{if(groups.has(b))g2.set(b,groups.get(b));});
+      const etc=minor.flatMap(b=>groups.get(b)||[]);if(etc.length)g2.set(T_ETC,etc);groups.forEach((v,b)=>{if(!g2.has(b)&&!minor.includes(b))g2.set(b,v);});groups=g2;}
     const solo=GEAR_F===s.k&&groups.size===1;
     html+=`<section class="gsec" id="g-${s.k}"><div class="ghead"><img src="${s.img}" alt="" loading="lazy"><div class="gtt"><h2>${s.t}</h2><span>${s.list.length}</span></div></div>
       ${[...groups].map(([b,items])=>{const key=s.k+'|'+b,open=q||solo||G_OPEN.has(key);
@@ -140,6 +142,11 @@ const _startFresh=startFresh;startFresh=async function(){await _startFresh();clo
 const _loadPlanCode2=loadPlanCode;loadPlanCode=async function(...a){const ok=await _loadPlanCode2(...a);if(ok)closeSave();return ok;};
 const _renderMine=renderMine;renderMine=function(){_renderMine();const e=document.querySelector('#myList .empty');if(e)e.textContent='아직 없어요. 위의 저장하기를 눌러보세요.';};
 
+/* 텐트 브랜드 정리: 스노우피크 먼저, 나머지는 텐트 많은 순. 3종 이하 브랜드는 '그 외 브랜드' 하나로 묶음 */
+const T_MINOR=3,T_ETC='그 외 브랜드';
+function tentBrandOrder(){const n={};TENT_ORDER.forEach(id=>{const b=TENTS[id].brand;if(b)n[b]=(n[b]||0)+1;});
+  const main=Object.keys(n).filter(b=>n[b]>T_MINOR).sort((a,b)=>(b==='스노우피크')-(a==='스노우피크')||n[b]-n[a]);
+  const minor=Object.keys(n).filter(b=>n[b]<=T_MINOR).sort((a,b)=>n[b]-n[a]||a.localeCompare(b,'ko'));return {main,minor};}
 /* 텐트 목록: 브랜드별 접기 + 찾기 */
 const T_OPEN=new Set();
 const tentBtn=id=>{const T=TENTS[id];return `<button class="tent" aria-pressed="${id===tent.id}" onclick="pickTent('${id}')">
@@ -148,9 +155,13 @@ renderTentList=function(){const el=document.getElementById('tentList');if(!el)re
   const q=((document.getElementById('tentQ')||{}).value||'').trim().toLowerCase();
   const hit=id=>{const T=TENTS[id];return !q||`${T.name} ${T.model} ${T.brand||''}`.toLowerCase().includes(q);};
   let html='';
-  BRANDS.forEach(b=>{const ids=TENT_ORDER.filter(id=>TENTS[id].brand===b&&hit(id));if(!ids.length)return;
+  const {main,minor}=tentBrandOrder();
+  main.forEach(b=>{const ids=TENT_ORDER.filter(id=>TENTS[id].brand===b&&hit(id));if(!ids.length)return;
     const open=!!q||T_OPEN.has(b),cur=ids.includes(tent.id);
     html+=`<details class="fold" data-k="${esc(b)}"${open?' open':''}><summary><b>${esc(b)}</b>${cur?`<em>${esc(TENTS[tent.id].name)}</em>`:''}<span>${ids.length}</span></summary><div class="fold-in">${ids.map(tentBtn).join('')}</div></details>`;});
+  const mg=minor.map(b=>[b,TENT_ORDER.filter(id=>TENTS[id].brand===b&&hit(id))]).filter(x=>x[1].length);
+  if(mg.length){const all=mg.flatMap(x=>x[1]),open=!!q||T_OPEN.has(T_ETC),cur=all.includes(tent.id);
+    html+=`<details class="fold" data-k="${T_ETC}"${open?' open':''}><summary><b>${T_ETC}</b><small class="fold-sub">${mg.map(x=>esc(x[0])).join(' · ')}</small>${cur?`<em>${esc(TENTS[tent.id].name)}</em>`:''}<span>${all.length}</span></summary><div class="fold-in">${mg.map(([b,ids])=>`<p class="fold-h">${esc(b)}</p>${ids.map(tentBtn).join('')}`).join('')}</div></details>`;}
   const rest=TENT_ORDER.filter(id=>!TENTS[id].brand&&hit(id));if(rest.length)html+=`<div class="fold-rest">${rest.map(tentBtn).join('')}</div>`;
   el.innerHTML=html||`<div class="cat-empty">‘${esc(q)}’에 맞는 텐트가 없어요.</div>`;
   if(!q)el.querySelectorAll('details.fold').forEach(d=>d.addEventListener('toggle',()=>{d.open?T_OPEN.add(d.dataset.k):T_OPEN.delete(d.dataset.k);}));

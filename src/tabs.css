@@ -215,4 +215,7 @@
     .sheetwrap{align-items:flex-end;padding:0}
     .sheetwrap .modal{max-width:none;border-radius:22px 22px 0 0;max-height:88vh;padding-bottom:env(safe-area-inset-bottom,0px)}
   }
+  .fold>summary .fold-sub{font-size:11.5px;color:var(--ink-3);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}
+  .fold-h{margin:10px 4px 4px;font-size:12px;font-weight:700;color:var(--ink-3)}
+  .fold-h:first-child{margin-top:2px}
 </style>

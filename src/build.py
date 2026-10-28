@@ -57,6 +57,8 @@ META = '''<meta name="description" content="캠테리어(CAMTERIOR) — 텐트 �
 <meta name="referrer" content="no-referrer">'''
 head = head.replace('<meta name="viewport" content="width=device-width, initial-scale=1">',
                     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' + META)
+for _c in ('tabs.css','ai.css'):
+    assert (HERE / _c).read_text(encoding='utf-8').rstrip().endswith('</style>'), _c + ': </style> 뒤에 CSS가 있으면 화면에 글자로 보여요'
 head = head.replace('</head>', (HERE / 'tabs.css').read_text(encoding='utf-8') + '\n' + (HERE / 'ai.css').read_text(encoding='utf-8') + '\n</head>')
 
 # --- body text renames
