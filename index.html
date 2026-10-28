@@ -2000,8 +2000,8 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
 /* ===== 스노우피크 타프 익스텐션 텐트 (FES-433): 타프 윙폴(280cm)에 이어 쓰는 텐트. 앞(x=0)이 타프 쪽 ===== */
 {const o=[[0,1000],[1100,0],[3250,350],[3250,3650],[1100,4000],[0,3000]];
  T2.add('sp_tarp_ext',{brand:'스노우피크',name:'타프 익스텐션 텐트',model:'FES-433',size:[325,400,280],weight:'7.5kg',cap:'4명 (제조사 표기)',href:'https://snowpeak.com/products/tarp-extentioin-tent-4',srcName:'제조사 공식 페이지',drawn:true,
-  est:'제조사 치수도(바닥 325×400cm, 앞 높이 280cm·뒤 120cm, 앞쪽 215cm 지점에 윙폴)로 그렸어요. 헥사타프 M·헥사 에보 Pro처럼 280cm 윙폴 타프에 이어 써요. 이너 크기는 공개되지 않아 도면 비율 추정이에요.',
-  outer:o,inners:{std:{label:'침실',model:'',size:'약 205×340 (추정)',poly:[[1150,180],[3150,480],[3150,3520],[1150,3820]],posEst:true}},innerDefault:'std',
+  est:'제조사 설명서 치수도(바닥 325×400cm, 윙폴 쪽 높이 280cm·뒤 120cm, 침실 215cm·윙폴 쪽 폭 370cm)로 그렸어요. 280cm 윙폴을 쓰는 스노우피크 타프(헥사 M·L, 헥사 에보 Pro., 렉타 M·L 등)의 윙폴 쪽에 이어 쓰고, 윙폴 280cm×1과 35cm 이상 펙이 있으면 혼자 세울 수도 있어요. 2022·2023 설봉제 한정품이에요.',
+  outer:o,inners:{std:{label:'침실(이너)',model:'',size:'215×370 (설명서 치수도)',poly:[[1100,150],[3200,450],[3200,3550],[1100,3850]]}},innerDefault:'std',
   doors:[{a:[0,1150],b:[0,2850],label:'타프 쪽 입구',zone:true}],frames:[{a:[1100,0],b:[1100,4000],label:'윙폴 280cm'}],
   living:[550,2000],tarpJoin:1100,h3d:2800,inH3:1200,color:'#C9C2B2',prof:T2.PROF.shelter});}
 /* ===== 스프링바 (커크햄): 제조사 공식 페이지 치수. 바닥 일체형 캔버스 텐트, 앞(x=0) 벽에 출입문 ===== */
