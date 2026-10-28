@@ -1579,6 +1579,13 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
    doors:[T2.front(W,2800,'전면 도어'),...sideD(L,W,1300,2500)],color:'#5F6366'});}
 }
 
+/* ===== 스노우피크 타프 익스텐션 텐트 (FES-433): 타프 윙폴(280cm)에 이어 쓰는 텐트. 앞(x=0)이 타프 쪽 ===== */
+{const o=[[0,1000],[1100,0],[3250,350],[3250,3650],[1100,4000],[0,3000]];
+ T2.add('sp_tarp_ext',{brand:'스노우피크',name:'타프 익스텐션 텐트',model:'FES-433',size:[325,400,280],weight:'7.5kg',cap:'4명 (제조사 표기)',href:'https://snowpeak.com/products/tarp-extentioin-tent-4',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 치수도(바닥 325×400cm, 앞 높이 280cm·뒤 120cm, 앞쪽 215cm 지점에 윙폴)로 그렸어요. 헥사타프 M·헥사 에보 Pro처럼 280cm 윙폴 타프에 이어 써요. 이너 크기는 공개되지 않아 도면 비율 추정이에요.',
+  outer:o,inners:{std:{label:'침실',model:'',size:'약 205×340 (추정)',poly:[[1150,180],[3150,480],[3150,3520],[1150,3820]],posEst:true}},innerDefault:'std',
+  doors:[{a:[0,1150],b:[0,2850],label:'타프 쪽 입구',zone:true}],frames:[{a:[1100,0],b:[1100,4000],label:'윙폴 280cm'}],
+  living:[550,2000],tarpJoin:1100,h3d:2800,inH3:1200,color:'#C9C2B2',prof:T2.PROF.shelter});}
 /* ===== 스프링바 (커크햄): 제조사 공식 페이지 치수. 바닥 일체형 캔버스 텐트, 앞(x=0) 벽에 출입문 ===== */
 {const SB='https://www.springbar.com/products/',SBN='제조사 공식 페이지',NOIN='바닥 일체형 캔버스 텐트라 따로 넣는 이너가 없어요. 안에 바로 매트·코트를 깔아요.';
  // L=앞뒤 깊이, W=문 있는 벽 길이(mm). door=[문 시작 y, 문 폭], win=창문들
@@ -2508,7 +2515,8 @@ function renderTarpList(){const el=document.getElementById('tarpList');
   el.innerHTML=[null].concat(TARP_ORDER).map(id=>{const t=id&&TARPS[id];return `<button class="tent" aria-pressed="${tarp.id===id}" onclick="pickTarp(${id?`'${id}'`:'null'})">
     ${tarpThumb(id)}<span><span class="nm">${t?t.name:'타프 없음'}</span><br><span class="md">${t?`${t.model}, ${t.L/10}×${t.W/10}cm`:'텐트만 칠 때'}</span></span></button>`;}).join('');}
 function placeTarpDefault(){const T=TENTS[tent.id],t=TARPS[tarp.id];if(!t)return;
-  if(T.outer){const b=bbox(T.outer.concat(extPts(T)));tarp.rot=90;tarp.x=b[0][0]-250-t.F[1]/2;tarp.y=centroid(T.outer)[1];}
+  if(T.outer&&T.tarpJoin!=null){tarp.rot=0;tarp.x=T.tarpJoin-t.L/2;tarp.y=centroid(T.outer)[1];}
+  else if(T.outer){const b=bbox(T.outer.concat(extPts(T)));tarp.rot=90;tarp.x=b[0][0]-250-t.F[1]/2;tarp.y=centroid(T.outer)[1];}
   else{tarp.rot=0;tarp.x=0;tarp.y=0;}}
 function pickTarp(id){if(tarp.id===id&&id!=null){sel='tarp';render();return;}tarp.id=id;
   if(id){placeTarpDefault();sel='tarp';}else if(sel==='tarp')sel=null;
@@ -2522,6 +2530,7 @@ function renderTarpSpec(){const el=document.getElementById('tarpSpec');const t=T
     <dt>출처</dt><dd><a href="${SRC}${t.src}" target="_blank" rel="noopener">판매처 상품 상세</a></dd>
     ${t.note?`<dt></dt><dd class="muted" style="text-align:left;margin-top:4px">${t.note}</dd>`:''}`;}
 function pickTent(id){if(tent.id===id){if(typeof renderLineup==='function')renderLineup();return;}const T=TENTS[id];tent={id,inner:T.innerDefault,canopy:false,canopy2:false,custom:tent.custom};
+  if(T.tarpJoin!=null&&!tarp.id)tarp.id='hexa_m';
   if(tarp.id)placeTarpDefault();renderTentList();renderTentOpts();fitView();render();}
 function setInner(v){tent.inner=v;renderTentOpts();render();}
 // 이너를 돌리거나 옮기면 안에 깔아둔 매트·코트도 같이 따라가요

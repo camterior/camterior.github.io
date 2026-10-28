@@ -268,7 +268,7 @@ function aiPlace(list){
 
 function aiApply(res){
   if(res.tent&&res.tent!==tent.id){const T=TENTS[res.tent];tent={id:res.tent,inner:T.innerDefault,canopy:false,custom:tent.custom};
-    if(tarp.id)placeTarpDefault();renderTentList();renderTentOpts();}
+    if(T.tarpJoin!=null&&!tarp.id)tarp.id='hexa_m';if(tarp.id)placeTarpDefault();renderTentList();renderTentOpts();}
   if(res.inner&&INNER_PRESETS[res.inner]){tent.inner='p:'+res.inner;tent.innerOff=null;renderTentOpts();}
   TW=tarpWorld();
   // 의자는 테이블(없으면 IGT 앞)에 둘러앉히고, 남는 의자만 따로 둠
