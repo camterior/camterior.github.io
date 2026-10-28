@@ -189,6 +189,8 @@
   .emptyMsg{padding:18px 10px;text-align:center;color:var(--ink-2);font-size:13px}
 
   .inrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;margin-top:8px}
+  .rotin{margin-top:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:40px}
+  .rotin[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
   .inrow label{display:flex;align-items:center;gap:6px;color:var(--ink-2)}
   .inrow input{width:72px;padding:5px 7px;border:1px solid var(--line);border-radius:3px;font:inherit;background:#fff;color:var(--ink)}
   .stagebar .acts{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -2170,8 +2172,8 @@ const pName=p=>{const c=CATALOG[p.type];return `${c.short||c.name}(${c.model})`;
 const INNER_PRESETS={
   shell_duo:{name:'스노우피크 쉘이너 듀오',model:'SD-460',w:210,d:260,h:170,note:'2명, 2.7kg (오캠프 상품 상세)'},
   geoair2:{name:'디얼스 지오 에어2',model:'Geo-Air 2',w:160,d:200,h:140,note:'에어 이너, 바닥 200×160cm (오캠프 상품 상세)'},
-  godong:{name:'캠빌 고동 2P 에어',model:'GoDong 2P Air',w:230,d:335,h:135,note:'룸 210×155cm, 앞 전실 포함 (캠빌 공식)'}};
-function customInnerPoly(w0,d0){const T=TENTS[tent.id],w=(w0||tent.custom.w)*10,d=(d0||tent.custom.d)*10,b=bbox(T.outer),cy=centroid(T.outer)[1];
+  godong:{name:'캠빌 고동 텐트',model:'No.201GT2',w:155,d:220,h:125,note:'고동 2.0, 5.8kg, 문은 긴 쪽 (캠빌 공식)'}};
+function customInnerPoly(w0,d0){const T=TENTS[tent.id];let w=(w0||tent.custom.w)*10,d=(d0||tent.custom.d)*10;if(tent.innerRot)[w,d]=[d,w];const b=bbox(T.outer),cy=centroid(T.outer)[1];
   for(let x1=b[1][0]-120;x1-d>=b[0][0];x1-=50){const r=[[x1-d,cy-w/2],[x1,cy-w/2],[x1,cy+w/2],[x1-d,cy+w/2]];if(r.every(v=>pointInPoly(v,T.outer)))return r;}
   const cx=(b[0][0]+b[1][0])/2;return [[cx-d/2,cy-w/2],[cx+d/2,cy-w/2],[cx+d/2,cy+w/2],[cx-d/2,cy+w/2]];}
 function tentInner(){const T=TENTS[tent.id];if(!T.outer||!tent.inner)return null;
@@ -2762,6 +2764,7 @@ function renderTarpSpec(){const el=document.getElementById('tarpSpec');const t=T
 function pickTent(id){if(tent.id===id){if(typeof renderLineup==='function')renderLineup();return;}const T=TENTS[id];tent={id,inner:T.innerDefault,canopy:false,canopy2:false,custom:tent.custom};
   if(tarp.id)placeTarpDefault();renderTentList();renderTentOpts();fitView();render();}
 function setInner(v){tent.inner=v;renderTentOpts();render();}
+function rotInner(){tent.innerRot=tent.innerRot?0:90;renderTentOpts();render();}
 function setCustom(k,v){const n=Math.max(60,Math.min(600,Math.round(+v||0)));tent.custom[k]=n;renderTentOpts();render();}
 function setCanopy(v){tent.canopy=v;fitView();render();}
 function setCanopy2(v){tent.canopy2=v;fitView();render();}
@@ -2772,6 +2775,7 @@ function renderTentOpts(){const T=TENTS[tent.id];
   h+=`<button aria-pressed="${tent.inner==='custom'}" onclick="setInner('custom')">직접 입력</button><button aria-pressed="${!tent.inner}" onclick="setInner(null)">없음</button></div>`;
   h+=`<div class="opt" style="margin-top:6px"><span>이너텐트 넣기</span><div class="seg">${Object.entries(INNER_PRESETS).map(([k,P])=>`<button aria-pressed="${tent.inner==='p:'+k}" onclick="setInner('p:${k}')" title="${P.w}×${P.d}cm">${P.name.replace(/^(스노우피크|디얼스|캠빌) /,'')}</button>`).join('')}</div></div>`;
   if(tent.inner&&tent.inner.startsWith&&tent.inner.startsWith('p:')){const P=INNER_PRESETS[tent.inner.slice(2)];if(P)h+=`<p class="muted" style="margin-top:4px">${P.name} ${P.w}×${P.d}cm · ${P.note}. 뒤쪽 벽에 붙여 놓아요.</p>`;}
+  if(tent.inner==='custom'||(tent.inner&&tent.inner.startsWith&&tent.inner.startsWith('p:')))h+=`<button type="button" class="rotin" onclick="rotInner()" aria-pressed="${!!tent.innerRot}">↻ 이너 90° 돌리기${tent.innerRot?' (돌림)':''}</button>`;
   if(tent.inner==='custom')h+=`<div class="inrow"><label>폭 <input type="number" min="60" max="600" step="5" value="${tent.custom.w}" onchange="setCustom('w',this.value)" aria-label="이너 폭 cm"> cm</label>
     <label>깊이 <input type="number" min="60" max="600" step="5" value="${tent.custom.d}" onchange="setCustom('d',this.value)" aria-label="이너 깊이 cm"> cm</label></div>
     <p class="muted" style="margin-top:4px">뒤쪽 벽에 붙여서 놓아요. 폭은 텐트 가로 방향이에요.</p>`;
@@ -3143,7 +3147,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 let DB=null,UID=null,DL=null,mineInDb=false,galleryOn=false,galleryWrite=false,MINE=[],GALLERY=[],GDOCS={},CURRENT_CODE='',undoCode=null;
 
 function planObj(){return {v:1,
-  tent:{id:tent.id,inner:tent.inner,canopy:!!tent.canopy,canopy2:!!tent.canopy2,custom:{w:tent.custom.w,d:tent.custom.d}},
+  tent:{id:tent.id,inner:tent.inner,ir:tent.innerRot?90:0,canopy:!!tent.canopy,canopy2:!!tent.canopy2,custom:{w:tent.custom.w,d:tent.custom.d}},
   tarp:tarp.id?{id:tarp.id,x:Math.round(tarp.x),y:Math.round(tarp.y),r:Math.round(tarp.rot)}:null,
   pieces:state.pieces.map(p=>{const o={u:p.uid,t:p.type};
     if(p.parent!=null){o.p=p.parent;o.pe=p.pEdge;o.me=p.mEdge;if(p.slide)o.s=Math.round(p.slide);}
@@ -3155,7 +3159,7 @@ function parsePlan(o){
   if(!o||o.v!==1||!Array.isArray(o.pieces))throw new Error('배치 형식을 읽을 수 없어요');
   const tid=o.tent&&TENTS[o.tent.id]?o.tent.id:'landlock',T=TENTS[tid],ti=o.tent||{};
   const inner=(ti.inner==='custom'&&T.outer)||(typeof ti.inner==='string'&&ti.inner.startsWith('p:')&&INNER_PRESETS[ti.inner.slice(2)]&&T.outer)||ti.inner===null||(ti.inner&&T.inners[ti.inner])?ti.inner:T.innerDefault;
-  const nt={id:tid,inner,canopy:!!ti.canopy&&!!T.canopy,canopy2:!!ti.canopy2&&!!T.canopy2,custom:{w:num(ti.custom&&ti.custom.w,60,600,200),d:num(ti.custom&&ti.custom.d,60,600,210)}};
+  const nt={id:tid,inner,innerRot:ti.ir===90?90:0,canopy:!!ti.canopy&&!!T.canopy,canopy2:!!ti.canopy2&&!!T.canopy2,custom:{w:num(ti.custom&&ti.custom.w,60,600,200),d:num(ti.custom&&ti.custom.d,60,600,210)}};
   const nTarp=o.tarp&&TARPS[o.tarp.id]?{id:o.tarp.id,x:num(o.tarp.x,-1e5,1e5,0),y:num(o.tarp.y,-1e5,1e5,0),rot:num(o.tarp.r,0,359,0)}:{id:null,x:0,y:0,rot:0};
   let list=[],seen=new Set();
   o.pieces.slice(0,200).forEach(q=>{if(!q||!CATALOG[q.t]||!Number.isInteger(q.u)||q.u<1||seen.has(q.u))return;seen.add(q.u);
