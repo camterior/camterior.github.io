@@ -193,15 +193,17 @@ renderCatalog=function(){const el=document.getElementById('catalog');if(!el)retu
 renderTentList();renderCatalog();renderMine();
 (function introCounts(){const n=document.getElementById('nTent');if(n)n.textContent=Math.floor(TENT_ORDER.filter(id=>TENTS[id].outer).length/10)*10;})();
 
-/* ---------- boot ---------- */
-(function camteriorBoot(){
+/* ---------- boot ----------
+   ai.js·mine.js가 이 뒤에 붙으므로, 그 코드가 다 읽힌 다음에 첫 탭을 엽니다
+   (주소가 #mine·#board로 바로 열려도 깨지지 않게) */
+queueMicrotask(function camteriorBoot(){
   const fromHash=(location.hash||'').slice(1);
   let start=fromHash||'intro';
   if(new URLSearchParams(location.search).get('p'))start='plan';
   go(start,{noHash:true,keepScroll:true});
   if(!IN_CLAUDE&&!fromHash)history.replaceState(null,'','#'+CUR);
   if('serviceWorker' in navigator&&!IN_CLAUDE&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
-})();
+});
 
 /* ---------- v19.1 touch gestures: one finger = move piece / pan, two fingers = zoom ----------
    Each gesture follows only its own pointer, stops on pointercancel, and yields to a pinch.
