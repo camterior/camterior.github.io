@@ -92,6 +92,8 @@ label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:cen
   .two{grid-template-columns:1fr}
   .step{grid-template-columns:6.6em 1fr 5.4em}
 }
+.rq li .nm{white-space:normal;overflow:visible}
+@media (max-width:520px){.rq:not(#ntAdmList) li{grid-template-columns:auto minmax(0,1fr)}.rq:not(#ntAdmList) li .nm{grid-column:1/-1}}
 @media (prefers-reduced-motion:reduce){.step .bar i{transition:none}}
 </style>
 </head>
@@ -151,15 +153,15 @@ label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:cen
         <div class="chart" id="chart"><p class="empty">불러오는 중…</p></div>
       </section>
 
-      <section class="cam" id="reqAdm">
-        <h2>게시판 관리 <small>공지 쓰기 · 요청 승인 (일요일 반영 예정만 반영)</small></h2>
+      <section id="reqAdm">
+        <h2><span id="rqSiteName">캠테리어</span> 게시판 관리 <small>공지 쓰기 · 상태 바꾸기 · 답글 (일요일 반영 예정만 반영)</small></h2>
         <form class="row" id="rqKeyForm" autocomplete="off"><input type="password" id="rqKey" placeholder="게시판 관리 키 (워커 ADMIN_KEY)" aria-label="게시판 관리 키"><button type="submit">열기</button></form>
         <p class="rq-hint" id="rqMsg"></p>
         <div id="rqBody" hidden>
           <h3 class="rq-h">공지 쓰기</h3>
           <form id="ntForm" class="nt-form"><input id="ntTitle" maxlength="60" placeholder="제목" required><textarea id="ntBody" maxlength="2000" rows="3" placeholder="내용"></textarea><label class="chk"><input type="checkbox" id="ntPin"> 맨 위 고정</label><button type="submit">공지 올리기</button></form>
           <ul class="list rq" id="ntAdmList"></ul>
-          <h3 class="rq-h">장비 요청</h3><ul class="list rq" id="rqAdm-gear"></ul>
+          <h3 class="rq-h" id="rqK1Label">장비 요청</h3><ul class="list rq" id="rqAdm-k1"></ul>
           <h3 class="rq-h">개발 요청</h3><ul class="list rq" id="rqAdm-dev"></ul>
         </div>
       </section>
@@ -205,7 +207,8 @@ function useSite(){var S=SITES[site];API=S.gc+'/api/v0';LAUNCH=S.launch;KEY_ST=S
   document.getElementById('k-cal').textContent=S.k[0];document.getElementById('k-open').textContent=S.k[1];
   document.getElementById('l-f2').textContent=S.l[0];document.getElementById('l-f3').textContent=S.l[1];
   document.querySelectorAll('.cam').forEach(function(e){e.hidden=site!=='camterior'});
-  document.querySelectorAll('.sites button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.s===site))});}
+  document.querySelectorAll('.sites button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.s===site))});
+  window.admSite=site;try{document.dispatchEvent(new Event('admsite'))}catch(e){}}
 useSite();
 var $=function(id){return document.getElementById(id)};
 var key='', period='7';
@@ -360,9 +363,9 @@ async function load(){
 
 function setPeriod(p){
   period=p; sset(P_ST,p);
-  document.querySelectorAll('.periods button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.p===p))});
+  document.querySelectorAll('.periods:not(.sites) button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.p===p))});
 }
-document.querySelectorAll('.periods button').forEach(function(b){b.addEventListener('click',function(){setPeriod(b.dataset.p);load()})});
+document.querySelectorAll('.periods:not(.sites) button').forEach(function(b){b.addEventListener('click',function(){setPeriod(b.dataset.p);load()})});
 $('reload').addEventListener('click',load);
 $('logout').addEventListener('click',function(){key='';sset(KEY_ST,'');view()});
 $('keyform').addEventListener('submit',function(e){e.preventDefault();
@@ -379,13 +382,15 @@ setPeriod(period); view();
   var W='https://camterior-ai.ghdwnd2.workers.dev',KS='camRqKey',ST={new:'확인 중',ok:'확인됨',sun:'일요일 반영 예정',done:'반영됨',no:'어려움',hide:'숨김'};
   function $i(id){return document.getElementById(id)}
   function k(){try{return localStorage.getItem(KS)||''}catch(e){return ''}}
-  function call(b){b.key=k();return fetch(W,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})}).then(function(r){return r.json().then(function(d){return r.ok?d:{fail:d.error||r.status}})}).catch(function(){return {fail:'net'}})}
+  function S(){return window.admSite==='caro'?'caro':'camterior'}
+  var K1={camterior:['gear','장비 요청'],caro:['camp','캠핑장 요청']},NM={camterior:'캠테리어',caro:'CARO'};
+  function call(b){b.key=k();b.site=S();return fetch(W,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})}).then(function(r){return r.json().then(function(d){return r.ok?d:{fail:d.error||r.status}})}).catch(function(){return {fail:'net'}})}
   function draw(d){var items=d.items||[],nts=d.notices||[];$i('rqBody').hidden=false;
     var sun=items.filter(function(r){return r.st==='sun'}).length,nw=items.filter(function(r){return r.st==='new'}).length;
     $i('rqMsg').textContent='요청 '+items.length+'개 · 새 요청 '+nw+'개 · 일요일 반영 예정 '+sun+'개';
     $i('ntAdmList').innerHTML=nts.length?nts.map(function(n){return '<li><span class="nm">'+(n.pin?'📌 ':'')+'<b>'+esc(n.title)+'</b><small>'+esc(n.at)+'</small></span><button class="x" data-pin="'+esc(n.id)+'">'+(n.pin?'고정 풀기':'고정')+'</button><button class="x" data-del="'+esc(n.id)+'">지우기</button></li>'}).join(''):'<li class="empty">공지가 없어요</li>';
-    ['gear','dev'].forEach(function(kind){var L=items.filter(function(r){return (r.kind||'gear')===kind});
-      $i('rqAdm-'+kind).innerHTML=L.length?L.map(function(r){return '<li><span class="nm"><b>'+esc(r.name)+'</b>'+(r.link?' · <a href="'+esc(r.link)+'" target="_blank" rel="noopener">링크</a>':'')+'<small>'+esc(r.at||'')+' · '+(r.from==='ai'?'AI에서':'게시판')+(r.note?' · '+esc(r.note):'')+'</small><input class="rp" data-rp="'+esc(r.id)+'" maxlength="200" placeholder="답글 (엔터로 저장)" value="'+esc(r.reply||'')+'"></span><span>+'+(r.n||1)+'</span><select data-id="'+esc(r.id)+'">'+Object.keys(ST).map(function(s){return '<option value="'+s+'"'+(s===r.st?' selected':'')+'>'+ST[s]+'</option>'}).join('')+'</select></li>'}).join(''):'<li class="empty">요청이 없어요</li>';});}
+    [K1[S()][0],'dev'].forEach(function(kind){var L=items.filter(function(r){return (r.kind||K1[S()][0])===kind});
+      $i(kind==='dev'?'rqAdm-dev':'rqAdm-k1').innerHTML=L.length?L.map(function(r){return '<li><span class="nm"><b>'+esc(r.name)+'</b>'+(r.link?' · <a href="'+esc(r.link)+'" target="_blank" rel="noopener">링크</a>':'')+'<small>'+esc(r.at||'')+' · '+(r.from==='ai'?'AI에서':r.from==='search'?'검색에서':'게시판')+(r.note?' · '+esc(r.note):'')+'</small><input class="rp" data-rp="'+esc(r.id)+'" maxlength="200" placeholder="답글 (엔터로 저장)" value="'+esc(r.reply||'')+'"></span><span>+'+(r.n||1)+'</span><select data-id="'+esc(r.id)+'">'+Object.keys(ST).map(function(s){return '<option value="'+s+'"'+(s===r.st?' selected':'')+'>'+ST[s]+'</option>'}).join('')+'</select></li>'}).join(''):'<li class="empty">요청이 없어요</li>';});}
   function run(b){if(!k()){$i('rqMsg').textContent='관리 키를 넣어주세요.';return;}
     call(b).then(function(d){if(d.fail){$i('rqMsg').textContent=d.fail==='key'?'관리 키가 맞지 않아요.':d.fail==='board-off'?'워커에 KV(RL)가 아직 연결되지 않았어요.':'게시판 서버에 연결하지 못했어요 ('+d.fail+').';return;}draw(d)});}
   $i('rqKeyForm').addEventListener('submit',function(e){e.preventDefault();var v=$i('rqKey').value.trim();try{localStorage.setItem(KS,v)}catch(x){}$i('rqKey').value='';run({op:'admin'});});
@@ -393,7 +398,8 @@ setPeriod(period); view();
   $i('reqAdm').addEventListener('change',function(e){var t=e.target;if(t.tagName==='SELECT'&&t.dataset.id)run({op:'admin',id:t.dataset.id,st:t.value});});
   $i('reqAdm').addEventListener('keydown',function(e){var t=e.target;if(e.key==='Enter'&&t.dataset&&t.dataset.rp){e.preventDefault();run({op:'admin',id:t.dataset.rp,reply:t.value});}});
   $i('reqAdm').addEventListener('click',function(e){var t=e.target;if(t.dataset&&t.dataset.del){if(confirm('이 공지를 지울까요?'))run({op:'notice',act:'del',id:t.dataset.del});}else if(t.dataset&&t.dataset.pin)run({op:'notice',act:'pin',id:t.dataset.pin});});
-  if(k())run({op:'admin'});
+  function sync(){$i('rqSiteName').textContent=NM[S()];$i('rqK1Label').textContent=K1[S()][1];$i('rqBody').hidden=true;$i('rqMsg').textContent='';if(k())run({op:'admin'});}
+  document.addEventListener('admsite',sync);sync();
 })();
 </script>
 </body>
