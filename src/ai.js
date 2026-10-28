@@ -100,7 +100,7 @@ function aiKeys(ids,nameOf,modelOf){const own={},map={};
 function aiLocal(text){
   const KN={한:1,두:2,세:3,네:4,다섯:5,여섯:6};
   let t=aiNorm(text.replace(/[x×*]\s*(\d)/gi,'$1')).replace(/(한|두|세|네|다섯|여섯)(개|장|대)/g,(m,a,b)=>KN[a]+b)
-    .replace(/코너(테이블)?(양쪽|양옆|좌우|2개|2)/g,'코너테이블l코너테이블r').replace(/(왼쪽|좌측)코너(테이블)?|코너(테이블)?(왼쪽|좌측)/g,'코너테이블l')
+    .replace(/코너(테이블)?(양쪽|양옆|좌우|둘다|모두|lr|rl|l과r|l랑r|2개|2)/g,'코너테이블l코너테이블r').replace(/(왼쪽|좌측)코너(테이블)?|코너(테이블)?(왼쪽|좌측)/g,'코너테이블l')
     .replace(/(오른쪽|우측)코너(테이블)?|코너(테이블)?(오른쪽|우측)/g,'코너테이블r').replace(/코너테이블(?![lr])/g,'코너테이블l');
   const res={tent:null,items:[],unknown:[],tip:''};
   for(const [k,al] of Object.entries(AI_INNER_AL)){const hit=al.map(aiNorm).sort((a,b)=>b.length-a.length).find(a=>t.includes(a));if(hit){res.inner=k;t=t.split(hit).join('#');break;}}
