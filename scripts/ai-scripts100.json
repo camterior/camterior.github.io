@@ -1,0 +1,4170 @@
+[
+ {
+  "id": 1,
+  "photo": "스노우피크존 키친 (1·9·10·11번 사진)",
+  "say": "랜드록 안에 IGT 롱 하나 벽쪽에 두고 양쪽 끝에 코너테이블 L이랑 R 붙여줘. 칸에는 설봉원, 플랫버너, 우드테이블 W 넣고 다리는 660. 가운데에 원액션테이블 롱 하나, FD체어 4개, 옆에 강염버너 하나.",
+  "answer": {
+   "tent": "landlock",
+   "items": [
+    {
+     "type": "long4",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "corner_L",
+       "shape": "line"
+      },
+      {
+       "type": "corner_R",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "wood_w",
+       "count": 1
+      }
+     ],
+     "leg": 660
+    },
+    {
+     "type": "sp_oat_l",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "sp_gs1000",
+     "count": 1,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": "IGT 롱 8칸이 설봉원·플랫버너·우드테이블 W로 꽉 차요. 강염버너는 텐트 벽에서 떨어뜨려 두세요."
+  }
+ },
+ {
+  "id": 2,
+  "photo": "로우 거실 (2·8번 사진)",
+  "say": "리빙쉘 롱 프로에 원액션 로우테이블 2개 가운데 두고 로우체어 30 두 개, 강염버너 하나. 벽쪽엔 쉘프컨테이너 50, 이너룸엔 메가매트 듀오. 육각 테이블도 있어.",
+  "answer": {
+   "tent": "living_shell_long_pro",
+   "items": [
+    {
+     "type": "sp_oat_low",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "sp_low30",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "sp_gs1000",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sc50",
+     "count": 1,
+     "zone": "wall"
+    },
+    {
+     "type": "megamat_duo",
+     "count": 1,
+     "zone": "inner"
+    }
+   ],
+   "unknown": [
+    "육각 테이블"
+   ],
+   "tip": "로우테이블 높이에 맞춰 로우체어 30을 붙였어요. 육각 테이블은 아직 제원에 없어서 뺐어요."
+  }
+ },
+ {
+  "id": 3,
+  "say": "쉘터GM에 세퍼레이트 3유닛 벽쪽에 두고 플랫버너, 원유닛 트레이 2개 넣어줘. 앞에 멀티펑션 롱 T자로 붙이고 하프슬라이드 2개, 다리는 660. 가운데 노가체어 2개, 벽쪽에 파세코 팬히터랑 도메틱 45.",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "sep3",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "T"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 2
+      }
+     ],
+     "leg": 660
+    },
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "camp5000",
+     "count": 1,
+     "zone": "wall"
+    },
+    {
+     "type": "cfx3_45",
+     "count": 1,
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": "세퍼레이트 3유닛 6칸이 플랫버너·원유닛 트레이 2개로 꽉 차요."
+  }
+ },
+ {
+  "id": 4,
+  "say": "쉘터GM 앞쪽에 세퍼레이트 IGT, 칸에 설봉원이랑 플랫버너 넣고 앞에 멀티펑션 롱 T자로. 뒤쪽으로 원액션테이블 롱 하나랑 FD체어 2개.",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "sep3",
+     "count": 1,
+     "zone": "bottom",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "T"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_oat_l",
+     "count": 1,
+     "zone": "top"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "top"
+    }
+   ],
+   "unknown": [],
+   "tip": "요리하는 IGT는 입구 쪽, 식탁은 안쪽에 두면 연기가 밖으로 잘 빠져요."
+  }
+ },
+ {
+  "id": 5,
+  "say": "카즈미 비바돔 플러스에 마운틴리버 야전침대 하나, 헬리녹스 선셋체어, 스텐 마이테이블, 강염버너.",
+  "answer": {
+   "tent": null,
+   "items": [
+    {
+     "type": "hx_sunset",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "mytable_s",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_gs1000",
+     "count": 1,
+     "zone": "center"
+    }
+   ],
+   "unknown": [
+    "카즈미 비바돔 플러스",
+    "마운틴리버 야전침대"
+   ],
+   "tip": "비바돔 플러스와 마운틴리버 야전침대는 아직 제원에 없어서 뺐어요."
+  }
+ },
+ {
+  "id": 6,
+  "photo": "랜드스테이션 지카로 (사용자 사진)",
+  "say": "메락 프로 가운데 지카로 테이블 두고 로우체어 쇼트 4개 둘러앉게, 벽쪽엔 IGT 롱에 코너테이블 L 붙이고 플랫버너, 설봉원. 코트원 하나 벽쪽.",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "sp_jikaro",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_lowshort",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "long4",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "corner_L",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "seppou",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "cot_one",
+     "count": 1,
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": "지카로 테이블 둘레로 앉고, 주방 IGT는 벽쪽에 붙여 가운데 길을 비웠어요."
+  }
+ },
+ {
+  "id": 7,
+  "photo": "IGT 앞에 앉기 (사용자 사진)",
+  "say": "쉘터GM에 세퍼레이트 3유닛에 플랫버너, 설봉원, 원유닛 트레이 하나. 하프슬라이드 하나 붙이고 FD체어 2개 IGT 앞에 앉게.",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "sep3",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": "버너 앞이라 의자는 IGT에서 한 뼘 띄웠어요."
+  }
+ },
+ {
+  "id": 8,
+  "photo": "키친+식탁",
+  "say": "리빙쉘 롱 프로에 IGT 롱 벽쪽, 코너테이블 R 붙이고 칸엔 플랫버너, 우드테이블 W, 메쉬트레이 딥. 가운데 원액션테이블 롱에 테이크체어 4개, 벽쪽에 토요토미 팬히터.",
+  "answer": {
+   "tent": "living_shell_long_pro",
+   "items": [
+    {
+     "type": "long4",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "corner_R",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "wood_w",
+       "count": 1
+      },
+      {
+       "id": "mesh_d1",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_oat_l",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_take",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "toyotomi_lcl53",
+     "count": 1,
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": "주방은 벽쪽, 식탁은 그 앞에 두고 출입구 쪽 길을 비웠어요."
+  }
+ },
+ {
+  "id": 9,
+  "photo": "지카로 둘러앉기",
+  "say": "랜드스테이션 L에 지카로 테이블 가운데, 로우체어 30 네 개 둘러서. 벽쪽엔 세퍼레이트 4유닛에 플랫버너, 설봉원, 원유닛 트레이 2개. 코트원은 이너룸.",
+  "answer": {
+   "tent": "sp_landstation_l",
+   "items": [
+    {
+     "type": "sp_jikaro",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_low30",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "sep4",
+     "count": 1,
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "type": "cot_one",
+     "count": 1,
+     "zone": "inner"
+    }
+   ],
+   "unknown": [],
+   "tip": "지카로 둘레에 4명이 앉고 주방은 벽쪽이에요."
+  }
+ },
+ {
+  "id": 10,
+  "photo": "가족 키친",
+  "say": "쿠디 파밀리아에 원액션테이블 하이 하나, FD체어 4개. IGT 레귤러에 플랫버너랑 스텐트레이 2개 넣어서 벽쪽. 도메틱 55 벽쪽, 이너룸엔 메가매트 듀오.",
+  "answer": {
+   "tent": "cd_familia",
+   "items": [
+    {
+     "type": "sp_oat",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "reg3",
+     "count": 1,
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "type": "cfx3_55",
+     "count": 1,
+     "zone": "wall"
+    },
+    {
+     "type": "megamat_duo",
+     "count": 1,
+     "zone": "inner"
+    }
+   ],
+   "unknown": [],
+   "tip": "4인 식탁은 가운데, 냉장고는 주방 옆 벽쪽이에요."
+  }
+ },
+ {
+  "id": 11,
+  "photo": "솔로",
+  "say": "어메니티돔 S에 헬리녹스 체어원 하나, 테이블원 하드탑, 강염버너.",
+  "answer": {
+   "tent": "sp_amenity_s",
+   "items": [
+    {
+     "type": "hx_one",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "hx_t1",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_gs1000",
+     "count": 1,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": "1인 세팅이라 테이블 앞에 체어원을 두고 버너는 옆에 띄웠어요."
+  }
+ },
+ {
+  "id": 12,
+  "photo": "IGT 바",
+  "say": "메락 프로에 IGT 롱, 칸엔 플랫버너 설봉원 우드테이블 W. 앞에 노가체어 3개 쭉 앉게.",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "long4",
+     "count": 1,
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "wood_w",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "noga_chair",
+     "count": 3,
+     "zone": "center",
+     "at": "long4"
+    }
+   ],
+   "unknown": [],
+   "tip": "IGT 앞 바 자리예요. 버너 앞이라 의자를 한 뼘 띄웠어요."
+  }
+ },
+ {
+  "id": 13,
+  "photo": "로우 거실 겨울",
+  "say": "랜드록 X에 싱글액션 로우테이블 M, 로우체어 쇼트 2개, 가운데 옴니230, 벽쪽에 폴딩쉘프 롱.",
+  "answer": {
+   "tent": "landlock_x",
+   "items": [
+    {
+     "type": "sp_chabu",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_lowshort",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "omni230",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "fshelf_l",
+     "count": 1,
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": "난로는 테이블 세트에서 떨어뜨려 두었어요."
+  }
+ },
+ {
+  "id": 14,
+  "photo": "오타·띄어쓰기",
+  "say": "미니멀웍스 쉘터g 에어에 스탠마이테이블 2개랑 헬리녹스체어원 2개",
+  "answer": {
+   "tent": "mw_shelter_gair",
+   "items": [
+    {
+     "type": "mytable_s",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "hx_one",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 15,
+  "photo": "목록에 없는 장비",
+  "say": "쉘터GM에 원액션 로우테이블, FD체어 2개, 이백 아이스박스, 크레모아 랜턴, 우드랙",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "sp_oat_low",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [
+    "이백 아이스박스",
+    "크레모아 랜턴",
+    "우드랙"
+   ],
+   "tip": "아이스박스·랜턴·우드랙은 아직 제원에 없어서 뺐어요."
+  }
+ },
+ {
+  "id": 16,
+  "photo": "대가족 키친",
+  "say": "쿠디 파밀리아 프로에 IGT 롱 벽쪽, 양쪽 끝에 코너테이블 L R, 앞에 멀티펑션 롱 T자. 칸은 플랫버너, 설봉원, 스텐트레이, 우드테이블 S. 원액션테이블 롱에 테이크체어 4개, FD체어 2개는 멀티펑션 쪽.",
+  "answer": {
+   "tent": "cd_familia_pro",
+   "items": [
+    {
+     "type": "long4",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "corner_L",
+       "shape": "line"
+      },
+      {
+       "type": "corner_R",
+       "shape": "line"
+      },
+      {
+       "type": "mf_long",
+       "shape": "T"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 1
+      },
+      {
+       "id": "wood_s",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_oat_l",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_take",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "long4"
+    }
+   ],
+   "unknown": [],
+   "tip": "6명 자리예요. 멀티펑션 쪽은 요리하며 먹는 자리, 원액션테이블은 식탁이에요."
+  }
+ },
+ {
+  "id": 17,
+  "photo": "2인 쉘터",
+  "say": "쉘터GM, 세퍼레이트 3유닛에 멀티펑션 롱 T자로, 노가체어 2개, 도메틱 35, 파세코 팬히터.",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "sep3",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "T"
+      }
+     ]
+    },
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "cfx3_35",
+     "count": 1,
+     "zone": "wall"
+    },
+    {
+     "type": "camp5000",
+     "count": 1,
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": "멀티펑션 양옆이 둘의 식탁이 돼요."
+  }
+ },
+ {
+  "id": 18,
+  "photo": "터널 캠핑",
+  "say": "헬리녹스 필드 터널에 카페테이블, 체어제로 2개, 이너룸에 코트원 1개.",
+  "answer": {
+   "tent": "hx_field_tunnel",
+   "items": [
+    {
+     "type": "hx_cafe",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "hx_zero",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "cot_one",
+     "count": 1,
+     "zone": "inner"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 19,
+  "photo": "대형 지카로",
+  "say": "노스피크 A9에 지카로 테이블 하나랑 로우체어 30 4개, IGT 레귤러 다리 400으로 플랫버너 넣어서 벽쪽.",
+  "answer": {
+   "tent": "np_a9",
+   "items": [
+    {
+     "type": "sp_jikaro",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_low30",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "reg3",
+     "count": 1,
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 400
+    }
+   ],
+   "unknown": [],
+   "tip": "낮은 지카로에 맞춰 IGT도 400 다리로 낮췄어요."
+  }
+ },
+ {
+  "id": 20,
+  "photo": "서서 요리",
+  "say": "랜드브리즈 4에 IGT 레귤러 다리 830, 플랫버너 스텐트레이 두 개. 원액션테이블 하이에 FD체어 2개.",
+  "answer": {
+   "tent": "sp_landbreeze4",
+   "items": [
+    {
+     "type": "reg3",
+     "count": 1,
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 2
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "sp_oat",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": "830 다리는 서서 요리하는 높이예요."
+  }
+ },
+ {
+  "id": 21,
+  "photo": "L자 주방",
+  "say": "리겔 프로에 IGT 롱이랑 코너테이블 R, 오픈멀티펑션 L 붙여서 벽쪽. 원액션 롱, FD체어 4개.",
+  "answer": {
+   "tent": "sp_riegel",
+   "items": [
+    {
+     "type": "long4",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "corner_R",
+       "shape": "line"
+      },
+      {
+       "type": "open_L",
+       "shape": "line"
+      }
+     ]
+    },
+    {
+     "type": "sp_oat_l",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 22,
+  "photo": "IGT 두 개",
+  "say": "쿠디 13.6에 세퍼레이트 3유닛 하나는 플랫버너 설봉원 스텐트레이 넣고, IGT 레귤러 하나는 우드테이블 W, 리드트레이, 스텐박스. 테이크체어 4개.",
+  "answer": {
+   "tent": "cd_136",
+   "items": [
+    {
+     "type": "sep3",
+     "count": 1,
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "reg3",
+     "count": 1,
+     "zone": "center",
+     "slots": [
+      {
+       "id": "wood_w",
+       "count": 1
+      },
+      {
+       "id": "lid_half",
+       "count": 1
+      },
+      {
+       "id": "box_half",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_take",
+     "count": 4,
+     "zone": "center",
+     "at": "reg3"
+    }
+   ],
+   "unknown": [],
+   "tip": "버너 없는 IGT를 식탁처럼 써요."
+  }
+ },
+ {
+  "id": 23,
+  "photo": "겨울 대형",
+  "say": "쿠디 13.6에 원액션테이블 롱, FD체어 4개, 신일 팬히터 1200이랑 900 하나씩, 스텐 마이테이블 2개 벽쪽.",
+  "answer": {
+   "tent": "cd_136",
+   "items": [
+    {
+     "type": "sp_oat_l",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "sfh1200",
+     "count": 1,
+     "zone": "wall"
+    },
+    {
+     "type": "sfh_bh900",
+     "count": 1,
+     "zone": "wall"
+    },
+    {
+     "type": "mytable_s",
+     "count": 2,
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 24,
+  "photo": "침실 위주",
+  "say": "헬리녹스 노나돔 이너룸에 메가매트 2개",
+  "answer": {
+   "tent": "hx_nona",
+   "items": [
+    {
+     "type": "megamat",
+     "count": 2,
+     "zone": "inner"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 25,
+  "photo": "커밋 세트",
+  "say": "콜맨 터프 와이드 돔 V에 커밋 테이블 와이드, 커밋체어 2개",
+  "answer": {
+   "tent": "cm_tough_wide_v",
+   "items": [
+    {
+     "type": "kermit_t",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "kermit",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 26,
+  "photo": "수납 벽",
+  "say": "리빙쉘에 알루텍 93 두 개, 알루텍 68 하나, 쉘프컨테이너 25 두 개 다 벽쪽, 폴딩쉘프 메탈탑 하나.",
+  "answer": {
+   "tent": "living_shell",
+   "items": [
+    {
+     "type": "alu93",
+     "count": 2,
+     "zone": "wall"
+    },
+    {
+     "type": "alu68",
+     "count": 1,
+     "zone": "wall"
+    },
+    {
+     "type": "sc25",
+     "count": 2,
+     "zone": "wall"
+    },
+    {
+     "type": "fshelf_m",
+     "count": 1,
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": "수납은 벽을 따라 붙여 가운데를 비웠어요."
+  }
+ },
+ {
+  "id": 27,
+  "photo": "볼트 2인",
+  "say": "볼트에 세퍼레이트 4유닛, 하프슬라이드 롱 2개, 칸은 메쉬트레이 샤로 2개 플랫버너 스텐트레이. 노가 테이블에 노가체어 2개.",
+  "answer": {
+   "tent": "sp_vault",
+   "items": [
+    {
+     "type": "sep4",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "slide_hl",
+       "shape": "line"
+      },
+      {
+       "type": "slide_hl",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "mesh_s1",
+       "count": 2
+      },
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "noga_table",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 28,
+  "photo": "오픈멀티 양쪽",
+  "say": "랜드네스트 쉘터에 IGT 레귤러, 오픈멀티펑션 L이랑 R 양쪽에. 칸은 플랫버너, 스텐트레이, 리드트레이, 스텐박스. 로우체어 쇼트 4개.",
+  "answer": {
+   "tent": "sp_landnest",
+   "items": [
+    {
+     "type": "reg3",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "open_L",
+       "shape": "line"
+      },
+      {
+       "type": "open_R",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 1
+      },
+      {
+       "id": "lid_half",
+       "count": 1
+      },
+      {
+       "id": "box_half",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_lowshort",
+     "count": 4,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 29,
+  "photo": "없는 텐트 모델",
+  "say": "콜맨 웨더마스터 와이드 2룸 코쿤 IV에 원액션테이블 롱, FD체어 4개.",
+  "answer": {
+   "tent": null,
+   "items": [
+    {
+     "type": "sp_oat_l",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "center"
+    }
+   ],
+   "unknown": [
+    "콜맨 웨더마스터 와이드 2룸 코쿤 IV"
+   ],
+   "tip": "코쿤 IV는 아직 제원에 없어요. 비슷한 모델로 바꾸지 않았어요."
+  }
+ },
+ {
+  "id": 30,
+  "photo": "버너 두 개",
+  "say": "IGT 레귤러에 플랫버너 2개랑 스텐트레이 하나. 원액션 로우테이블, 로우체어 30 2개.",
+  "answer": {
+   "tent": null,
+   "items": [
+    {
+     "type": "reg3",
+     "count": 1,
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 2
+      },
+      {
+       "id": "steel1",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_oat_low",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_low30",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 31,
+  "photo": "로우 혼합",
+  "say": "어메니티 엘필드에 원액션 로우테이블, 로우체어 30 세 개.",
+  "answer": {
+   "tent": "sp_elfield",
+   "items": [
+    {
+     "type": "sp_oat_low",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_low30",
+     "count": 3,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 32,
+  "photo": "화목난로",
+  "say": "메락 프로 가운데 MK스토브, 싱글액션 로우테이블 M에 로우체어 쇼트 2개.",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "mk_stove",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_chabu",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_lowshort",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": "화목난로 둘레는 넉넉히 비웠어요."
+  }
+ },
+ {
+  "id": 33,
+  "photo": "이너 코트",
+  "say": "랜드록 이너룸에 코트원 2개, 거실엔 원액션테이블 하이랑 테이크체어 2개.",
+  "answer": {
+   "tent": "landlock",
+   "items": [
+    {
+     "type": "cot_one",
+     "count": 2,
+     "zone": "inner"
+    },
+    {
+     "type": "sp_oat",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_take",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 34,
+  "photo": "소문자 별칭",
+  "say": "igt 레귤러에 멀티펑션 일자로 붙여줘. 체어원 2개.",
+  "answer": {
+   "tent": null,
+   "items": [
+    {
+     "type": "reg3",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "mf_reg",
+       "shape": "line"
+      }
+     ]
+    },
+    {
+     "type": "hx_one",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 35,
+  "photo": "방향 지정",
+  "say": "쿠디 10.0에 냉장고 도메틱 45는 오른쪽 끝, 쉘프컨테이너 50은 왼쪽, 가운데 원액션테이블 롱에 FD체어 4개.",
+  "answer": {
+   "tent": "cd_100",
+   "items": [
+    {
+     "type": "cfx3_45",
+     "count": 1,
+     "zone": "right"
+    },
+    {
+     "type": "sc50",
+     "count": 1,
+     "zone": "left"
+    },
+    {
+     "type": "sp_oat_l",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 36,
+  "photo": "식탁 두 개",
+  "say": "쿠디 파밀리아 프로에 원액션테이블 하이 2개, FD체어 4개, 테이크체어 2개.",
+  "answer": {
+   "tent": "cd_familia_pro",
+   "items": [
+    {
+     "type": "sp_oat",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "sp_take",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 37,
+  "photo": "타프 솔로",
+  "say": "헬리녹스 브이타프에 선셋체어, 테이블원 라지, 강염버너.",
+  "answer": {
+   "tent": "hx_vtarp",
+   "items": [
+    {
+     "type": "hx_sunset",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "hx_t1l",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_gs1000",
+     "count": 1,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 38,
+  "photo": "키친테이블",
+  "say": "노스피크 아틀란틱 오션에 스테인리스 키친테이블 벽쪽, 원액션테이블 롱, FD체어 2개, 도메틱 45.",
+  "answer": {
+   "tent": "np_atlantic",
+   "items": [
+    {
+     "type": "sp_kitchen",
+     "count": 1,
+     "zone": "wall"
+    },
+    {
+     "type": "sp_oat_l",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "cfx3_45",
+     "count": 1,
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 39,
+  "photo": "x 표기",
+  "say": "FD체어x4, 원액션테이블롱x1, 랜드록",
+  "answer": {
+   "tent": "landlock",
+   "items": [
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "sp_oat_l",
+     "count": 1,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 40,
+  "photo": "소형 2룸",
+  "say": "스노우라인 새턴 2룸에 세퍼레이트 2유닛 플랫버너, 노가테이블, 노가체어 2개, 신일 팬히터 300.",
+  "answer": {
+   "tent": "sl_saturn",
+   "items": [
+    {
+     "type": "sep2",
+     "count": 1,
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "noga_table",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "sfh300",
+     "count": 1,
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 41,
+  "photo": "하프 파츠",
+  "say": "브이하우스 L에 IGT 레귤러, 하프슬라이드 2개, 칸엔 메쉬트레이 하프 딥 2개랑 플랫버너 스텐트레이. 커밋체어 2개 IGT 앞.",
+  "answer": {
+   "tent": "mw_vhouse_l",
+   "items": [
+    {
+     "type": "reg3",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "mesh_hd",
+       "count": 2
+      },
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "kermit",
+     "count": 2,
+     "zone": "center",
+     "at": "reg3"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 42,
+  "photo": "제인아츠 지카로",
+  "say": "제인아츠 제쿠 L에 지카로 테이블, 로우체어 쇼트 4개.",
+  "answer": {
+   "tent": "za_zeku_l",
+   "items": [
+    {
+     "type": "sp_jikaro",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_lowshort",
+     "count": 4,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 43,
+  "photo": "바+거실 분리",
+  "say": "리빙쉘 롱 프로, IGT 롱에 플랫버너 설봉원 우드테이블 W, IGT 앞엔 노가체어 2개. 원액션 로우테이블엔 로우체어 30 2개.",
+  "answer": {
+   "tent": "living_shell_long_pro",
+   "items": [
+    {
+     "type": "long4",
+     "count": 1,
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "wood_w",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center",
+     "at": "long4"
+    },
+    {
+     "type": "sp_oat_low",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_low30",
+     "count": 2,
+     "zone": "center",
+     "at": "sp_oat_low"
+    }
+   ],
+   "unknown": [],
+   "tip": "요리 바와 낮은 거실을 나눴어요."
+  }
+ },
+ {
+  "id": 44,
+  "photo": "작은 돔",
+  "say": "랜드브리즈 프로1에 스텐 마이테이블, 체어제로 1개, 이너룸에 메가매트.",
+  "answer": {
+   "tent": "sp_landbreeze1",
+   "items": [
+    {
+     "type": "mytable_s",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "hx_zero",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "megamat",
+     "count": 1,
+     "zone": "inner"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 45,
+  "photo": "세퍼 풀세트",
+  "say": "세퍼레이트 4유닛 양쪽에 코너테이블 L R, 앞에 멀티펑션 롱 T자, 칸은 플랫버너 설봉원 우드테이블 W. FD체어 4개.",
+  "answer": {
+   "tent": null,
+   "items": [
+    {
+     "type": "sep4",
+     "count": 1,
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "corner_L",
+       "shape": "line"
+      },
+      {
+       "type": "corner_R",
+       "shape": "line"
+      },
+      {
+       "type": "mf_long",
+       "shape": "T"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "wood_w",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 46,
+  "photo": "일반 이름",
+  "say": "테이블 하나랑 의자 두 개, 버너 하나",
+  "answer": {
+   "tent": null,
+   "items": [],
+   "unknown": [
+    "테이블",
+    "의자 2개",
+    "버너"
+   ],
+   "tip": "어떤 제품인지 이름을 알려주시면 정확히 놓을게요."
+  }
+ },
+ {
+  "id": 47,
+  "photo": "어메니티 가족",
+  "say": "어메니티돔 M 이너룸에 스패로우 그랜드50, 거실엔 헬리녹스 테이블원에 체어원 2개.",
+  "answer": {
+   "tent": "sp_amenity_m",
+   "items": [
+    {
+     "type": "sparrow50",
+     "count": 1,
+     "zone": "inner"
+    },
+    {
+     "type": "hx_t1",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "hx_one",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 48,
+  "photo": "타프 키친",
+  "say": "도쿄크래프트 윙 아래 IGT 레귤러 플랫버너, 원액션테이블 롱, 커밋체어 4개.",
+  "answer": {
+   "tent": "tc_wing",
+   "items": [
+    {
+     "type": "reg3",
+     "count": 1,
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_oat_l",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "kermit",
+     "count": 4,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 49,
+  "photo": "하이브리드 겨울",
+  "say": "캠핑칸 오크돔 L에 원액션테이블 하이, 테이크체어 2개, 토요토미 옴니 230, 쉘프컨테이너 50 벽쪽, 이너룸엔 메가매트 듀오.",
+  "answer": {
+   "tent": "ck_oakdome_l",
+   "items": [
+    {
+     "type": "sp_oat",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sp_take",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "omni230",
+     "count": 1,
+     "zone": "center"
+    },
+    {
+     "type": "sc50",
+     "count": 1,
+     "zone": "wall"
+    },
+    {
+     "type": "megamat_duo",
+     "count": 1,
+     "zone": "inner"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 50,
+  "photo": "부분 모름",
+  "say": "쉘터GH에 IGT 레귤러에 플랫버너, 워터저그, 헬리녹스 체어원 2개, 코베아 화로대.",
+  "answer": {
+   "tent": "mw_shelter_gh",
+   "items": [
+    {
+     "type": "reg3",
+     "count": 1,
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "hx_one",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [
+    "워터저그",
+    "코베아 화로대"
+   ],
+   "tip": "워터저그·화로대는 아직 제원에 없어요."
+  }
+ },
+ {
+  "id": 51,
+  "style": "user",
+  "say": "메락에 고동 이너텐트 쓰고 메가매트 깔거야. 세퍼레이트 레귤러에 멀티펑션 롱 T자로 붙이고 하프슬라이드 2개, 다리는 660으로 해줘 플랫버너랑 원유닛 트레이 2개 넣고 FD체어 2개",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "T"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 2
+      }
+     ],
+     "leg": 660
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": "고동 안에 메가매트, 주방 IGT는 벽쪽에 두고 멀티펑션 양옆에 FD체어를 앉혔어요.",
+   "inner": "godong"
+  }
+ },
+ {
+  "id": 52,
+  "style": "user",
+  "say": "쉘터gm에 세퍼레이트 레귤러 두고 멀티펑션 롱 일자로 붙여줘 노가체어 2개 앉고 파세코 5000은 벽쪽 도메틱 45도 벽쪽에 둘게",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "sep3",
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      }
+     ]
+    },
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "cfx3_45",
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 53,
+  "style": "user",
+  "say": "랜드록 쓸건데 igt 롱 벽쪽에 놓고 코너테이블 양쪽 다 붙여줘 칸은 설봉원 플랫버너 우드테이블 w 들어가고 가운데 원액션 롱 놓고 테이크체어 4개",
+  "answer": {
+   "tent": "landlock",
+   "items": [
+    {
+     "type": "long4",
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "corner_L",
+       "shape": "line"
+      },
+      {
+       "type": "corner_R",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "wood_w",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_oat_l",
+     "zone": "center"
+    },
+    {
+     "type": "sp_take",
+     "count": 4,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 54,
+  "style": "user",
+  "say": "리빙쉘롱프로에 쉘이너 듀오 넣고 메가매트 듀오 깔아줘 거실엔 로우테이블이랑 로우체어 30 두개",
+  "answer": {
+   "tent": "living_shell_long_pro",
+   "items": [
+    {
+     "type": "megamat_duo",
+     "zone": "inner"
+    },
+    {
+     "type": "sp_oat_low",
+     "zone": "center"
+    },
+    {
+     "type": "sp_low30",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": "",
+   "inner": "shell_duo"
+  }
+ },
+ {
+  "id": 55,
+  "style": "user",
+  "say": "오늘은 쉘터gm 쓰고 이너는 지오에어2 넣을게 메가매트 하나만 깔고 igt는 세퍼레이트 2유닛에 플랫버너 하나 노가테이블 노가체어2",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep2",
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "noga_table",
+     "zone": "center"
+    },
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": "",
+   "inner": "geoair2"
+  }
+ },
+ {
+  "id": 56,
+  "style": "user",
+  "say": "메락 프로에 세퍼레이트 레귤러 860높이로 하고 플랫버너 설봉원 넣어줘 멀티펑션 롱은 앞에 t자 FD체어 3개",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "sep3",
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "T"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "seppou",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "sp_fd",
+     "count": 3,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 57,
+  "style": "user",
+  "say": "주방은 텐트 입구쪽에 두고 식탁은 안쪽으로 해줘 쉘터gm, 세퍼레이트 레귤러 설봉원, 원액션테이블 롱 FD체어 4개",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "sep3",
+     "zone": "bottom",
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_oat_l",
+     "zone": "top"
+    },
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "top"
+    }
+   ],
+   "unknown": [],
+   "tip": "요리는 입구 쪽, 식탁은 안쪽이라 연기가 밖으로 빠져요."
+  }
+ },
+ {
+  "id": 58,
+  "style": "user",
+  "say": "랜드록에 지카로 가운데 놓고 로우체어 쇼트 4개 둘러앉게 해주고 옴니230 하나 벽쪽엔 폴딩쉘프 롱 2개",
+  "answer": {
+   "tent": "landlock",
+   "items": [
+    {
+     "type": "sp_jikaro",
+     "zone": "center"
+    },
+    {
+     "type": "sp_lowshort",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "omni230",
+     "zone": "center"
+    },
+    {
+     "type": "fshelf_l",
+     "count": 2,
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 59,
+  "style": "user",
+  "say": "쿠디 파밀리아에 igt 레귤러 다리 400 멀티펑션 붙이고 설봉원 넣어줘 로우체어 30 네개랑 쉘프컨테이너 50 두개",
+  "answer": {
+   "tent": "cd_familia",
+   "items": [
+    {
+     "type": "reg3",
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "mf_reg",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      }
+     ],
+     "leg": 400
+    },
+    {
+     "type": "sp_low30",
+     "count": 4,
+     "zone": "center",
+     "at": "reg3"
+    },
+    {
+     "type": "sc50",
+     "count": 2,
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 60,
+  "style": "user",
+  "say": "메락에 고동 이너, 메가매트 듀오 깔고 세퍼레이트 4유닛 하프슬라이드 롱 하나 붙여 플랫버너 메쉬트레이 2개 넣고 커밋체어 2개 커밋테이블",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat_duo",
+     "zone": "inner"
+    },
+    {
+     "type": "sep4",
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "slide_hl",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "mesh_s1",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "type": "kermit_t",
+     "zone": "center"
+    },
+    {
+     "type": "kermit",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": "",
+   "inner": "godong"
+  }
+ },
+ {
+  "id": 61,
+  "style": "user",
+  "say": "겨울이라 파세코 5000이랑 신일 900 두대 쓸거야 텐트는 리빙쉘 원액션테이블 하이에 FD체어 2개",
+  "answer": {
+   "tent": "living_shell",
+   "items": [
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sfh_bh900",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_oat",
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 62,
+  "style": "user",
+  "say": "쉘터gm 밖에 타프 치고 그 안에 igt 놓을건데 일단 텐트 안엔 매트만 메가매트 2개",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "megamat",
+     "count": 2,
+     "zone": "inner"
+    }
+   ],
+   "unknown": [],
+   "tip": "텐트 밖 타프 쪽 배치는 아직 못 해요. 타프는 ‘타프’ 칸에서 골라 주세요."
+  }
+ },
+ {
+  "id": 63,
+  "style": "user",
+  "say": "비바돔플러스에 마운틴리버 야전침대 2개 놓고 노가체어 2개 스텐마이테이블",
+  "answer": {
+   "tent": null,
+   "items": [
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "mytable_s",
+     "zone": "center"
+    }
+   ],
+   "unknown": [
+    "비바돔플러스",
+    "마운틴리버 야전침대"
+   ],
+   "tip": "비바돔 플러스와 마운틴리버 야전침대는 아직 제원에 없어서 뺐어요."
+  }
+ },
+ {
+  "id": 64,
+  "style": "user",
+  "say": "igt 레귤러 다리 830 서서 요리할거고 플랫버너 두개 넣어 원유닛트레이 하나 멀티펑션 일자로 붙여",
+  "answer": {
+   "tent": null,
+   "items": [
+    {
+     "type": "reg3",
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "mf_reg",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 2
+      },
+      {
+       "id": "steel1",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 65,
+  "style": "user",
+  "say": "메가메트 듀오 하나 코트원 하나 이너에 넣어주고 리빙쉘에 로우테이블 로우체어쇼트 2개",
+  "answer": {
+   "tent": "living_shell",
+   "items": [
+    {
+     "type": "megamat_duo",
+     "zone": "inner"
+    },
+    {
+     "type": "cot_one",
+     "zone": "inner"
+    },
+    {
+     "type": "sp_oat_low",
+     "zone": "center"
+    },
+    {
+     "type": "sp_lowshort",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 66,
+  "style": "user",
+  "say": "노스피크 a9에 세퍼레이트 레귤러 + 멀티펑션 롱 T자 + 하프슬라이드 2개, 칸은 설봉원 플랫버너 원유닛 트레이 하나 다리 660 체어는 테이크체어 4개 원액션 롱 하나",
+  "answer": {
+   "tent": "np_a9",
+   "items": [
+    {
+     "type": "sep3",
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "T"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 1
+      }
+     ],
+     "leg": 660
+    },
+    {
+     "type": "sp_oat_l",
+     "zone": "center"
+    },
+    {
+     "type": "sp_take",
+     "count": 4,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 67,
+  "style": "user",
+  "say": "헬리녹스 노나돔에 체어원 2개 테이블원 그리고 강염버너 하나",
+  "answer": {
+   "tent": "hx_nona",
+   "items": [
+    {
+     "type": "hx_one",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "hx_t1",
+     "zone": "center"
+    },
+    {
+     "type": "sp_gs1000",
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 68,
+  "style": "user",
+  "say": "쉘터gm 쓸거고 주방을 왼쪽벽에 붙여줘 세퍼레이트 레귤러 플랫버너 하프슬라이드 두개 노가체어 둘은 igt 앞에",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "sep3",
+     "zone": "left",
+     "attach": [
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 69,
+  "style": "user",
+  "say": "랜드록 x에 이너룸 쓰고 제백 프로 240 하나 깔아줘 거실엔 원액션 롱이랑 fd체어 4개 옴니230",
+  "answer": {
+   "tent": "landlock_x",
+   "items": [
+    {
+     "type": "zebec_pro240",
+     "zone": "inner"
+    },
+    {
+     "type": "sp_oat_l",
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "omni230",
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 70,
+  "style": "user",
+  "say": "코쿤 쓸건데 igt 롱이랑 롤테이블 그리고 화로대 놓을게 FD체어 2개",
+  "answer": {
+   "tent": null,
+   "items": [
+    {
+     "type": "long4",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "long4"
+    }
+   ],
+   "unknown": [
+    "코쿤",
+    "롤테이블",
+    "화로대"
+   ],
+   "tip": "코쿤·롤테이블·화로대는 어떤 제품인지 목록에서 못 찾았어요."
+  }
+ },
+ {
+  "id": 71,
+  "style": "user",
+  "say": "쿠디 13.6에 igt 두개 놓을거야 하나는 세퍼레이트 레귤러에 플랫버너 설봉원 다른 하나는 igt 롱에 우드테이블 w 두개 테이크체어 4개는 롱 쪽에",
+  "answer": {
+   "tent": "cd_136",
+   "items": [
+    {
+     "type": "sep3",
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "seppou",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "long4",
+     "zone": "center",
+     "slots": [
+      {
+       "id": "wood_w",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "type": "sp_take",
+     "count": 4,
+     "zone": "center",
+     "at": "long4"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 72,
+  "style": "user",
+  "say": "메락에 오른쪽엔 침실 고동 이너 메가매트 듀오 왼쪽은 주방 세퍼레이트 레귤러 플랫버너 하프슬라이드 2개 가운데 원액션 로우 로우체어30 두개",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat_duo",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "left",
+     "attach": [
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_oat_low",
+     "zone": "center"
+    },
+    {
+     "type": "sp_low30",
+     "count": 2,
+     "zone": "center",
+     "at": "sp_oat_low"
+    }
+   ],
+   "unknown": [],
+   "tip": "",
+   "inner": "godong"
+  }
+ },
+ {
+  "id": 73,
+  "style": "user",
+  "say": "어메니티돔 m 이너에 스패로우 그랜드 깔고 거실 노가테이블 노가체어 2 강염버너",
+  "answer": {
+   "tent": "sp_amenity_m",
+   "items": [
+    {
+     "type": "sparrow50",
+     "zone": "inner"
+    },
+    {
+     "type": "noga_table",
+     "zone": "center"
+    },
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "sp_gs1000",
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 74,
+  "style": "user",
+  "say": "폴딩쉘프 3개 벽따라 쭉 놓고 알루텍 68 하나 93 하나 쉘프컨테이너 25 두개 랜드록",
+  "answer": {
+   "tent": "landlock",
+   "items": [
+    {
+     "type": "fshelf",
+     "count": 3,
+     "zone": "wall"
+    },
+    {
+     "type": "alu68",
+     "zone": "wall"
+    },
+    {
+     "type": "alu93",
+     "zone": "wall"
+    },
+    {
+     "type": "sc25",
+     "count": 2,
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": "수납은 벽을 따라 붙였어요."
+  }
+ },
+ {
+  "id": 75,
+  "style": "user",
+  "say": "세퍼레이트 3유닛 다리 300으로 낮게 하고 로우체어쇼트 2개 앞에 앉게 칸엔 플랫버너 우드테이블 S 리드트레이",
+  "answer": {
+   "tent": null,
+   "items": [
+    {
+     "type": "sep3",
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "wood_s",
+       "count": 1
+      },
+      {
+       "id": "lid_half",
+       "count": 1
+      }
+     ],
+     "leg": 300
+    },
+    {
+     "type": "sp_lowshort",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 76,
+  "style": "user",
+  "say": "도메틱 55 냉장고 오른쪽 끝에 두고 igt 롱은 왼쪽 벽 쉘터gm",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "cfx3_55",
+     "zone": "right"
+    },
+    {
+     "type": "long4",
+     "zone": "left"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 77,
+  "style": "user",
+  "say": "쉘터gm에 노가체어2 노가테이블 메가매트 지오에어2 파세코5000 원액션 로우",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center"
+    },
+    {
+     "type": "noga_table",
+     "zone": "center"
+    },
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_oat_low",
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": "",
+   "inner": "geoair2"
+  }
+ },
+ {
+  "id": 78,
+  "style": "user",
+  "say": "제인아츠 제쿠 l에 세퍼레이트 레귤러 멀티펑션 롱 t자 fd체어 4개 다리 660 플랫버너 원유닛 트레이2",
+  "answer": {
+   "tent": "za_zeku_l",
+   "items": [
+    {
+     "type": "sep3",
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "T"
+      }
+     ],
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 2
+      }
+     ],
+     "leg": 660
+    },
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 79,
+  "style": "user",
+  "say": "캠핑칸 오크돔 l 이너에 제백 프로 300 깔고 거실엔 지카로랑 로우체어30 4개",
+  "answer": {
+   "tent": "ck_oakdome_l",
+   "items": [
+    {
+     "type": "zebec_pro300",
+     "zone": "inner"
+    },
+    {
+     "type": "sp_jikaro",
+     "zone": "center"
+    },
+    {
+     "type": "sp_low30",
+     "count": 4,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 80,
+  "style": "user",
+  "say": "igt 레귤러 설봉원 플랫버너 둘다 넣고 코너테이블 r 하나 붙여 테이블은 헬리녹스 테이블원 라지 체어원 2개",
+  "answer": {
+   "tent": null,
+   "items": [
+    {
+     "type": "reg3",
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "corner_R",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "hx_t1l",
+     "zone": "center"
+    },
+    {
+     "type": "hx_one",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 81,
+  "style": "user",
+  "say": "메락 프로 이너룸 없이 쓸거야 지카로 가운데 로우체어쇼트 4개 mk스토브 하나",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "sp_jikaro",
+     "zone": "center"
+    },
+    {
+     "type": "sp_lowshort",
+     "count": 4,
+     "zone": "center"
+    },
+    {
+     "type": "mk_stove",
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": "이너는 ‘없음’으로 두세요."
+  }
+ },
+ {
+  "id": 82,
+  "style": "user",
+  "say": "쉘터gm 에 큐브 쉘프 2개랑 사이드 테이블 노가체어 2",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [
+    "큐브 쉘프",
+    "사이드 테이블"
+   ],
+   "tip": "큐브 쉘프·사이드 테이블은 어떤 제품인지 목록에서 못 찾았어요."
+  }
+ },
+ {
+  "id": 83,
+  "style": "user",
+  "say": "파세코 팬히터 식탁 쪽 보게 해줘 쉘터gm 원액션테이블 fd체어2",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_oat",
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": "팬히터 바람이 식탁 쪽으로 가게 돌렸어요."
+  }
+ },
+ {
+  "id": 84,
+  "style": "user",
+  "say": "세퍼레이트 2유닛 두개 놓을게 하나는 플랫버너 하나는 원유닛트레이 체어는 헬리녹스 체어제로 2개",
+  "answer": {
+   "tent": null,
+   "items": [
+    {
+     "type": "sep2",
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sep2",
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "steel1",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "hx_zero",
+     "count": 2,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 85,
+  "style": "user",
+  "say": "리빙쉘 롱 프로 이너에 코트원 2개 쉘이너 듀오는 안쓰고 원래 이너룸 쓸게 거실엔 키친테이블 원액션 롱 fd 4",
+  "answer": {
+   "tent": "living_shell_long_pro",
+   "items": [
+    {
+     "type": "cot_one",
+     "count": 2,
+     "zone": "inner"
+    },
+    {
+     "type": "sp_kitchen",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_oat_l",
+     "zone": "center"
+    },
+    {
+     "type": "sp_fd",
+     "count": 4,
+     "zone": "center"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 86,
+  "style": "user",
+  "say": "igt롱 다리660 코너테이블 L R 둘다 멀티펑션롱 T자 칸은 설봉원 플랫버너 우드테이블w 메쉬트레이딥 하나 의자는 멀티펑션쪽에 노가체어 2 반대편에 FD 2",
+  "answer": {
+   "tent": null,
+   "items": [
+    {
+     "type": "long4",
+     "zone": "wall",
+     "attach": [
+      {
+       "type": "corner_L",
+       "shape": "line"
+      },
+      {
+       "type": "corner_R",
+       "shape": "line"
+      },
+      {
+       "type": "mf_long",
+       "shape": "T"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "wood_w",
+       "count": 1
+      },
+      {
+       "id": "mesh_d1",
+       "count": 1
+      }
+     ],
+     "leg": 660
+    },
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center",
+     "at": "long4"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "long4"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 87,
+  "style": "user",
+  "say": "그냥 의자 4개랑 테이블 하나",
+  "answer": {
+   "tent": null,
+   "items": [],
+   "unknown": [
+    "의자 4개",
+    "테이블"
+   ],
+   "tip": "어떤 제품인지 이름을 알려주시면 정확히 놓을게요."
+  }
+ },
+ {
+  "id": 88,
+  "style": "user",
+  "say": "메락에 고동 넣고 오른쪽으로 붙여줘 매트는 메가매트",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    }
+   ],
+   "unknown": [],
+   "tip": "고동은 이너 버튼에서 끌어 옮기고 고정할 수 있어요.",
+   "inner": "godong"
+  }
+ },
+ {
+  "id": 89,
+  "style": "user",
+  "say": "코베아 고스트 팬텀 에어에 igt 레귤러 플랫버너 하나 fd체어 2 도메틱 35",
+  "answer": {
+   "tent": "kv_ghost_air",
+   "items": [
+    {
+     "type": "reg3",
+     "zone": "wall",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "reg3"
+    },
+    {
+     "type": "cfx3_35",
+     "zone": "wall"
+    }
+   ],
+   "unknown": [],
+   "tip": ""
+  }
+ },
+ {
+  "id": 90,
+  "style": "user",
+  "say": "쉘터gm 앞쪽 입구엔 아무것도 두지 말고 뒤쪽에 세퍼레이트 레귤러 플랫버너 노가체어 2",
+  "answer": {
+   "tent": "mw_shelter_gm",
+   "items": [
+    {
+     "type": "sep3",
+     "zone": "top",
+     "slots": [
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ]
+    },
+    {
+     "type": "noga_chair",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": "입구 쪽은 비웠어요."
+  }
+ },
+ {
+  "id": 91,
+  "style": "user",
+  "say": "테이블을 T자모양으로 수정해줘",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "T"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": "멀티펑션 롱을 T자로 붙였어요.",
+   "inner": "godong"
+  },
+  "prev": {
+   "tent": "merak_pro",
+   "inner": "godong",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": []
+  }
+ },
+ {
+  "id": 92,
+  "style": "user",
+  "say": "팬히터는 좌측 벽에서 식탁쪽 방향을 바라보자",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "left"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": "팬히터를 왼쪽 벽으로 옮기고 식탁 쪽을 보게 했어요.",
+   "inner": "godong"
+  },
+  "prev": {
+   "tent": "merak_pro",
+   "inner": "godong",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": []
+  }
+ },
+ {
+  "id": 93,
+  "style": "user",
+  "say": "fd체어 하나 더 추가해줘",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 3,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": "FD체어를 3개로 늘렸어요.",
+   "inner": "godong"
+  },
+  "prev": {
+   "tent": "merak_pro",
+   "inner": "godong",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": []
+  }
+ },
+ {
+  "id": 94,
+  "style": "user",
+  "say": "메가매트 말고 제백 프로 260으로 바꿔줘",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "zebec_pro260",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": "매트를 제백 에어리스 프로 260으로 바꿨어요.",
+   "inner": "godong"
+  },
+  "prev": {
+   "tent": "merak_pro",
+   "inner": "godong",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": []
+  }
+ },
+ {
+  "id": 95,
+  "style": "user",
+  "say": "하프슬라이드 하나 빼",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": "하프슬라이드를 하나로 줄였어요.",
+   "inner": "godong"
+  },
+  "prev": {
+   "tent": "merak_pro",
+   "inner": "godong",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": []
+  }
+ },
+ {
+  "id": 96,
+  "style": "user",
+  "say": "다리는 660으로 낮춰줘",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 660
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": "IGT 다리를 660으로 바꿨어요.",
+   "inner": "godong"
+  },
+  "prev": {
+   "tent": "merak_pro",
+   "inner": "godong",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": []
+  }
+ },
+ {
+  "id": 97,
+  "style": "user",
+  "say": "이너를 쉘이너 듀오로 바꿔",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": "이너를 쉘이너 듀오로 바꿨어요.",
+   "inner": "shell_duo"
+  },
+  "prev": {
+   "tent": "merak_pro",
+   "inner": "godong",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": []
+  }
+ },
+ {
+  "id": 98,
+  "style": "user",
+  "say": "주방을 오른쪽 벽으로 옮겨",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "right",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": "주방을 오른쪽 벽으로 옮겼어요.",
+   "inner": "godong"
+  },
+  "prev": {
+   "tent": "merak_pro",
+   "inner": "godong",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": []
+  }
+ },
+ {
+  "id": 99,
+  "style": "user",
+  "say": "원유닛 트레이 하나 칸에 추가해줘",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      },
+      {
+       "id": "steel1",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": "IGT 칸에 원유닛 트레이를 넣었어요.",
+   "inner": "godong"
+  },
+  "prev": {
+   "tent": "merak_pro",
+   "inner": "godong",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": []
+  }
+ },
+ {
+  "id": 100,
+  "style": "user",
+  "say": "팬히터 빼고 옴니230으로",
+  "answer": {
+   "tent": "merak_pro",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "omni230",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": [],
+   "tip": "팬히터를 옴니 230으로 바꿨어요.",
+   "inner": "godong"
+  },
+  "prev": {
+   "tent": "merak_pro",
+   "inner": "godong",
+   "items": [
+    {
+     "type": "megamat",
+     "zone": "inner"
+    },
+    {
+     "type": "sep3",
+     "zone": "center",
+     "attach": [
+      {
+       "type": "mf_long",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      },
+      {
+       "type": "slide_h",
+       "shape": "line"
+      }
+     ],
+     "slots": [
+      {
+       "id": "seppou",
+       "count": 1
+      },
+      {
+       "id": "flat",
+       "count": 1
+      }
+     ],
+     "leg": 830
+    },
+    {
+     "type": "camp5000",
+     "zone": "wall"
+    },
+    {
+     "type": "sp_fd",
+     "count": 2,
+     "zone": "center",
+     "at": "sep3"
+    }
+   ],
+   "unknown": []
+  }
+ }
+]
