@@ -98,7 +98,8 @@ function aiKeys(ids,nameOf,modelOf){const own={},map={};
     ks.forEach(k=>{if(k.length<2||/^[\d.]+$/.test(k))return;(map[k]=map[k]||new Set()).add(id);});});
   return Object.entries(map).map(([k,s])=>own[k]?[own[k],k]:s.size===1?[[...s][0],k]:null).filter(Boolean).sort((a,b)=>b[1].length-a[1].length);}
 function aiLocal(text){
-  let t=aiNorm(text.replace(/[x×*]\s*(\d)/gi,'$1'));
+  const KN={한:1,두:2,세:3,네:4,다섯:5,여섯:6};
+  let t=aiNorm(text.replace(/[x×*]\s*(\d)/gi,'$1')).replace(/(한|두|세|네|다섯|여섯)(개|장|대)/g,(m,a,b)=>KN[a]+b);
   const res={tent:null,items:[],unknown:[],tip:''};
   for(const [k,al] of Object.entries(AI_INNER_AL)){const hit=al.map(aiNorm).sort((a,b)=>b.length-a.length).find(a=>t.includes(a));if(hit){res.inner=k;t=t.split(hit).join('#');break;}}
   const tid=TENT_ORDER.filter(id=>id!=='none');
@@ -293,6 +294,12 @@ function aiTidy(res,said,prev){const L=aiLocal(said),want={};L.items.forEach(x=>
   Object.entries(want).forEach(([id,n])=>{const have=roots.reduce((t,rt)=>t+rt.slots.filter(q=>q.id===id).reduce((a,q)=>a+q.count,0),0);
     if(have>n&&!prev){let over=have-n;roots.slice().reverse().forEach(rt=>rt.slots.forEach(q=>{if(q.id===id&&over>0){const c=Math.min(over,q.count-0);q.count-=c;over-=c;}}));roots.forEach(rt=>rt.slots=rt.slots.filter(q=>q.count>0));}
     else if(have<n&&roots.length&&!prev){const rt=roots[0],q=rt.slots.find(x=>x.id===id);if(q)q.count+=n-have;else rt.slots.push({id,count:n-have});added.push(aiSlotName(id));}});
+  // 결합 파츠(멀티펑션·하프슬라이드·코너)도 글 기준으로 맞추기
+  const wantA={},prevA={};L.items.forEach(x=>(x.attach||[]).forEach(a=>wantA[a.type]=(wantA[a.type]||0)+1));
+  if(prev)prev.items.forEach(it=>(it.attach||[]).forEach(a=>prevA[a.type]=1));
+  roots.forEach(rt=>{const seen={};rt.attach=(rt.attach||[]).filter(a=>{if(!wantA[a.type]&&!prevA[a.type])return false;seen[a.type]=(seen[a.type]||0)+1;return prev||seen[a.type]<=wantA[a.type];});});
+  if(!prev&&roots.length)Object.entries(wantA).forEach(([type,n])=>{const have=roots.reduce((t,rt)=>t+rt.attach.filter(a=>a.type===type).length,0);
+    const src=L.items.flatMap(x=>x.attach||[]).find(a=>a.type===type);for(let q=have;q<n;q++)roots[0].attach.push({type,shape:src?src.shape:'line'});});
   if(added.length&&!(res.added&&res.added.length))res.added=added;
   if(res.inner&&!(prev&&prev.inner===res.inner)&&L.inner!==res.inner)res.inner=L.inner||null;}
 /* 대화로 고치기: 첫 세팅 뒤에는 '고칠 점'만 적으면 지금 배치를 바탕으로 다시 세팅 */
