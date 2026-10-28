@@ -4416,10 +4416,10 @@ function bdOpen(k){go('board');bdShow(k);}
 const rqDate=s=>String(s||'').slice(5).replace('-','.');
 function reqRender(){
   const nt=document.getElementById('ntList');
-  if(nt){nt.innerHTML=NT==null?(RQ===false?'<li class="rq-empty">게시판을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.</li>':'<li class="rq-empty">불러오는 중…</li>'):!NT.length?'<li class="rq-empty">아직 공지사항이 없어요.</li>':
+  if(nt){nt.innerHTML=NT==null?(RQ===false?'<li class="rq-empty">게시판을 불러오지 못했어요. 곧 열려요, 잠시 뒤 다시 와주세요.</li>':'<li class="rq-empty">불러오는 중…</li>'):!NT.length?'<li class="rq-empty">아직 공지사항이 없어요.</li>':
     NT.map(n=>`<li class="${n.pin?'pin':''}"><details${n.pin?' open':''}><summary>${n.pin?'<span class="nt-pin">고정</span>':''}<b>${aiEsc(n.title)}</b><small>${aiEsc(rqDate(n.at))}</small></summary><p>${aiEsc(n.body||'').replace(/\n/g,'<br>')}</p></details></li>`).join('');}
   ['gear','dev'].forEach(kind=>{const ul=document.getElementById('rqList-'+kind);if(!ul)return;
-    if(!RQ){ul.innerHTML=RQ===false?'<li class="rq-empty">게시판을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.</li>':'';return;}
+    if(!RQ){ul.innerHTML=RQ===false?'<li class="rq-empty">게시판을 불러오지 못했어요. 곧 열려요, 잠시 뒤 다시 와주세요.</li>':'';return;}
     const L=RQ.filter(r=>(r.kind||'gear')===kind);
     if(!L.length){ul.innerHTML='<li class="rq-empty">아직 요청이 없어요. 첫 요청을 남겨주세요.</li>';return;}
     ul.innerHTML=L.slice(0,80).map(r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(rqDate(r.at))}</small>${r.note?`<p>${aiEsc(r.note)}</p>`:''}${r.reply?`<p class="rq-re">↳ ${aiEsc(r.reply)}</p>`:''}</div>
