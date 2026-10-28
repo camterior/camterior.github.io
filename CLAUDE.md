@@ -16,7 +16,7 @@
 - 마음에 안 들면 브랜치를 버리면 되고, `main`(실제 사이트)은 그대로입니다.
 
 ## 4. 배포
-- `main` 푸시 → `.github/workflows/deploy.yml`이 `scripts/smoke.js`(4개 탭 열기 검사)를 통과해야 배포됩니다. 실패하면 지금 사이트가 유지됩니다.
+- `main` 푸시 → `.github/workflows/deploy.yml`이 `scripts/smoke.js`(모든 탭 열기 + 휴대폰 폭 넘침 검사)를 통과해야 배포됩니다. 실패하면 지금 사이트가 유지됩니다.
 - 푸시 전 직접 검사: `node scripts/smoke.js` (playwright 필요).
 
 ## 참고
