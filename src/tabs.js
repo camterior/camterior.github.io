@@ -11,6 +11,7 @@ addEventListener('scroll',updBar,{passive:true});
 function go(v,opts){opts=opts||{};v=LEGACY[v]||v;if(!VIEWS.includes(v))v='intro';
   const changed=v!==CUR;CUR=v;document.body.dataset.view=v;
   VIEWS.forEach(k=>{document.getElementById('v-'+k).hidden=k!==v;});
+  if(v==='gear'&&typeof reqLoad==='function')reqLoad();
   document.querySelectorAll('[data-tab]').forEach(a=>{if(a.dataset.tab===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v)history.pushState(null,'','#'+v);
   if(changed&&!opts.keepScroll)window.scrollTo(0,0);

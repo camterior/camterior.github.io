@@ -891,6 +891,28 @@
 .aiset .ai-msg.ai{align-self:flex-start;background:#EEF2EC;color:var(--ink);border-bottom-left-radius:4px}
 .aiset .ai-next{font-size:12.5px;color:var(--ink-3);margin:6px 0 0}
 .aiset #aiNew{margin-left:6px}
+.aiset .ai-unk p{margin:6px 0 0;display:flex;flex-wrap:wrap;gap:6px}
+.aiset .rq-ask{border:1px dashed var(--maple);background:#fff;color:var(--maple);border-radius:999px;padding:7px 12px;font-weight:700;font-size:13px;cursor:pointer;min-height:36px}
+.aiset .rq-ask:disabled{border-style:solid;cursor:default;opacity:.85}
+.rq-jump{margin:14px auto -14px}.rq-jump button{border:1px dashed var(--line);background:var(--surface);border-radius:999px;padding:9px 16px;font:inherit;font-size:14px;color:var(--ink-2);cursor:pointer;min-height:40px}.rq-jump b{color:var(--maple)}
+.reqb{scroll-margin-top:140px;margin:8px auto 36px;padding:24px;border:1px solid var(--line);border-radius:22px;background:var(--surface)}
+.reqb .rq-head h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}
+.reqb .rq-head p{margin:6px 0 14px;color:var(--ink-2)}
+.reqb .rq-form{display:grid;grid-template-columns:1.3fr 1fr auto;gap:8px}
+.reqb input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;background:#fff;min-height:46px}
+.reqb .btn-dark{border:0;border-radius:12px;background:var(--ink);color:#fff;font-weight:800;padding:0 18px;min-height:46px;cursor:pointer}
+.reqb .rq-st{min-height:1.4em;margin:8px 0 4px;color:var(--ink-2);font-size:14px}
+.reqb .rq-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.reqb .rq-list li{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.reqb .rq-n{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}
+.reqb .rq-n a{font-size:13px;color:var(--ink-2)}
+.reqb .rq-n small{color:var(--ink-3);font-family:var(--mono);font-size:12px}
+.reqb .rq-badge{flex:none;font-size:12px;font-weight:800;border-radius:999px;padding:4px 10px;background:#EEF0EA;color:var(--ink-2)}
+.reqb .rq-badge.s-sun{background:#FFF1E6;color:#B4501C}.reqb .rq-badge.s-done{background:#E6F2E8;color:#25683A}.reqb .rq-badge.s-no{background:#F1EEEE;color:#8A5A5A}.reqb .rq-badge.s-ok{background:#E8EEF6;color:#2C4E7A}
+.reqb .rq-plus{flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;cursor:pointer;min-height:36px}
+.reqb .rq-plus:disabled{opacity:.55;cursor:default}
+.reqb .rq-empty{color:var(--ink-3);justify-content:center}
+@media (max-width:720px){.reqb{padding:18px;border-radius:18px}.reqb .rq-form{grid-template-columns:1fr}.reqb .rq-list li{flex-wrap:wrap}.reqb .rq-n{flex-basis:100%}}
 </style>
 
 </head>
@@ -1043,7 +1065,18 @@
   </header>
   <nav class="gnav" aria-label="장비 분류"><div class="wrap"><div class="gn-in" id="gearNav" role="group"></div>
     <label class="gsearch"><span class="sr-only">장비 찾기</span><input id="gearQ" type="search" placeholder="장비 찾기 (예: 노나돔, CK-149)" oninput="renderGear()"></label></div></nav>
+  <p class="wrap rq-jump"><button type="button" onclick="document.getElementById('reqBoard').scrollIntoView({behavior:'smooth',block:'start'})">찾는 장비가 없나요? <b>추가 요청 게시판 ↓</b></button></p>
   <div class="wrap gearbody" id="gearBody"></div>
+  <section class="wrap reqb" id="reqBoard" aria-labelledby="reqTitle">
+    <div class="rq-head"><h2 id="reqTitle">찾는 장비가 없나요?</h2><p>추가 요청을 남겨주세요. 모아서 확인한 뒤 <b>매주 일요일</b>에 한 번에 넣어요.</p></div>
+    <form class="rq-form" onsubmit="event.preventDefault();reqSend()">
+      <label><span class="sr-only">장비 이름</span><input id="rqName" maxlength="40" placeholder="장비 이름 (예: 마운틴리버 야전침대)" required></label>
+      <label><span class="sr-only">상품 링크</span><input id="rqLink" maxlength="300" inputmode="url" placeholder="상품 링크 (있으면)"></label>
+      <button type="submit" class="btn-dark">추가 요청</button>
+    </form>
+    <p class="rq-st" id="rqSt" role="status"></p>
+    <ul class="rq-list" id="rqList"></ul>
+  </section>
   <div hidden><div id="lineFilter"></div><div id="lineup-list"></div></div>
   <p class="wrap gearsrc">규격 출처: 판매처 상품 상세, 제조사 공식 페이지와 카탈로그. ‘판매처’는 판매처 표기, ‘사진추정’은 사진 비율로 계산한 값이에요. 구매 전에는 제품 설명서를 확인해 주세요.</p>
 </div>
@@ -3693,6 +3726,7 @@ addEventListener('scroll',updBar,{passive:true});
 function go(v,opts){opts=opts||{};v=LEGACY[v]||v;if(!VIEWS.includes(v))v='intro';
   const changed=v!==CUR;CUR=v;document.body.dataset.view=v;
   VIEWS.forEach(k=>{document.getElementById('v-'+k).hidden=k!==v;});
+  if(v==='gear'&&typeof reqLoad==='function')reqLoad();
   document.querySelectorAll('[data-tab]').forEach(a=>{if(a.dataset.tab===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v)history.pushState(null,'','#'+v);
   if(changed&&!opts.keepScroll)window.scrollTo(0,0);
@@ -4011,6 +4045,7 @@ JSON만 출력: {"tent":"텐트 id 또는 null","inner":"[이너텐트] id 또�
 - 사용자 글에 없는 장비는 절대 추가하지 마. 띄어쓰기·오타가 있어도 (=별칭)을 보고 맞춰 (예: 스탠마이테이블=mytable_s).
 - '테이블','의자','버너'처럼 브랜드·모델 없는 일반 이름은 아무 제품으로 바꾸지 말고 unknown에.
 - 수량이 없으면 1. 같은 id는 count로 합쳐. 목록에 없으면 unknown에 원래 이름 그대로.
+- 목록에 없는 브랜드·모델은 비슷한 장비로 바꾸지 마. 예: '마운틴리버 야전침대'가 목록에 없으면 코트원으로 바꾸지 말고 unknown에만.
 - zone: 사용자가 말한 위치를 따름. 가운데/중앙=center, 벽쪽=wall, 오른쪽(끝)=right, 왼쪽=left, 위쪽/뒤쪽=top, 아래쪽/앞쪽=bottom, 이너룸/침실=inner. 말이 없으면 매트·코트=inner, IGT·선반·박스=wall, 체어·테이블·난로=center.
 - [결합] 목록의 멀티펑션·코너·오픈멀티펑션은 혼자 두지 말고 IGT 프레임 항목의 attach에 넣어. IGT 앞(긴 변)에 붙여 앞으로 내면 shape "T"(T자/앞에 붙여), 일자로 길게 이으면(IGT 끝에 연결) "line". 말이 없으면 "line". IGT를 말하지 않았으면 reg3을 하나 만들어 붙여.
 - [IGT 칸] 목록(버너·트레이·상판·수납)은 장비가 아니라 IGT 프레임 칸에 끼우는 파츠라 IGT 항목의 slots에 넣어. 슬라이드 트레이는 attach(shape line).
@@ -4266,6 +4301,10 @@ function aiTidy(res,said,prev,now){const L=aiLocal(said),want={};
   // 글에 없는 IGT를 지어냈고 칸·결합도 없으면 빼기
   const named=new Set(L.items.map(x=>x.type));if(prev)prev.items.forEach(x=>named.add(x.type));
   res.items=res.items.filter(it=>!(AI_ROOTS.includes(it.type)&&!named.has(it.type)&&!(it.slots||[]).length&&!(it.attach||[]).length&&!L.items.some(x=>AI_ROOTS.includes(x.type))));
+  // 목록에 없다고 한 장비를 비슷한 장비로 바꿔 넣었으면 빼기 (같은 종류 이름이 unknown에 있고, 글에서 그 장비 이름을 못 찾을 때)
+  const unk=(res.unknown||[]).map(aiNorm).join('|');
+  if(unk)res.items=res.items.filter(it=>{if(AI_ROOTS.includes(it.type)||named.has(it.type))return true;const c=CATALOG[it.type];
+    const g=[c&&c.group,c&&c.gtype==='chair'&&'체어',c&&c.gtype==='chair'&&'의자',c&&c.gtype==='cot'&&'침대'].filter(Boolean).map(aiNorm);return !g.some(w=>w.length>=2&&unk.includes(w));});
   res.unknown=(res.unknown||[]).filter(u=>!/^(igt|아이지티|타프|텐트|이너|이너텐트|매트|테이블|의자|체어)$/i.test(aiNorm(u)));
   if(added.length&&!(res.added&&res.added.length))res.added=added;
   if(res.inner&&!(prev&&prev.inner===res.inner)&&L.inner!==res.inner)res.inner=L.inner||null;}
@@ -4311,10 +4350,36 @@ async function aiRun(){
   h+=`<ul class="ai-got">${res.tent?`<li class="ai-tent">⛺ ${aiEsc(aiTentName(res.tent))}</li>`:''}${res.inner?`<li class="ai-tent">⛺ 이너: ${aiEsc(INNER_PRESETS[res.inner].name)}</li>`:''}${res.items.map(it=>`<li>${nm(it.type)}${it.attach&&it.attach.length?' + '+Object.entries(it.attach.reduce((m,a)=>{const k=nm(a.type)+(a.shape==='T'?' (T자)':'');m[k]=(m[k]||0)+1;return m;},{})).map(([k,n])=>k+(n>1?' ×'+n:'')).join(' + '):''}${it.count>1?` <b>×${it.count}</b>`:''}${it.slots&&it.slots.length?' · 칸: '+it.slots.map(sl=>aiEsc(aiSlotName(sl.id))+(sl.count>1?' ×'+sl.count:'')).join(', '):''}${it.leg?` · ${it.leg}다리`:''}${it.zone&&it.zone!==aiZone(it.type)?` · ${ZN[it.zone]}`:''}</li>`).join('')}</ul>`;
   if(aiApply.over&&aiApply.over.length)h+=`<p class="ai-warn">자리가 모자라 IGT에 못 붙인 파츠: ${[...new Set(aiApply.over)].map(id=>aiEsc(CATALOG[id]?CATALOG[id].name:aiSlotName(id))).join(', ')}</p>`;
   if(miss.length)h+=`<p class="ai-warn">자리가 모자라 텐트 밖 오른쪽에 둔 장비: ${[...new Set(miss)].map(nm).join(', ')}</p>`;
-  if(res.unknown.length)h+=`<p class="ai-warn">목록에 아직 없어서 빼둔 장비: ${res.unknown.map(aiEsc).join(', ')}</p>`;
+  if(res.unknown.length)h+=`<div class="ai-unk"><p class="ai-warn">장비 제원에 아직 없어서 빼둔 장비예요. 비슷한 장비로 바꾸지 않았어요.</p><p>${res.unknown.map(u=>`<button type="button" class="rq-ask" data-n="${aiEsc(u)}" onclick="reqAsk(this)">${aiEsc(u)} · 추가 요청</button>`).join('')}</p></div>`;
   h+=`<p class="ai-next">더 바꿀 게 있으면 위 칸에 적고 ‘고치기’를 눌러요.</p>`;
   box.innerHTML=h;box.hidden=false;
   const b=document.getElementById('board');if(b&&b.scrollIntoView&&innerWidth<900)setTimeout(()=>b.scrollIntoView({behavior:'smooth',block:'start'}),400);}
+
+/* --- 장비 추가요청 게시판 (워커 KV에 저장, 매주 일요일 확인 후 추가) --- */
+const RQ_ST={new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정',done:'추가됨',no:'추가 어려움'};
+let RQ=null,RQ_MINE=new Set();try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
+const rqSave=()=>{try{localStorage.setItem('rqMine',JSON.stringify([...RQ_MINE].slice(-200)));}catch(e){}};
+async function rqCall(b){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})});const d=await r.json().catch(()=>({}));return r.ok?d:{fail:d.error||'error'};}catch(e){return {fail:'error'};}}
+function reqRender(){const ul=document.getElementById('rqList');if(!ul)return;
+  if(!RQ){ul.innerHTML='';return;}
+  if(!RQ.length){ul.innerHTML='<li class="rq-empty">아직 요청이 없어요. 첫 요청을 남겨주세요.</li>';return;}
+  ul.innerHTML=RQ.slice(0,60).map(r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(r.at||'')}</small></div>
+    <span class="rq-badge s-${aiEsc(r.st)}">${RQ_ST[r.st]||'확인 중'}</span>
+    <button type="button" class="rq-plus" ${RQ_MINE.has(r.id)||r.st==='done'||r.st==='no'?'disabled':''} onclick="reqPlus('${aiEsc(r.id)}')" aria-label="${aiEsc(r.name)} 나도 필요해">나도 필요해 ${r.n||1}</button></li>`).join('');}
+async function reqLoad(force){if(RQ&&!force){reqRender();return;}const st=document.getElementById('rqSt');
+  const d=await rqCall({op:'list'});if(d.fail){if(st)st.textContent='게시판을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.';return;}
+  RQ=d.items||[];if(st&&st.textContent.startsWith('게시판을'))st.textContent='';reqRender();}
+async function reqAdd(name,link,from){const d=await rqCall({op:'add',name,link,from});
+  if(d.ok){RQ=d.items;RQ_MINE.add(d.id);rqSave();reqRender();if(typeof camEv==='function')camEv('req/'+encodeURIComponent(String(name).slice(0,30)),'장비 추가 요청');}
+  return d;}
+async function reqSend(){const n=document.getElementById('rqName'),l=document.getElementById('rqLink'),st=document.getElementById('rqSt');
+  const name=n.value.trim();if(name.length<2){st.textContent='장비 이름을 적어주세요';n.focus();return;}
+  st.textContent='보내는 중…';const d=await reqAdd(name,l.value.trim(),'form');
+  st.textContent=d.ok?'요청했어요. 일요일에 확인해서 추가할게요.':d.fail==='quota'?'오늘은 요청을 많이 보냈어요. 내일 다시 남겨주세요.':'보내지 못했어요. 잠시 뒤 다시 해주세요.';
+  if(d.ok){n.value='';l.value='';}}
+async function reqPlus(id){if(RQ_MINE.has(id))return;const d=await rqCall({op:'plus',id});if(d.ok){RQ=d.items;RQ_MINE.add(id);rqSave();reqRender();}}
+async function reqAsk(b){b.disabled=true;const t=b.textContent;b.textContent='보내는 중…';const d=await reqAdd(b.dataset.n,'','ai');
+  b.textContent=d.ok?`${b.dataset.n} · 요청했어요 (일요일에 확인)`:d.fail==='quota'?'오늘 요청을 많이 보냈어요':'보내지 못했어요';if(!d.ok)setTimeout(()=>{b.disabled=false;b.textContent=t;},2500);}
 
 </script>
 <script data-goatcounter="https://camterior.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>

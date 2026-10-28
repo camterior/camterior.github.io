@@ -61,7 +61,18 @@
   </header>
   <nav class="gnav" aria-label="장비 분류"><div class="wrap"><div class="gn-in" id="gearNav" role="group"></div>
     <label class="gsearch"><span class="sr-only">장비 찾기</span><input id="gearQ" type="search" placeholder="장비 찾기 (예: 노나돔, CK-149)" oninput="renderGear()"></label></div></nav>
+  <p class="wrap rq-jump"><button type="button" onclick="document.getElementById('reqBoard').scrollIntoView({behavior:'smooth',block:'start'})">찾는 장비가 없나요? <b>추가 요청 게시판 ↓</b></button></p>
   <div class="wrap gearbody" id="gearBody"></div>
+  <section class="wrap reqb" id="reqBoard" aria-labelledby="reqTitle">
+    <div class="rq-head"><h2 id="reqTitle">찾는 장비가 없나요?</h2><p>추가 요청을 남겨주세요. 모아서 확인한 뒤 <b>매주 일요일</b>에 한 번에 넣어요.</p></div>
+    <form class="rq-form" onsubmit="event.preventDefault();reqSend()">
+      <label><span class="sr-only">장비 이름</span><input id="rqName" maxlength="40" placeholder="장비 이름 (예: 마운틴리버 야전침대)" required></label>
+      <label><span class="sr-only">상품 링크</span><input id="rqLink" maxlength="300" inputmode="url" placeholder="상품 링크 (있으면)"></label>
+      <button type="submit" class="btn-dark">추가 요청</button>
+    </form>
+    <p class="rq-st" id="rqSt" role="status"></p>
+    <ul class="rq-list" id="rqList"></ul>
+  </section>
   <div hidden><div id="lineFilter"></div><div id="lineup-list"></div></div>
   <p class="wrap gearsrc">규격 출처: 판매처 상품 상세, 제조사 공식 페이지와 카탈로그. ‘판매처’는 판매처 표기, ‘사진추정’은 사진 비율로 계산한 값이에요. 구매 전에는 제품 설명서를 확인해 주세요.</p>
 </div>

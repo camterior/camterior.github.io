@@ -365,7 +365,33 @@ async function aiRun(){
   h+=`<ul class="ai-got">${res.tent?`<li class="ai-tent">⛺ ${aiEsc(aiTentName(res.tent))}</li>`:''}${res.inner?`<li class="ai-tent">⛺ 이너: ${aiEsc(INNER_PRESETS[res.inner].name)}</li>`:''}${res.items.map(it=>`<li>${nm(it.type)}${it.attach&&it.attach.length?' + '+Object.entries(it.attach.reduce((m,a)=>{const k=nm(a.type)+(a.shape==='T'?' (T자)':'');m[k]=(m[k]||0)+1;return m;},{})).map(([k,n])=>k+(n>1?' ×'+n:'')).join(' + '):''}${it.count>1?` <b>×${it.count}</b>`:''}${it.slots&&it.slots.length?' · 칸: '+it.slots.map(sl=>aiEsc(aiSlotName(sl.id))+(sl.count>1?' ×'+sl.count:'')).join(', '):''}${it.leg?` · ${it.leg}다리`:''}${it.zone&&it.zone!==aiZone(it.type)?` · ${ZN[it.zone]}`:''}</li>`).join('')}</ul>`;
   if(aiApply.over&&aiApply.over.length)h+=`<p class="ai-warn">자리가 모자라 IGT에 못 붙인 파츠: ${[...new Set(aiApply.over)].map(id=>aiEsc(CATALOG[id]?CATALOG[id].name:aiSlotName(id))).join(', ')}</p>`;
   if(miss.length)h+=`<p class="ai-warn">자리가 모자라 텐트 밖 오른쪽에 둔 장비: ${[...new Set(miss)].map(nm).join(', ')}</p>`;
-  if(res.unknown.length)h+=`<p class="ai-warn">목록에 아직 없어서 빼둔 장비: ${res.unknown.map(aiEsc).join(', ')}</p>`;
+  if(res.unknown.length)h+=`<div class="ai-unk"><p class="ai-warn">장비 제원에 아직 없어서 빼둔 장비예요. 비슷한 장비로 바꾸지 않았어요.</p><p>${res.unknown.map(u=>`<button type="button" class="rq-ask" data-n="${aiEsc(u)}" onclick="reqAsk(this)">${aiEsc(u)} · 추가 요청</button>`).join('')}</p></div>`;
   h+=`<p class="ai-next">더 바꿀 게 있으면 위 칸에 적고 ‘고치기’를 눌러요.</p>`;
   box.innerHTML=h;box.hidden=false;
   const b=document.getElementById('board');if(b&&b.scrollIntoView&&innerWidth<900)setTimeout(()=>b.scrollIntoView({behavior:'smooth',block:'start'}),400);}
+
+/* --- 장비 추가요청 게시판 (워커 KV에 저장, 매주 일요일 확인 후 추가) --- */
+const RQ_ST={new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정',done:'추가됨',no:'추가 어려움'};
+let RQ=null,RQ_MINE=new Set();try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
+const rqSave=()=>{try{localStorage.setItem('rqMine',JSON.stringify([...RQ_MINE].slice(-200)));}catch(e){}};
+async function rqCall(b){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})});const d=await r.json().catch(()=>({}));return r.ok?d:{fail:d.error||'error'};}catch(e){return {fail:'error'};}}
+function reqRender(){const ul=document.getElementById('rqList');if(!ul)return;
+  if(!RQ){ul.innerHTML='';return;}
+  if(!RQ.length){ul.innerHTML='<li class="rq-empty">아직 요청이 없어요. 첫 요청을 남겨주세요.</li>';return;}
+  ul.innerHTML=RQ.slice(0,60).map(r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(r.at||'')}</small></div>
+    <span class="rq-badge s-${aiEsc(r.st)}">${RQ_ST[r.st]||'확인 중'}</span>
+    <button type="button" class="rq-plus" ${RQ_MINE.has(r.id)||r.st==='done'||r.st==='no'?'disabled':''} onclick="reqPlus('${aiEsc(r.id)}')" aria-label="${aiEsc(r.name)} 나도 필요해">나도 필요해 ${r.n||1}</button></li>`).join('');}
+async function reqLoad(force){if(RQ&&!force){reqRender();return;}const st=document.getElementById('rqSt');
+  const d=await rqCall({op:'list'});if(d.fail){if(st)st.textContent='게시판을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.';return;}
+  RQ=d.items||[];if(st&&st.textContent.startsWith('게시판을'))st.textContent='';reqRender();}
+async function reqAdd(name,link,from){const d=await rqCall({op:'add',name,link,from});
+  if(d.ok){RQ=d.items;RQ_MINE.add(d.id);rqSave();reqRender();if(typeof camEv==='function')camEv('req/'+encodeURIComponent(String(name).slice(0,30)),'장비 추가 요청');}
+  return d;}
+async function reqSend(){const n=document.getElementById('rqName'),l=document.getElementById('rqLink'),st=document.getElementById('rqSt');
+  const name=n.value.trim();if(name.length<2){st.textContent='장비 이름을 적어주세요';n.focus();return;}
+  st.textContent='보내는 중…';const d=await reqAdd(name,l.value.trim(),'form');
+  st.textContent=d.ok?'요청했어요. 일요일에 확인해서 추가할게요.':d.fail==='quota'?'오늘은 요청을 많이 보냈어요. 내일 다시 남겨주세요.':'보내지 못했어요. 잠시 뒤 다시 해주세요.';
+  if(d.ok){n.value='';l.value='';}}
+async function reqPlus(id){if(RQ_MINE.has(id))return;const d=await rqCall({op:'plus',id});if(d.ok){RQ=d.items;RQ_MINE.add(id);rqSave();reqRender();}}
+async function reqAsk(b){b.disabled=true;const t=b.textContent;b.textContent='보내는 중…';const d=await reqAdd(b.dataset.n,'','ai');
+  b.textContent=d.ok?`${b.dataset.n} · 요청했어요 (일요일에 확인)`:d.fail==='quota'?'오늘 요청을 많이 보냈어요':'보내지 못했어요';if(!d.ok)setTimeout(()=>{b.disabled=false;b.textContent=t;},2500);}

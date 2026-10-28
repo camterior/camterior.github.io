@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://camterior.goatcounter.com https://caro-camp.goatcounter.com; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://camterior-ai.ghdwnd2.workers.dev https://camterior.goatcounter.com https://caro-camp.goatcounter.com; base-uri 'self'; form-action 'none'">
 <title>CAMTERIOR 관리실</title>
 <link rel="icon" href="assets/icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
@@ -67,6 +67,8 @@ h2 small{font-weight:500;color:var(--muted);font-size:12.5px;margin-left:6px}
 .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .list{display:grid;gap:7px;margin:0;padding:0;list-style:none}
 .list li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;font-size:13.5px;align-items:center}
+.rq li{grid-template-columns:minmax(0,1fr) auto auto;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+.rq li small{display:block;color:#888;font-size:12px}.rq select{font:inherit;padding:5px 6px;border-radius:8px}.rq-hint{font-size:13px;color:#777;margin:6px 0}
 .list li .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .list li .ct{font-variant-numeric:tabular-nums;font-weight:600}
 .list li .mini{grid-column:1/-1;height:4px;background:var(--sunk);border-radius:2px;overflow:hidden;margin-top:-3px}
@@ -147,6 +149,13 @@ label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:cen
       <section>
         <h2>날짜별 방문 <small id="chart-sub"></small></h2>
         <div class="chart" id="chart"><p class="empty">불러오는 중…</p></div>
+      </section>
+
+      <section class="cam" id="reqAdm">
+        <h2>장비 추가요청 게시판 <small>일요일에 승인한 것만 추가</small></h2>
+        <form class="row" id="rqKeyForm" autocomplete="off"><input type="password" id="rqKey" placeholder="게시판 관리 키 (워커 ADMIN_KEY)" aria-label="게시판 관리 키"><button type="submit">열기</button></form>
+        <p class="rq-hint" id="rqMsg"></p>
+        <ul class="list rq" id="rqAdmList"></ul>
       </section>
 
       <div class="two">
@@ -357,6 +366,21 @@ document.querySelectorAll('.sites button').forEach(function(b){b.addEventListene
   site=b.dataset.s;try{localStorage.setItem(SITE_ST,site)}catch(e){}useSite();key=sget(KEY_ST);view();})});
 function view(){ var has=!!key; $('setup').hidden=has; $('dash').hidden=!has; if(has) load(); }
 setPeriod(period); view();
+})();
+
+/* 장비 추가요청 게시판 관리 */
+(function(){function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+ var W='https://camterior-ai.ghdwnd2.workers.dev',KS='camRqKey',ST={new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정',done:'추가됨',no:'추가 어려움',hide:'숨김'};
+  function k(){try{return localStorage.getItem(KS)||''}catch(e){return ''}}
+  function call(b){return fetch(W,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})}).then(function(r){return r.json().then(function(d){return r.ok?d:{fail:d.error||r.status}})}).catch(function(){return {fail:'net'}})}
+  function draw(items){var ul=document.getElementById('rqAdmList');var sun=items.filter(function(r){return r.st==='sun'}).length;
+    document.getElementById('rqMsg').textContent='요청 '+items.length+'개 · 일요일 추가 예정 '+sun+'개 · 상태를 "일요일 추가 예정"으로 바꾼 것만 일요일에 넣어요.';
+    ul.innerHTML=items.length?items.map(function(r){return '<li><span class="nm"><b>'+esc(r.name)+'</b>'+(r.link?' · <a href="'+esc(r.link)+'" target="_blank" rel="noopener">링크</a>':'')+'<small>'+esc(r.at||'')+' · '+(r.from==='ai'?'AI에서':'게시판')+'</small></span><span>+'+(r.n||1)+'</span><select data-id="'+esc(r.id)+'">'+Object.keys(ST).map(function(s){return '<option value="'+s+'"'+(s===r.st?' selected':'')+'>'+ST[s]+'</option>'}).join('')+'</select></li>'}).join(''):'<li class="empty">아직 요청이 없어요</li>';}
+  function open(id,st){var key=k();if(!key){document.getElementById('rqMsg').textContent='관리 키를 넣어주세요.';return;}
+    call({op:'admin',key:key,id:id||'',st:st||''}).then(function(d){if(d.fail){document.getElementById('rqMsg').textContent=d.fail==='key'?'관리 키가 맞지 않아요.':d.fail==='board-off'?'워커에 KV(RL)가 아직 연결되지 않았어요.':'게시판 서버에 연결하지 못했어요 ('+d.fail+').';return;}draw(d.items||[])});}
+  document.getElementById('rqKeyForm').addEventListener('submit',function(e){e.preventDefault();var v=document.getElementById('rqKey').value.trim();try{localStorage.setItem(KS,v)}catch(x){}document.getElementById('rqKey').value='';open();});
+  document.getElementById('rqAdmList').addEventListener('change',function(e){var t=e.target;if(t.tagName==='SELECT')open(t.dataset.id,t.value);});
+  if(k())open();
 })();
 </script>
 </body>
