@@ -125,6 +125,7 @@ js = js.replace("모두의 배치는 공유된 페이지에서 로그인하면 �
                 "모두의 배치는 캠핑 허브 탭의 ‘Claude 함께 쓰기’ 버전에서 올릴 수 있어요. 여기서는 공유 링크를 써주세요.")
 tail = (HERE / 'tabs.js').read_text(encoding='utf-8')
 tail += '\n' + (HERE / 'ai.js').read_text(encoding='utf-8')
+tail += '\n' + (HERE / 'mine.js').read_text(encoding='utf-8')
 js = js.replace('</script>\n</body>', '</script>\n<script>\n' + tail + '\n</script>\n</body>')
 assert '<script>\n' + tail in js, 'tail not injected'
 

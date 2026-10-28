@@ -1,7 +1,7 @@
 /* =====================================================================
    CAMTERIOR — app tabs, gear spec catalog, share links
    ===================================================================== */
-const VIEWS=['intro','plan','gear','board','hub'];
+const VIEWS=['intro','plan','mine','gear','board','hub'];
 const LEGACY={top:'intro',features:'intro',how:'intro',lineup:'gear',journal:'hub',commons:'hub'};
 let CUR='intro',planFitted=false;
 const IN_CLAUDE=!!window.claude||!!document.querySelector('[data-art]');
@@ -12,6 +12,7 @@ function go(v,opts){opts=opts||{};v=LEGACY[v]||v;if(!VIEWS.includes(v))v='intro'
   const changed=v!==CUR;CUR=v;document.body.dataset.view=v;
   VIEWS.forEach(k=>{document.getElementById('v-'+k).hidden=k!==v;});
   if(v==='board'&&typeof reqLoad==='function')reqLoad();
+  if(v==='mine'&&typeof mineInit==='function')mineInit();
   document.querySelectorAll('[data-tab]').forEach(a=>{if(a.dataset.tab===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v)history.pushState(null,'','#'+v);
   if(changed&&!opts.keepScroll)window.scrollTo(0,0);

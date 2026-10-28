@@ -7,7 +7,8 @@ const MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 앞에서
 const ALLOWED_ORIGINS = ["https://camterior.github.io"];
 const LIMIT_FREE = 10, LIMIT_CODE = 50; // 하루 횟수 (한국 시간 기준)
 const MAX_INPUT_CHARS = 8000;
-const MAX_SYSTEM_CHARS = 20000;
+const MAX_SYSTEM_CHARS = 40000; // 사진 인식은 장비 목록 전체를 보내서 길어요
+const MAX_IMAGE_CHARS = 3000000; // base64 약 2.2MB
 
 function cors(origin) {
   const ok = ALLOWED_ORIGINS.includes(origin);
@@ -117,8 +118,16 @@ export default {
     const system = String(body.system || "").slice(0, MAX_SYSTEM_CHARS); // 장비·텐트 목록과 예시가 들어가서 길게
     if (!prompt) return json({ error: "empty" }, 400, origin);
 
+    const parts = [{ text: prompt }];
+    // 사진 인식(내 장비 등록): {image:{mime:'image/jpeg', data:base64}}
+    if (body.image) {
+      const mime = String(body.image.mime || "");
+      const data = String(body.image.data || "");
+      if (!/^image\/(jpeg|png|webp)$/.test(mime) || !data || data.length > MAX_IMAGE_CHARS || /[^A-Za-z0-9+/=]/.test(data)) return json({ error: "image" }, 400, origin);
+      parts.push({ inline_data: { mime_type: mime, data } });
+    }
     const payload = {
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      contents: [{ role: "user", parts }],
       generationConfig: { temperature: 0, responseMimeType: "application/json" },
     };
     if (system) payload.systemInstruction = { parts: [{ text: system }] };

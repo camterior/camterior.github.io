@@ -7,7 +7,7 @@ const srv=http.createServer((q,r)=>{let f=path.join(ROOT,decodeURIComponent(q.ur
   p.on('pageerror',e=>errs.push(e.message));
   await p.route('https://cdn.jsdelivr.net/**',r=>r.abort());
   await p.goto('http://127.0.0.1:8799/');await p.waitForTimeout(1500);
-  const r=await p.evaluate(async()=>{const out={};for(const v of ['intro','plan','gear','board','hub']){go(v);await new Promise(s=>setTimeout(s,300));
+  const r=await p.evaluate(async()=>{const out={};for(const v of ['intro','plan','mine','gear','board','hub']){go(v);await new Promise(s=>setTimeout(s,300));
     out[v]=!document.getElementById('v-'+v).hidden;}
     out.gear=document.querySelectorAll('.gcard').length;go('plan');await new Promise(s=>setTimeout(s,300));
     out.svg=!!document.querySelector('#svgHost svg');out.tents=Object.keys(TENTS).length;return out;});

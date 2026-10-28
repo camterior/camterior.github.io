@@ -4,6 +4,7 @@
   <nav class="nav apptabs" aria-label="화면">
     <a href="#intro" data-go="intro" data-tab="intro">소개</a>
     <a href="#plan" data-go="plan" data-tab="plan">내부 구성</a>
+    <a href="#mine" data-go="mine" data-tab="mine">내 장비</a>
     <a href="#gear" data-go="gear" data-tab="gear">장비 제원</a>
     <a href="#board" data-go="board" data-tab="board">게시판</a>
     <a href="#hub" data-go="hub" data-tab="hub">캠핑 허브</a>
@@ -48,6 +49,43 @@
 <!-- ============ 2. 내부 구성 ============ -->
 <div class="view" id="v-plan" data-view="plan" hidden>
 {{WORKSPACE}}
+</div>
+
+<!-- ============ 내 장비 ============ -->
+<div class="view" id="v-mine" data-view="mine" hidden>
+  <header class="vhero" aria-labelledby="mineTitle">
+    <img src="img/overhead.webp" alt="" aria-hidden="true">
+    <div class="wrap vh-in">
+      <p class="eyebrow">My gear</p>
+      <h1 id="mineTitle">내 장비</h1>
+      <p>가진 장비를 한 번 등록해 두면, 다음부터는 버튼 하나로 AI 세팅을 시작해요.</p>
+    </div>
+  </header>
+  <div class="wrap mine">
+    <div class="mn-grid">
+      <section class="mn-card" aria-labelledby="mnPhotoT">
+        <h2 id="mnPhotoT">📷 사진으로 찾기</h2>
+        <p class="mn-d">장비 사진(최대 3장)을 올리면 AI가 장비 제원에서 같은 제품을 찾아요. 세팅 사진도 돼요.</p>
+        <label class="mn-pick"><input type="file" id="minePic" accept="image/*" multiple onchange="minePicked()"><span>사진 고르기</span><small id="minePicN"></small></label>
+        <button type="button" class="btn-dark" id="mineGo" onclick="minePhoto()">✨ 사진 속 장비 찾기</button>
+        <p class="mn-st" id="mineSt" role="status"></p>
+        <div id="mineRes"></div>
+        <p class="mn-note">사진은 Google Gemini로 보내져 장비를 찾는 데만 쓰고, 저장하지 않아요. 얼굴·차 번호판이 나온 사진은 피해 주세요.</p>
+      </section>
+      <section class="mn-card" aria-labelledby="mnFindT">
+        <h2 id="mnFindT">🔎 이름으로 찾기</h2>
+        <label><span class="sr-only">장비 이름</span><input id="mineQ" type="search" placeholder="예: FD체어, 메락, IGT 롱, 파세코" oninput="mineSearch()"></label>
+        <ul class="mn-find" id="mineFind"></ul>
+      </section>
+    </div>
+    <section class="mn-card mn-mine" aria-labelledby="mnListT">
+      <div class="mn-head"><h2 id="mnListT">내가 가진 장비 <small id="mineCnt"></small></h2>
+        <button type="button" class="btn-dark" id="mineUse" onclick="mineUse()" disabled>✨ 내 장비로 AI 세팅하기</button></div>
+      <div id="mineList"></div>
+      <p class="mn-bk"><button type="button" onclick="mineCopy()">백업 코드 복사</button><button type="button" onclick="mineLoad()">코드로 불러오기</button><span id="mineBk" role="status"></span></p>
+      <p class="mn-note">이 기기(브라우저)에 저장돼요. 다른 기기에서 쓰려면 백업 코드로 옮겨 주세요.</p>
+    </section>
+  </div>
 </div>
 
 <!-- ============ 3. 장비 제원 ============ -->
@@ -144,6 +182,7 @@
 <nav class="tabbar" aria-label="화면">
   <a href="#intro" data-go="intro" data-tab="intro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 12 5l9 14H3Z"/><path d="M12 5v14"/></svg><span>소개</span></a>
   <a href="#plan" data-go="plan" data-tab="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 12h9v8.5M12.5 3.5V8"/></svg><span>내부 구성</span></a>
+  <a href="#mine" data-go="mine" data-tab="mine"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5h16v11H4z"/><path d="M9 8.5V6a3 3 0 0 1 6 0v2.5"/><path d="M4 12.5h16"/></svg><span>내 장비</span></a>
   <a href="#gear" data-go="gear" data-tab="gear"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="11" rx="2"/><path d="M7.5 7v11M12 7v11M16.5 7v11M3 12.5h18"/></svg><span>장비 제원</span></a>
   <a href="#board" data-go="board" data-tab="board"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v10H9l-5 4v-14Z"/><path d="M8 9.5h8M8 12.5h5"/></svg><span>게시판</span></a>
   <a href="#hub" data-go="hub" data-tab="hub"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11 15.7 7M8.3 13l7.4 4"/></svg><span>캠핑 허브</span></a>
