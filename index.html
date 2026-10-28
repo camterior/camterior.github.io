@@ -3963,7 +3963,7 @@ const aiSlotName=id=>getItem(id).name;
 const AI_ZONES=['wall','center','inner','left','right','top','bottom'];
 const AI_MAX_EACH=6,AI_MAX_TOTAL=24;
 // 사람들이 흔히 부르는 이름 (AI 안내 + 이름 맞추기 둘 다 씀)
-const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유닛'],long4:['IGT 롱','IGT 4유닛','IGT 프레임 롱'],
+const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유닛','IGT 레귤러','아이지티 레귤러','IGT 프레임 레귤러'],long4:['IGT 롱','IGT 4유닛','IGT 프레임 롱'],
   sep2:['세퍼레이트 2유닛','세퍼레이트 하프'],sep3:['세퍼레이트 3유닛','세퍼레이트 레귤러','세퍼레이트 IGT'],sep4:['세퍼레이트 4유닛','세퍼레이트 롱'],
   mf_reg:['멀티펑션','멀티펑션 테이블'],slide_h:['하프슬라이드','슬라이드하프','슬라이드 트레이'],slide_hl:['하프슬라이드 롱','슬라이드하프롱'],
   mytable_s:['스텐 마이테이블','스탠 마이테이블','스텐마이테이블','스탠마이테이블','스테인리스 마이테이블'],
@@ -4018,6 +4018,8 @@ JSON만 출력: {"tent":"텐트 id 또는 null","inner":"[이너텐트] id 또�
 - 같은 결합 파츠가 여러 개면(예: 하프슬라이드 2개) attach에 개수만큼 넣어.
 - 의자는 따로 흩어 두지 않아. 코드가 테이블(없으면 IGT 앞) 둘레에 앉혀 주니까 체어는 zone을 비우거나 center로.
 - 동선: 요리(IGT)는 벽쪽, 식탁 세트는 그 앞, 출입구에서 이너룸까지 길은 비워. tip에 이런 동선 팁을 짧게.
+- 강염버너(sp_gs1000)는 바닥에 세우는 장비라 IGT 칸이 아니야. 칸 파츠 id는 [IGT 칸] 목록 id만(flat, seppou, steel1…).
+- [이너텐트] 목록(쉘이너·지오에어·고동)은 글에 그 이름이 있을 때만 inner에. 그 외에는 null.
 - [이너텐트] 목록(쉘이너·지오에어·고동)은 장비가 아니라 텐트 안에 넣는 이너라서 inner에 id를 넣어. unknown에 넣지 마.
 - [고치기] '지금 배치(JSON)'와 '고칠 점'이 오면 고칠 점만 반영하고 나머지는 그대로 둔 전체 JSON을 다시 출력해. tip에는 무엇을 바꿨는지 한 문장.
 - 텐트를 말하지 않으면 null. [텐트] 후보에 없는 텐트면 비슷한 모델로 바꾸지 말고 null + unknown에 이름.
@@ -4081,7 +4083,7 @@ async function aiAsk(text,ctx){
 
 function aiClean(o){const ids=new Set(aiIds()),exts=new Set(AI_EXTS),out={tent:null,items:[],unknown:[],tip:''};
   if(o&&typeof o.tent==='string'&&TENTS[o.tent]&&o.tent!=='none')out.tent=o.tent;
-  if(o&&typeof o.inner==='string'){const k=o.inner.replace(/^p:/,'');if(INNER_PRESETS[k])out.inner=k;}
+  if(o&&typeof o.inner==='string'){const k=o.inner.replace(/^p:/,'');if(INNER_PRESETS[k])out.inner=k;else if(ids.has(k)&&Array.isArray(o.items))o.items.push({type:k,count:1,zone:'inner'});}
   const items=[],loose=[],looseS=[];
   (Array.isArray(o&&o.items)?o.items:[]).forEach(it=>{if(!it)return;
     if(exts.has(it.type)){for(let q=0;q<Math.min(4,Math.max(1,+it.count||1));q++)loose.push({type:it.type,shape:'line'});return;}
@@ -4091,6 +4093,7 @@ function aiClean(o){const ids=new Set(aiIds()),exts=new Set(AI_EXTS),out={tent:n
     if(CATALOG[it.type].gtype==='chair'&&typeof it.at==='string'&&(ids.has(it.at)||AI_ROOTS.includes(it.at)))x.at=it.at;
     if(AI_ROOTS.includes(it.type)){x.attach=(Array.isArray(it.attach)?it.attach:[]).filter(a=>a&&exts.has(a.type)).flatMap(a=>Array(Math.min(4,Math.max(1,Math.round(+a.count||1)))).fill({type:a.type,shape:a.shape==='T'?'T':'line'})).slice(0,6);
       if(+it.leg>=200&&+it.leg<=1000)x.leg=[300,400,660,830].reduce((a,b)=>Math.abs(b-it.leg)<Math.abs(a-it.leg)?b:a);
+      (Array.isArray(it.slots)?it.slots:[]).forEach(a=>{const id=a&&(a.id||a.type);if(exts.has(id))for(let q=0;q<Math.min(4,Math.max(1,+a.count||1));q++)x.attach.push({type:id,shape:'line'});});
       x.slots=(Array.isArray(it.slots)?it.slots:[]).map(a=>a&&({...a,id:a.id||a.type})).filter(a=>a&&AI_SLOTS.includes(a.id)).slice(0,8).map(a=>({id:a.id,count:Math.min(8,Math.max(1,Math.round(+a.count||1)))}));}
     const same=items.find(y=>y.type===x.type&&!x.attach?.length&&!y.attach?.length&&y.zone===x.zone&&y.at===x.at);
     if(same)same.count=Math.min(AI_MAX_EACH,same.count+x.count);else items.push(x);});
@@ -4233,6 +4236,16 @@ function aiApply(res){
   fitView();render();return miss;}
 
 /* --- 화면 --- */
+/* AI 답 다듬기: 칸 파츠 개수는 글이 기준(지어낸 파츠 빼고, 빠뜨린 파츠 넣고, 두 번 들어간 것 합치기), 글에 없는 이너는 빼기 */
+function aiTidy(res,said,prev){const L=aiLocal(said),want={};L.items.forEach(x=>(x.slots||[]).forEach(q=>want[q.id]=(want[q.id]||0)+q.count));
+  const prevSlots={};if(prev)prev.items.forEach(it=>(it.slots||[]).forEach(q=>prevSlots[q.id]=(prevSlots[q.id]||0)+q.count));
+  const roots=res.items.filter(i=>AI_ROOTS.includes(i.type)),added=[];
+  roots.forEach(rt=>{const m={};(rt.slots||[]).forEach(q=>{if(want[q.id]||prevSlots[q.id])m[q.id]=(m[q.id]||0)+q.count;});rt.slots=Object.entries(m).map(([id,count])=>({id,count}));});
+  Object.entries(want).forEach(([id,n])=>{const have=roots.reduce((t,rt)=>t+rt.slots.filter(q=>q.id===id).reduce((a,q)=>a+q.count,0),0);
+    if(have>n&&!prev){let over=have-n;roots.slice().reverse().forEach(rt=>rt.slots.forEach(q=>{if(q.id===id&&over>0){const c=Math.min(over,q.count-0);q.count-=c;over-=c;}}));roots.forEach(rt=>rt.slots=rt.slots.filter(q=>q.count>0));}
+    else if(have<n&&roots.length&&!prev){const rt=roots[0],q=rt.slots.find(x=>x.id===id);if(q)q.count+=n-have;else rt.slots.push({id,count:n-have});added.push(aiSlotName(id));}});
+  if(added.length&&!(res.added&&res.added.length))res.added=added;
+  if(res.inner&&!(prev&&prev.inner===res.inner)&&L.inner!==res.inner)res.inner=L.inner||null;}
 /* 대화로 고치기: 첫 세팅 뒤에는 '고칠 점'만 적으면 지금 배치를 바탕으로 다시 세팅 */
 const AI_CHAT={log:[],last:null,said:''};
 const aiCompact=r=>({tent:r.tent,inner:r.inner||null,items:r.items.map(it=>{const o={type:it.type};if(it.count>1)o.count=it.count;if(it.zone)o.zone=it.zone;if(it.at)o.at=it.at;
@@ -4255,18 +4268,12 @@ async function aiRun(){
   if(fix&&!r.ok){btn.disabled=false;st.textContent='';AI_CHAT.log.push({who:'ai',t:r.fail==='limit'?'오늘 AI 사용량을 다 써서 고치지 못했어요. 끌어서 직접 다듬어 주세요.':'AI 연결이 안 돼서 고치지 못했어요. 잠시 뒤 다시 해보세요.'});aiChatUI();return;}
   inp.value='';
   if(r.ok){res=aiClean(r.ok);
-    // AI가 글에 없는 칸 파츠를 지어내면 빼기 (이름 맞추기로 찾은 파츠만 남김)
-    {const said=AI_CHAT.said+' '+text,ok=new Set(aiLocal(said).items.flatMap(x=>(x.slots||[]).map(q=>q.id)));
-     res.items.forEach(it=>{if(it.slots)it.slots=it.slots.filter(q=>ok.has(q.id));});
-     // 글에 있는데 AI가 빠뜨린 칸 파츠는 다시 넣기
-     const root=res.items.find(i=>AI_ROOTS.includes(i.type));
-     if(root){const have=new Set((root.slots||[]).map(q=>q.id)),add=aiLocal(said).items.flatMap(x=>x.slots||[]).filter(q=>!have.has(q.id));
-       if(add.length){root.slots=(root.slots||[]).concat(add);res.added=add.map(q=>aiSlotName(q.id));}}}
     // AI가 모른다고 한 이름도 별칭으로 한 번 더 찾아보기
     res.unknown=res.unknown.filter(u=>{const l=aiLocal(u);if(l.inner&&!l.items.length){res.inner=res.inner||l.inner;return false;}if(!l.items.length)return true;
       l.items.forEach(x=>{if(x.slots&&x.slots.length||x.attach&&x.attach.length){let f=res.items.find(i=>AI_ROOTS.includes(i.type));if(f){f.slots=(f.slots||[]).concat(x.slots||[]);f.attach=(f.attach||[]).concat(x.attach||[]);return;}}
         if(x.type==='reg3'&&(x.slots||x.attach))return;const same=res.items.find(i=>i.type===x.type);if(same)return;res.items.push({type:x.type,count:x.count,zone:null});});return false;});if(!res.items.length&&!res.tent){const l=aiLocal(text);if(l.items.length){res=l;via='local';}}}
   else{res=aiLocal(text);via=r.fail==='limit'?'limit':'local';}
+  if(via==='ai')aiTidy(res,AI_CHAT.said+' '+text,fix?AI_CHAT.last:null);
   btn.disabled=false;
   if(!res.items.length&&!res.tent){st.textContent='';box.hidden=false;
     box.innerHTML=`<p class="ai-warn">목록에서 맞는 장비를 못 찾았어요. ‘장비 제원’ 탭의 이름으로 적어보세요 (예: 폴딩쉘프, IGT 롱, 체어원).</p>`;return;}
