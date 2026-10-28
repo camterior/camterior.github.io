@@ -2002,8 +2002,8 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  T2.add('sp_tarp_ext',{brand:'스노우피크',name:'타프 익스텐션 텐트',model:'FES-433',size:[325,400,280],weight:'7.5kg',cap:'4명 (제조사 표기)',href:'https://snowpeak.com/products/tarp-extentioin-tent-4',srcName:'제조사 공식 페이지',drawn:true,
   est:'제조사 설명서 치수도(바닥 325×400cm, 윙폴 쪽 높이 280cm·뒤 120cm, 침실 215cm·윙폴 쪽 폭 370cm)로 그렸어요. 280cm 윙폴을 쓰는 스노우피크 타프(헥사 M·L, 헥사 에보 Pro., 렉타 M·L 등)의 윙폴 쪽에 이어 쓰고, 윙폴 280cm×1과 35cm 이상 펙이 있으면 혼자 세울 수도 있어요. 2022·2023 설봉제 한정품이에요.',
   outer:o,inners:{std:{label:'침실(이너)',model:'',size:'215×370 (설명서 치수도)',poly:[[1100,150],[3200,450],[3200,3550],[1100,3850]]}},innerDefault:'std',
-  doors:[{a:[0,1150],b:[0,2850],label:'타프 쪽 입구',zone:true}],frames:[{a:[1100,0],b:[1100,4000],label:'윙폴 280cm'}],
-  living:[550,2000],tarpJoin:1100,h3d:2800,inH3:1200,color:'#C9C2B2',prof:T2.PROF.shelter});}
+  doors:[{a:[0,1150],b:[0,2850],label:'타프 쪽 입구',zone:true}],pole:[1100,2000],poleLabel:'가운데 기둥 (윙폴 280cm)',apex:[1100,2000],
+  living:[550,2000],tarpJoin:1100,h3d:2800,inH3:1050,color:'#C9C2B2',walls:[0,0,1200,1200,0,0],prof:[[1,1,0],[1,1,.43],[.03,.03,1]]});}
 /* ===== 스프링바 (커크햄): 제조사 공식 페이지 치수. 바닥 일체형 캔버스 텐트, 앞(x=0) 벽에 출입문 ===== */
 {const SB='https://www.springbar.com/products/',SBN='제조사 공식 페이지',NOIN='바닥 일체형 캔버스 텐트라 따로 넣는 이너가 없어요. 안에 바로 매트·코트를 깔아요.';
  // L=앞뒤 깊이, W=문 있는 벽 길이(mm). door=[문 시작 y, 문 폭], win=창문들
@@ -2557,6 +2557,7 @@ function tentLayer(){
   // frames
   T.frames.forEach(f=>{o+=`<line x1="${f.a[0]}" y1="${f.a[1]}" x2="${f.b[0]}" y2="${f.b[1]}" stroke="${COL.ink2}" stroke-opacity=".5" stroke-width="${k}" stroke-dasharray="${10*k} ${4*k} ${2*k} ${4*k}"/>`;
     o+=`<text x="${f.a[0]+6*k}" y="${f.a[1]+18*k}" font-size="${11*k}" fill="${COL.ink2}">${f.label}</text>`;});
+  if(T.pole){const [px,py]=T.pole;o+=`<circle cx="${px}" cy="${py}" r="${45}" fill="${COL.ink2}" stroke="#fff" stroke-width="${2*k}"/><text x="${px+70}" y="${py+5*k}" font-size="${11*k}" fill="${COL.ink2}" font-weight="700">${T.poleLabel||'가운데 기둥'}</text>`;}
   // door zones
   doorZones().forEach(z=>{o+=`<polygon points="${pts(z.poly)}" fill="${z.blocked?'rgba(185,134,42,.18)':'rgba(185,134,42,.07)'}" stroke="${COL.ochre}" stroke-opacity="${z.blocked?.9:.35}" stroke-width="${k}" stroke-dasharray="${3*k} ${3*k}"/>`;});
   // inner room
@@ -3193,9 +3194,10 @@ function cyl(THREE,p,y0,y1,r,mat){const me=new THREE.Mesh(new THREE.CylinderGeom
 function lineOf(THREE,pts,color,opacity){const g=new THREE.BufferGeometry().setFromPoints(pts.map(a=>new THREE.Vector3(...a)));
   return new THREE.Line(g,new THREE.LineBasicMaterial({color,transparent:opacity<1,opacity:opacity??1}));}
 function tent3(THREE,T){
-  const grp=new THREE.Group(),H=T.h3d,prof=T.prof,outer=T.outer,c=centroid(outer),n=outer.length;
+  const grp=new THREE.Group(),H=T.h3d,prof=T.prof,outer=T.outer,c=T.apex||centroid(outer),n=outer.length;
   const at=(v,[sx,sy,hf])=>[c[0]+(v[0]-c[0])*sx,c[1]+(v[1]-c[1])*sy,hf*H];
-  const lv=prof.map(pr=>outer.map(v=>at(v,pr)));
+  // 가운데 기둥 텐트(타프 익스텐션 등): 벽 높이를 꼭짓점마다 따로 두고 모두 기둥 꼭대기로 모아요
+  const lv=T.walls?[outer.map(v=>[v[0],v[1],0]),outer.map((v,i)=>{const w=T.walls[i],f=w?.04:0;return [v[0]+(c[0]-v[0])*f,v[1]+(c[1]-v[1])*f,w];}),outer.map(v=>[c[0]+(v[0]-c[0])*.03,c[1]+(v[1]-c[1])*.03,H*.985])]:prof.map(pr=>outer.map(v=>at(v,pr)));
   const pos=[];lv.forEach(L=>L.forEach(p=>pos.push(mm(p[0]),mm(p[2]),mm(p[1]))));
   const top=lv[lv.length-1],tc=centroid(top.map(p=>[p[0],p[1]]));pos.push(mm(tc[0]),mm(H),mm(tc[1]));const ci=pos.length/3-1;
   const idx=[];for(let L=0;L<lv.length-1;L++)for(let i=0;i<n;i++){const j=(i+1)%n,a=L*n+i,b=L*n+j,c2=(L+1)*n+j,d=(L+1)*n+i;idx.push(a,b,c2,a,c2,d);}
@@ -3203,6 +3205,7 @@ function tent3(THREE,T){
   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setIndex(idx);geo.computeVertexNormals();
   const mat=new THREE.MeshStandardMaterial({color:T.color||'#8F806C',roughness:.95,transparent:true,opacity:.3,side:THREE.DoubleSide,depthWrite:false});
   const shell=new THREE.Group();shell.add(new THREE.Mesh(geo,mat));
+  if(T.pole){const pm=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,mm(H),12),new THREE.MeshStandardMaterial({color:'#B0342C',roughness:.4,metalness:.5}));pm.position.set(mm(T.pole[0]),mm(H)/2,mm(T.pole[1]));pm.castShadow=true;grp.add(pm);}
   // seams + floor outline
   for(let i=0;i<n;i++)shell.add(lineOf(THREE,lv.map(L=>[mm(L[i][0]),mm(L[i][2]),mm(L[i][1])]),'#4B4034',.5));
   shell.add(lineOf(THREE,outer.concat([outer[0]]).map(v=>[mm(v[0]),.005,mm(v[1])]),'#3A3128',.9));
@@ -3236,8 +3239,15 @@ function tent3(THREE,T){
   // inner room
   const inner=tentInner();
   if(inner){const im=new THREE.MeshStandardMaterial({color:'#E7DFCC',roughness:.95,transparent:true,opacity:.55,depthWrite:false});
-    const me=extrudePoly(THREE,inner.poly,0,T.inH3||1800,im);me.castShadow=false;grp.add(me);
-    grp.add(lineOf(THREE,inner.poly.concat([inner.poly[0]]).map(v=>[mm(v[0]),mm(T.inH3||1800),mm(v[1])]),'#7A6F5C',.7));}
+    if(T.apex&&!inner.custom){// 가운데 기둥 텐트의 이너: 기둥 쪽은 높고 뒤로 갈수록 낮은 고깔 모양
+      const P=inner.poly,n2=P.length,ax=T.apex[0]+120,ay=T.apex[1],AH=(T.h3d||2800)*.92,ws=P.map(v=>v[0]>ax+600?(T.inH3||1100):0),ps=[];
+      P.forEach(v=>ps.push(mm(v[0]),0,mm(v[1])));P.forEach((v,i)=>{const f=ws[i]?.05:0;ps.push(mm(v[0]+(ax-v[0])*f),mm(ws[i]),mm(v[1]+(ay-v[1])*f));});ps.push(mm(ax),mm(AH),mm(ay));
+      const ix=[],top=2*n2;for(let i=0;i<n2;i++){const j=(i+1)%n2;ix.push(i,j,n2+j,i,n2+j,n2+i,n2+i,n2+j,top);}
+      const g2=new THREE.BufferGeometry();g2.setAttribute('position',new THREE.Float32BufferAttribute(ps,3));g2.setIndex(ix);g2.computeVertexNormals();
+      const im2=im.clone();im2.side=THREE.DoubleSide;grp.add(new THREE.Mesh(g2,im2));
+      P.forEach((v,i)=>grp.add(lineOf(THREE,[[mm(v[0]),0,mm(v[1])],[mm(v[0]),mm(ws[i]),mm(v[1])],[mm(ax),mm(AH),mm(ay)]],'#7A6F5C',.6)));}
+    else{const me=extrudePoly(THREE,inner.poly,0,T.inH3||1800,im);me.castShadow=false;grp.add(me);
+    grp.add(lineOf(THREE,inner.poly.concat([inner.poly[0]]).map(v=>[mm(v[0]),mm(T.inH3||1800),mm(v[1])]),'#7A6F5C',.7));}}
   return grp;}
 function tarp3(THREE){
   const grp=new THREE.Group(),t=TARPS[tarp.id],loc=tarpLocal(tarp.id),X=tarpXf(),f=v=>applyT(X,v);
