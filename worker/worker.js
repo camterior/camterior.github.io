@@ -2,9 +2,10 @@
 // - Gemini 키: Secret GEMINI_API_KEY
 // - 초대 코드: Secret INVITE_CODE (여러 개면 쉼표로: abc,def)
 // - 하루 횟수 세기: KV 바인딩 RL (없으면 제한 없이 동작)
-// - 장비 추가요청 게시판: 같은 KV(RL)의 'reqs' 키에 저장. 관리용 Secret ADMIN_KEY
+// - 게시판: 같은 KV(RL)에 사이트별로 저장 (캠테리어 'reqs'·'notices', CARO 'caro:reqs'·'caro:notices'). 관리용 Secret ADMIN_KEY
 const MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 앞에서부터 시도
-const ALLOWED_ORIGINS = ["https://camterior.github.io"];
+const ALLOWED_ORIGINS = ["https://camterior.github.io", "https://caro-camp.github.io"];
+const BOARD_ONLY = ["https://caro-camp.github.io"]; // CARO는 게시판만 쓰고 AI는 못 씀
 const LIMIT_FREE = 10, LIMIT_CODE = 50; // 하루 횟수 (한국 시간 기준)
 const MAX_INPUT_CHARS = 8000;
 const MAX_SYSTEM_CHARS = 20000;
@@ -28,37 +29,41 @@ function codeOk(env, code) {
   return env.INVITE_CODE.split(",").map(s => s.trim()).filter(Boolean).includes(String(code).trim());
 }
 
-// 게시판: 공지사항(관리자만) · 장비 요청 · 개발 요청
+// 게시판: 공지사항(관리자만) · 요청 2종 (캠테리어: 장비·개발 / CARO: 캠핑장·개발)
+const SITES = { camterior: { pre: "", kinds: ["gear", "dev"] }, caro: { pre: "caro:", kinds: ["camp", "dev"] } };
 const ST = ["new", "ok", "sun", "done", "no"]; // 확인 중 · 확인됨 · 일요일 반영 예정 · 반영됨 · 어려움
 const clip = (v, n) => String(v || "").replace(/[<>\u0000-\u0009\u000b-\u001f]/g, " ").trim().slice(0, n);
 const norm = s => s.toLowerCase().replace(/[\s·\-_,./()]+/g, "");
 const today = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
 async function board(b, env, request, origin) {
   if (!env.RL) return json({ error: "board-off" }, 503, origin);
-  const list = JSON.parse((await env.RL.get("reqs")) || "[]");
-  const notices = JSON.parse((await env.RL.get("notices")) || "[]");
-  const pub = () => list.filter(r => r.st !== "hide").map(({ id, kind, name, link, note, reply, n, st, at }) => ({ id, kind: kind || "gear", name, link, note, reply, n, st, at }));
+  // 사이트 구분: CARO 페이지에서 오면 항상 caro. 캠테리어 페이지에서는 관리실(관리 키)만 caro를 고를 수 있음
+  const site = BOARD_ONLY.includes(origin) ? "caro" : (b.site === "caro" && (b.op === "list" || b.key)) ? "caro" : "camterior", S = SITES[site];
+  const K_REQ = S.pre + "reqs", K_NT = S.pre + "notices";
+  const list = JSON.parse((await env.RL.get(K_REQ)) || "[]");
+  const notices = JSON.parse((await env.RL.get(K_NT)) || "[]");
+  const pub = () => list.filter(r => r.st !== "hide").map(({ id, kind, name, link, note, reply, n, st, at }) => ({ id, kind: kind || S.kinds[0], name, link, note, reply, n, st, at }));
   const pubN = () => notices.slice().sort((a, b) => (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || (b.at > a.at ? 1 : -1));
   if (b.op === "list") return json({ items: pub(), notices: pubN() }, 200, origin);
   if (b.op === "add" || b.op === "plus") {
     const ip = request.headers.get("CF-Connecting-IP") || "0";
-    const rk = `b:${today()}:${ip}`, used = parseInt(await env.RL.get(rk)) || 0;
+    const rk = `b:${site}:${today()}:${ip}`, used = parseInt(await env.RL.get(rk)) || 0;
     if (used >= 10) return json({ error: "quota" }, 429, origin);
     let r;
     if (b.op === "plus") r = list.find(x => x.id === b.id);
     else {
-      const kind = b.kind === "dev" ? "dev" : "gear", name = clip(b.name, 40);
+      const kind = S.kinds.includes(b.kind) ? b.kind : S.kinds[0], name = clip(b.name, 40);
       if (name.length < 2) return json({ error: "empty" }, 400, origin);
-      r = list.find(x => (x.kind || "gear") === kind && norm(x.name) === norm(name) && x.st !== "hide");
+      r = list.find(x => (x.kind || S.kinds[0]) === kind && norm(x.name) === norm(name) && x.st !== "hide");
       if (!r) {
         if (list.length >= 800) return json({ error: "full" }, 507, origin);
-        r = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), kind, name, link: /^https?:\/\//.test(b.link || "") ? clip(b.link, 300) : "", note: clip(b.note, 300), n: 0, st: "new", at: today(), from: b.from === "ai" ? "ai" : "form" };
+        r = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), kind, name, link: /^https?:\/\//.test(b.link || "") ? clip(b.link, 300) : "", note: clip(b.note, 300), n: 0, st: "new", at: today(), from: ["ai", "search"].includes(b.from) ? b.from : "form" };
         list.unshift(r);
       }
     }
     if (!r) return json({ error: "none" }, 404, origin);
     r.n = (r.n || 0) + 1;
-    await env.RL.put("reqs", JSON.stringify(list));
+    await env.RL.put(K_REQ, JSON.stringify(list));
     await env.RL.put(rk, String(used + 1), { expirationTtl: 172800 });
     return json({ ok: true, id: r.id, items: pub() }, 200, origin);
   }
@@ -69,7 +74,7 @@ async function board(b, env, request, origin) {
     if (r) {
       if (ST.includes(b.st) || b.st === "hide") r.st = b.st;
       if (typeof b.reply === "string") r.reply = clip(b.reply, 200);
-      await env.RL.put("reqs", JSON.stringify(list));
+      await env.RL.put(K_REQ, JSON.stringify(list));
     }
     return json({ ok: true, items: list, notices: pubN() }, 200, origin);
   }
@@ -83,7 +88,7 @@ async function board(b, env, request, origin) {
     } else if (b.act === "pin") {
       const n = notices.find(n => n.id === b.id); if (n) n.pin = !n.pin;
     }
-    await env.RL.put("notices", JSON.stringify(notices.slice(0, 100)));
+    await env.RL.put(K_NT, JSON.stringify(notices.slice(0, 100)));
     return json({ ok: true, items: list, notices: pubN() }, 200, origin);
   }
   return json({ error: "op" }, 400, origin);
@@ -95,12 +100,13 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { headers: cors(origin) });
     if (request.method !== "POST") return json({ error: "method" }, 405, origin);
     if (!ALLOWED_ORIGINS.includes(origin)) return json({ error: "origin" }, 403, origin);
-    if (!env.GEMINI_API_KEY) return json({ error: "key" }, 500, origin);
 
     let body;
     try { body = await request.json(); } catch { return json({ error: "bad" }, 400, origin); }
 
     if (body.board) return board(body.board, env, request, origin);
+    if (BOARD_ONLY.includes(origin)) return json({ error: "origin" }, 403, origin); // CARO에서 AI 호출 막기
+    if (!env.GEMINI_API_KEY) return json({ error: "key" }, 500, origin);
 
     // 하루 횟수
     const vip = codeOk(env, body.code);
