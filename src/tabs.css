@@ -218,4 +218,10 @@
   .fold>summary .fold-sub{font-size:11.5px;color:var(--ink-3);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}
   .fold-h{margin:10px 4px 4px;font-size:12px;font-weight:700;color:var(--ink-3)}
   .fold-h:first-child{margin-top:2px}
+  .gpv .gart{display:block;width:100%;height:100%;object-fit:contain;position:absolute;inset:0}
+  .gpv .gart-ai{position:absolute;right:10px;bottom:8px;font-size:10.5px;color:var(--ink-3);background:rgba(255,255,255,.7);border-radius:6px;padding:1px 6px}
+  .fold>summary b{white-space:nowrap;flex:none}
+  @media (max-width:520px){.fold>summary .fold-sub{display:none}}
+  .gcard .gpv:has(.gart){padding:0;background:#EFE8DD}
+  .gpv .bt,.gpv .cf{position:relative;z-index:1}
 </style>

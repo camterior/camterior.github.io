@@ -71,8 +71,9 @@ AI_CARD = '''<div class="aiset" id="aiset" aria-labelledby="aiTitle">
   <div class="ai-head"><span class="ai-badge">✨ AI</span><div><h3 id="aiTitle">내 장비 적으면 자동 배치</h3></div></div>
   <label class="sr-only" for="aiIn">가진 장비</label>
   <textarea id="aiIn" rows="3" maxlength="600" placeholder="예: 랜드록, IGT 롱에 플랫버너, 원액션테이블 롱, FD체어 4개"></textarea>
-  <div class="ai-row"><button class="btn primary" id="aiGo" type="button" onclick="aiRun()">✨ AI로 세팅하기</button><span class="ai-st" id="aiSt" role="status" aria-live="polite"></span>
+  <div class="ai-row"><button class="btn primary" id="aiGo" type="button" onclick="aiRun()">✨ AI로 세팅하기</button><button class="btn ghost" id="aiNew" type="button" onclick="aiNew()" hidden>새로 시작</button><span class="ai-st" id="aiSt" role="status" aria-live="polite"></span>
     <p class="ai-priv">Google Gemini로 보내져요 · 개인정보는 적지 마세요</p></div>
+  <div class="ai-log" id="aiLog" hidden aria-live="polite"></div>
   <div class="ai-out" id="aiOut" hidden></div>
 </div>'''
 _pm = '<div class="presets" id="presets" hidden></div>'
@@ -132,7 +133,7 @@ assert 'data:image/webp;base64' not in page
 out = HERE / 'site'
 if out.exists(): shutil.rmtree(out)
 (out / 'img').mkdir(parents=True); (out / 'assets').mkdir()
-for f in (HERE / 'img').iterdir(): shutil.copy(f, out / 'img' / f.name)
+for f in (HERE / 'img').iterdir(): (shutil.copytree(f, out / 'img' / f.name, dirs_exist_ok=True) if f.is_dir() else shutil.copy(f, out / 'img' / f.name))
 for f in (HERE / 'assets').iterdir(): shutil.copy(f, out / 'assets' / f.name)
 for f in ('manifest.webmanifest', 'sw.js', 'README.md', '404.html', 'robots.txt'):
     if (HERE / f).exists(): shutil.copy(HERE / f, out / f)
@@ -144,7 +145,10 @@ def datauri(p, mime):
     return f'data:{mime};base64,' + base64.b64encode(p.read_bytes()).decode()
 art = page
 for f in sorted((HERE / 'img').iterdir(), key=lambda p: -len(p.name)):
+    if f.is_dir(): continue
     art = art.replace(f'img/{f.name}', datauri(f, 'image/webp'))
+# Claude 페이지판은 장비 그림 파일을 못 불러서 도형 그림 그대로
+art = art.replace('const GEAR_ART=new Set(', 'const GEAR_ART=new Set([]);const _GEAR_ART_SITE=(', 1)
 art = art.replace('url(assets/pretendard.woff2)', 'url(' + datauri(HERE / 'assets/pretendard.woff2', 'font/woff2') + ')')
 art = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\n?', '', art)
 art = re.sub(r'<link rel="(icon|manifest)"[^>]*>\n?', '', art)

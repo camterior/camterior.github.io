@@ -92,6 +92,10 @@ function gearCard(id){const g=GEAR[id];
 const GBRANDS=['스노우피크','헬리녹스','커밋','토요토미','파세코','신일','엑스페드','스패로우','도메틱','알루텍','코베아'];
 function gearBrand(g){const n=g.name||'';return GBRANDS.find(b=>n.startsWith(b))||'스노우피크';}
 let GEAR_F='all';const G_OPEN=new Set();
+/* 장비 카드 그림: 힉스필드로 만든 제품 사진풍 그림이 있으면 도형 대신 보여줌 (텐트·타프는 도면 그대로) */
+const GEAR_ART=new Set(["reg3", "long4", "sep2", "sep3", "sep4", "mf_reg", "mf_long", "open_L", "open_R", "corner_L", "corner_R", "slide_h", "slide_hl", "h020", "wood_s", "wood_w", "steel1", "lid_half", "box_half", "mesh_d1", "mesh_s1", "mesh_hd", "mesh_hs", "flat", "seppou", "CK-230", "CK-220", "legs", "sc25", "sc50", "mytable", "mytable_s", "fshelf", "fshelf_l", "fshelf_m", "sp_oat", "sp_oat_l", "sp_oat_low", "sp_chabu", "sp_kitchen", "hx_t1", "hx_t1l", "hx_t0lt", "hx_cafe", "kermit_t", "noga_table", "alu48", "alu68", "alu93", "sp_jikaro", "megamat", "megamat_duo", "sparrow50", "cot_one", "sp_low30", "sp_lowshort", "sp_fd", "sp_take", "hx_one", "hx_zero", "hx_sunset", "kermit", "noga_chair", "omni230", "camp5000", "sfh1200", "sfh300", "mk_stove", "toyotomi_lcl53", "sfh_bh900", "sp_gs1000", "cfx3_35", "cfx3_45", "cfx3_55"]);
+function gArt(it){if(!GEAR_ART.has(it.id))return it.html;
+  return it.html.replace(/<svg[\s\S]*?<\/svg>/,`<img class="gart" src="img/gear/${it.id}.webp" alt="" loading="lazy"><span class="gart-ai">AI 그림</span>`);}
 function renderGear(){const nav=document.getElementById('gearNav'),body=document.getElementById('gearBody');if(!body)return;
   const q=(document.getElementById('gearQ').value||'').trim().toLowerCase();
   const secs=GSEC.map(s=>({...s,list:s.items().filter(it=>!q||it.q.toLowerCase().includes(q))}));
@@ -106,11 +110,10 @@ function renderGear(){const nav=document.getElementById('gearNav'),body=document
     html+=`<section class="gsec" id="g-${s.k}"><div class="ghead"><img src="${s.img}" alt="" loading="lazy"><div class="gtt"><h2>${s.t}</h2><span>${s.list.length}</span></div></div>
       ${[...groups].map(([b,items])=>{const key=s.k+'|'+b,open=q||solo||G_OPEN.has(key);
         return `<details class="gbrand" data-k="${esc(key)}"${open?' open':''}><summary><b>${esc(b)}</b><span>${items.length}</span></summary>
-        <div class="ggrid">${items.map(it=>`<article class="gcard">${it.html}</article>`).join('')}</div></details>`;}).join('')}</section>`;});
+        <div class="ggrid">${items.map(it=>`<article class="gcard">${gArt(it)}</article>`).join('')}</div></details>`;}).join('')}</section>`;});
   body.innerHTML=html||`<div class="gempty">‘${esc(q)}’에 맞는 장비가 없어요.</div>`;
   if(!q)body.querySelectorAll('details.gbrand').forEach(d=>d.addEventListener('toggle',()=>{d.open?G_OPEN.add(d.dataset.k):G_OPEN.delete(d.dataset.k);}));
-  const st=document.getElementById('gearStats');
-  if(st&&!st.dataset.done){st.dataset.done=1;st.innerHTML=GSEC.map(s=>`<span><b>${s.items().length}</b>${s.t}</span>`).join('');}}
+}
 function gearUse(kind,id){go('plan');afterPaint(()=>{
   if(kind==='tent'){pickTent(id);showTab('tent');fitView();render();}
   else if(kind==='tarp'){pickTarp(id);showTab('tarp');fitView();render();}

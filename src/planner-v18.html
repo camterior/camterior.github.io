@@ -180,6 +180,7 @@
   .emptyMsg{padding:18px 10px;text-align:center;color:var(--ink-2);font-size:13px}
 
   .inrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;margin-top:8px}
+  .inbtns{display:flex;flex-wrap:wrap;gap:6px}
   .rotin{margin-top:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:40px}
   .rotin[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
   .inrow label{display:flex;align-items:center;gap:6px;color:var(--ink-2)}
@@ -1880,8 +1881,9 @@ function customInnerPoly(w0,d0){const T=TENTS[tent.id];let w=(w0||tent.custom.w)
   for(let x1=b[1][0]-120;x1-d>=b[0][0];x1-=50){const r=[[x1-d,cy-w/2],[x1,cy-w/2],[x1,cy+w/2],[x1-d,cy+w/2]];if(r.every(v=>pointInPoly(v,T.outer)))return r;}
   const cx=(b[0][0]+b[1][0])/2;return [[cx-d/2,cy-w/2],[cx+d/2,cy-w/2],[cx+d/2,cy+w/2],[cx-d/2,cy+w/2]];}
 function tentInner(){const T=TENTS[tent.id];if(!T.outer||!tent.inner)return null;
-  if(tent.inner==='custom')return {label:'이너',model:'',size:`${tent.custom.w}×${tent.custom.d}`,poly:customInnerPoly(),custom:true};
-  if(typeof tent.inner==='string'&&tent.inner.startsWith('p:')){const P=INNER_PRESETS[tent.inner.slice(2)];if(P)return {label:P.name,model:P.model,size:`${P.w}×${P.d}`,poly:customInnerPoly(P.w,P.d),custom:true};}
+  const mv=pl=>{const o=tent.innerOff;return o&&(o[0]||o[1])?pl.map(v=>[v[0]+o[0],v[1]+o[1]]):pl;};
+  if(tent.inner==='custom')return {label:'이너',model:'',size:`${tent.custom.w}×${tent.custom.d}`,poly:mv(customInnerPoly()),custom:true};
+  if(typeof tent.inner==='string'&&tent.inner.startsWith('p:')){const P=INNER_PRESETS[tent.inner.slice(2)];if(P)return {label:P.name,model:P.model,size:`${P.w}×${P.d}`,poly:mv(customInnerPoly(P.w,P.d)),custom:true};}
   return T.inners[tent.inner]||null;}
 function doorZones(){const T=TENTS[tent.id];if(!T.outer)return [];
   return T.doors.filter(d=>d.zone).map(d=>{const A=d.a,B=d.b,L=dist(A,B);let n=[-(B[1]-A[1])/L,(B[0]-A[0])/L];
@@ -2106,7 +2108,8 @@ function tentLayer(){
   doorZones().forEach(z=>{o+=`<polygon points="${pts(z.poly)}" fill="${z.blocked?'rgba(185,134,42,.18)':'rgba(185,134,42,.07)'}" stroke="${COL.ochre}" stroke-opacity="${z.blocked?.9:.35}" stroke-width="${k}" stroke-dasharray="${3*k} ${3*k}"/>`;});
   // inner room
   if(inner){const ib=bbox(inner.poly),c=[(ib[0][0]+ib[1][0])/2,(ib[0][1]+ib[1][1])/2];
-    o+=`<polygon points="${pts(inner.poly)}" fill="url(#hatch)" stroke="${COL.ink}" stroke-opacity=".75" stroke-width="${1.2*k}" stroke-dasharray="${6*k} ${4*k}"/>`;
+    const mov=inner.custom&&!tent.innerLock;
+    o+=`<polygon id="innerP" points="${pts(inner.poly)}" fill="url(#hatch)" stroke="${mov?COL.ai:COL.ink}" stroke-opacity=".75" stroke-width="${(mov?2:1.2)*k}" stroke-dasharray="${6*k} ${4*k}"${mov?` class="ctl" style="cursor:move" onpointerdown="innerDown(event)"`:''}>${mov?'<title>끌어서 이너를 옮겨요</title>':''}</polygon>`;
     o+=`<text x="${c[0]}" y="${c[1]+60}" text-anchor="middle" font-family="Gowun Batang,serif" font-size="${Math.min(200,(ib[1][0]-ib[0][0])/3.2)}" fill="rgba(31,36,33,.22)">${inner.custom?'이너':(inner.label.replace('이너룸 ','')==inner.label?'이너룸':inner.label)}</text>`;
     if((ib[1][0]-ib[0][0])*SCALE>230)o+=`<text x="${c[0]}" y="${c[1]+60+26*k}" text-anchor="middle" font-size="${11.5*k}" fill="${COL.ink2}">${inner.size} cm${inner.posEst?' (위치 추정)':''}</text>`;}
   // doors
@@ -2483,6 +2486,15 @@ function pickTent(id){if(tent.id===id){if(typeof renderLineup==='function')rende
   if(tarp.id)placeTarpDefault();renderTentList();renderTentOpts();fitView();render();}
 function setInner(v){tent.inner=v;renderTentOpts();render();}
 function rotInner(){tent.innerRot=tent.innerRot?0:90;renderTentOpts();render();}
+function lockInner(){tent.innerLock=!tent.innerLock;renderTentOpts();render();}
+function resetInner(){tent.innerOff=null;renderTentOpts();render();}
+// 따로 쓰는 이너(쉘이너·지오에어·고동·직접 입력)는 끌어서 옮기기. 고정하면 안 움직임
+function innerDown(e){if(e.button!==undefined&&e.button!==0)return;if(tent.innerLock)return;e.stopPropagation();
+  const sx=e.clientX,sy=e.clientY,P=document.getElementById('innerP'),base=P.getAttribute('points');let moved=false;const seq=gestSeq;
+  const onMove=ev=>{if(seq!==gestSeq)return;const dx=ev.clientX-sx,dy=ev.clientY-sy;if(!moved&&Math.hypot(dx,dy)<5)return;moved=true;P.setAttribute('transform',`translate(${(dx/SCALE).toFixed(1)} ${(dy/SCALE).toFixed(1)})`);};
+  const onUp=ev=>{window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);if(seq!==gestSeq)return;
+    if(moved){const o=tent.innerOff||[0,0];tent.innerOff=[Math.round(o[0]+(ev.clientX-sx)/SCALE),Math.round(o[1]+(ev.clientY-sy)/SCALE)];justDragged=true;setTimeout(()=>justDragged=false,80);renderTentOpts();render();}};
+  window.addEventListener('pointermove',onMove);window.addEventListener('pointerup',onUp);}
 function setCustom(k,v){const n=Math.max(60,Math.min(600,Math.round(+v||0)));tent.custom[k]=n;renderTentOpts();render();}
 function setCanopy(v){tent.canopy=v;fitView();render();}
 function setCanopy2(v){tent.canopy2=v;fitView();render();}
@@ -2493,7 +2505,7 @@ function renderTentOpts(){const T=TENTS[tent.id];
   h+=`<button aria-pressed="${tent.inner==='custom'}" onclick="setInner('custom')">직접 입력</button><button aria-pressed="${!tent.inner}" onclick="setInner(null)">없음</button></div>`;
   h+=`<div class="opt" style="margin-top:6px"><span>이너텐트 넣기</span><div class="seg">${Object.entries(INNER_PRESETS).map(([k,P])=>`<button aria-pressed="${tent.inner==='p:'+k}" onclick="setInner('p:${k}')" title="${P.w}×${P.d}cm">${P.name.replace(/^(스노우피크|디얼스|캠빌) /,'')}</button>`).join('')}</div></div>`;
   if(tent.inner&&tent.inner.startsWith&&tent.inner.startsWith('p:')){const P=INNER_PRESETS[tent.inner.slice(2)];if(P)h+=`<p class="muted" style="margin-top:4px">${P.name} ${P.w}×${P.d}cm · ${P.note}. 뒤쪽 벽에 붙여 놓아요.</p>`;}
-  if(tent.inner==='custom'||(tent.inner&&tent.inner.startsWith&&tent.inner.startsWith('p:')))h+=`<button type="button" class="rotin" onclick="rotInner()" aria-pressed="${!!tent.innerRot}">↻ 이너 90° 돌리기${tent.innerRot?' (돌림)':''}</button>`;
+  if(tent.inner==='custom'||(tent.inner&&tent.inner.startsWith&&tent.inner.startsWith('p:')))h+=`<div class="inbtns"><button type="button" class="rotin" onclick="rotInner()" aria-pressed="${!!tent.innerRot}">↻ 90° 돌리기</button><button type="button" class="rotin" onclick="lockInner()" aria-pressed="${!!tent.innerLock}">${tent.innerLock?'🔒 고정됨':'✥ 끌어서 이동 중'}</button>${tent.innerOff?`<button type="button" class="rotin" onclick="resetInner()">처음 자리로</button>`:''}</div><p class="muted" style="margin-top:4px">${tent.innerLock?'이너가 고정됐어요. 옮기려면 고정을 풀어요.':'도면에서 이너(파란 점선)를 끌어 옮기고, 다 되면 고정을 눌러요.'}</p>`;
   if(tent.inner==='custom')h+=`<div class="inrow"><label>폭 <input type="number" min="60" max="600" step="5" value="${tent.custom.w}" onchange="setCustom('w',this.value)" aria-label="이너 폭 cm"> cm</label>
     <label>깊이 <input type="number" min="60" max="600" step="5" value="${tent.custom.d}" onchange="setCustom('d',this.value)" aria-label="이너 깊이 cm"> cm</label></div>
     <p class="muted" style="margin-top:4px">뒤쪽 벽에 붙여서 놓아요. 폭은 텐트 가로 방향이에요.</p>`;
@@ -2865,7 +2877,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 let DB=null,UID=null,DL=null,mineInDb=false,galleryOn=false,galleryWrite=false,MINE=[],GALLERY=[],GDOCS={},CURRENT_CODE='',undoCode=null;
 
 function planObj(){return {v:1,
-  tent:{id:tent.id,inner:tent.inner,ir:tent.innerRot?90:0,canopy:!!tent.canopy,canopy2:!!tent.canopy2,custom:{w:tent.custom.w,d:tent.custom.d}},
+  tent:{id:tent.id,inner:tent.inner,ir:tent.innerRot?90:0,io:tent.innerOff||null,il:tent.innerLock?1:0,canopy:!!tent.canopy,canopy2:!!tent.canopy2,custom:{w:tent.custom.w,d:tent.custom.d}},
   tarp:tarp.id?{id:tarp.id,x:Math.round(tarp.x),y:Math.round(tarp.y),r:Math.round(tarp.rot)}:null,
   pieces:state.pieces.map(p=>{const o={u:p.uid,t:p.type};
     if(p.parent!=null){o.p=p.parent;o.pe=p.pEdge;o.me=p.mEdge;if(p.slide)o.s=Math.round(p.slide);}
@@ -2877,7 +2889,7 @@ function parsePlan(o){
   if(!o||o.v!==1||!Array.isArray(o.pieces))throw new Error('배치 형식을 읽을 수 없어요');
   const tid=o.tent&&TENTS[o.tent.id]?o.tent.id:'landlock',T=TENTS[tid],ti=o.tent||{};
   const inner=(ti.inner==='custom'&&T.outer)||(typeof ti.inner==='string'&&ti.inner.startsWith('p:')&&INNER_PRESETS[ti.inner.slice(2)]&&T.outer)||ti.inner===null||(ti.inner&&T.inners[ti.inner])?ti.inner:T.innerDefault;
-  const nt={id:tid,inner,innerRot:ti.ir===90?90:0,canopy:!!ti.canopy&&!!T.canopy,canopy2:!!ti.canopy2&&!!T.canopy2,custom:{w:num(ti.custom&&ti.custom.w,60,600,200),d:num(ti.custom&&ti.custom.d,60,600,210)}};
+  const nt={id:tid,inner,innerRot:ti.ir===90?90:0,innerOff:Array.isArray(ti.io)&&ti.io.length===2?[num(ti.io[0],-2e4,2e4,0),num(ti.io[1],-2e4,2e4,0)]:null,innerLock:!!ti.il,canopy:!!ti.canopy&&!!T.canopy,canopy2:!!ti.canopy2&&!!T.canopy2,custom:{w:num(ti.custom&&ti.custom.w,60,600,200),d:num(ti.custom&&ti.custom.d,60,600,210)}};
   const nTarp=o.tarp&&TARPS[o.tarp.id]?{id:o.tarp.id,x:num(o.tarp.x,-1e5,1e5,0),y:num(o.tarp.y,-1e5,1e5,0),rot:num(o.tarp.r,0,359,0)}:{id:null,x:0,y:0,rot:0};
   let list=[],seen=new Set();
   o.pieces.slice(0,200).forEach(q=>{if(!q||!CATALOG[q.t]||!Number.isInteger(q.u)||q.u<1||seen.has(q.u))return;seen.add(q.u);
