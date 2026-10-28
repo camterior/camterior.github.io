@@ -3892,7 +3892,7 @@ const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유�
   mytable_s:['스텐 마이테이블','스탠 마이테이블','스텐마이테이블','스탠마이테이블','스테인리스 마이테이블'],
   flat:['플랫버너'],sp_jikaro:['지카로','지카로테이블','지카로 테이블','ST-050'],sp_gs1000:['강염버너','강염스토브','GS-1000','스노우피크 강염'],seppou:['설봉','그릴버너'],steel1:['원유닛 트레이','1유닛 트레이','스텐트레이','스텐 트레이','스탠트레이'],lid_half:['리드트레이'],box_half:['스텐박스'],
   wood_s:['우드테이블 S','우드 S'],wood_w:['우드테이블 W','우드 W'],mesh_d1:['메쉬트레이 딥'],mesh_s1:['메쉬트레이'],mf_long:['멀티펑션 롱','멀티펑션롱'],open_L:['오픈멀티펑션 L'],open_R:['오픈멀티펑션 R'],corner_L:['코너테이블 L'],corner_R:['코너테이블 R'],
-  sp_fd:['FD체어','에프디체어'],hx_one:['체어원'],omni230:['옴니','옴니230'],camp5000:['파세코 팬히터','캠프5000','파세코'],mk_stove:['MK스토브','화목난로','장작난로'],toyotomi_lcl53:['토요토미 팬히터','LC-L53'],sfh_bh900:['신일 900','신일 팬히터 900'],sfh1200:['신일 1200','신일 팬히터 1200'],cfx3_35:['도메틱 35','CFX3 35'],cfx3_45:['도메틱 45','CFX3 45'],cfx3_55:['도메틱 55','CFX3 55'],
+  sp_fd:['FD체어','에프디체어'],hx_one:['체어원','헬리녹스 체어원','헬리녹스체어원'],hx_zero:['체어제로','헬리녹스 체어제로'],omni230:['옴니','옴니230'],camp5000:['파세코 팬히터','캠프5000','파세코'],mk_stove:['MK스토브','화목난로','장작난로'],toyotomi_lcl53:['토요토미 팬히터','LC-L53'],sfh_bh900:['신일 900','신일 팬히터 900'],sfh1200:['신일 1200','신일 팬히터 1200'],cfx3_35:['도메틱 35','CFX3 35'],cfx3_45:['도메틱 45','CFX3 45'],cfx3_55:['도메틱 55','CFX3 55'],
   megamat_duo:['메가매트 듀오'],megamat:['메가매트'],cot_one:['코트원'],sp_oat_low:['원액션 로우'],sp_oat:['원액션테이블'],
   merak_pro:['메락'],landlock:['랜드락'],living_shell_long_pro:['리빙쉘 롱 프로','리빙쉘롱'],living_shell:['리빙쉘']};
 const aiTentName=id=>{const T=TENTS[id];return ((T.brand?T.brand+' ':'')+T.name).trim();};
@@ -3927,6 +3927,7 @@ function aiSystem(text=''){
 JSON만 출력: {"tent":"텐트 id 또는 null","items":[{"type":"장비 id","count":1,"zone":"wall|center|inner|left|right|top|bottom","attach":[{"type":"결합 id","shape":"T|line"}],"slots":[{"id":"칸 파츠 id","count":1}],"leg":660,"at":"(체어만) 앉을 테이블·IGT id"}],"unknown":["목록에 없는 장비"],"tip":"배치 팁 한두 문장(한국어, 존댓말)"}
 규칙:
 - 사용자 글에 없는 장비는 절대 추가하지 마. 띄어쓰기·오타가 있어도 (=별칭)을 보고 맞춰 (예: 스탠마이테이블=mytable_s).
+- '테이블','의자','버너'처럼 브랜드·모델 없는 일반 이름은 아무 제품으로 바꾸지 말고 unknown에.
 - 수량이 없으면 1. 같은 id는 count로 합쳐. 목록에 없으면 unknown에 원래 이름 그대로.
 - zone: 사용자가 말한 위치를 따름. 가운데/중앙=center, 벽쪽=wall, 오른쪽(끝)=right, 왼쪽=left, 위쪽/뒤쪽=top, 아래쪽/앞쪽=bottom, 이너룸/침실=inner. 말이 없으면 매트·코트=inner, IGT·선반·박스=wall, 체어·테이블·난로=center.
 - [결합] 목록의 멀티펑션·코너·오픈멀티펑션은 혼자 두지 말고 IGT 프레임 항목의 attach에 넣어. IGT 앞(긴 변)에 붙여 앞으로 내면 shape "T"(T자/앞에 붙여), 일자로 길게 이으면(IGT 끝에 연결) "line". 말이 없으면 "line". IGT를 말하지 않았으면 reg3을 하나 만들어 붙여.
@@ -3997,9 +3998,9 @@ function aiClean(o){const ids=new Set(aiIds()),exts=new Set(AI_EXTS),out={tent:n
     if(!ids.has(it.type))return;
     const x={type:it.type,count:Math.min(AI_MAX_EACH,Math.max(1,Math.round(+it.count||1))),zone:AI_ZONES.includes(it.zone)?it.zone:null};
     if(CATALOG[it.type].gtype==='chair'&&typeof it.at==='string'&&(ids.has(it.at)||AI_ROOTS.includes(it.at)))x.at=it.at;
-    if(AI_ROOTS.includes(it.type)){x.attach=(Array.isArray(it.attach)?it.attach:[]).filter(a=>a&&exts.has(a.type)).slice(0,6).map(a=>({type:a.type,shape:a.shape==='T'?'T':'line'}));
+    if(AI_ROOTS.includes(it.type)){x.attach=(Array.isArray(it.attach)?it.attach:[]).filter(a=>a&&exts.has(a.type)).flatMap(a=>Array(Math.min(4,Math.max(1,Math.round(+a.count||1)))).fill({type:a.type,shape:a.shape==='T'?'T':'line'})).slice(0,6);
       if([300,400,660,830].includes(+it.leg))x.leg=+it.leg;
-      x.slots=(Array.isArray(it.slots)?it.slots:[]).filter(a=>a&&AI_SLOTS.includes(a.id)).slice(0,8).map(a=>({id:a.id,count:Math.min(8,Math.max(1,Math.round(+a.count||1)))}));}
+      x.slots=(Array.isArray(it.slots)?it.slots:[]).map(a=>a&&({...a,id:a.id||a.type})).filter(a=>a&&AI_SLOTS.includes(a.id)).slice(0,8).map(a=>({id:a.id,count:Math.min(8,Math.max(1,Math.round(+a.count||1)))}));}
     const same=items.find(y=>y.type===x.type&&!x.attach?.length&&!y.attach?.length&&y.zone===x.zone&&y.at===x.at);
     if(same)same.count=Math.min(AI_MAX_EACH,same.count+x.count);else items.push(x);});
   if(loose.length||looseS.length){let f=items.find(i=>AI_ROOTS.includes(i.type));if(!f){f={type:'reg3',count:1,zone:null,attach:[],slots:[]};items.unshift(f);}
