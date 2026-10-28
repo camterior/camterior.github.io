@@ -181,7 +181,13 @@
   /* 장비 제원: 브랜드별 접기 */
   .gsec{margin-bottom:28px}
   .ghead{align-items:center}
-  .ghead img{width:44px;height:44px;border-radius:12px;object-fit:cover}
+  .ghead{position:relative;display:block;height:132px;border-radius:20px;overflow:hidden;margin:0 0 14px}
+  .ghead img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .ghead::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,12,9,.72),rgba(8,12,9,.15) 70%)}
+  .ghead .gtt{position:absolute;left:20px;bottom:16px;z-index:1;display:flex;align-items:baseline;gap:10px}
+  .ghead .gtt h2{color:#fff}
+  .ghead .gtt span{color:rgba(255,255,255,.75)}
+  @media (min-width:900px){.ghead{height:168px}}
   .gbrand{border:1px solid var(--line);border-radius:18px;background:var(--surface);margin-bottom:8px}
   .gbrand>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;font-size:16px;min-height:52px;box-sizing:border-box}
   .gbrand>summary::-webkit-details-marker{display:none}

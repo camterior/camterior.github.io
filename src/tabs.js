@@ -46,19 +46,19 @@ const GSEC=[
       <dl><dt>크기 (가로×세로×높이)</dt><dd>${T.size[0]}×${T.size[1]}×${T.size[2]}cm</dd><dt>바닥 면적</dt><dd>${tentArea(T).toFixed(1)}㎡</dd>
       <dt>정원</dt><dd>${T.cap}</dd><dt>무게</dt><dd>${T.weight}</dd>${inn?`<dt>${inn.label}</dt><dd>${inn.size||'도면 표기'}</dd>`:''}<dt>도어</dt><dd>${T.doors.length}곳</dd></dl>
       <div class="ga"><button type="button" onclick="gearUse('tent','${id}')">이 텐트로 배치</button>${tentLink(T)?`<a href="${tentLink(T)}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};})},
-  {k:'tarp',t:'타프',img:'img/tarp.webp',d:'펙과 스트링까지 포함한 설영 면적으로 필요한 사이트 크기를 계산해요.',
+  {k:'tarp',t:'타프',img:'img/g-tarp.webp',d:'펙과 스트링까지 포함한 설영 면적으로 필요한 사이트 크기를 계산해요.',
    items:()=>TARP_ORDER.map(id=>{const t=TARPS[id];return {id,b:'스노우피크',q:`${t.name} ${t.model} 타프`,html:`<div class="gpv"><span class="bt">스노우피크</span><span class="cf">판매처</span>${tarpThumb(id)}</div>
       <div class="gb"><div><h3>${t.name}</h3><span class="md">${t.model}</span></div>
       <dl><dt>원단 크기</dt><dd>${fmt(t.L)}×${fmt(t.W)}mm</dd><dt>설영 면적</dt><dd>${(t.F[0]/1000).toFixed(1)}×${(t.F[1]/1000).toFixed(1)}m</dd><dt>폴</dt><dd>${t.poles.map(p=>fmt(p)).join(' / ')}mm</dd><dt>무게</dt><dd>${t.weight}</dd>${t.cap?`<dt>정원</dt><dd>${t.cap}</dd>`:''}</dl>
       ${t.note?`<p class="nt">${t.note}</p>`:''}
       <div class="ga"><button type="button" onclick="gearUse('tarp','${id}')">이 타프로 배치</button>${t.src?`<a href="${SRC+t.src}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};})},
-  {k:'igt',t:'IGT 프레임·테이블',img:'img/igt.webp',d:'0.5유닛(124mm) 단위로 이어 붙는 아이언 그릴 테이블 시스템. 프레임과 확장 테이블의 실제 윤곽이에요.',
+  {k:'igt',t:'IGT 프레임·테이블',img:'img/g-igt.webp',d:'0.5유닛(124mm) 단위로 이어 붙는 아이언 그릴 테이블 시스템. 프레임과 확장 테이블의 실제 윤곽이에요.',
    items:()=>Object.keys(CATALOG).filter(k=>CATALOG[k].kind!=='gear').map(id=>{const c=CATALOG[id],b=bbox(c.verts),w=Math.round(b[1][0]-b[0][0]),d=Math.round(b[1][1]-b[0][1]);
      return {id,b:c.group,q:`${c.name} ${c.model} ${c.group} igt`,html:`<div class="gpv"><span class="bt">${c.group}</span>${confBadge(c.conf)}${catPreview(id)}</div>
       <div class="gb"><div><h3>${c.name}</h3><span class="md">${c.model}</span></div>
       <dl><dt>외곽</dt><dd>${fmt(w)}×${fmt(d)}mm</dd><dt>규격 표기</dt><dd>${c.spec}</dd>${c.units?`<dt>유닛</dt><dd>${c.units}유닛 · 칸 ${c.units*2}개</dd>`:''}</dl>
       <div class="ga"><button type="button" onclick="gearUse('item','${id}')">배치에 놓기</button></div></div>`};})},
-  {k:'parts',t:'IGT 파츠',img:'img/flatlay.webp',d:'프레임 칸에 끼우는 상판·수납·화기와 행잉랙, 다리 높이. 배치 화면에서 IGT를 고른 뒤 ‘파츠·붙이기’로 넣어요.',
+  {k:'parts',t:'IGT 파츠',img:'img/g-parts.webp',d:'프레임 칸에 끼우는 상판·수납·화기와 행잉랙, 다리 높이. 배치 화면에서 IGT를 고른 뒤 ‘파츠·붙이기’로 넣어요.',
    items:()=>SLOT_ITEMS.map(p=>({id:p.id,b:p.grp,q:`${p.name} ${p.model} ${p.grp} 파츠`,html:`<div class="gpv"><span class="bt">${p.grp}</span>${confBadge(p.conf)}${partSvg(p.w,p.d,PARTS_COL[p.draw]||'#B9BDC1',p.deep)}</div>
       <div class="gb"><div><h3>${p.name}</h3><span class="md">${p.model}</span></div>
       <dl><dt>크기</dt><dd>${p.w}×${p.d}mm</dd><dt>차지하는 칸</dt><dd>${p.halves===1?'하프 1칸':`${p.halves/2}유닛 (${p.halves}칸)`}</dd></dl>
@@ -70,15 +70,15 @@ const GSEC=[
       <div class="gb"><div><h3>IGT 다리</h3><span class="md">${Object.values(LEGS).map(l=>l.model).join(' · ')}</span></div>
       <dl>${Object.entries(LEGS).map(([h,l])=>`<dt>${l.name}</dt><dd>${h}mm</dd>`).join('')}</dl>
       <p class="nt">입체 보기에서 다리 높이에 맞춰 테이블 높이가 바뀌어요.</p></div>`}])},
-  {k:'gear',t:'수납·테이블·선반',img:'img/top.webp',d:'쉘프컨테이너, 마이테이블, 폴딩쉘프, 그리고 스노우피크·헬리녹스·커밋 테이블. 바닥 크기와 상판 높이까지 실제 값이에요. 의자 좌면 높이와 맞춰 고르세요.',
+  {k:'gear',t:'수납·테이블·선반',img:'img/g-table.webp',d:'쉘프컨테이너, 마이테이블, 폴딩쉘프, 그리고 스노우피크·헬리녹스·커밋 테이블. 바닥 크기와 상판 높이까지 실제 값이에요. 의자 좌면 높이와 맞춰 고르세요.',
    items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat&&!GEAR[id].sleep&&GEAR[id].gtype!=='chair'&&GEAR[id].gtype!=='fridge'&&GEAR[id].gtype!=='burner').map(id=>gearCard(id))},
   {k:'sleep',t:'매트·야전침대',img:'img/g-sleep.webp',d:'자충매트와 야전침대. 이너룸 안에 놓아도 경고가 뜨지 않아요. 매트 폭으로 이너룸에 몇 명이 누울 수 있는지 확인해보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].sleep).map(id=>gearCard(id))},
   {k:'chair',t:'체어',img:'img/g-chair.webp',d:'스노우피크·헬리녹스·커밋체어. 펼친 크기와 좌면 높이를 실제 값으로 넣었어요. 좌면이 낮은 로우체어는 낮은 테이블과 맞춰보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='chair').map(id=>gearCard(id))},
-  {k:'heat',t:'난방',img:'img/heat.webp',d:'팬히터·가스난로·화목난로의 크기예요.',
+  {k:'heat',t:'난방',img:'img/g-heat.webp',d:'팬히터·가스난로·화목난로의 크기예요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].heat).map(id=>gearCard(id))},
-  {k:'fire',t:'버너',img:'img/heat.webp',d:'바닥에 세우는 버너예요. IGT에 끼우는 플랫버너·설봉원은 IGT 파츠에 있어요.',
+  {k:'fire',t:'버너',img:'img/g-fire.webp',d:'바닥에 세우는 버너예요. IGT에 끼우는 플랫버너·설봉원은 IGT 파츠에 있어요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='burner').map(id=>gearCard(id))},
   {k:'cool',t:'냉장고',img:'img/g-cool.webp',d:'캠핑용 컴프레서 냉장고. 바닥 크기와 높이를 실제 값으로 넣었어요. 테이블 아래 공간에 들어가는지 확인해보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='fridge').map(id=>gearCard(id))},
@@ -101,7 +101,7 @@ function renderGear(){const nav=document.getElementById('gearNav'),body=document
   secs.forEach(s=>{if(GEAR_F!=='all'&&GEAR_F!==s.k)return;if(!s.list.length)return;
     const groups=new Map();s.list.forEach(it=>{const b=it.b||'기타';if(!groups.has(b))groups.set(b,[]);groups.get(b).push(it);});
     const solo=GEAR_F===s.k&&groups.size===1;
-    html+=`<section class="gsec" id="g-${s.k}"><div class="ghead"><img src="${s.img}" alt="" loading="lazy"><h2>${s.t}</h2><span>${s.list.length}</span></div>
+    html+=`<section class="gsec" id="g-${s.k}"><div class="ghead"><img src="${s.img}" alt="" loading="lazy"><div class="gtt"><h2>${s.t}</h2><span>${s.list.length}</span></div></div>
       ${[...groups].map(([b,items])=>{const key=s.k+'|'+b,open=q||solo||G_OPEN.has(key);
         return `<details class="gbrand" data-k="${esc(key)}"${open?' open':''}><summary><b>${esc(b)}</b><span>${items.length}</span></summary>
         <div class="ggrid">${items.map(it=>`<article class="gcard">${it.html}</article>`).join('')}</div></details>`;}).join('')}</section>`;});
