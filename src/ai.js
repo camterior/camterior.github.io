@@ -297,7 +297,11 @@ async function aiRun(){
   if(r.ok){res=aiClean(r.ok);
     // AI가 글에 없는 칸 파츠를 지어내면 빼기 (이름 맞추기로 찾은 파츠만 남김)
     {const said=AI_CHAT.said+' '+text,ok=new Set(aiLocal(said).items.flatMap(x=>(x.slots||[]).map(q=>q.id)));
-     res.items.forEach(it=>{if(it.slots)it.slots=it.slots.filter(q=>ok.has(q.id));});}
+     res.items.forEach(it=>{if(it.slots)it.slots=it.slots.filter(q=>ok.has(q.id));});
+     // 글에 있는데 AI가 빠뜨린 칸 파츠는 다시 넣기
+     const root=res.items.find(i=>AI_ROOTS.includes(i.type));
+     if(root){const have=new Set((root.slots||[]).map(q=>q.id)),add=aiLocal(said).items.flatMap(x=>x.slots||[]).filter(q=>!have.has(q.id));
+       if(add.length){root.slots=(root.slots||[]).concat(add);res.added=add.map(q=>aiSlotName(q.id));}}}
     // AI가 모른다고 한 이름도 별칭으로 한 번 더 찾아보기
     res.unknown=res.unknown.filter(u=>{const l=aiLocal(u);if(l.inner&&!l.items.length){res.inner=res.inner||l.inner;return false;}if(!l.items.length)return true;
       l.items.forEach(x=>{if(x.slots&&x.slots.length||x.attach&&x.attach.length){let f=res.items.find(i=>AI_ROOTS.includes(i.type));if(f){f.slots=(f.slots||[]).concat(x.slots||[]);f.attach=(f.attach||[]).concat(x.attach||[]);return;}}
@@ -309,7 +313,7 @@ async function aiRun(){
   if(typeof camEv==='function'){camEv(fix?'ai-fix':via==='ai'?'ai-run':'ai-local',fix?'AI 고치기':via==='ai'?'AI 세팅':'AI 대신 이름 맞추기');
     res.unknown.slice(0,5).forEach(u=>{const n=String(u).replace(/[\n\r/]/g,' ').trim().slice(0,30);if(n)camEv('ai-unknown/'+encodeURIComponent(n),n);});}
   const miss=aiApply(res);AI_CHAT.last=res;AI_CHAT.said=(AI_CHAT.said+' '+text).slice(-1200);
-  AI_CHAT.log.push({who:'ai',t:res.tip||(fix?'고쳤어요.':'세팅했어요.')});aiChatUI();
+  AI_CHAT.log.push({who:'ai',t:(res.tip||(fix?'고쳤어요.':'세팅했어요.'))+(res.added&&res.added.length?` (${res.added.join(', ')}은 목록에 있어서 IGT 칸에 넣었어요.)`:'')});aiChatUI();
   st.textContent=via==='ai'?'세팅했어요. 끌어서 다듬어 보세요':'기본 자동 배치로 세팅했어요';
   const nm=id=>aiEsc(CATALOG[id].name),ZN={center:'가운데',wall:'벽쪽',inner:'이너룸',left:'왼쪽',right:'오른쪽',top:'위쪽',bottom:'아래쪽'};
   let h='';
