@@ -127,7 +127,7 @@ function aiBuild(it){
     (it.attach||[]).forEach(a=>{const ac=CATALOG[a.type],tray=ac.kind==='tray';
       const longs=c.edges.filter(e=>e.long),shorts=c.edges.filter(e=>!e.long);
       // 빈 긴 변을 먼저: 트레이는 다른 결합이 없는 변, 멀티펑션은 아무것도 없는 변
-      const busy=e=>edgeKids(root,e.name).filter(k=>tray?CATALOG[k.type].kind!=='tray':true).length;
+      const busy=e=>{const ks=edgeKids(root,e.name);return tray?-ks.filter(k=>CATALOG[k.type].kind!=='tray').length*10+ks.length:ks.length;};
       const tries=(a.shape==='T'?longs:tray?longs:shorts.concat(longs)).slice().sort((x,y)=>busy(x)-busy(y));
       for(const pe of tries){if(!canTake(root,pe,a.type))continue;
         const ok=ac.edges.filter(ce2=>mateKind(pe.types,ce2.types));if(!ok.length)continue;
@@ -139,17 +139,24 @@ function aiBuild(it){
       over.push(a.type);});
     computeAll();
     const coreN=set.length;set.coreN=coreN;set.left=[];
-    if(it.seats&&it.seats.length){const b=bbox(set.flatMap(p=>p._v)),W=b[1][0]-b[0][0],D=b[1][1]-b[0][1],horiz=W>=D,L=horiz?W:D;
-      const cwMax=Math.max(...it.seats.map(t=>CATALOG[t].w)),k=Math.max(1,Math.floor((L+40)/(cwMax+40)));let sides=['+','-'];
-      if(c.kind==='frame'){const fb=bbox(root._v),plus=horiz?b[1][1]-fb[1][1]:b[1][0]-fb[1][0],minus=horiz?fb[0][1]-b[0][1]:fb[0][0]-b[0][0];sides=[plus>=minus?'+':'-'];}
-      const spots=[];for(let i=0;i<k;i++)sides.forEach(sd=>spots.push({sd,i}));if(c.kind!=='frame')spots.push({sd:'e+'},{sd:'e-'});
-      const mid=[(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2],lo=horiz?b[0][0]:b[0][1],IN=60;
-      it.seats.forEach((t,j)=>{const sp=spots[j];if(!sp){set.left.push(t);return;}const ch=CATALOG[t],cd=ch.d,cc=centroid(ch.verts);let pos,n;
-        if(sp.sd==='+'||sp.sd==='-'){const a=lo+L*(sp.i+.5)/k,pp=sp.sd==='+'?(horiz?b[1][1]:b[1][0])+cd/2-IN:(horiz?b[0][1]:b[0][0])-cd/2+IN;
-          pos=horiz?[a,pp]:[pp,a];n=sp.sd==='+'?(horiz?[0,1]:[1,0]):(horiz?[0,-1]:[-1,0]);}
-        else{const e=sp.sd==='e+'?(horiz?b[1][0]:b[1][1])+cd/2-IN:(horiz?b[0][0]:b[0][1])-cd/2+IN;pos=horiz?[e,mid[1]]:[mid[0],e];n=sp.sd==='e+'?(horiz?[1,0]:[0,1]):(horiz?[-1,0]:[0,-1]);}
-        const rot=n[1]===1?180:n[1]===-1?0:n[0]===1?90:270;
-        set.push(newPiece(t,{ox:pos[0]-cc[0],oy:pos[1]-cc[1],rot,z:0}));});
+    if(it.seats&&it.seats.length){
+      // 앉을 상판: 테이블 자체, IGT면 붙은 멀티펑션·코너·오픈멀티(없으면 IGT 앞, 버너가 있으니 10cm 띄움)
+      const ext=set.filter(p=>p!==root&&CATALOG[p.type].kind==='ext'),fr=c.kind==='frame',host=fr&&ext.length?ext:fr?set.filter(p=>p===root||CATALOG[p.type].kind==='tray'):[root];
+      const b=bbox(host.flatMap(p=>p._v)),W=b[1][0]-b[0][0],D=b[1][1]-b[0][1],horiz=W>=D,L=horiz?W:D;
+      const bar=fr&&!ext.length,IN=bar?-100:60,cwMax=Math.max(...it.seats.map(t=>CATALOG[t].w)),k=bar?Math.min(it.seats.length,3):Math.max(1,Math.floor((L+40)/(cwMax+40)));
+      let sides=['+','-'];if(fr&&!ext.length){const ib=bbox(set.flatMap(p=>p._v)),fb=bbox(root._v),plus=horiz?ib[1][1]-fb[1][1]:ib[1][0]-fb[1][0],minus=horiz?fb[0][1]-ib[0][1]:fb[0][0]-ib[0][0];sides=[plus>=minus?'+':'-'];}
+      const spots=[];for(let i=0;i<k;i++)sides.forEach(sd=>spots.push({sd,i}));if(!(fr&&!ext.length))spots.push({sd:'e+'},{sd:'e-'});
+      const mid=[(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2],lo=horiz?b[0][0]:b[0][1],others=set.filter(p=>!host.includes(p)),taken=[];
+      let si=0;it.seats.forEach(t=>{const ch=CATALOG[t],cd=ch.d,cc=centroid(ch.verts);let ok=null;
+        while(!ok&&si<spots.length){const sp=spots[si++];let pos,n;
+          if(sp.sd==='+'||sp.sd==='-'){const a=bar?(horiz?mid[0]:mid[1])+(sp.i-(k-1)/2)*(cwMax+60):lo+L*(sp.i+.5)/k,pp=sp.sd==='+'?(horiz?b[1][1]:b[1][0])+cd/2-IN:(horiz?b[0][1]:b[0][0])-cd/2+IN;
+            pos=horiz?[a,pp]:[pp,a];n=sp.sd==='+'?(horiz?[0,1]:[1,0]):(horiz?[0,-1]:[-1,0]);}
+          else{const e=sp.sd==='e+'?(horiz?b[1][0]:b[1][1])+cd/2-IN:(horiz?b[0][0]:b[0][1])-cd/2+IN;pos=horiz?[e,mid[1]]:[mid[0],e];n=sp.sd==='e+'?(horiz?[1,0]:[0,1]):(horiz?[-1,0]:[0,-1]);}
+          const ex=n[0]?cd:ch.w,ey=n[0]?ch.w:cd,box=[[pos[0]-ex/2,pos[1]-ey/2],[pos[0]+ex/2,pos[1]-ey/2],[pos[0]+ex/2,pos[1]+ey/2],[pos[0]-ex/2,pos[1]+ey/2]];
+          if(others.some(o=>satPen(box,o._v)>3)||taken.some(q=>satPen(box,q)>3))continue;
+          taken.push(box);ok={pos,rot:n[1]===1?180:n[1]===-1?0:n[0]===1?90:270};}
+        if(!ok){set.left.push(t);return;}
+        set.push(newPiece(t,{ox:ok.pos[0]-cc[0],oy:ok.pos[1]-cc[1],rot:ok.rot,z:0}));});
       computeAll();}}
   finally{state.pieces=keep;}
   return {pieces:set,polys:set.map(p=>p._v.map(v=>v.slice())),heat:!!c.heat,over,coreN:set.coreN,left:set.left,seated:set.length>set.coreN};}
