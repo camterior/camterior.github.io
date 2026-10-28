@@ -168,7 +168,8 @@ function aiBuild(it){
       for(let k=0;k<root.slots.length;k++)if(freeRun(root.slots,k)>=t.halves){i=k;break;}
       if(i<0){over.push(sl.id);continue;}for(let k=0;k<t.halves;k++)root.slots[i+k]={id:sl.id,head:k===0};}});
   try{const clash=q=>{computeAll();return set.some(o=>o!==q&&o.uid!==q.parent&&satPen(o._v,q._v)>3);};
-    (it.attach||[]).forEach(a=>{const ac=CATALOG[a.type],tray=ac.kind==='tray';
+    // T자 테이블을 먼저 붙여야 끝자리를 슬라이드가 먼저 차지하지 않아요
+    (it.attach||[]).slice().sort((x,y)=>(y.shape==='T')-(x.shape==='T')).forEach(a=>{const ac=CATALOG[a.type],tray=ac.kind==='tray';
       const longs=c.edges.filter(e=>e.long),shorts=c.edges.filter(e=>!e.long);
       // 빈 긴 변을 먼저: 트레이는 다른 결합이 없는 변, 멀티펑션은 아무것도 없는 변
       const busy=e=>{const ks=edgeKids(root,e.name);return tray?-ks.filter(k=>CATALOG[k.type].kind!=='tray').length*10+ks.length:ks.length;};
@@ -193,12 +194,15 @@ function aiBuild(it){
       const mid=[(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2],lo=horiz?b[0][0]:b[0][1],others=set.filter(p=>!host.includes(p)),taken=[];
       let si=0;it.seats.forEach(t=>{const ch=CATALOG[t],cd=ch.d,cc=centroid(ch.verts);let ok=null;
         while(!ok&&si<spots.length){const sp=spots[si++];let pos,n;
-          if(sp.sd==='+'||sp.sd==='-'){const a=bar?(horiz?mid[0]:mid[1])+(sp.i-(k-1)/2)*(cwMax+60):lo+L*(sp.i+.5)/k,pp=sp.sd==='+'?(horiz?b[1][1]:b[1][0])+cd/2-IN:(horiz?b[0][1]:b[0][0])-cd/2+IN;
+          // 옆자리는 IGT 등에 걸리면 상판 길이 방향으로 조금씩 밀어서 다시 찾아요 (T자 테이블 옆에 의자가 모이게)
+          const side=sp.sd==='+'||sp.sd==='-',shifts=side?[0,...[60,120,180,240,300,360,420,480,540,600].flatMap(v=>[v,-v])]:[0,60,120,180];
+          for(const sh of shifts){
+          if(sp.sd==='+'||sp.sd==='-'){const a=(bar?(horiz?mid[0]:mid[1])+(sp.i-(k-1)/2)*(cwMax+60):lo+L*(sp.i+.5)/k)+sh,pp=sp.sd==='+'?(horiz?b[1][1]:b[1][0])+cd/2-IN:(horiz?b[0][1]:b[0][0])-cd/2+IN;
             pos=horiz?[a,pp]:[pp,a];n=sp.sd==='+'?(horiz?[0,1]:[1,0]):(horiz?[0,-1]:[-1,0]);}
-          else{const e=sp.sd==='e+'?(horiz?b[1][0]:b[1][1])+cd/2-IN:(horiz?b[0][0]:b[0][1])-cd/2+IN;pos=horiz?[e,mid[1]]:[mid[0],e];n=sp.sd==='e+'?(horiz?[1,0]:[0,1]):(horiz?[-1,0]:[0,-1]);}
+          else{const e=sp.sd==='e+'?(horiz?b[1][0]:b[1][1])+cd/2-IN+sh:(horiz?b[0][0]:b[0][1])-cd/2+IN-sh;pos=horiz?[e,mid[1]]:[mid[0],e];n=sp.sd==='e+'?(horiz?[1,0]:[0,1]):(horiz?[-1,0]:[0,-1]);}
           const ex=n[0]?cd:ch.w,ey=n[0]?ch.w:cd,box=[[pos[0]-ex/2,pos[1]-ey/2],[pos[0]+ex/2,pos[1]-ey/2],[pos[0]+ex/2,pos[1]+ey/2],[pos[0]-ex/2,pos[1]+ey/2]];
           if(others.some(o=>satPen(box,o._v)>3)||taken.some(q=>satPen(box,q)>3))continue;
-          taken.push(box);ok={pos,rot:n[1]===1?180:n[1]===-1?0:n[0]===1?90:270};}
+          taken.push(box);ok={pos,rot:n[1]===1?180:n[1]===-1?0:n[0]===1?90:270};break;}}
         if(!ok){set.left.push(t);return;}
         set.push(newPiece(t,{ox:ok.pos[0]-cc[0],oy:ok.pos[1]-cc[1],rot:ok.rot,z:0}));});
       computeAll();}}
@@ -239,7 +243,7 @@ function aiPlace(list){
       if(it.zone!=='inner'&&PS.some(pl=>doors.some(d=>satPen(pl,d)>3)))continue;
       if(PS.some(pl=>polyGap(pl,R.wall)<gapW))continue;
       if(strict&&lane&&it.zone!=='inner'&&PS.some(pl=>satPen(pl,lane)>3))continue;
-      const need=q=>Math.max(heat||q.heat?(strict?700:300):0,strict&&!(it.zone==='wall'&&q.zone==='wall')?WALK:60);
+      const need=q=>Math.max(heat||q.heat?(strict?700:300):0,it.near&&q.seated?60:strict&&!(it.zone==='wall'&&q.zone==='wall')?WALK:60);
       if(placed.some(q=>{const g=need(q);return PS.some(pl=>q.polys.some(qp=>satPen(pl,qp)>3||polyGap(pl,qp)<g));}))continue;
       const b=bbox(V),ce=[(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2];let s;
       if(it.zone==='wall')s=CV.reduce((a,v)=>a+aiEdgeDist(v,R.wall),0)/CV.length;
@@ -251,6 +255,8 @@ function aiPlace(list){
       else{s=dist(ce,R.center)+(heat&&placed.length?-Math.min(...placed.map(q=>dist(ce,centroid(q.polys.flat()))),1500)*.3:0);
         // 식탁 세트는 주방(IGT) 가까이: 사이 통로 약 80cm
         if(it.seated&&kitchen().length){const g=Math.min(...kitchen().map(q=>Math.min(...PS.map(pl=>Math.min(...q.polys.map(qp=>polyGap(pl,qp)))))));s=s*.4+Math.abs(g-800)*1.2;}}
+      // 테이블에 다 못 앉은 의자는 식탁 세트 바로 옆으로
+      if(it.near){const sg=placed.filter(q=>q.seated);if(sg.length)s=Math.min(...sg.map(q=>Math.min(...PS.map(pl=>Math.min(...q.polys.map(qp=>polyGap(pl,qp)))))))*3+dist(ce,sg[0].c)*.3;}
       // 팬히터는 바람 나오는 앞면이 거실(가운데·식탁) 쪽을 보게
       if(CATALOG[it.type].gtype==='fan'){const th=rot*Math.PI/180,fx=-Math.sin(th),fy=Math.cos(th),tg=(placed.find(q=>q.seated)||{}).c||R.center,vx=tg[0]-ce[0],vy=tg[1]-ce[1],L=Math.hypot(vx,vy)||1;s+=(1-(fx*vx+fy*vy)/L)*600;}
       s+=rot%180?1:0; // 같은 점수면 돌리지 않은 쪽
@@ -279,7 +285,7 @@ function aiApply(res){
     let hi=0;chairs.forEach(u=>{while(hi<hosts.length-1&&hosts[hi].seats.length>=cap(hosts[hi]))hi++;hosts[hi].seats.push(u.type);});chairs.forEach(u=>units.splice(units.indexOf(u),1));
     hosts.forEach(h=>{if(!h.zone&&!AI_ROOTS.includes(h.type))h.zone='center';});}
   const list=[];units.forEach(it=>{const b=aiBuild(it);list.push({type:it.type,zone:it.zone||aiZone(it.type),...b});
-    (b.left||[]).forEach(t=>{const lb=aiBuild({type:t});list.push({type:t,zone:'center',...lb});});});
+    (b.left||[]).forEach(t=>{const lb=aiBuild({type:t});list.push({type:t,zone:'center',near:true,...lb});});});
   const {out,miss}=aiPlace(list);aiApply.over=list.flatMap(x=>x.over||[]);
   state.pieces=[];sel=null;
   out.forEach(({it,rot,P})=>{const root=it.pieces[0],c=centroid(CATALOG[root.type].verts),map={};
