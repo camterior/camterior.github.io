@@ -39,6 +39,7 @@
 .bd-foot{color:var(--ink-3);font-size:13px;margin:12px 4px 0}
 .nt-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .nt-list li{border:1px solid var(--line);border-radius:14px;background:#fff}
+.nt-list li.rq-empty,.rq-list li.rq-empty{border:0;background:none;padding:6px 2px;color:var(--ink-2)}
 .nt-list li.pin{border-color:#F2C7A8;background:#FFF9F4}
 .nt-list summary{display:flex;align-items:baseline;gap:8px;padding:14px 16px;cursor:pointer;list-style:none}
 .nt-list summary::-webkit-details-marker{display:none}
