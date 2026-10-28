@@ -994,7 +994,8 @@ const T2={
   rear(L,W,er,label,zone){const a=(W-er)/2;return {a:[L,a+er*0.1],b:[L,a+er*0.9],label:label||'뒤쪽 출입',zone:!!zone};},
   side(x0,x1,y,label,zone){return {a:[x0,y],b:[x1,y],label:label||'측면 도어',zone:zone!==false};},
   PROF:{tunnel:[[1,1,0],[.97,.9,.5],[.88,.55,.86],[.74,.16,1]],dome:[[1,1,0],[.97,.97,.38],[.8,.8,.76],[.4,.4,1]],
-        cabin:[[1,1,0],[.99,.99,.55],[.95,.95,.85],[.84,.8,1]],shelter:[[1,1,0],[.96,.9,.48],[.84,.58,.86],[.62,.18,1]]},
+        cabin:[[1,1,0],[.99,.99,.55],[.95,.95,.85],[.84,.8,1]],shelter:[[1,1,0],[.96,.9,.48],[.84,.58,.86],[.62,.18,1]],
+        tipi:[[1,1,0],[.96,.96,.16],[.5,.5,.6],[.03,.03,1]],ridge:[[1,1,0],[1,.92,.35],[1,.08,1]]},
   add(id,o){const H=o.size[2]*10;TENTS[id]=Object.assign({frames:[],inners:{},innerDefault:null,windows:[],h3d:H,inH3:Math.max(1200,H-250),
     color:'#8F806C',prof:T2.PROF.tunnel},o);if(o.inners&&Object.keys(o.inners).length&&o.innerDefault===undefined)TENTS[id].innerDefault=Object.keys(o.inners)[0];
     if(!o.living){const b=bbox(TENTS[id].outer);TENTS[id].living=[Math.round(b[0][0]+(b[1][0]-b[0][0])*.32),Math.round((b[0][1]+b[1][1])/2)];}T2.ids.push(id);},
@@ -1579,6 +1580,238 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
    doors:[T2.front(W,2800,'전면 도어'),...sideD(L,W,1300,2500)],color:'#5F6366'});}
 }
 
+/*FLAM_TENTS*/
+/* ===== 스노우피크 (추가 11종) ===== */
+/* 랜드베이스6 Pro.: 메인코너 2(240cm 폴)·서브코너 4(180cm 폴)의 육각 쉘터. 800(꼭짓점-꼭짓점)×700(변-변). 앞(x=0)=큰 도어 패널 쪽 */
+{const o=[[0,1980],[3500,0],[7000,1980],[7000,6020],[3500,8000],[0,6020]];
+ T2.add('sp_landbase6',{brand:'스노우피크',name:'랜드베이스6 Pro.',model:'TP-656',size:[700,800,240],weight:'15.4kg',cap:'5–6명 (제조사 표기)',
+  href:'https://www.snowpeak.com/products/65th-anniversary-land-base-6-pro-in-ivory',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기 23′×26.25′×7.9′(설명서 크기도 700·800·240cm)와 설명서의 메인코너 2·서브코너 4 구성으로 그린 육각 평면이에요. 큰 도어 패널을 앞, 작은 도어 패널을 뒤로 둔 건 추정이에요. 이너룸(215×135cm, 최대 5개)은 메인폴–서브폴 사이 벽에 붙이며 위치는 예시예요.',outer:o,
+  inners:{std:{label:'이너룸',model:'TP-656IR',size:'215×135',poly:[[4289,505],[6161,1563],[5496,2738],[3624,1680]],posEst:true}},
+  doors:[{a:[0,2400],b:[0,5600],label:'도어 패널(대)',zone:true},{a:[7000,3000],b:[7000,5000],label:'도어 패널(소)',zone:false}],
+  living:[3500,4300],color:'#B8AE98',prof:T2.PROF.shelter});}
+/* 그랑베르크 L / M: 앞·뒤 출입 패널, 메인폴 3(앞·가운데·뒤)+서브폴 6. 이너는 뒤쪽 */
+{const L=8600,W=5200,o=T2.tun(L,W,600,4400,600,4400);
+ T2.add('sp_grandberg_l',{brand:'스노우피크',name:'그랑베르크 L',model:'TP-782',size:[860,520,240],weight:'29.5kg',cap:'5–7명 (제조사 표기)',
+  href:'https://snowpeak.com/products/living-lodge-l',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기 28.2′×17.1′×7.9′(860×520×240cm)와 설명서 크기도 숫자(이너 약 440×250cm, 이너 높이 210cm, 이너매트 430×245cm)로 그렸어요. 앞뒤 끝이 좁아지는 정도와 이너 위치는 사진 비율 추정이에요.',outer:o,
+  inners:{std:{label:'이너룸',model:'',size:'약 440×250',poly:T2.rect(6050,400,8550,4800),posEst:true}},
+  doors:[T2.front(W,4400,'전면 출입 패널'),T2.rear(L,W,4400,'후면 출입 패널',false)],
+  living:[3000,2600],h3d:2400,inH3:2100,color:'#8A8270',prof:T2.PROF.tunnel});}
+{const L=6800,W=4400,o=T2.tun(L,W,500,3600,500,3600);
+ T2.add('sp_grandberg_m',{brand:'스노우피크',name:'그랑베르크 M',model:'TP-781',size:[680,440,240],weight:'24kg',cap:'3–5명 (제조사 표기)',
+  href:'https://uk.snowpeak.com/products/tp-781',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기 680×440×240cm와 설명서 크기도 숫자(이너 약 360×200cm, 이너매트 350×195cm)로 그렸어요. 앞뒤 끝 모양과 이너 위치는 사진 비율 추정이에요.',outer:o,
+  inners:{std:{label:'이너룸',model:'',size:'약 360×200',poly:T2.rect(4750,400,6750,4000),posEst:true}},
+  doors:[T2.front(W,3600,'전면 출입 패널'),T2.rear(L,W,3600,'후면 출입 패널',false)],
+  living:[2400,2200],h3d:2400,inH3:2100,color:'#8A8270',prof:T2.PROF.tunnel});}
+/* 제카: 이너룸은 좌우 어느 쪽에나 다는 방식 */
+{const L=8800,W=4200,o=T2.tun(L,W,1200,3400,600,3400);
+ T2.add('sp_zekka',{brand:'스노우피크',name:'제카',model:'TP-710',size:[880,420,230],weight:'30kg',cap:'6명 (제조사 표기)',
+  href:'https://snowpeak.co.uk/products/tp-710',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기 880×420×230cm(실내 높이 220cm)로 그렸어요. 이너룸(약 290×205cm, 높이 170cm)은 설명서대로 좌우 어느 쪽에나 달 수 있고 앞뒤 위치는 추정이에요. 앞뒤 끝 폭(340cm)은 설명서 크기도 숫자를 쓴 추정, 측면 도어 위치도 추정이에요.',outer:o,
+  inners:{std:{label:'이너룸 (오른쪽)',model:'TP-710IR',size:'약 290×205',poly:T2.rect(4800,2100,7700,4150),posEst:true},
+          left:{label:'이너룸 (왼쪽)',model:'TP-710IR',size:'약 290×205',poly:T2.rect(4800,50,7700,2100),posEst:true}},innerDefault:'std',
+  doors:[T2.front(W,3400,'전면 패널(출입)'),T2.rear(L,W,3400,'후면 패널(출입)',true),T2.side(2600,4200,0,'측면 도어 패널')],
+  living:[2700,2100],h3d:2300,inH3:2200,color:'#8C8677',prof:T2.PROF.tunnel});}
+/* 라운지쉘: 팔각 바닥 쉘터(화로 리빙용) */
+{const D=4000,o=T2.box(D,D,1172);
+ T2.add('sp_loungeshell',{brand:'스노우피크',name:'라운지쉘',model:'TP-500',size:[400,400,240],weight:'18kg (세트 총중량)',cap:'6명 (좌식 기준)',
+  href:'https://uk.snowpeak.com/collections/camp-sets/products/set-500',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 페이지의 높이 240cm·세트 18kg과 제조사 카탈로그 값(hinata 제품 DB: 400×400×240cm, 팔각 바닥)으로 그린 정팔각형이에요. 출입 패널 위치는 추정이에요.',outer:o,innerNote:NOFLOOR,
+  doors:[T2.front(D,1656,'출입 패널')],living:[2000,2000],color:'#C2B9A3',prof:T2.PROF.shelter});}
+/* 메쉬쉘터: 크로스 프레임 돔 + 바이저, 출입 4곳 */
+{const L=3900,W=4000,o=T2.box(L,W,300);
+ T2.add('sp_meshshelter',{brand:'스노우피크',name:'메쉬쉘터',model:'TP-925',size:[390,400,220],weight:'12.5kg',cap:'4명 (제조사 표기)',
+  href:'https://uk.snowpeak.com/products/mesh-shelter-1',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기 400×390×220cm(실내 215cm)와 출입 4곳으로 그렸어요. 네 면 출입은 설명서의 양쪽 도어 패널·사진 기준이고, 모서리 모양은 추정이에요. 단종 모델이에요.',outer:o,innerNote:NOFLOOR,
+  doors:[T2.front(W,W-600,'도어 패널'),T2.rear(L,W,W-600,'도어 패널',true),T2.side(600,3300,0,'측면 출입'),T2.side(600,3300,W,'측면 출입')],
+  living:[1950,2000],h3d:2200,inH3:2150,color:'#9E9A8C',prof:T2.PROF.dome});}
+/* 스피어헤드 Pro. L / M: 원폴 쉘터, 원형에 가까운 바닥(타원 12각 근사) */
+{const ell=(L,W)=>Array.from({length:12},(_,k)=>{const t=Math.PI+Math.PI/12+k*Math.PI/6,c=Math.cos(Math.PI/12);return [Math.round(L/2+L/2*Math.cos(t)/c),Math.round(W/2+W/2*Math.sin(t)/c)];});
+ const cone=[[1,1,0],[.72,.72,.35],[.38,.38,.7],[.03,.03,1]];
+ {const L=6000,W=6800,o=ell(L,W);
+  T2.add('sp_spearhead_l',{brand:'스노우피크',name:'스피어헤드 Pro. L',model:'TP-450',size:[600,680,280],weight:'16kg',cap:'8명 (제조사 표기)',
+   href:'https://uk.snowpeak.com/products/tp-450',srcName:'제조사 공식 페이지',drawn:true,
+   est:'제조사 표기 600×680×280cm와 "원형에 가까운 바닥" 설명으로 그린 타원(12각 근사)이에요. 기둥이 정가운데인지, 출입 위치는 사진 기준 추정이에요.',outer:o,innerNote:NOFLOOR,
+   doors:[{a:[0,2500],b:[0,4300],label:'출입 패널',zone:true}],pole:[3000,3400],poleLabel:'가운데 기둥',apex:[3000,3400],
+   living:[1800,3400],h3d:2800,inH3:2400,color:'#A79F8B',prof:cone});}
+ {const L=5000,W=5900,o=ell(L,W);
+  T2.add('sp_spearhead_m',{brand:'스노우피크',name:'스피어헤드 Pro. M',model:'TP-455',size:[500,590,260],weight:'13.5kg',cap:'6명',
+   href:'https://hinata.me/article/1108954315759327498',srcName:'캠핑 정보 사이트(hinata)',drawn:true,
+   est:'사용 크기 590×500×260cm(제조사 카탈로그 값, hinata 정리)로 L과 같은 비율의 타원(12각 근사)으로 그렸어요. 길이·폭 방향, 기둥·출입 위치는 L 기준 추정이에요.',outer:o,innerNote:NOFLOOR,
+   doors:[{a:[0,2150],b:[0,3750],label:'출입 패널',zone:true}],pole:[2500,2950],poleLabel:'가운데 기둥',apex:[2500,2950],
+   living:[1500,2950],h3d:2600,inH3:2200,color:'#A79F8B',prof:cone});}}
+/* 토우가(투가): 2룸 터널. 앞=출입 패널, 왼쪽(A폴 L쪽)=측면 도어, 뒤=이너룸 */
+{const L=5950,W=3800,o=T2.tun(L,W,1000,2600,400,3200);
+ T2.add('sp_tuga',{brand:'스노우피크',name:'토우가',model:'TP-690',size:[595,380,215],weight:'18.3kg',cap:'2–4명 (제조사 표기)',
+  href:'https://snowpeak.com/products/tuga',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기 19.5′×12.5′×7.1′(595×380cm)와 설명서 크기도·매트시트 세트 숫자(이너 약 220cm 깊이, 폭 340→305cm)로 그렸어요. 앞뒤 끝 모양은 추정이에요. 측면 도어는 설명서대로 A폴(L) 쪽이에요.',outer:o,
+  inners:{std:{label:'이너룸',model:'',size:'약 340(305)×220',poly:[[3700,200],[5900,375],[5900,3425],[3700,3600]],posEst:true}},
+  doors:[T2.front(W,2600,'출입 패널'),T2.side(1300,2900,0,'측면 도어 패널')],
+  living:[1900,1900],h3d:2150,inH3:2000,color:'#8A8573',prof:T2.PROF.tunnel});}
+/* 어메니티돔 L: 앞=전실(대형 D패널), 이너 295×295 */
+{const o=[[0,1050],[2100,0],[5050,0],[5400,350],[5400,2750],[5050,3100],[2100,3100],[0,2050]];
+ T2.add('sp_amenity_l',{brand:'스노우피크',name:'어메니티돔 L',model:'SDE-003',size:[540,310,165],weight:'9.8kg',cap:'6명 (어른 4·어린이 2)',
+  href:'https://www.snowpeak.com/products/amenity-dome-l',srcName:'제조사 공식 페이지',drawn:true,
+  est:'일본 카탈로그 값(전체 540×310×165cm, 이너 295×295cm)으로 그렸어요(미국 페이지는 15.7′×9.8′로 전실 길이가 짧게 표기). 전실 모양은 어메니티돔 M과 같은 비율 추정이에요.',outer:o,
+  inners:{std:{label:'이너',model:'',size:'295×295',poly:T2.rect(2350,75,5300,3025)}},
+  doors:[{a:[0,1200],b:[0,1900],label:'전실 출입',zone:true},{a:[5400,1150],b:[5400,1950],label:'후면 출입',zone:false}],
+  living:[1000,1550],h3d:1650,inH3:1500,color:'#C9C2B2',prof:T2.PROF.dome});}
+/* 후비(Fubi): 2룸 쉘터. 폭(좌우)이 더 길고, 이너룸은 좌우 어느 쪽에나 */
+{const L=4340,W=6610,o=T2.box(L,W,400);
+ T2.add('sp_fubi',{brand:'스노우피크',name:'후비',model:'TP-720',size:[434,661,229],weight:'25.2kg',cap:'2명 (이너 1개) · 4명 (이너 2개)',
+  href:'https://snowpeak.com/products/fubi',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기 14.25′×21.7′×7.5′(434×661×229cm, 실내 220cm)와 이너룸 12.5′×5.25′(381×160cm)로 그렸어요. 출입 3곳 중 앞 메인 도어만 넣었고 나머지 두 곳 위치·모서리 모양은 확인되지 않았어요. 이너는 좌우 어느 쪽에나 달고, 하나 더 사면 양쪽에 둘 수 있어요.',outer:o,
+  inners:{left:{label:'이너룸 (왼쪽)',model:'',size:'381×160',poly:T2.rect(265,100,4075,1700),posEst:true},
+          right:{label:'이너룸 (오른쪽)',model:'',size:'381×160',poly:T2.rect(265,4910,4075,6510),posEst:true}},innerDefault:'left',
+  doors:[T2.front(W,W-800,'메인 프런트 도어')],
+  living:[2000,3300],h3d:2290,inH3:2200,color:'#A39C8A',prof:T2.PROF.shelter});}
+
+/* ===== 노르디스크 (Nordisk): 제조사 공식 페이지(nordisk.eu) 플라이 치수. 테크니컬 코튼 싱글월 텐트는 이너가 없거나(별매 이너 캐빈 크기 비공개) 바닥 일체형 ===== */
+{const ND='https://nordisk.eu/products/',NDN='제조사 공식 페이지',NDC='#E3D9C3',
+  NDIN='싱글월 면 텐트라 기본 이너가 없어요. 별매 이너 캐빈은 크기가 공개되지 않았어요.',
+  // 벨·티피: 원형 바닥(면적 = 원 넓이)을 12각형으로 근사. 폭 W(좌우) 기준 12각형을 앞뒤 길이 L에 맞춰 눌러요.
+  bell=(L,W)=>T2.poly(12,W,W/2,W/2).map(([x,y])=>[Math.round(x*L/W),Math.round(y)]),
+  frontEdge=(o,label)=>{const [A,B]=T2.edge(o,'front');return {a:A,b:B,label,zone:true};};
+
+ /* --- 아스가르드 (벨텐트: 가운데 기둥 + A형 도어 기둥, 총 2개) --- */
+ const asg=(id,name,model,L,W,H,kg,cap,slug,est)=>{const o=bell(L,W);
+  T2.add(id,{brand:'노르디스크',name,model,size:[L/10,W/10,H],weight:kg,cap,href:ND+slug,srcName:NDN,drawn:true,
+   est,outer:o,innerNote:NDIN,doors:[frontEdge(o,'A형 출입문')],
+   pole:[Math.round(L/2),Math.round(W/2)],poleLabel:'가운데 기둥',apex:[Math.round(L/2),Math.round(W/2)],
+   living:[Math.round(L/2),Math.round(W/2)],color:NDC,prof:T2.PROF.tipi});};
+ asg('nd_asgard71','아스가르드 7.1','Asgard 7.1 m²',2650,3000,200,'15.5kg','3명 (제조사 표기)','asgard-71-m2-glamping-tent-3-person-natural',
+  '제조사 플라이 치수(길이 265×폭 300cm, 높이 200cm, 바닥 7.1㎡=지름 300cm 원)로 둥근 바닥을 12각형으로 그렸어요. A형 도어는 앞쪽, 창문은 바닥 높이 D형이에요. 벽 높이는 공개되지 않았어요.');
+ asg('nd_asgard126','아스가르드 12.6','Asgard 12.6 m²',3750,4000,250,'16kg','6명 (제조사 표기)','asgard-126-m2-glamping-tent-6-person-natural',
+  '제조사 플라이 치수(길이 375×폭 400cm, 높이 250cm, 바닥 12.6㎡=지름 400cm 원)로 둥근 바닥을 12각형으로 그렸어요. A형 도어는 앞쪽, 양옆에 바닥 높이 D형 창이 있어요. 벽 높이는 공개되지 않았어요.');
+ asg('nd_asgard196','아스가르드 19.6','Asgard 19.6 m²',4700,5000,300,'20kg','8–10명 (제조사 표기)','asgard-196-m2-glamping-tent-8-10-person-natural',
+  '제조사 플라이 치수(길이 470×폭 500cm, 높이 300cm, 바닥 19.6㎡=지름 500cm 원)로 둥근 바닥을 12각형으로 그렸어요. A형 도어는 앞쪽이에요. 벽 높이는 공개되지 않았어요.');
+
+ /* --- 알프하임 (티피: 가운데 기둥 1개 + 도어 V폴) --- */
+ const alf=(id,name,model,D,H,kg,cap,slug,est)=>{const o=bell(D,D);
+  T2.add(id,{brand:'노르디스크',name,model,size:[D/10,D/10,H],weight:kg,cap,href:slug.startsWith('http')?slug:ND+slug,srcName:NDN,drawn:true,
+   est,outer:o,innerNote:'바닥 없는 티피예요(지퍼식 그라운드시트·이너 캐빈은 별매, 크기 비공개).',doors:[frontEdge(o,'출입문')],
+   pole:[D/2,D/2],poleLabel:'가운데 기둥',apex:[D/2,D/2],living:[D/2,D/2],color:NDC,prof:T2.PROF.tipi});};
+ alf('nd_alfheim126','알프하임 12.6','Alfheim 12.6 m²',4000,275,'12.7kg','6명 (제조사 표기)','https://nordisk.eu/alfheim-126-m-glamping-tent/natural/p/232/1881',
+  '제조사 플라이 치수(400×400cm, 높이 275cm, 바닥 12.6㎡=지름 400cm 원)로 둥근 바닥을 12각형으로 그렸어요. 문은 앞쪽(V폴로 세우는 반개방 도어)이고 벽 높이는 공개되지 않았어요.');
+ alf('nd_alfheim196','알프하임 19.6','Alfheim 19.6 m²',5000,350,'19.7kg','8–10명 (제조사 표기)','alfheim-196-m2-glamping-tent-8-10-person-natural',
+  '제조사 플라이 치수(500×500cm, 높이 350cm, 바닥 19.6㎡=지름 500cm 원)로 둥근 바닥을 12각형으로 그렸어요. 문 위치는 12.6과 같은 앞쪽으로 봤고 벽 높이는 공개되지 않았어요.');
+
+ /* --- 우트가르드 13.2 (사각 캐빈형, 폴 9개, 앞·뒤 출입구) --- */
+ {const L=2950,W=4300,o=T2.rect(0,0,L,W);
+  T2.add('nd_utgard132',{brand:'노르디스크',name:'우트가르드 13.2',model:'Utgard 13.2 m²',size:[295,430,240],weight:'23.1kg',cap:'6명 (제조사 표기)',href:ND+'utgard-132-m2-glamping-tent-6-person-natural',srcName:NDN,drawn:true,
+   est:'제조사 플라이 치수(길이 295×폭 430cm, 높이 240cm, 사각형, 출입구 2개)로 그렸어요. 출입구를 앞·뒤 긴 벽 가운데로 둔 것과 문 폭은 사진으로 추정했어요. 양옆에는 바닥 높이 창이 있어요.',
+   outer:o,innerNote:NDIN,doors:[{a:[0,1550],b:[0,2750],label:'전면 출입구',zone:true},{a:[L,1550],b:[L,2750],label:'후면 출입구',zone:true}],
+   windows:[{a:[900,0],b:[2050,0],label:'바닥 높이 창'},{a:[900,W],b:[2050,W],label:'바닥 높이 창'}],
+   living:[L/2,W/2],color:NDC,prof:T2.PROF.cabin});}
+
+ /* --- 바나하임 (집 모양 대형, 폴 7개, 앞쪽 더블 출입구) --- */
+ const van=(id,name,model,L,W,kg,cap,slug,est)=>{const o=T2.rect(0,0,L,W);
+  T2.add(id,{brand:'노르디스크',name,model,size:[L/10,W/10,300],weight:kg,cap,href:ND+slug,srcName:NDN,drawn:true,
+   est,outer:o,innerNote:NDIN,doors:[{a:[0,W/2-800],b:[0,W/2+800],label:'더블 출입구',zone:true}],
+   pole:[L/2,W/2],poleLabel:'가운데 기둥 (빼고 쓸 수 있음)',living:[L/2,W/2],color:NDC,prof:T2.PROF.cabin});};
+ van('nd_vanaheim24','바나하임 24','Vanaheim 24 m²',4000,6000,'43.4kg','16명 (제조사 표기)','vanaheim-24-m2-glamping-tent-16-person-natural',
+  '제조사 플라이 치수(길이 400×폭 600cm, 높이 300cm)로 그렸어요. 양 끝벽에 큰 창, 앞 긴 벽 가운데에 더블 출입구가 있다고 보고 문 폭(160cm)은 사진으로 추정했어요.');
+ van('nd_vanaheim40','바나하임 40','Vanaheim 40 m²',4950,8000,'55.2kg','20명 (제조사 표기)','vanaheim-40-m2-glamping-tent-16-person-natural',
+  '제조사 플라이 치수(길이 495×폭 800cm, 높이 300cm)로 그렸어요. 출입구는 24와 같은 앞 긴 벽 가운데 더블 도어로 보고 문 폭(160cm)은 사진으로 추정했어요.');
+
+ /* --- 미드가르드 20 (육각, A프레임·터틀 허브, 기둥 없는 실내, 바닥 일체형) --- */
+ {const D=4920,o=T2.poly(6,D,D/2,2840);
+  T2.add('nd_midgard20',{brand:'노르디스크',name:'미드가르드 20',model:'Midgard 20 m²',size:[536,568,300],weight:'49.5kg',cap:'10명 (제조사 표기)',href:ND+'midgard-20-m2-glamping-tent-10-person-natural',srcName:NDN,drawn:true,
+   est:'제조사 높이 300cm·바닥 20㎡와 판매처(Bergzeit) 길이 536×폭 568cm로, 꼭짓점 사이 568cm인 정육각형(마주 보는 변 사이 492cm, 20.9㎡)으로 그렸어요. 536cm는 도어 처마를 포함한 값으로 봤어요. 출입 개구부 4곳 중 앞·뒤 두 곳만 표시했고 위치는 추정이에요.',
+   outer:o,innerNote:'바닥이 꿰매진 싱글월 텐트라 따로 넣는 이너가 없어요.',doors:[T2.door(o,'front','전면 도어',true),T2.door(o,'rear','후면 도어',true)],
+   living:[D/2,2840],color:NDC,prof:T2.PROF.dome});}
+
+ /* --- 이둔 5.5 (클래식 릿지 텐트, 양 끝 출입) --- */
+ {const L=2600,W=2100,o=T2.rect(0,0,L,W);
+  T2.add('nd_ydun55',{brand:'노르디스크',name:'이둔 5.5',model:'Ydun 5.5 m²',size:[260,210,150],weight:'13kg',cap:'4명 (제조사 표기)',href:'https://nordisk.eu/ydun-55-m-glamping-tent/natural/p/24/28',srcName:NDN,drawn:true,
+   est:'제조사 플라이 치수(길이 260×폭 210cm, 높이 150cm)로 그렸어요. 사각 릿지폴 구조의 스카우트 텐트로 양 끝이 통째로 열리고, 양옆에 창이 있어요.',
+   outer:o,innerNote:NDIN,doors:[T2.front(W,W,'전면 도어'),T2.rear(L,W,W,'후면 도어',true)],
+   windows:[{a:[800,0],b:[1800,0],label:'창문'},{a:[800,W],b:[1800,W],label:'창문'}],
+   living:[L/2,W/2],color:NDC,prof:T2.PROF.ridge});}
+
+ /* --- 레이사 6 PU (터널, 이너 2인+4인 분할) --- */
+ {const L=6450,W=2950,o=T2.tun(L,W,600,2300,400,2500);
+  T2.add('nd_reisa6',{brand:'노르디스크',name:'레이사 6 PU',model:'Reisa 6 PU',size:[645,295,210],weight:'18.9kg',cap:'6명 (제조사 표기)',href:ND+'reisa-6-pu-tent-6-person-beige',srcName:NDN,drawn:true,
+   est:'제조사 치수(플라이 645×295cm·높이 210cm, 이너 230×280cm)로 그렸어요. 이너는 뒤쪽(2인+4인 분할), 앞문 1개·옆문 2개는 전실 쪽으로 봤어요. 앞뒤 끝 좁아지는 정도와 옆문 위치는 사진으로 추정했어요.',
+   outer:o,inners:{std:{label:'이너룸 (2인+4인)',model:'',size:'230×280',poly:T2.rect(L-150-2300,75,L-150,W-75),posEst:true}},
+   doors:[T2.front(W,2300,'전면 도어'),T2.side(1300,2700,0,'측면 도어'),T2.side(1300,2700,W,'측면 도어')],
+   living:[2000,W/2],color:'#C8B89C',prof:T2.PROF.tunnel});}
+
+ /* --- 오플란드 3 PU (3인 트레킹 터널) --- */
+ {const L=4450,W=2100,o=T2.tun(L,W,1300,1000,700,1100);
+  T2.add('nd_oppland3',{brand:'노르디스크',name:'오플란드 3 PU',model:'Oppland 3 PU (3.0)',size:[445,210,120],weight:'4.5kg',cap:'3명 (제조사 표기)',href:ND+'oppland-3-pu-30-tent-onesize-dark-olive',srcName:NDN,drawn:true,
+   est:'제조사 치수(플라이 445×210cm·높이 120cm, 이너 225×190cm)로 그렸어요. 이너는 뒤쪽, 앞쪽은 전실(포치)이고 앞 끝 전체가 열려요. 앞뒤 끝 모양은 사진으로 추정했어요.',
+   outer:o,inners:{std:{label:'이너룸',model:'',size:'225×190',poly:T2.rect(L-100-2250,100,L-100,W-100),posEst:true}},
+   doors:[T2.front(W,1000,'전면 도어')],living:[900,W/2],color:'#5E5F45',prof:T2.PROF.tunnel});}
+}
+
+/* ===== 라디트 (LADIT): 공식몰 ladit.app은 상세 제원이 이미지라 판매처(오캠프·플램아웃도어) 상세 표기값 사용 ===== */
+{const L=6200,W=3600,o=T2.tun(L,W,600,3000,500,3000);
+ T2.add('rd_solongo',{brand:'라디트',name:'솔롱고',model:'SOLONGO Tunnel 5P (TTSO-BD05-LB)',size:[620,360,210],weight:'17.39kg (스킨 9.26kg · 폴 3.52kg)',cap:'5명 (판매처 표기)',
+  href:'https://flamoutdoor.kr/?idx=1272',srcName:'판매처 상품 상세',drawn:true,
+  est:'판매처 표기(620×360×210cm, 출입문 5개, 전용 이너 325×220cm)로 그렸어요. 앞·뒤 끝이 좁아지는 정도와 문 위치(앞 1 + 양옆 2개씩, 별매 TPU 도어 구성 기준)는 공개되지 않아 비율 추정이에요. 이너는 뒤쪽 가로 배치로 추정했어요.',outer:o,
+  inners:{std:{label:'전용 이너텐트',model:'TTSO-IT-BD05-LB (별매, flamoutdoor ?idx=1273)',size:'325×220',poly:T2.rect(3700,175,5900,3425),posEst:true}},
+  doors:[T2.front(W,3000,'전면 도어'),T2.side(800,1900,0,'측면 도어'),T2.side(800,1900,W,'측면 도어'),T2.side(3900,5000,0,'측면 도어 (이너)',false),T2.side(3900,5000,W,'측면 도어 (이너)',false)],
+  living:[1800,1800],color:'#CBBF9F',prof:T2.PROF.tunnel});}
+{const L=4500,W=4500,o=T2.box(L,W,300);
+ T2.add('rd_gaur',{brand:'라디트',name:'가우르',model:'GAUR Dome 4P (DTGA-BD05-LB)',size:[450,450,220],weight:'15.78kg (스킨 5.9kg · 폴 5.27kg)',cap:'4명 (판매처 표기)',
+  href:'https://flamoutdoor.kr/?idx=1275',srcName:'판매처 상품 상세',drawn:true,
+  est:'판매처 표기(450×450×220cm, DAC 폴 8개 교차 프레임, 전후면 2도어, 전용 이너 200×415cm)로 그렸어요. 바닥 모서리 모양은 공개되지 않아 추정이고, 이너는 뒤쪽 절반에 둔 것으로 추정했어요.',outer:o,
+  inners:{std:{label:'전용 이너텐트',model:'DTGA-IT-BD05-LB (별매, flamoutdoor ?idx=1276)',size:'415×200',poly:T2.rect(2300,175,4300,4325),posEst:true}},
+  doors:[T2.front(W,W-600,'전면 도어'),T2.rear(L,W,W-600,'후면 도어',false)],
+  living:[1150,2250],color:'#CBBF9F',prof:T2.PROF.dome});}
+{const L=5600,W=4000,o=T2.tun(L,W,600,3000,500,3200);
+ T2.add('rd_serinoa',{brand:'라디트',name:'세리노아',model:'SERINOA Tunnel 6P (TTSE-BD05-LB)',size:[560,400,230],weight:'26.23kg (스킨 11.65kg · 폴 12.13kg)',cap:'6명 (판매처 표기)',
+  href:'https://flamoutdoor.kr/?idx=1280',srcName:'판매처 상품 상세',drawn:true,
+  est:'판매처 표기(560×400×230cm, 어닝 펼치면 720cm, 출입문 6개, 별매 이너 250×370×215cm)로 그렸어요. 앞 어닝(160cm)은 평면에 넣지 않았고, 끝이 좁아지는 정도와 문 위치(앞·뒤 + 양옆 2개씩)는 비율 추정이에요.',outer:o,
+  inners:{std:{label:'전용 이너텐트',model:'TTSE-IT-BD05-LB (별매)',size:'370×250',poly:T2.rect(2600,150,5100,3850),posEst:true}},
+  doors:[T2.front(W,3000,'전면 도어'),T2.rear(L,W,3200,'후면 도어',false),T2.side(800,2000,0,'측면 도어'),T2.side(800,2000,W,'측면 도어'),T2.side(3200,4400,0,'측면 도어 (이너)',false),T2.side(3200,4400,W,'측면 도어 (이너)',false)],
+  living:[1300,2000],color:'#CBBF9F',prof:T2.PROF.tunnel});}
+{const D=5000,o=T2.poly(8,D,D/2,D/2);
+ T2.add('rd_lexicon',{brand:'라디트',name:'렉시콘',model:'LEXICON Tipi 4P',size:[500,500,300],weight:'11.82kg (스킨 5.9kg · 폴 1.43kg)',cap:'4명 (판매처 표기)',
+  href:'https://flamoutdoor.kr/?idx=1283',srcName:'판매처 상품 상세',drawn:true,
+  est:'판매처 표기(500×500×300cm, 가운데 기둥 1개, 출입문 2개)로 그렸어요. 바닥 각 수는 공개되지 않아 팔각으로 추정했고, 두 번째 문은 뒤쪽으로 추정했어요. 이너·확장 베스티블은 별매이며 크기가 공개되지 않았어요.',outer:o,
+  inners:{},innerNote:NOINNER,
+  doors:[T2.door(o,'front','출입문',true),T2.door(o,'rear','출입문',false)],
+  pole:[D/2,D/2],poleLabel:'가운데 기둥',apex:[D/2,D/2],walls:[0,0,0,0,0,0,0,0],
+  living:[D/2,D/2],color:'#CBBF9F',prof:T2.PROF.tipi});}
+{const L=5500,W=3200,o=T2.tun(L,W,500,2600,500,2600);
+ T2.add('rd_arca',{brand:'라디트',name:'아르카',model:'ARCA Tunnel 4P (TTAR-BD05-LB)',size:[550,320,200],weight:'12.26kg (스킨 6.69kg · 폴 1.74kg)',cap:'4명 (판매처 표기)',
+  href:'https://flamoutdoor.kr/?idx=1436',srcName:'판매처 상품 상세',drawn:true,
+  est:'판매처 표기(550×320×200cm, DAC 폴 3개, 출입문 2개)로 그렸어요. 끝이 좁아지는 정도와 문 위치(앞·뒤)는 공개되지 않아 비율 추정이에요. 전용 이너는 별매이며 크기가 공개되지 않았어요.',outer:o,
+  inners:{},innerNote:NOINNER,
+  doors:[T2.front(W,2600,'전면 도어'),T2.rear(L,W,2600,'후면 도어',false)],
+  living:[1600,1600],color:'#CBBF9F',prof:T2.PROF.tunnel});}
+
+/* ===== 하이퍼라이트마운틴기어 (HMG): 제조사 공식 페이지 치수. 바닥 없는 피라미드, 가운데 기둥 1개 ===== */
+{const L=2819,W=2819,o=T2.rect(0,0,L,W);
+ T2.add('hmg_ultamid4',{brand:'하이퍼라이트마운틴기어',name:'울타미드 4',model:'UltaMid 4',size:[282,282,191],weight:'635g (폴 별매)',cap:'2–4명 (제조사 표기)',
+  href:'https://hyperlitemountaingear.com/products/ultamid-4-ultralight-pyramid-tent',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기(바닥 281.9×281.9cm 정사각, 높이 190.5cm, 가운데 기둥 1개 또는 트레킹폴 2개)로 그렸어요. 문은 한 면 전체를 여는 지퍼 도어 1개이며, 하프 이너(243.8×127cm)는 뒤쪽 벽에 붙인 위치로 추정했어요.',outer:o,
+  inners:{half:{label:'하프 이너 (2인)',model:'UltaMid 4 Half Insert (별매)',size:'243.8×127',poly:T2.rect(1499,190,2769,2628),posEst:true}},innerNote:NOFLOOR,
+  doors:[{a:[0,300],b:[0,2519],label:'지퍼 도어',zone:true}],
+  pole:[1410,1410],poleLabel:'가운데 기둥',apex:[1410,1410],walls:[0,0,0,0],
+  living:[700,1410],color:'#E8E6DF',prof:T2.PROF.tipi});}
+{const L=2108,W=2718,o=T2.rect(0,0,L,W);
+ T2.add('hmg_ultamid2',{brand:'하이퍼라이트마운틴기어',name:'울타미드 2',model:'UltaMid 2',size:[211,272,163],weight:'541g (폴 별매)',cap:'1–2명 (제조사 표기)',
+  href:'https://hyperlitemountaingear.com/products/ultamid-2-ultralight-pyramid-tent',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기(바닥 271.8×210.8cm, 높이 162.6cm, 가운데 기둥 1개 또는 트레킹폴 2개)로 그렸어요. 지퍼 도어 1개를 긴 변 쪽에 둔 것과 하프 이너(226.1×83.8cm)를 뒤쪽 긴 벽에 붙인 위치는 추정이에요.',outer:o,
+  inners:{half:{label:'하프 이너 (1인)',model:'UltaMid 2 Half Insert (별매)',size:'226.1×83.8',poly:T2.rect(1220,229,2058,2490),posEst:true}},innerNote:NOFLOOR,
+  doors:[{a:[0,300],b:[0,2418],label:'지퍼 도어',zone:true}],
+  pole:[1054,1359],poleLabel:'가운데 기둥',apex:[1054,1359],walls:[0,0,0,0],
+  living:[600,1359],color:'#E8E6DF',prof:T2.PROF.tipi});}
+
+/* ===== 헬스포츠 (Helsport): 제조사 공식 페이지 + 판매처 치수 ===== */
+{const D=4350,c=Math.round(D*(1-Math.tan(Math.PI/8))/2),o=T2.poly(8,D,D/2,D/2);
+ T2.add('hs_varanger_dome8',{brand:'헬스포츠',name:'바랑에르 돔 8-10 아우터',model:'Varanger Dome 8-10 Outer (310-020-V)',size:[435,435,210],weight:'9.75kg (폴 포함)',cap:'8–10명 (제조사 표기)',
+  href:'https://helsport.com/eu/tents/all-tents/8-person/varanger-dome-8-10-outer-tent-incl-pole--310-020-V',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기(출입구 3개, 폴 4×685cm)와 판매처 치수(바닥 ø435/470cm 팔각 = 벽-벽 435·꼭짓점 470cm, 높이 210cm, 면적 11.3㎡)로 그렸어요. 문 3곳의 위치(앞 + 뒤쪽 사선 2곳)와 별매 이너(280×400cm) 위치는 추정이에요.',outer:o,
+  inners:{std:{label:'이너 (별매)',model:'Varanger Dome 8-10 Inner',size:'400×280',poly:[[1470,175],[3150,175],[4250,1275],[4250,3075],[3150,4175],[1470,4175]],posEst:true}},
+  doors:[T2.door(o,'front','출입문',true),{a:L2([D-c,0],[D,c],.15),b:L2([D-c,0],[D,c],.85),label:'출입문',zone:false},{a:L2([D,D-c],[D-c,D],.15),b:L2([D,D-c],[D-c,D],.85),label:'출입문',zone:false}],
+  living:[1100,2175],color:'#5E6B44',prof:T2.PROF.dome});}
+
 /* ===== 스노우피크 타프 익스텐션 텐트 (FES-433): 타프 윙폴(280cm)에 이어 쓰는 텐트. 앞(x=0)이 타프 쪽 ===== */
 {const o=[[0,1000],[1100,0],[3250,350],[3250,3650],[1100,4000],[0,3000]];
  T2.add('sp_tarp_ext',{brand:'스노우피크',name:'타프 익스텐션 텐트',model:'FES-433',size:[325,400,280],weight:'7.5kg',cap:'4명 (제조사 표기)',href:'https://snowpeak.com/products/tarp-extentioin-tent-4',srcName:'제조사 공식 페이지',drawn:true,
@@ -1618,7 +1851,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
 }
 TENT_ORDER.splice(0,TENT_ORDER.length,'landlock','landlock_x','living_shell','living_shell_long_pro','merak_pro','hb_atlas','hb_keron4gt','hx_nona','hx_vtarp','hp_backdoor','hp_cave','hp_mavericks',...T2.ids,'none');
 TENTS.none.brand='';
-const BRANDS=['스노우피크','힐레베르그','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸','미니멀웍스','제인아츠','콜맨','텐트마크디자인','제이크라','그라운드커버','헬스포츠','몽벨','도메틱','위너웰','트로이','스프링바'];
+const BRANDS=['스노우피크','힐레베르그','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸','미니멀웍스','제인아츠','콜맨','텐트마크디자인','제이크라','그라운드커버','헬스포츠','몽벨','도메틱','위너웰','트로이','스프링바','노르디스크','라디트','하이퍼라이트마운틴기어','TFS','고파미르'];
 
 let tent={id:'landlock',inner:'std',canopy:false,custom:{w:200,d:210}};
 
