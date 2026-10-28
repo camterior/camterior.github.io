@@ -161,9 +161,9 @@ function aiBuild(it){
     const coreN=set.length;set.coreN=coreN;set.left=[];
     if(it.seats&&it.seats.length){
       // 앉을 상판: 테이블 자체, IGT면 붙은 멀티펑션·코너·오픈멀티(없으면 IGT 앞, 버너가 있으니 10cm 띄움)
-      const ext=set.filter(p=>p!==root&&CATALOG[p.type].kind==='ext'),fr=c.kind==='frame',host=fr&&ext.length?ext:fr?set.filter(p=>p===root||CATALOG[p.type].kind==='tray'):[root];
+      const exAll=set.filter(p=>p!==root&&CATALOG[p.type].kind==='ext'),pr=t=>t.startsWith('mf_')?0:t.startsWith('open_')?1:2,ext=exAll.length?[exAll.slice().sort((x,y)=>pr(x.type)-pr(y.type))[0]].filter(e=>pr(e.type)<2||exAll.every(x=>pr(x.type)===2)).slice(0,1):[],fr=c.kind==='frame',host=fr&&ext.length?ext:fr?set.filter(p=>p===root||CATALOG[p.type].kind==='tray'):[root];
       const b=bbox(host.flatMap(p=>p._v)),W=b[1][0]-b[0][0],D=b[1][1]-b[0][1],horiz=W>=D,L=horiz?W:D;
-      const bar=fr&&!ext.length,IN=bar?-100:60,cwMax=Math.max(...it.seats.map(t=>CATALOG[t].w)),k=bar?Math.min(it.seats.length,3):Math.max(1,Math.floor((L+150)/(cwMax+20)));
+      const bar=fr&&!ext.length,IN=bar?-100:-10,cwMax=Math.max(...it.seats.map(t=>CATALOG[t].w)),k=bar?Math.min(it.seats.length,3):Math.max(1,Math.floor((L+150)/(cwMax+20)));
       let sides=['+','-'];if(fr&&!ext.length){const ib=bbox(set.flatMap(p=>p._v)),fb=bbox(root._v),plus=horiz?ib[1][1]-fb[1][1]:ib[1][0]-fb[1][0],minus=horiz?fb[0][1]-ib[0][1]:fb[0][0]-ib[0][0];sides=[plus>=minus?'+':'-'];}
       const spots=[];for(let i=0;i<k;i++)sides.forEach(sd=>spots.push({sd,i}));if(!(fr&&!ext.length))spots.push({sd:'e+'},{sd:'e-'});
       const mid=[(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2],lo=horiz?b[0][0]:b[0][1],others=set.filter(p=>!host.includes(p)),taken=[];
