@@ -1748,8 +1748,10 @@ const GEAR={
     note:'46L 컴프레서 냉장고. 12/24V·220V. 바닥 크기는 35와 같고 높이만 높아요',href:'https://www.dometic.com/en/product/dometic-cfx3-45-9620009573',srcName:'도메틱 공식'},
   cfx3_55:{gtype:'fridge',group:'냉장고',name:'도메틱 CFX3 55',model:'CFX3 55',conf:'official',w:720,d:455,h:480,kg:21.2,sw:'#3B3F44',
     note:'55L 컴프레서 냉장고. 12/24V·220V',href:'https://www.dometic.com/en/product/dometic-cfx3-55-9620009574',srcName:'도메틱 공식'},
+  sp_gs1000:{gtype:'burner',round:true,group:'버너',name:'스노우피크 강염버너',model:'GS-1000',conf:'retailer',w:350,d:350,h:420,kg:1.8,sw:'#8C9196',
+    note:'바닥에 세우는 강염 스토브(삼발 다리). 삼발 지름 350mm, 높이 420mm, 8,500kcal. 화기라 천·텐트 벽에서 떨어뜨려 두세요',href:'https://campinglist.co.kr/product/%EC%8A%A4%EB%85%B8%EC%9A%B0%ED%94%BC%ED%81%AC-%EA%B0%95%EC%97%BC%EC%8A%A4%ED%86%A0%EB%B8%8C-gs-1000-%EA%B0%95%EC%97%BC%EB%B2%84%EB%84%88-%EA%B7%B8%EB%A6%AC%EB%93%A4%EB%B2%84%EB%84%88/124/',srcName:'캠핑리스트 상품 상세'},
 };
-const GEAR_GROUPS=['쉘프컨테이너','알루미늄 박스','마이테이블','테이블','폴딩쉘프','체어','매트','야전침대','난방','냉장고'];
+const GEAR_GROUPS=['쉘프컨테이너','알루미늄 박스','마이테이블','테이블','폴딩쉘프','체어','매트','야전침대','난방','냉장고','버너'];
 const GEAR_ORDER=Object.keys(GEAR);
 const gLink=g=>g.href||(g.src?SRC+g.src:null),gLinkName=g=>g.srcName||'아이엘캠프 상품 상세';
 const GEAR_CAT=Object.fromEntries(Object.entries(GEAR).map(([id,g])=>[id,{kind:'gear',...g,short:g.name,
@@ -2031,6 +2033,10 @@ function gearBody(p,fine){const c=CATALOG[p.type],w=c.w,d=c.d;let o='';
     o+=`<circle cx="${r}" cy="${r}" r="${r}" fill="#3B3F3A" stroke="#1C1E1C" stroke-width="5"/><circle cx="${r}" cy="${r}" r="${r*.78}" fill="#545A55"/>`;
     [.62,.44,.26].forEach(k=>{o+=`<circle cx="${r}" cy="${r}" r="${r*k}" fill="none" stroke="#2A2D2A" stroke-width="6"/>`;});
     o+=`<circle cx="${r}" cy="${r}" r="${r*.12}" fill="#C8642E"/><rect x="${r-26}" y="${-34}" width="52" height="40" rx="10" fill="#8C908A"/>`;return o;}
+  if(c.gtype==='burner'){const r=w/2;
+    o+=`<circle cx="${r}" cy="${r}" r="${r}" fill="none" stroke="#5E6368" stroke-width="16"/>`;
+    [0,120,240].forEach(a=>{const t=a*Math.PI/180;o+=`<line x1="${r}" y1="${r}" x2="${r+r*Math.cos(t)}" y2="${r+r*Math.sin(t)}" stroke="#7F8489" stroke-width="12" stroke-linecap="round"/>`;});
+    o+=`<circle cx="${r}" cy="${r}" r="${r*.42}" fill="#3E4246" stroke="#1C1E1C" stroke-width="5"/><circle cx="${r}" cy="${r}" r="${r*.2}" fill="#C8642E"/>`;return o;}
   if(c.gtype==='fan'){
     o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="26" fill="#2E3134" stroke="#151617" stroke-width="5"/><rect x="40" y="36" width="${w-80}" height="${d*.42}" rx="12" fill="#3E4246"/>`;
     for(let x=40;x<=w-40;x+=26)o+=`<line x1="${x}" y1="${d-70}" x2="${x}" y2="${d-12}" stroke="#7F8489" stroke-width="7"/>`;
@@ -2810,6 +2816,9 @@ function igt3(THREE){
         [[20,20],[w-20,20],[20,d-20],[w-20,d-20],[w/2,20],[w/2,d-20]].forEach(q=>grp.add(cyl(THREE,X(q),0,h-30,10,M.dark)));}
       else if(c.gtype==='stove'){const ce=X([w/2,w/2]),mk=(r0,r1,y0,y1,m)=>{const me=new THREE.Mesh(new THREE.CylinderGeometry(mm(r1),mm(r0),mm(y1-y0),32),m);me.position.set(mm(ce[0]),mm((y0+y1)/2),mm(ce[1]));me.castShadow=true;return me;};
         grp.add(mk(w/2,w/2,0,60,M.stove),mk(w/2-20,w/2-20,60,h-170,M.stove),mk(w/2-25,w/2-25,h-170,h-90,M.glow),mk(w/2-20,w/2-60,h-90,h,M.stove));}
+      else if(c.gtype==='burner'){const ce=[w/2,w/2];[0,120,240].forEach(a=>{const t=a*Math.PI/180;grp.add(cyl(THREE,X([ce[0]+w*.42*Math.cos(t),ce[1]+w*.42*Math.sin(t)]),0,h-20,9,M.leg));});
+        const me=new THREE.Mesh(new THREE.TorusGeometry(mm(w/2-10),mm(8),8,40),M.steel);me.rotation.x=Math.PI/2;const cc=X(ce);me.position.set(mm(cc[0]),mm(h-10),mm(cc[1]));grp.add(me);
+        grp.add(cyl(THREE,X(ce),h-140,h-40,w*.2,M.stove));}
       else if(c.gtype==='chair'){const sh=c.sh||Math.round(h*.42),fm=new THREE.MeshStandardMaterial({color:c.sw,roughness:.9}),lm=c.wood?M.bamboo:M.dark,bk=Math.min(110,d*.18);
         grp.add(extrudePoly(THREE,R(30,bk,w-30,d-30),sh-30,sh,fm));
         grp.add(extrudePoly(THREE,R(20,0,w-20,bk*.6),sh,h,fm));

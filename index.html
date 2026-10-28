@@ -2038,8 +2038,10 @@ const GEAR={
     note:'46L 컴프레서 냉장고. 12/24V·220V. 바닥 크기는 35와 같고 높이만 높아요',href:'https://www.dometic.com/en/product/dometic-cfx3-45-9620009573',srcName:'도메틱 공식'},
   cfx3_55:{gtype:'fridge',group:'냉장고',name:'도메틱 CFX3 55',model:'CFX3 55',conf:'official',w:720,d:455,h:480,kg:21.2,sw:'#3B3F44',
     note:'55L 컴프레서 냉장고. 12/24V·220V',href:'https://www.dometic.com/en/product/dometic-cfx3-55-9620009574',srcName:'도메틱 공식'},
+  sp_gs1000:{gtype:'burner',round:true,group:'버너',name:'스노우피크 강염버너',model:'GS-1000',conf:'retailer',w:350,d:350,h:420,kg:1.8,sw:'#8C9196',
+    note:'바닥에 세우는 강염 스토브(삼발 다리). 삼발 지름 350mm, 높이 420mm, 8,500kcal. 화기라 천·텐트 벽에서 떨어뜨려 두세요',href:'https://campinglist.co.kr/product/%EC%8A%A4%EB%85%B8%EC%9A%B0%ED%94%BC%ED%81%AC-%EA%B0%95%EC%97%BC%EC%8A%A4%ED%86%A0%EB%B8%8C-gs-1000-%EA%B0%95%EC%97%BC%EB%B2%84%EB%84%88-%EA%B7%B8%EB%A6%AC%EB%93%A4%EB%B2%84%EB%84%88/124/',srcName:'캠핑리스트 상품 상세'},
 };
-const GEAR_GROUPS=['쉘프컨테이너','알루미늄 박스','마이테이블','테이블','폴딩쉘프','체어','매트','야전침대','난방','냉장고'];
+const GEAR_GROUPS=['쉘프컨테이너','알루미늄 박스','마이테이블','테이블','폴딩쉘프','체어','매트','야전침대','난방','냉장고','버너'];
 const GEAR_ORDER=Object.keys(GEAR);
 const gLink=g=>g.href||(g.src?SRC+g.src:null),gLinkName=g=>g.srcName||'아이엘캠프 상품 상세';
 const GEAR_CAT=Object.fromEntries(Object.entries(GEAR).map(([id,g])=>[id,{kind:'gear',...g,short:g.name,
@@ -2310,6 +2312,10 @@ function gearBody(p,fine){const c=CATALOG[p.type],w=c.w,d=c.d;let o='';
     o+=`<circle cx="${r}" cy="${r}" r="${r}" fill="#3B3F3A" stroke="#1C1E1C" stroke-width="5"/><circle cx="${r}" cy="${r}" r="${r*.78}" fill="#545A55"/>`;
     [.62,.44,.26].forEach(k=>{o+=`<circle cx="${r}" cy="${r}" r="${r*k}" fill="none" stroke="#2A2D2A" stroke-width="6"/>`;});
     o+=`<circle cx="${r}" cy="${r}" r="${r*.12}" fill="#C8642E"/><rect x="${r-26}" y="${-34}" width="52" height="40" rx="10" fill="#8C908A"/>`;return o;}
+  if(c.gtype==='burner'){const r=w/2;
+    o+=`<circle cx="${r}" cy="${r}" r="${r}" fill="none" stroke="#5E6368" stroke-width="16"/>`;
+    [0,120,240].forEach(a=>{const t=a*Math.PI/180;o+=`<line x1="${r}" y1="${r}" x2="${r+r*Math.cos(t)}" y2="${r+r*Math.sin(t)}" stroke="#7F8489" stroke-width="12" stroke-linecap="round"/>`;});
+    o+=`<circle cx="${r}" cy="${r}" r="${r*.42}" fill="#3E4246" stroke="#1C1E1C" stroke-width="5"/><circle cx="${r}" cy="${r}" r="${r*.2}" fill="#C8642E"/>`;return o;}
   if(c.gtype==='fan'){
     o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="26" fill="#2E3134" stroke="#151617" stroke-width="5"/><rect x="40" y="36" width="${w-80}" height="${d*.42}" rx="12" fill="#3E4246"/>`;
     for(let x=40;x<=w-40;x+=26)o+=`<line x1="${x}" y1="${d-70}" x2="${x}" y2="${d-12}" stroke="#7F8489" stroke-width="7"/>`;
@@ -3085,6 +3091,9 @@ function igt3(THREE){
         [[20,20],[w-20,20],[20,d-20],[w-20,d-20],[w/2,20],[w/2,d-20]].forEach(q=>grp.add(cyl(THREE,X(q),0,h-30,10,M.dark)));}
       else if(c.gtype==='stove'){const ce=X([w/2,w/2]),mk=(r0,r1,y0,y1,m)=>{const me=new THREE.Mesh(new THREE.CylinderGeometry(mm(r1),mm(r0),mm(y1-y0),32),m);me.position.set(mm(ce[0]),mm((y0+y1)/2),mm(ce[1]));me.castShadow=true;return me;};
         grp.add(mk(w/2,w/2,0,60,M.stove),mk(w/2-20,w/2-20,60,h-170,M.stove),mk(w/2-25,w/2-25,h-170,h-90,M.glow),mk(w/2-20,w/2-60,h-90,h,M.stove));}
+      else if(c.gtype==='burner'){const ce=[w/2,w/2];[0,120,240].forEach(a=>{const t=a*Math.PI/180;grp.add(cyl(THREE,X([ce[0]+w*.42*Math.cos(t),ce[1]+w*.42*Math.sin(t)]),0,h-20,9,M.leg));});
+        const me=new THREE.Mesh(new THREE.TorusGeometry(mm(w/2-10),mm(8),8,40),M.steel);me.rotation.x=Math.PI/2;const cc=X(ce);me.position.set(mm(cc[0]),mm(h-10),mm(cc[1]));grp.add(me);
+        grp.add(cyl(THREE,X(ce),h-140,h-40,w*.2,M.stove));}
       else if(c.gtype==='chair'){const sh=c.sh||Math.round(h*.42),fm=new THREE.MeshStandardMaterial({color:c.sw,roughness:.9}),lm=c.wood?M.bamboo:M.dark,bk=Math.min(110,d*.18);
         grp.add(extrudePoly(THREE,R(30,bk,w-30,d-30),sh-30,sh,fm));
         grp.add(extrudePoly(THREE,R(20,0,w-20,bk*.6),sh,h,fm));
@@ -3687,18 +3696,20 @@ const GSEC=[
       <dl>${Object.entries(LEGS).map(([h,l])=>`<dt>${l.name}</dt><dd>${h}mm</dd>`).join('')}</dl>
       <p class="nt">입체 보기에서 다리 높이에 맞춰 테이블 높이가 바뀌어요.</p></div>`}])},
   {k:'gear',t:'수납·테이블·선반',img:'img/top.webp',d:'쉘프컨테이너, 마이테이블, 폴딩쉘프, 그리고 스노우피크·헬리녹스·커밋 테이블. 바닥 크기와 상판 높이까지 실제 값이에요. 의자 좌면 높이와 맞춰 고르세요.',
-   items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat&&!GEAR[id].sleep&&GEAR[id].gtype!=='chair'&&GEAR[id].gtype!=='fridge').map(id=>gearCard(id))},
+   items:()=>GEAR_ORDER.filter(id=>!GEAR[id].heat&&!GEAR[id].sleep&&GEAR[id].gtype!=='chair'&&GEAR[id].gtype!=='fridge'&&GEAR[id].gtype!=='burner').map(id=>gearCard(id))},
   {k:'sleep',t:'매트·야전침대',img:'img/g-sleep.webp',d:'자충매트와 야전침대. 이너룸 안에 놓아도 경고가 뜨지 않아요. 매트 폭으로 이너룸에 몇 명이 누울 수 있는지 확인해보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].sleep).map(id=>gearCard(id))},
   {k:'chair',t:'체어',img:'img/g-chair.webp',d:'스노우피크·헬리녹스·커밋체어. 펼친 크기와 좌면 높이를 실제 값으로 넣었어요. 좌면이 낮은 로우체어는 낮은 테이블과 맞춰보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='chair').map(id=>gearCard(id))},
   {k:'heat',t:'난방',img:'img/heat.webp',d:'팬히터·가스난로·화목난로의 크기예요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].heat).map(id=>gearCard(id))},
+  {k:'fire',t:'버너',img:'img/heat.webp',d:'바닥에 세우는 버너예요. IGT에 끼우는 플랫버너·설봉원은 IGT 파츠에 있어요.',
+   items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='burner').map(id=>gearCard(id))},
   {k:'cool',t:'냉장고',img:'img/g-cool.webp',d:'캠핑용 컴프레서 냉장고. 바닥 크기와 높이를 실제 값으로 넣었어요. 테이블 아래 공간에 들어가는지 확인해보세요.',
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='fridge').map(id=>gearCard(id))},
 ];
 function gearCard(id){const g=GEAR[id];
-  return {id,b:gearBrand(g),q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'||g.gtype==='wood'?'난로 히터 화목난로 장작':''}${g.gtype==='fridge'?'냉장고 쿨러 아이스박스':''}${g.gtype==='chair'?'의자 체어 '+(g.srcName||''):''}${g.sleep?'매트 침대 야전침대 코트 자충':''}${g.alu?'알루텍 알루미늄 박스 수납':''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
+  return {id,b:gearBrand(g),q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'||g.gtype==='wood'?'난로 히터 화목난로 장작':''}${g.gtype==='fridge'?'냉장고 쿨러 아이스박스':''}${g.gtype==='burner'?'버너 스토브 강염 화구 ':''}${g.gtype==='chair'?'의자 체어 '+(g.srcName||''):''}${g.sleep?'매트 침대 야전침대 코트 자충':''}${g.alu?'알루텍 알루미늄 박스 수납':''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
     <div class="gb"><div><h3>${g.name}</h3><span class="md">${g.model}</span></div>
     <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.sh?`<dt>좌면 높이</dt><dd>${fmt(g.sh)}mm</dd>`:''}${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}</dl>
     ${g.note?`<p class="nt">${g.note}</p>`:''}
@@ -3872,7 +3883,7 @@ const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유�
   sep2:['세퍼레이트 2유닛','세퍼레이트 하프'],sep3:['세퍼레이트 3유닛','세퍼레이트 레귤러','세퍼레이트 IGT'],sep4:['세퍼레이트 4유닛','세퍼레이트 롱'],
   mf_reg:['멀티펑션','멀티펑션 테이블'],slide_h:['하프슬라이드','슬라이드하프','슬라이드 트레이'],slide_hl:['하프슬라이드 롱','슬라이드하프롱'],
   mytable_s:['스텐 마이테이블','스탠 마이테이블','스텐마이테이블','스탠마이테이블','스테인리스 마이테이블'],
-  flat:['플랫버너'],seppou:['설봉','그릴버너'],steel1:['원유닛 트레이','1유닛 트레이','스텐트레이','스텐 트레이','스탠트레이'],lid_half:['리드트레이'],box_half:['스텐박스'],
+  flat:['플랫버너'],sp_gs1000:['강염버너','강염스토브','GS-1000','스노우피크 강염'],seppou:['설봉','그릴버너'],steel1:['원유닛 트레이','1유닛 트레이','스텐트레이','스텐 트레이','스탠트레이'],lid_half:['리드트레이'],box_half:['스텐박스'],
   wood_s:['우드테이블 S','우드 S'],wood_w:['우드테이블 W','우드 W'],mesh_d1:['메쉬트레이 딥'],mesh_s1:['메쉬트레이'],mf_long:['멀티펑션 롱','멀티펑션롱'],open_L:['오픈멀티펑션 L'],open_R:['오픈멀티펑션 R'],corner_L:['코너테이블 L'],corner_R:['코너테이블 R'],
   sp_fd:['FD체어','에프디체어'],hx_one:['체어원'],omni230:['옴니','옴니230'],camp5000:['파세코 팬히터','캠프5000','파세코'],mk_stove:['MK스토브','화목난로','장작난로'],toyotomi_lcl53:['토요토미 팬히터','LC-L53'],sfh_bh900:['신일 900','신일 팬히터 900'],sfh1200:['신일 1200','신일 팬히터 1200'],cfx3_35:['도메틱 35','CFX3 35'],cfx3_45:['도메틱 45','CFX3 45'],cfx3_55:['도메틱 55','CFX3 55'],
   megamat_duo:['메가매트 듀오'],megamat:['메가매트'],cot_one:['코트원'],sp_oat_low:['원액션 로우'],sp_oat:['원액션테이블'],
