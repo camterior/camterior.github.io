@@ -339,8 +339,9 @@
   .brand{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none;white-space:nowrap}
   .brand .mark{width:30px;height:30px;border-radius:9px;background:var(--accent);display:grid;place-items:center}
   .brand .mark svg{width:18px;height:18px}
-  .brand .bn{font-weight:800;font-size:18px;letter-spacing:-.04em}
-  .brand small{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;opacity:.65}
+  .brand .bt{display:flex;flex-direction:column;justify-content:center;line-height:1}
+  .brand .bn{font-weight:800;font-size:18px;letter-spacing:.06em}
+  .brand small{font-size:11.5px;letter-spacing:.01em;color:var(--ink-3);margin-top:4px}
   .nav{display:flex;gap:26px;margin-left:auto}
   .nav a{color:inherit;opacity:.82;text-decoration:none;font-size:14.5px;font-weight:600}
   .nav a:hover{opacity:1}
@@ -604,7 +605,7 @@
     .tile,.t-plan,.t-mm,.t-heat,.t-3d,.t-code,.t-rev{grid-column:1/-1}
     .t-plan{min-height:320px}
     .commons{padding:20px 16px}
-    .brand small{display:none}
+    .brand small{font-size:11px}
     .stagebar .acts{width:100%;justify-content:space-between}
     .ws-sec .wrap{padding-inline:10px}
   }
@@ -862,15 +863,14 @@
 .aiset .ai-note{color:var(--ochre)}
 .aiset .ai-tip{color:var(--ink-2)}
 @media (min-width:900px){.aiset{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);align-items:start}.aiset .ai-head{grid-row:span 2}.aiset .ai-out{grid-column:1/-1}}
-</style>
-
 #aiIn::placeholder{color:#9A9E98;opacity:1}
+</style>
 
 </head>
 <body data-view="intro">
 <a class="skip" href="#main">본문으로 건너뛰기</a>
 <header class="appbar" id="appbar"><div class="in">
-  <a class="brand" href="#intro" data-go="intro" aria-label="캠테리어 처음으로"><span class="mark"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 19 12 5l9 14H3Z" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M12 5v14M9.5 19l2.5-5 2.5 5" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg></span><span class="bn">캠테리어</span><small>CAMTERIOR</small></a>
+  <a class="brand" href="#intro" data-go="intro" aria-label="캠테리어 처음으로"><span class="mark"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 19 12 5l9 14H3Z" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M12 5v14M9.5 19l2.5-5 2.5 5" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg></span><span class="bt"><span class="bn">CAMTERIOR</span><small>캠테리어 · 캠핑 인테리어</small></span></a>
   <nav class="nav apptabs" aria-label="화면">
     <a href="#intro" data-go="intro" data-tab="intro">소개</a>
     <a href="#plan" data-go="plan" data-tab="plan">내부 구성</a>
