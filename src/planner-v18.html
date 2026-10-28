@@ -1581,6 +1581,59 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
 }
 
 /*FLAM_TENTS*/
+/* ===== TFS (더프리스피릿츠 / The Free Spirits) ===== */
+{const L=6600,W=3250,o=T2.tun(L,W,700,2200,500,2600);
+ T2.add('tfs_yoto_plus',{brand:'TFS',name:'요토플러스',model:'YOTO PLUS (화이트라벨)',size:[660,325,200],weight:'11kg (풀패킹, 제조사 표기)',cap:'4명 (제조사 표기)',
+  href:'https://tfstents.com/products/yoto-plus',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기 플라이 660×325×200cm, 이너 220×280×185cm(바닥 5.3㎡, 전실 11.8㎡)로 그렸어요. 투폴 터널이라 앞뒤 끝이 좁아지는 정도와 이너를 뒤쪽에 둔 위치는 사진 기준 추정이에요. 문은 설명의 "4방향 4개 도어"를 앞·뒤·양옆으로 넣었고 옆문 위치는 추정이에요.',outer:o,
+  inners:{std:{label:'이너룸',model:'',size:'220×280',poly:T2.rect(4050,225,6250,3025),posEst:true}},
+  doors:[T2.front(W,2200,'전면 도어'),T2.side(1200,2800,0,'측면 도어'),T2.side(1200,2800,W,'측면 도어'),T2.rear(L,W,2600,'후면 도어')],
+  living:[2000,1625],color:'#7A7656',prof:T2.PROF.tunnel});}
+{const L=5300,W=3250,o=T2.tun(L,W,700,2200,500,2600);
+ T2.add('tfs_beyond',{brand:'TFS',name:'비욘드',model:'BEYOND',size:[530,325,205],weight:'10.8kg (제조사 표기)',cap:'3명 (제조사 표기)',
+  href:'https://tfstents.com/products/beyond',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기 플라이 530×325×205cm, 이너 220×265×185cm(바닥 4.9㎡, 전실 7.75㎡)로 그렸어요. 터널 끝 모양과 이너 위치(뒤쪽)는 추정이에요. 도어 2개는 앞·뒤로 넣었는데 실제 위치는 확인 못 했어요.',outer:o,
+  inners:{std:{label:'이너룸',model:'',size:'220×265',poly:T2.rect(2850,300,5050,2950),posEst:true}},
+  doors:[T2.front(W,2200,'전면 도어'),T2.rear(L,W,2600,'후면 도어')],
+  living:[1400,1625],color:'#8C8670',prof:T2.PROF.tunnel});}
+{const L=4450,W=4350,o=T2.rect(0,0,L,W);
+ T2.add('tfs_skydome',{brand:'TFS',name:'스카이돔',model:'SKYDOME (화이트라벨)',size:[445,435,205],weight:'13.6kg (70D)',cap:'5명',
+  href:'https://www.zetuenlife.com/entry/tfstents',srcName:'일본 리뷰 블로그 (스펙 인용)',drawn:true,
+  est:'일본 블로그에 인용된 스펙(외부 445×435×205cm, 이너 215×435×190cm)으로 그렸어요. 공식 페이지는 확인 못 했어요. 바닥 모양은 공개되지 않아 직사각형으로 단순화했고, 이너를 뒤쪽 전체 폭에 둔 위치와 앞문 위치는 추정이에요.',outer:o,
+  inners:{std:{label:'이너룸',model:'',size:'215×435',poly:T2.rect(2300,0,4450,4350),posEst:true}},
+  doors:[T2.front(W,2600,'전면 도어')],
+  living:[1150,2175],color:'#B8AE98',prof:T2.PROF.dome});}
+{const D=5000,o=T2.poly(8,D,2500,2500);
+ T2.add('tfs_robotech',{brand:'TFS',name:'로보텍',model:'ROBOTECH (화이트라벨)',size:[500,500,235],weight:'약 18kg (패키지, 제조사 표기)',cap:'10명 (제조사 표기)',
+  href:'https://tfstents.com/products/robotech',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 표기 "대각 550cm, 변-변 500cm, 높이 235cm, 바닥 21.15㎡"에 맞춘 정팔각형이에요(벽-벽 500cm 팔각형 넓이 약 20.7㎡). 도어 4개는 앞·뒤·양옆 네 면에 넣었는데 위치는 사진 기준 추정이에요. 이너는 1/2·1/4 옵션이 있지만 크기가 공개되지 않았어요.',outer:o,
+  inners:{},innerNote:NOINNER,
+  doors:[T2.door(o,'front','전면 도어',true),T2.door(o,'rear','후면 도어',true),T2.side(1700,3300,0,'측면 도어'),T2.side(1700,3300,D,'측면 도어')],
+  living:[2500,2500],color:'#8F806C',prof:T2.PROF.dome});}
+
+/* ===== 고파미르 (GOPAMIR) ===== */
+{const L=7200,W=3600,o=T2.tun(L,W,800,2400,800,2400);
+ T2.add('gp_t720',{brand:'고파미르',name:'리빙쉘터 T720+',model:'T720+ (T720 PLUS)',size:[720,360,225],weight:'21.0kg (판매처 표기)',cap:'4–5명 (판매처 표기)',
+  href:'https://bigtentoutdoors.com/products/gopamir-t720-living-air-shelter',srcName:'판매처 상품 상세 (북미 공식 판매처 BIGTENT)',drawn:true,
+  est:'판매처 표기 외곽 720×360cm, 높이 225cm(본체 안쪽 실내 660×280cm, 175cm)로 그린 에어빔 터널이에요. 앞뒤 끝이 둥글게 좁아지는 정도는 사진 비율 추정이에요. 대형 TPU창이 전/후면용, 소형이 사이드용이라 문을 앞·뒤·양옆에 넣었고 옆문 위치는 추정이에요. 별매 T/C 면이너(T720·T720+ 공용)는 크기가 공개되지 않았어요(제조사 Q&A에 "280 사이즈 사용 권장" 언급만 있음).',outer:o,
+  inners:{},innerNote:NOINNER,
+  doors:[T2.front(W,2400,'전면 도어'),T2.side(2600,4600,0,'측면 도어'),T2.side(2600,4600,W,'측면 도어'),T2.rear(L,W,2400,'후면 도어',true)],
+  living:[2600,1800],color:'#A08B6C',prof:T2.PROF.tunnel});}
+{const L=6000,W=3500,o=T2.tun(L,W,600,2600,600,2600);
+ T2.add('gp_tn600',{brand:'고파미르',name:'에어쉘터 TN600',model:'TN600',size:[600,350,210],weight:'21.0kg (판매처 표기)',cap:'3–4명 (판매처 표기)',
+  href:'https://bigtentoutdoors.com/products/gopamir-tn600-air-shelter',srcName:'판매처 상품 상세 (북미 공식 판매처 BIGTENT)',drawn:true,
+  est:'판매처 표기 600×350×210cm(도어 높이 180cm)로 그린 에어빔 터널이에요. 끝 모서리는 추정이에요. 별매 이너텐트(T/C·나일론) 바닥은 판매처 표기 "앞 310 × 깊이 220 × 뒤 260cm" 사다리꼴로 넣었고, 뒤쪽 위치는 추정이에요. 메쉬 도어 3개는 앞·양옆으로 넣었는데(TPU창이 전면용·사이드용으로 나옴) 위치는 확인 못 했어요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'GOP-TN600-ITTC / ITN',size:'310(앞)·260(뒤)×220',poly:[[3700,200],[5900,450],[5900,3050],[3700,3300]],posEst:true}},
+  doors:[T2.front(W,2600,'전면 도어'),T2.side(1300,2900,0,'측면 도어'),T2.side(1300,2900,W,'측면 도어')],
+  living:[1900,1750],color:'#A08B6C',prof:T2.PROF.tunnel});}
+{const o=[[0,1150],[1900,0],[3800,1150],[3800,3350],[1900,4500],[0,3350]];
+ T2.add('gp_g450',{brand:'고파미르',name:'에어쉘터 G450',model:'G450',size:[380,450,250],weight:'21kg (폴·펌프·팩 포함 풀킷, 본체 9.8kg)',cap:'2–3명 (판매처 표기)',
+  href:'https://bigtentoutdoors.com/products/gopamir-g450-air-shelter',srcName:'판매처 상품 상세 (북미 공식 판매처 BIGTENT)',drawn:true,
+  est:'판매처 표기 육각 바닥 450×380cm, 높이 250cm로 그렸어요. 별매 이너텐트가 "앞 400 × 깊이 150 × 뒤 200cm" 사다리꼴이라 폭 450cm를 좌우로 두고 이너를 뒤쪽 절반에 넣었어요. 앞뒤 변 길이(약 220cm)는 그라운드시트 도면 비율로 추정했고, 도어 3개(앞·앞쪽 양 사선)의 위치도 추정이에요.',outer:o,
+  inners:{std:{label:'이너텐트',model:'',size:'400(앞)·200(뒤)×150',poly:[[2200,250],[3700,1250],[3700,3250],[2200,4250]],posEst:true}},
+  doors:[{a:[0,1450],b:[0,3050],label:'전면 도어',zone:true},{a:L2(o[0],o[1],.2),b:L2(o[0],o[1],.8),label:'측면 도어',zone:true},{a:L2(o[4],o[5],.2),b:L2(o[4],o[5],.8),label:'측면 도어',zone:true}],
+  living:[1000,2250],color:'#A08B6C',prof:T2.PROF.dome});}
+
 /* ===== 스노우피크 (추가 11종) ===== */
 /* 랜드베이스6 Pro.: 메인코너 2(240cm 폴)·서브코너 4(180cm 폴)의 육각 쉘터. 800(꼭짓점-꼭짓점)×700(변-변). 앞(x=0)=큰 도어 패널 쪽 */
 {const o=[[0,1980],[3500,0],[7000,1980],[7000,6020],[3500,8000],[0,6020]];
