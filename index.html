@@ -2927,7 +2927,12 @@ function renderTarpSpec(){const el=document.getElementById('tarpSpec');const t=T
 function pickTent(id){if(tent.id===id){if(typeof renderLineup==='function')renderLineup();return;}const T=TENTS[id];tent={id,inner:T.innerDefault,canopy:false,canopy2:false,custom:tent.custom};
   if(tarp.id)placeTarpDefault();renderTentList();renderTentOpts();fitView();render();}
 function setInner(v){tent.inner=v;renderTentOpts();render();}
-function rotInner(){tent.innerRot=tent.innerRot?0:90;renderTentOpts();render();}
+// 이너를 돌리거나 옮기면 안에 깔아둔 매트·코트도 같이 따라가요
+function innerCarry(fn,turn){computeAll();const ia=tentInner(),a=ia&&ia.poly;const inside=a?state.pieces.filter(p=>p.parent==null&&p._v&&pointInPoly(centroid(p._v),a)):[];
+  const ca=a&&centroid(a);fn();if(!inside.length){return;}const ib=tentInner(),b=ib&&ib.poly;if(!b)return;const cb=centroid(b);
+  inside.forEach(p=>{const w=centroid(p._v);let rx=w[0]-ca[0],ry=w[1]-ca[1];if(turn){[rx,ry]=turn>0?[-ry,rx]:[ry,-rx];p.rot=(((p.rot||0)+turn)%360+360)%360;}
+    const c=centroid(CATALOG[p.type].verts);p.ox=Math.round(cb[0]+rx-c[0]);p.oy=Math.round(cb[1]+ry-c[1]);});computeAll();}
+function rotInner(){const to=tent.innerRot?0:90;innerCarry(()=>{tent.innerRot=to;},to?90:-90);renderTentOpts();render();}
 function lockInner(){tent.innerLock=!tent.innerLock;renderTentOpts();render();}
 function resetInner(){tent.innerOff=null;renderTentOpts();render();}
 // 따로 쓰는 이너(쉘이너·지오에어·고동·직접 입력)는 끌어서 옮기기. 고정하면 안 움직임
@@ -2935,7 +2940,7 @@ function innerDown(e){if(e.button!==undefined&&e.button!==0)return;if(tent.inner
   const sx=e.clientX,sy=e.clientY,P=document.getElementById('innerP'),base=P.getAttribute('points');let moved=false;const seq=gestSeq;
   const onMove=ev=>{if(seq!==gestSeq)return;const dx=ev.clientX-sx,dy=ev.clientY-sy;if(!moved&&Math.hypot(dx,dy)<5)return;moved=true;P.setAttribute('transform',`translate(${(dx/SCALE).toFixed(1)} ${(dy/SCALE).toFixed(1)})`);};
   const onUp=ev=>{window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);if(seq!==gestSeq)return;
-    if(moved){const o=tent.innerOff||[0,0];tent.innerOff=[Math.round(o[0]+(ev.clientX-sx)/SCALE),Math.round(o[1]+(ev.clientY-sy)/SCALE)];justDragged=true;setTimeout(()=>justDragged=false,80);renderTentOpts();render();}};
+    if(moved){const o=tent.innerOff||[0,0];innerCarry(()=>{tent.innerOff=[Math.round(o[0]+(ev.clientX-sx)/SCALE),Math.round(o[1]+(ev.clientY-sy)/SCALE)];},0);justDragged=true;setTimeout(()=>justDragged=false,80);renderTentOpts();render();}};
   window.addEventListener('pointermove',onMove);window.addEventListener('pointerup',onUp);}
 function setCustom(k,v){const n=Math.max(60,Math.min(600,Math.round(+v||0)));tent.custom[k]=n;renderTentOpts();render();}
 function setCanopy(v){tent.canopy=v;fitView();render();}
