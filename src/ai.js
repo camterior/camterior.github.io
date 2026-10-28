@@ -370,28 +370,36 @@ async function aiRun(){
   box.innerHTML=h;box.hidden=false;
   const b=document.getElementById('board');if(b&&b.scrollIntoView&&innerWidth<900)setTimeout(()=>b.scrollIntoView({behavior:'smooth',block:'start'}),400);}
 
-/* --- 장비 추가요청 게시판 (워커 KV에 저장, 매주 일요일 확인 후 추가) --- */
-const RQ_ST={new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정',done:'추가됨',no:'추가 어려움'};
-let RQ=null,RQ_MINE=new Set();try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
+/* --- 게시판: 공지사항 · 장비 요청 · 개발 요청 (워커 KV에 저장, 매주 일요일 확인 후 반영) --- */
+const RQ_ST={gear:{new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정',done:'추가됨',no:'추가 어려움'},dev:{new:'확인 중',ok:'확인됨',sun:'일요일 반영 예정',done:'반영됨',no:'반영 어려움'}};
+let RQ=null,NT=null,BD_TAB='notice',RQ_MINE=new Set();try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
 const rqSave=()=>{try{localStorage.setItem('rqMine',JSON.stringify([...RQ_MINE].slice(-200)));}catch(e){}};
 async function rqCall(b){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})});const d=await r.json().catch(()=>({}));return r.ok?d:{fail:d.error||'error'};}catch(e){return {fail:'error'};}}
-function reqRender(){const ul=document.getElementById('rqList');if(!ul)return;
-  if(!RQ){ul.innerHTML='';return;}
-  if(!RQ.length){ul.innerHTML='<li class="rq-empty">아직 요청이 없어요. 첫 요청을 남겨주세요.</li>';return;}
-  ul.innerHTML=RQ.slice(0,60).map(r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(r.at||'')}</small></div>
-    <span class="rq-badge s-${aiEsc(r.st)}">${RQ_ST[r.st]||'확인 중'}</span>
-    <button type="button" class="rq-plus" ${RQ_MINE.has(r.id)||r.st==='done'||r.st==='no'?'disabled':''} onclick="reqPlus('${aiEsc(r.id)}')" aria-label="${aiEsc(r.name)} 나도 필요해">나도 필요해 ${r.n||1}</button></li>`).join('');}
-async function reqLoad(force){if(RQ&&!force){reqRender();return;}const st=document.getElementById('rqSt');
-  const d=await rqCall({op:'list'});if(d.fail){if(st)st.textContent='게시판을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.';return;}
-  RQ=d.items||[];if(st&&st.textContent.startsWith('게시판을'))st.textContent='';reqRender();}
-async function reqAdd(name,link,from){const d=await rqCall({op:'add',name,link,from});
-  if(d.ok){RQ=d.items;RQ_MINE.add(d.id);rqSave();reqRender();if(typeof camEv==='function')camEv('req/'+encodeURIComponent(String(name).slice(0,30)),'장비 추가 요청');}
+function bdShow(k){BD_TAB=k;['notice','gear','dev'].forEach(x=>{const t=document.getElementById('bdt-'+x),p=document.getElementById('bd-'+x);if(t)t.setAttribute('aria-selected',x===k);if(p)p.hidden=x!==k;});reqRender();}
+function bdOpen(k){go('board');bdShow(k);}
+const rqDate=s=>String(s||'').slice(5).replace('-','.');
+function reqRender(){
+  const nt=document.getElementById('ntList');
+  if(nt){nt.innerHTML=NT==null?(RQ===false?'<li class="rq-empty">게시판을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.</li>':'<li class="rq-empty">불러오는 중…</li>'):!NT.length?'<li class="rq-empty">아직 공지사항이 없어요.</li>':
+    NT.map(n=>`<li class="${n.pin?'pin':''}"><details${n.pin?' open':''}><summary>${n.pin?'<span class="nt-pin">고정</span>':''}<b>${aiEsc(n.title)}</b><small>${aiEsc(rqDate(n.at))}</small></summary><p>${aiEsc(n.body||'').replace(/\n/g,'<br>')}</p></details></li>`).join('');}
+  ['gear','dev'].forEach(kind=>{const ul=document.getElementById('rqList-'+kind);if(!ul)return;
+    if(!RQ){ul.innerHTML=RQ===false?'<li class="rq-empty">게시판을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.</li>':'';return;}
+    const L=RQ.filter(r=>(r.kind||'gear')===kind);
+    if(!L.length){ul.innerHTML='<li class="rq-empty">아직 요청이 없어요. 첫 요청을 남겨주세요.</li>';return;}
+    ul.innerHTML=L.slice(0,80).map(r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(rqDate(r.at))}</small>${r.note?`<p>${aiEsc(r.note)}</p>`:''}${r.reply?`<p class="rq-re">↳ ${aiEsc(r.reply)}</p>`:''}</div>
+      <span class="rq-badge s-${aiEsc(r.st)}">${RQ_ST[kind][r.st]||'확인 중'}</span>
+      <button type="button" class="rq-plus" ${RQ_MINE.has(r.id)||r.st==='done'||r.st==='no'?'disabled':''} onclick="reqPlus('${aiEsc(r.id)}')" aria-label="${aiEsc(r.name)} 나도 필요해">나도 필요해 ${r.n||1}</button></li>`).join('');});}
+async function reqLoad(force){if(RQ&&NT&&!force){reqRender();return;}
+  const d=await rqCall({op:'list'});if(d.fail){RQ=false;reqRender();return;}
+  RQ=d.items||[];NT=d.notices||[];reqRender();}
+async function reqAdd(kind,name,link,note,from){const d=await rqCall({op:'add',kind,name,link,note,from});
+  if(d.ok){RQ=d.items;if(d.notices)NT=d.notices;RQ_MINE.add(d.id);rqSave();reqRender();if(typeof camEv==='function')camEv('req-'+kind+'/'+encodeURIComponent(String(name).slice(0,30)),kind==='dev'?'개발 요청':'장비 추가 요청');}
   return d;}
-async function reqSend(){const n=document.getElementById('rqName'),l=document.getElementById('rqLink'),st=document.getElementById('rqSt');
-  const name=n.value.trim();if(name.length<2){st.textContent='장비 이름을 적어주세요';n.focus();return;}
-  st.textContent='보내는 중…';const d=await reqAdd(name,l.value.trim(),'form');
-  st.textContent=d.ok?'요청했어요. 일요일에 확인해서 추가할게요.':d.fail==='quota'?'오늘은 요청을 많이 보냈어요. 내일 다시 남겨주세요.':'보내지 못했어요. 잠시 뒤 다시 해주세요.';
-  if(d.ok){n.value='';l.value='';}}
+async function reqSend(kind){const n=document.getElementById('rqName-'+kind),l=document.getElementById('rqLink-'+kind),t=document.getElementById('rqNote-'+kind),st=document.getElementById('rqSt-'+kind);
+  const name=n.value.trim();if(name.length<2){st.textContent=kind==='dev'?'한 줄 요약을 적어주세요':'장비 이름을 적어주세요';n.focus();return;}
+  st.textContent='보내는 중…';const d=await reqAdd(kind,name,l?l.value.trim():'',t?t.value.trim():'','form');
+  st.textContent=d.ok?'요청했어요. 일요일에 확인할게요.':d.fail==='quota'?'오늘은 요청을 많이 보냈어요. 내일 다시 남겨주세요.':'보내지 못했어요. 잠시 뒤 다시 해주세요.';
+  if(d.ok){n.value='';if(l)l.value='';if(t)t.value='';}}
 async function reqPlus(id){if(RQ_MINE.has(id))return;const d=await rqCall({op:'plus',id});if(d.ok){RQ=d.items;RQ_MINE.add(id);rqSave();reqRender();}}
-async function reqAsk(b){b.disabled=true;const t=b.textContent;b.textContent='보내는 중…';const d=await reqAdd(b.dataset.n,'','ai');
+async function reqAsk(b){b.disabled=true;const t=b.textContent;b.textContent='보내는 중…';const d=await reqAdd('gear',b.dataset.n,'','','ai');
   b.textContent=d.ok?`${b.dataset.n} · 요청했어요 (일요일에 확인)`:d.fail==='quota'?'오늘 요청을 많이 보냈어요':'보내지 못했어요';if(!d.ok)setTimeout(()=>{b.disabled=false;b.textContent=t;},2500);}

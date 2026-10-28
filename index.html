@@ -658,7 +658,7 @@
   .tabbar{display:none}
   @media (max-width:860px){
     .appbar .nav,.appbar .pill{display:none}
-    .tabbar{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:rgba(255,255,255,.94);backdrop-filter:saturate(160%) blur(16px);-webkit-backdrop-filter:saturate(160%) blur(16px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+    .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:rgba(255,255,255,.94);backdrop-filter:saturate(160%) blur(16px);-webkit-backdrop-filter:saturate(160%) blur(16px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
     .tabbar a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;color:var(--ink-3);text-decoration:none;font-size:11.5px;font-weight:700;border-radius:12px;min-height:48px}
     .tabbar svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
     .tabbar a[aria-current="page"]{color:var(--accent)}
@@ -895,7 +895,25 @@
 .aiset .rq-ask{border:1px dashed var(--maple);background:#fff;color:var(--maple);border-radius:999px;padding:7px 12px;font-weight:700;font-size:13px;cursor:pointer;min-height:36px}
 .aiset .rq-ask:disabled{border-style:solid;cursor:default;opacity:.85}
 .rq-jump{margin:14px auto -14px}.rq-jump button{border:1px dashed var(--line);background:var(--surface);border-radius:999px;padding:9px 16px;font:inherit;font-size:14px;color:var(--ink-2);cursor:pointer;min-height:40px}.rq-jump b{color:var(--maple)}
-.reqb{scroll-margin-top:140px;margin:8px auto 36px;padding:24px;border:1px solid var(--line);border-radius:22px;background:var(--surface)}
+.bdwrap{padding-block:24px 40px}
+.bd-tabs{display:flex;gap:6px;margin:0 0 16px;overflow-x:auto}
+.bd-tabs button{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 18px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;min-height:44px;color:var(--ink-2)}
+.bd-tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.bd-pane{padding:24px;border:1px solid var(--line);border-radius:22px;background:var(--surface)}
+.bd-foot{color:var(--ink-3);font-size:13px;margin:12px 4px 0}
+.nt-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.nt-list li{border:1px solid var(--line);border-radius:14px;background:#fff}
+.nt-list li.pin{border-color:#F2C7A8;background:#FFF9F4}
+.nt-list summary{display:flex;align-items:baseline;gap:8px;padding:14px 16px;cursor:pointer;list-style:none}
+.nt-list summary::-webkit-details-marker{display:none}
+.nt-list summary b{flex:1;font-size:16px}
+.nt-list summary small{color:var(--ink-3);font-family:var(--mono);font-size:12px}
+.nt-list .nt-pin{flex:none;font-size:11.5px;font-weight:800;color:#B4501C;background:#FFE9D9;border-radius:999px;padding:2px 8px}
+.nt-list details p{margin:0;padding:0 16px 16px;color:var(--ink-2);line-height:1.7}
+.reqb .rq-form.dev{grid-template-columns:1fr}.reqb .rq-form .wide{grid-column:1/-1;order:2}.reqb .rq-form.dev .btn-dark{order:3;grid-column:1/-1}
+.reqb textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;background:#fff;resize:vertical}
+.reqb .rq-n p{flex-basis:100%;margin:2px 0 0;color:var(--ink-2);font-size:14px;line-height:1.55}
+.reqb .rq-n .rq-re{color:#25683A}
 .reqb .rq-head h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}
 .reqb .rq-head p{margin:6px 0 14px;color:var(--ink-2)}
 .reqb .rq-form{display:grid;grid-template-columns:1.3fr 1fr auto;gap:8px}
@@ -912,7 +930,7 @@
 .reqb .rq-plus{flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;cursor:pointer;min-height:36px}
 .reqb .rq-plus:disabled{opacity:.55;cursor:default}
 .reqb .rq-empty{color:var(--ink-3);justify-content:center}
-@media (max-width:720px){.reqb{padding:18px;border-radius:18px}.reqb .rq-form{grid-template-columns:1fr}.reqb .rq-list li{flex-wrap:wrap}.reqb .rq-n{flex-basis:100%}}
+@media (max-width:720px){.bd-pane{padding:18px;border-radius:18px}.reqb .rq-form{grid-template-columns:1fr}.reqb .rq-list li{flex-wrap:wrap}.reqb .rq-n{flex-basis:100%}}
 </style>
 
 </head>
@@ -924,6 +942,7 @@
     <a href="#intro" data-go="intro" data-tab="intro">소개</a>
     <a href="#plan" data-go="plan" data-tab="plan">내부 구성</a>
     <a href="#gear" data-go="gear" data-tab="gear">장비 제원</a>
+    <a href="#board" data-go="board" data-tab="board">게시판</a>
     <a href="#hub" data-go="hub" data-tab="hub">캠핑 허브</a>
   </nav>
   <a class="pill ink" href="#plan" data-go="plan">배치 시작</a>
@@ -1065,23 +1084,54 @@
   </header>
   <nav class="gnav" aria-label="장비 분류"><div class="wrap"><div class="gn-in" id="gearNav" role="group"></div>
     <label class="gsearch"><span class="sr-only">장비 찾기</span><input id="gearQ" type="search" placeholder="장비 찾기 (예: 노나돔, CK-149)" oninput="renderGear()"></label></div></nav>
-  <p class="wrap rq-jump"><button type="button" onclick="document.getElementById('reqBoard').scrollIntoView({behavior:'smooth',block:'start'})">찾는 장비가 없나요? <b>추가 요청 게시판 ↓</b></button></p>
+  <p class="wrap rq-jump"><button type="button" onclick="bdOpen('gear')">찾는 장비가 없나요? <b>게시판에 추가 요청 →</b></button></p>
   <div class="wrap gearbody" id="gearBody"></div>
-  <section class="wrap reqb" id="reqBoard" aria-labelledby="reqTitle">
-    <div class="rq-head"><h2 id="reqTitle">찾는 장비가 없나요?</h2><p>추가 요청을 남겨주세요. 모아서 확인한 뒤 <b>매주 일요일</b>에 한 번에 넣어요.</p></div>
-    <form class="rq-form" onsubmit="event.preventDefault();reqSend()">
-      <label><span class="sr-only">장비 이름</span><input id="rqName" maxlength="40" placeholder="장비 이름 (예: 마운틴리버 야전침대)" required></label>
-      <label><span class="sr-only">상품 링크</span><input id="rqLink" maxlength="300" inputmode="url" placeholder="상품 링크 (있으면)"></label>
-      <button type="submit" class="btn-dark">추가 요청</button>
-    </form>
-    <p class="rq-st" id="rqSt" role="status"></p>
-    <ul class="rq-list" id="rqList"></ul>
-  </section>
   <div hidden><div id="lineFilter"></div><div id="lineup-list"></div></div>
   <p class="wrap gearsrc">규격 출처: 판매처 상품 상세, 제조사 공식 페이지와 카탈로그. ‘판매처’는 판매처 표기, ‘사진추정’은 사진 비율로 계산한 값이에요. 구매 전에는 제품 설명서를 확인해 주세요.</p>
 </div>
 
-<!-- ============ 4. 캠핑 허브 ============ -->
+<!-- ============ 4. 게시판 ============ -->
+<div class="view" id="v-board" data-view="board" hidden>
+  <header class="vhero" aria-labelledby="boardTitle">
+    <img src="img/flatlay.webp" alt="" aria-hidden="true">
+    <div class="wrap vh-in">
+      <p class="eyebrow">Board</p>
+      <h1 id="boardTitle">게시판</h1>
+      <p>공지사항을 보고, 필요한 장비나 기능을 요청해 주세요. 매주 일요일에 확인해서 반영해요.</p>
+    </div>
+  </header>
+  <div class="wrap bdwrap">
+    <div class="bd-tabs" role="tablist" aria-label="게시판 종류">
+      <button type="button" role="tab" id="bdt-notice" aria-selected="true" onclick="bdShow('notice')">공지사항</button>
+      <button type="button" role="tab" id="bdt-gear" aria-selected="false" onclick="bdShow('gear')">장비 요청</button>
+      <button type="button" role="tab" id="bdt-dev" aria-selected="false" onclick="bdShow('dev')">개발 요청</button>
+    </div>
+    <section class="bd-pane" id="bd-notice" role="tabpanel" aria-labelledby="bdt-notice"><ul class="nt-list" id="ntList"><li class="rq-empty">불러오는 중…</li></ul></section>
+    <section class="bd-pane reqb" id="bd-gear" role="tabpanel" aria-labelledby="bdt-gear" hidden>
+      <div class="rq-head"><h2>찾는 장비가 없나요?</h2><p>장비 제원에 없는 장비를 알려주세요. 모아서 확인한 뒤 <b>매주 일요일</b>에 한 번에 넣어요.</p></div>
+      <form class="rq-form" onsubmit="event.preventDefault();reqSend('gear')">
+        <label><span class="sr-only">장비 이름</span><input id="rqName-gear" maxlength="40" placeholder="장비 이름 (예: 마운틴리버 야전침대)" required></label>
+        <label><span class="sr-only">상품 링크</span><input id="rqLink-gear" maxlength="300" inputmode="url" placeholder="상품 링크 (있으면)"></label>
+        <button type="submit" class="btn-dark">추가 요청</button>
+      </form>
+      <p class="rq-st" id="rqSt-gear" role="status"></p>
+      <ul class="rq-list" id="rqList-gear"></ul>
+    </section>
+    <section class="bd-pane reqb" id="bd-dev" role="tabpanel" aria-labelledby="bdt-dev" hidden>
+      <div class="rq-head"><h2>이런 기능이 있으면 좋겠어요</h2><p>불편한 점이나 바라는 기능을 적어주세요. 일요일에 확인하고 반영할 것부터 진행해요.</p></div>
+      <form class="rq-form dev" onsubmit="event.preventDefault();reqSend('dev')">
+        <label><span class="sr-only">제목</span><input id="rqName-dev" maxlength="40" placeholder="한 줄 요약 (예: 배치를 PDF로 저장)" required></label>
+        <label class="wide"><span class="sr-only">자세한 내용</span><textarea id="rqNote-dev" maxlength="300" rows="3" placeholder="자세한 내용 (있으면)"></textarea></label>
+        <button type="submit" class="btn-dark">요청하기</button>
+      </form>
+      <p class="rq-st" id="rqSt-dev" role="status"></p>
+      <ul class="rq-list" id="rqList-dev"></ul>
+    </section>
+    <p class="bd-foot">개인정보(전화번호·주소 등)는 적지 마세요. 공개 게시판이라 누구나 볼 수 있어요.</p>
+  </div>
+</div>
+
+<!-- ============ 5. 캠핑 허브 ============ -->
 <div class="view" id="v-hub" data-view="hub" hidden>
   <header class="vhero hubhero" aria-labelledby="hubTitle">
     <img src="img/dawn.webp" alt="" aria-hidden="true">
@@ -1143,6 +1193,7 @@
   <a href="#intro" data-go="intro" data-tab="intro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 12 5l9 14H3Z"/><path d="M12 5v14"/></svg><span>소개</span></a>
   <a href="#plan" data-go="plan" data-tab="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 12h9v8.5M12.5 3.5V8"/></svg><span>내부 구성</span></a>
   <a href="#gear" data-go="gear" data-tab="gear"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="11" rx="2"/><path d="M7.5 7v11M12 7v11M16.5 7v11M3 12.5h18"/></svg><span>장비 제원</span></a>
+  <a href="#board" data-go="board" data-tab="board"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v10H9l-5 4v-14Z"/><path d="M8 9.5h8M8 12.5h5"/></svg><span>게시판</span></a>
   <a href="#hub" data-go="hub" data-tab="hub"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11 15.7 7M8.3 13l7.4 4"/></svg><span>캠핑 허브</span></a>
 </nav>
 
@@ -3716,7 +3767,7 @@ async function exportCard(){
 /* =====================================================================
    CAMTERIOR — app tabs, gear spec catalog, share links
    ===================================================================== */
-const VIEWS=['intro','plan','gear','hub'];
+const VIEWS=['intro','plan','gear','board','hub'];
 const LEGACY={top:'intro',features:'intro',how:'intro',lineup:'gear',journal:'hub',commons:'hub'};
 let CUR='intro',planFitted=false;
 const IN_CLAUDE=!!window.claude||!!document.querySelector('[data-art]');
@@ -3726,7 +3777,7 @@ addEventListener('scroll',updBar,{passive:true});
 function go(v,opts){opts=opts||{};v=LEGACY[v]||v;if(!VIEWS.includes(v))v='intro';
   const changed=v!==CUR;CUR=v;document.body.dataset.view=v;
   VIEWS.forEach(k=>{document.getElementById('v-'+k).hidden=k!==v;});
-  if(v==='gear'&&typeof reqLoad==='function')reqLoad();
+  if(v==='board'&&typeof reqLoad==='function')reqLoad();
   document.querySelectorAll('[data-tab]').forEach(a=>{if(a.dataset.tab===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v)history.pushState(null,'','#'+v);
   if(changed&&!opts.keepScroll)window.scrollTo(0,0);
@@ -4355,30 +4406,38 @@ async function aiRun(){
   box.innerHTML=h;box.hidden=false;
   const b=document.getElementById('board');if(b&&b.scrollIntoView&&innerWidth<900)setTimeout(()=>b.scrollIntoView({behavior:'smooth',block:'start'}),400);}
 
-/* --- 장비 추가요청 게시판 (워커 KV에 저장, 매주 일요일 확인 후 추가) --- */
-const RQ_ST={new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정',done:'추가됨',no:'추가 어려움'};
-let RQ=null,RQ_MINE=new Set();try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
+/* --- 게시판: 공지사항 · 장비 요청 · 개발 요청 (워커 KV에 저장, 매주 일요일 확인 후 반영) --- */
+const RQ_ST={gear:{new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정',done:'추가됨',no:'추가 어려움'},dev:{new:'확인 중',ok:'확인됨',sun:'일요일 반영 예정',done:'반영됨',no:'반영 어려움'}};
+let RQ=null,NT=null,BD_TAB='notice',RQ_MINE=new Set();try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
 const rqSave=()=>{try{localStorage.setItem('rqMine',JSON.stringify([...RQ_MINE].slice(-200)));}catch(e){}};
 async function rqCall(b){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})});const d=await r.json().catch(()=>({}));return r.ok?d:{fail:d.error||'error'};}catch(e){return {fail:'error'};}}
-function reqRender(){const ul=document.getElementById('rqList');if(!ul)return;
-  if(!RQ){ul.innerHTML='';return;}
-  if(!RQ.length){ul.innerHTML='<li class="rq-empty">아직 요청이 없어요. 첫 요청을 남겨주세요.</li>';return;}
-  ul.innerHTML=RQ.slice(0,60).map(r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(r.at||'')}</small></div>
-    <span class="rq-badge s-${aiEsc(r.st)}">${RQ_ST[r.st]||'확인 중'}</span>
-    <button type="button" class="rq-plus" ${RQ_MINE.has(r.id)||r.st==='done'||r.st==='no'?'disabled':''} onclick="reqPlus('${aiEsc(r.id)}')" aria-label="${aiEsc(r.name)} 나도 필요해">나도 필요해 ${r.n||1}</button></li>`).join('');}
-async function reqLoad(force){if(RQ&&!force){reqRender();return;}const st=document.getElementById('rqSt');
-  const d=await rqCall({op:'list'});if(d.fail){if(st)st.textContent='게시판을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.';return;}
-  RQ=d.items||[];if(st&&st.textContent.startsWith('게시판을'))st.textContent='';reqRender();}
-async function reqAdd(name,link,from){const d=await rqCall({op:'add',name,link,from});
-  if(d.ok){RQ=d.items;RQ_MINE.add(d.id);rqSave();reqRender();if(typeof camEv==='function')camEv('req/'+encodeURIComponent(String(name).slice(0,30)),'장비 추가 요청');}
+function bdShow(k){BD_TAB=k;['notice','gear','dev'].forEach(x=>{const t=document.getElementById('bdt-'+x),p=document.getElementById('bd-'+x);if(t)t.setAttribute('aria-selected',x===k);if(p)p.hidden=x!==k;});reqRender();}
+function bdOpen(k){go('board');bdShow(k);}
+const rqDate=s=>String(s||'').slice(5).replace('-','.');
+function reqRender(){
+  const nt=document.getElementById('ntList');
+  if(nt){nt.innerHTML=NT==null?(RQ===false?'<li class="rq-empty">게시판을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.</li>':'<li class="rq-empty">불러오는 중…</li>'):!NT.length?'<li class="rq-empty">아직 공지사항이 없어요.</li>':
+    NT.map(n=>`<li class="${n.pin?'pin':''}"><details${n.pin?' open':''}><summary>${n.pin?'<span class="nt-pin">고정</span>':''}<b>${aiEsc(n.title)}</b><small>${aiEsc(rqDate(n.at))}</small></summary><p>${aiEsc(n.body||'').replace(/\n/g,'<br>')}</p></details></li>`).join('');}
+  ['gear','dev'].forEach(kind=>{const ul=document.getElementById('rqList-'+kind);if(!ul)return;
+    if(!RQ){ul.innerHTML=RQ===false?'<li class="rq-empty">게시판을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.</li>':'';return;}
+    const L=RQ.filter(r=>(r.kind||'gear')===kind);
+    if(!L.length){ul.innerHTML='<li class="rq-empty">아직 요청이 없어요. 첫 요청을 남겨주세요.</li>';return;}
+    ul.innerHTML=L.slice(0,80).map(r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(rqDate(r.at))}</small>${r.note?`<p>${aiEsc(r.note)}</p>`:''}${r.reply?`<p class="rq-re">↳ ${aiEsc(r.reply)}</p>`:''}</div>
+      <span class="rq-badge s-${aiEsc(r.st)}">${RQ_ST[kind][r.st]||'확인 중'}</span>
+      <button type="button" class="rq-plus" ${RQ_MINE.has(r.id)||r.st==='done'||r.st==='no'?'disabled':''} onclick="reqPlus('${aiEsc(r.id)}')" aria-label="${aiEsc(r.name)} 나도 필요해">나도 필요해 ${r.n||1}</button></li>`).join('');});}
+async function reqLoad(force){if(RQ&&NT&&!force){reqRender();return;}
+  const d=await rqCall({op:'list'});if(d.fail){RQ=false;reqRender();return;}
+  RQ=d.items||[];NT=d.notices||[];reqRender();}
+async function reqAdd(kind,name,link,note,from){const d=await rqCall({op:'add',kind,name,link,note,from});
+  if(d.ok){RQ=d.items;if(d.notices)NT=d.notices;RQ_MINE.add(d.id);rqSave();reqRender();if(typeof camEv==='function')camEv('req-'+kind+'/'+encodeURIComponent(String(name).slice(0,30)),kind==='dev'?'개발 요청':'장비 추가 요청');}
   return d;}
-async function reqSend(){const n=document.getElementById('rqName'),l=document.getElementById('rqLink'),st=document.getElementById('rqSt');
-  const name=n.value.trim();if(name.length<2){st.textContent='장비 이름을 적어주세요';n.focus();return;}
-  st.textContent='보내는 중…';const d=await reqAdd(name,l.value.trim(),'form');
-  st.textContent=d.ok?'요청했어요. 일요일에 확인해서 추가할게요.':d.fail==='quota'?'오늘은 요청을 많이 보냈어요. 내일 다시 남겨주세요.':'보내지 못했어요. 잠시 뒤 다시 해주세요.';
-  if(d.ok){n.value='';l.value='';}}
+async function reqSend(kind){const n=document.getElementById('rqName-'+kind),l=document.getElementById('rqLink-'+kind),t=document.getElementById('rqNote-'+kind),st=document.getElementById('rqSt-'+kind);
+  const name=n.value.trim();if(name.length<2){st.textContent=kind==='dev'?'한 줄 요약을 적어주세요':'장비 이름을 적어주세요';n.focus();return;}
+  st.textContent='보내는 중…';const d=await reqAdd(kind,name,l?l.value.trim():'',t?t.value.trim():'','form');
+  st.textContent=d.ok?'요청했어요. 일요일에 확인할게요.':d.fail==='quota'?'오늘은 요청을 많이 보냈어요. 내일 다시 남겨주세요.':'보내지 못했어요. 잠시 뒤 다시 해주세요.';
+  if(d.ok){n.value='';if(l)l.value='';if(t)t.value='';}}
 async function reqPlus(id){if(RQ_MINE.has(id))return;const d=await rqCall({op:'plus',id});if(d.ok){RQ=d.items;RQ_MINE.add(id);rqSave();reqRender();}}
-async function reqAsk(b){b.disabled=true;const t=b.textContent;b.textContent='보내는 중…';const d=await reqAdd(b.dataset.n,'','ai');
+async function reqAsk(b){b.disabled=true;const t=b.textContent;b.textContent='보내는 중…';const d=await reqAdd('gear',b.dataset.n,'','','ai');
   b.textContent=d.ok?`${b.dataset.n} · 요청했어요 (일요일에 확인)`:d.fail==='quota'?'오늘 요청을 많이 보냈어요':'보내지 못했어요';if(!d.ok)setTimeout(()=>{b.disabled=false;b.textContent=t;},2500);}
 
 </script>

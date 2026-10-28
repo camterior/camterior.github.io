@@ -5,6 +5,7 @@
     <a href="#intro" data-go="intro" data-tab="intro">소개</a>
     <a href="#plan" data-go="plan" data-tab="plan">내부 구성</a>
     <a href="#gear" data-go="gear" data-tab="gear">장비 제원</a>
+    <a href="#board" data-go="board" data-tab="board">게시판</a>
     <a href="#hub" data-go="hub" data-tab="hub">캠핑 허브</a>
   </nav>
   <a class="pill ink" href="#plan" data-go="plan">배치 시작</a>
@@ -61,23 +62,54 @@
   </header>
   <nav class="gnav" aria-label="장비 분류"><div class="wrap"><div class="gn-in" id="gearNav" role="group"></div>
     <label class="gsearch"><span class="sr-only">장비 찾기</span><input id="gearQ" type="search" placeholder="장비 찾기 (예: 노나돔, CK-149)" oninput="renderGear()"></label></div></nav>
-  <p class="wrap rq-jump"><button type="button" onclick="document.getElementById('reqBoard').scrollIntoView({behavior:'smooth',block:'start'})">찾는 장비가 없나요? <b>추가 요청 게시판 ↓</b></button></p>
+  <p class="wrap rq-jump"><button type="button" onclick="bdOpen('gear')">찾는 장비가 없나요? <b>게시판에 추가 요청 →</b></button></p>
   <div class="wrap gearbody" id="gearBody"></div>
-  <section class="wrap reqb" id="reqBoard" aria-labelledby="reqTitle">
-    <div class="rq-head"><h2 id="reqTitle">찾는 장비가 없나요?</h2><p>추가 요청을 남겨주세요. 모아서 확인한 뒤 <b>매주 일요일</b>에 한 번에 넣어요.</p></div>
-    <form class="rq-form" onsubmit="event.preventDefault();reqSend()">
-      <label><span class="sr-only">장비 이름</span><input id="rqName" maxlength="40" placeholder="장비 이름 (예: 마운틴리버 야전침대)" required></label>
-      <label><span class="sr-only">상품 링크</span><input id="rqLink" maxlength="300" inputmode="url" placeholder="상품 링크 (있으면)"></label>
-      <button type="submit" class="btn-dark">추가 요청</button>
-    </form>
-    <p class="rq-st" id="rqSt" role="status"></p>
-    <ul class="rq-list" id="rqList"></ul>
-  </section>
   <div hidden><div id="lineFilter"></div><div id="lineup-list"></div></div>
   <p class="wrap gearsrc">규격 출처: 판매처 상품 상세, 제조사 공식 페이지와 카탈로그. ‘판매처’는 판매처 표기, ‘사진추정’은 사진 비율로 계산한 값이에요. 구매 전에는 제품 설명서를 확인해 주세요.</p>
 </div>
 
-<!-- ============ 4. 캠핑 허브 ============ -->
+<!-- ============ 4. 게시판 ============ -->
+<div class="view" id="v-board" data-view="board" hidden>
+  <header class="vhero" aria-labelledby="boardTitle">
+    <img src="img/flatlay.webp" alt="" aria-hidden="true">
+    <div class="wrap vh-in">
+      <p class="eyebrow">Board</p>
+      <h1 id="boardTitle">게시판</h1>
+      <p>공지사항을 보고, 필요한 장비나 기능을 요청해 주세요. 매주 일요일에 확인해서 반영해요.</p>
+    </div>
+  </header>
+  <div class="wrap bdwrap">
+    <div class="bd-tabs" role="tablist" aria-label="게시판 종류">
+      <button type="button" role="tab" id="bdt-notice" aria-selected="true" onclick="bdShow('notice')">공지사항</button>
+      <button type="button" role="tab" id="bdt-gear" aria-selected="false" onclick="bdShow('gear')">장비 요청</button>
+      <button type="button" role="tab" id="bdt-dev" aria-selected="false" onclick="bdShow('dev')">개발 요청</button>
+    </div>
+    <section class="bd-pane" id="bd-notice" role="tabpanel" aria-labelledby="bdt-notice"><ul class="nt-list" id="ntList"><li class="rq-empty">불러오는 중…</li></ul></section>
+    <section class="bd-pane reqb" id="bd-gear" role="tabpanel" aria-labelledby="bdt-gear" hidden>
+      <div class="rq-head"><h2>찾는 장비가 없나요?</h2><p>장비 제원에 없는 장비를 알려주세요. 모아서 확인한 뒤 <b>매주 일요일</b>에 한 번에 넣어요.</p></div>
+      <form class="rq-form" onsubmit="event.preventDefault();reqSend('gear')">
+        <label><span class="sr-only">장비 이름</span><input id="rqName-gear" maxlength="40" placeholder="장비 이름 (예: 마운틴리버 야전침대)" required></label>
+        <label><span class="sr-only">상품 링크</span><input id="rqLink-gear" maxlength="300" inputmode="url" placeholder="상품 링크 (있으면)"></label>
+        <button type="submit" class="btn-dark">추가 요청</button>
+      </form>
+      <p class="rq-st" id="rqSt-gear" role="status"></p>
+      <ul class="rq-list" id="rqList-gear"></ul>
+    </section>
+    <section class="bd-pane reqb" id="bd-dev" role="tabpanel" aria-labelledby="bdt-dev" hidden>
+      <div class="rq-head"><h2>이런 기능이 있으면 좋겠어요</h2><p>불편한 점이나 바라는 기능을 적어주세요. 일요일에 확인하고 반영할 것부터 진행해요.</p></div>
+      <form class="rq-form dev" onsubmit="event.preventDefault();reqSend('dev')">
+        <label><span class="sr-only">제목</span><input id="rqName-dev" maxlength="40" placeholder="한 줄 요약 (예: 배치를 PDF로 저장)" required></label>
+        <label class="wide"><span class="sr-only">자세한 내용</span><textarea id="rqNote-dev" maxlength="300" rows="3" placeholder="자세한 내용 (있으면)"></textarea></label>
+        <button type="submit" class="btn-dark">요청하기</button>
+      </form>
+      <p class="rq-st" id="rqSt-dev" role="status"></p>
+      <ul class="rq-list" id="rqList-dev"></ul>
+    </section>
+    <p class="bd-foot">개인정보(전화번호·주소 등)는 적지 마세요. 공개 게시판이라 누구나 볼 수 있어요.</p>
+  </div>
+</div>
+
+<!-- ============ 5. 캠핑 허브 ============ -->
 <div class="view" id="v-hub" data-view="hub" hidden>
   <header class="vhero hubhero" aria-labelledby="hubTitle">
     <img src="img/dawn.webp" alt="" aria-hidden="true">
@@ -107,5 +139,6 @@
   <a href="#intro" data-go="intro" data-tab="intro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 12 5l9 14H3Z"/><path d="M12 5v14"/></svg><span>소개</span></a>
   <a href="#plan" data-go="plan" data-tab="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 12h9v8.5M12.5 3.5V8"/></svg><span>내부 구성</span></a>
   <a href="#gear" data-go="gear" data-tab="gear"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="11" rx="2"/><path d="M7.5 7v11M12 7v11M16.5 7v11M3 12.5h18"/></svg><span>장비 제원</span></a>
+  <a href="#board" data-go="board" data-tab="board"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v10H9l-5 4v-14Z"/><path d="M8 9.5h8M8 12.5h5"/></svg><span>게시판</span></a>
   <a href="#hub" data-go="hub" data-tab="hub"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11 15.7 7M8.3 13l7.4 4"/></svg><span>캠핑 허브</span></a>
 </nav>

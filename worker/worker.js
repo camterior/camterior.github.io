@@ -28,29 +28,31 @@ function codeOk(env, code) {
   return env.INVITE_CODE.split(",").map(s => s.trim()).filter(Boolean).includes(String(code).trim());
 }
 
-// 장비 추가요청 게시판
-const ST = ["new", "ok", "sun", "done", "no"]; // 확인 중 · 확인됨 · 일요일 추가 예정 · 추가됨 · 추가 어려움
-const clip = (v, n) => String(v || "").replace(/[<>\u0000-\u001f]/g, " ").trim().slice(0, n);
+// 게시판: 공지사항(관리자만) · 장비 요청 · 개발 요청
+const ST = ["new", "ok", "sun", "done", "no"]; // 확인 중 · 확인됨 · 일요일 반영 예정 · 반영됨 · 어려움
+const clip = (v, n) => String(v || "").replace(/[<>\u0000-\u0009\u000b-\u001f]/g, " ").trim().slice(0, n);
 const norm = s => s.toLowerCase().replace(/[\s·\-_,./()]+/g, "");
+const today = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
 async function board(b, env, request, origin) {
   if (!env.RL) return json({ error: "board-off" }, 503, origin);
   const list = JSON.parse((await env.RL.get("reqs")) || "[]");
-  const pub = () => list.filter(r => r.st !== "hide").map(({ id, name, brand, link, note, n, st, at }) => ({ id, name, brand, link, note, n, st, at }));
-  if (b.op === "list") return json({ items: pub() }, 200, origin);
+  const notices = JSON.parse((await env.RL.get("notices")) || "[]");
+  const pub = () => list.filter(r => r.st !== "hide").map(({ id, kind, name, link, note, reply, n, st, at }) => ({ id, kind: kind || "gear", name, link, note, reply, n, st, at }));
+  const pubN = () => notices.slice().sort((a, b) => (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || (b.at > a.at ? 1 : -1));
+  if (b.op === "list") return json({ items: pub(), notices: pubN() }, 200, origin);
   if (b.op === "add" || b.op === "plus") {
     const ip = request.headers.get("CF-Connecting-IP") || "0";
-    const day = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
-    const rk = `b:${day}:${ip}`, used = parseInt(await env.RL.get(rk)) || 0;
+    const rk = `b:${today()}:${ip}`, used = parseInt(await env.RL.get(rk)) || 0;
     if (used >= 10) return json({ error: "quota" }, 429, origin);
     let r;
     if (b.op === "plus") r = list.find(x => x.id === b.id);
     else {
-      const name = clip(b.name, 40);
+      const kind = b.kind === "dev" ? "dev" : "gear", name = clip(b.name, 40);
       if (name.length < 2) return json({ error: "empty" }, 400, origin);
-      r = list.find(x => norm(x.name) === norm(name) && x.st !== "hide");
+      r = list.find(x => (x.kind || "gear") === kind && norm(x.name) === norm(name) && x.st !== "hide");
       if (!r) {
-        if (list.length >= 500) return json({ error: "full" }, 507, origin);
-        r = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, brand: clip(b.brand, 30), link: /^https?:\/\//.test(b.link || "") ? clip(b.link, 300) : "", note: clip(b.note, 200), n: 0, st: "new", at: day, from: b.from === "ai" ? "ai" : "form" };
+        if (list.length >= 800) return json({ error: "full" }, 507, origin);
+        r = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), kind, name, link: /^https?:\/\//.test(b.link || "") ? clip(b.link, 300) : "", note: clip(b.note, 300), n: 0, st: "new", at: today(), from: b.from === "ai" ? "ai" : "form" };
         list.unshift(r);
       }
     }
@@ -60,11 +62,29 @@ async function board(b, env, request, origin) {
     await env.RL.put(rk, String(used + 1), { expirationTtl: 172800 });
     return json({ ok: true, id: r.id, items: pub() }, 200, origin);
   }
+  // 관리자: 상태·답글 바꾸기, 공지 쓰기·지우기
+  if (!env.ADMIN_KEY || b.key !== env.ADMIN_KEY) return json({ error: "key" }, 403, origin);
   if (b.op === "admin") {
-    if (!env.ADMIN_KEY || b.key !== env.ADMIN_KEY) return json({ error: "key" }, 403, origin);
     const r = list.find(x => x.id === b.id);
-    if (r && (ST.includes(b.st) || b.st === "hide")) { r.st = b.st; await env.RL.put("reqs", JSON.stringify(list)); }
-    return json({ ok: true, items: list }, 200, origin);
+    if (r) {
+      if (ST.includes(b.st) || b.st === "hide") r.st = b.st;
+      if (typeof b.reply === "string") r.reply = clip(b.reply, 200);
+      await env.RL.put("reqs", JSON.stringify(list));
+    }
+    return json({ ok: true, items: list, notices: pubN() }, 200, origin);
+  }
+  if (b.op === "notice") {
+    if (b.act === "add") {
+      const title = clip(b.title, 60);
+      if (!title) return json({ error: "empty" }, 400, origin);
+      notices.unshift({ id: Date.now().toString(36), title, body: clip(b.body, 2000), pin: !!b.pin, at: today() });
+    } else if (b.act === "del") {
+      const k = notices.findIndex(n => n.id === b.id); if (k >= 0) notices.splice(k, 1);
+    } else if (b.act === "pin") {
+      const n = notices.find(n => n.id === b.id); if (n) n.pin = !n.pin;
+    }
+    await env.RL.put("notices", JSON.stringify(notices.slice(0, 100)));
+    return json({ ok: true, items: list, notices: pubN() }, 200, origin);
   }
   return json({ error: "op" }, 400, origin);
 }
