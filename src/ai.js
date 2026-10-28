@@ -31,13 +31,15 @@ function aiZone(id){const c=CATALOG[id];
   if(c.kind==='frame'||['shelf','box','fridge'].includes(c.gtype)||c.group==='알루미늄 박스'||id==='sp_kitchen')return 'wall';
   return 'center';}
 
+// 사진 속 실제 배치를 옮긴 대본 50개 중 대표 20개 (count 1은 생략). 전체 50개는 scripts/ai-scripts50.json 시험용
+const AI_EXAMPLES=[["랜드록 안에 IGT 롱 하나 벽쪽에 두고 양쪽 끝에 코너테이블 L이랑 R 붙여줘. 칸에는 설봉원, 플랫버너, 우드테이블 W 넣고 다리는 660. 가운데에 원액션테이블 롱 하나, FD체어 4개, 옆에 강염버너 하나.",{"tent":"landlock","items":[{"type":"long4","zone":"wall","attach":[{"type":"corner_L","shape":"line"},{"type":"corner_R","shape":"line"}],"slots":[{"id":"seppou","count":1},{"id":"flat","count":1},{"id":"wood_w","count":1}],"leg":660},{"type":"sp_oat_l","zone":"center"},{"type":"sp_fd","count":4,"zone":"center"},{"type":"sp_gs1000","zone":"center"}],"unknown":[],"tip":"IGT 롱 8칸이 설봉원·플랫버너·우드테이블 W로 꽉 차요. 강염버너는 텐트 벽에서 떨어뜨려 두세요."}],["리빙쉘 롱 프로에 원액션 로우테이블 2개 가운데 두고 로우체어 30 두 개, 강염버너 하나. 벽쪽엔 쉘프컨테이너 50, 이너룸엔 메가매트 듀오. 육각 테이블도 있어.",{"tent":"living_shell_long_pro","items":[{"type":"sp_oat_low","count":2,"zone":"center"},{"type":"sp_low30","count":2,"zone":"center"},{"type":"sp_gs1000","zone":"center"},{"type":"sc50","zone":"wall"},{"type":"megamat_duo","zone":"inner"}],"unknown":["육각 테이블"],"tip":"로우테이블 높이에 맞춰 로우체어 30을 붙였어요. 육각 테이블은 아직 제원에 없어서 뺐어요."}],["쉘터GM 앞쪽에 세퍼레이트 IGT, 칸에 설봉원이랑 플랫버너 넣고 앞에 멀티펑션 롱 T자로. 뒤쪽으로 원액션테이블 롱 하나랑 FD체어 2개.",{"tent":"mw_shelter_gm","items":[{"type":"sep3","zone":"bottom","attach":[{"type":"mf_long","shape":"T"}],"slots":[{"id":"seppou","count":1},{"id":"flat","count":1}]},{"type":"sp_oat_l","zone":"top"},{"type":"sp_fd","count":2,"zone":"top"}],"unknown":[],"tip":"요리하는 IGT는 입구 쪽, 식탁은 안쪽에 두면 연기가 밖으로 잘 빠져요."}],["카즈미 비바돔 플러스에 마운틴리버 야전침대 하나, 헬리녹스 선셋체어, 스텐 마이테이블, 강염버너.",{"tent":null,"items":[{"type":"hx_sunset","zone":"center"},{"type":"mytable_s","zone":"center"},{"type":"sp_gs1000","zone":"center"}],"unknown":["카즈미 비바돔 플러스","마운틴리버 야전침대"],"tip":"비바돔 플러스와 마운틴리버 야전침대는 아직 제원에 없어서 뺐어요."}],["메락 프로 가운데 지카로 테이블 두고 로우체어 쇼트 4개 둘러앉게, 벽쪽엔 IGT 롱에 코너테이블 L 붙이고 플랫버너, 설봉원. 코트원 하나 벽쪽.",{"tent":"merak_pro","items":[{"type":"sp_jikaro","zone":"center"},{"type":"sp_lowshort","count":4,"zone":"center"},{"type":"long4","zone":"wall","attach":[{"type":"corner_L","shape":"line"}],"slots":[{"id":"flat","count":1},{"id":"seppou","count":1}]},{"type":"cot_one","zone":"wall"}],"unknown":[],"tip":"지카로 테이블 둘레로 앉고, 주방 IGT는 벽쪽에 붙여 가운데 길을 비웠어요."}],["쉘터GM에 세퍼레이트 3유닛에 플랫버너, 설봉원, 원유닛 트레이 하나. 하프슬라이드 하나 붙이고 FD체어 2개 IGT 앞에 앉게.",{"tent":"mw_shelter_gm","items":[{"type":"sep3","zone":"wall","attach":[{"type":"slide_h","shape":"line"}],"slots":[{"id":"flat","count":1},{"id":"seppou","count":1},{"id":"steel1","count":1}]},{"type":"sp_fd","count":2,"zone":"center"}],"unknown":[],"tip":"버너 앞이라 의자는 IGT에서 한 뼘 띄웠어요."}],["메락 프로에 IGT 롱, 칸엔 플랫버너 설봉원 우드테이블 W. 앞에 노가체어 3개 쭉 앉게.",{"tent":"merak_pro","items":[{"type":"long4","zone":"wall","slots":[{"id":"flat","count":1},{"id":"seppou","count":1},{"id":"wood_w","count":1}]},{"type":"noga_chair","count":3,"zone":"center","at":"long4"}],"unknown":[],"tip":"IGT 앞 바 자리예요. 버너 앞이라 의자를 한 뼘 띄웠어요."}],["미니멀웍스 쉘터g 에어에 스탠마이테이블 2개랑 헬리녹스체어원 2개",{"tent":"mw_shelter_gair","items":[{"type":"mytable_s","count":2,"zone":"center"},{"type":"hx_one","count":2,"zone":"center"}],"unknown":[],"tip":""}],["쉘터GM에 원액션 로우테이블, FD체어 2개, 이백 아이스박스, 크레모아 랜턴, 우드랙",{"tent":"mw_shelter_gm","items":[{"type":"sp_oat_low","zone":"center"},{"type":"sp_fd","count":2,"zone":"center"}],"unknown":["이백 아이스박스","크레모아 랜턴","우드랙"],"tip":"아이스박스·랜턴·우드랙은 아직 제원에 없어서 뺐어요."}],["쿠디 파밀리아 프로에 IGT 롱 벽쪽, 양쪽 끝에 코너테이블 L R, 앞에 멀티펑션 롱 T자. 칸은 플랫버너, 설봉원, 스텐트레이, 우드테이블 S. 원액션테이블 롱에 테이크체어 4개, FD체어 2개는 멀티펑션 쪽.",{"tent":"cd_familia_pro","items":[{"type":"long4","zone":"wall","attach":[{"type":"corner_L","shape":"line"},{"type":"corner_R","shape":"line"},{"type":"mf_long","shape":"T"}],"slots":[{"id":"flat","count":1},{"id":"seppou","count":1},{"id":"steel1","count":1},{"id":"wood_s","count":1}]},{"type":"sp_oat_l","zone":"center"},{"type":"sp_take","count":4,"zone":"center"},{"type":"sp_fd","count":2,"zone":"center","at":"long4"}],"unknown":[],"tip":"6명 자리예요. 멀티펑션 쪽은 요리하며 먹는 자리, 원액션테이블은 식탁이에요."}],["랜드브리즈 4에 IGT 레귤러 다리 830, 플랫버너 스텐트레이 두 개. 원액션테이블 하이에 FD체어 2개.",{"tent":"sp_landbreeze4","items":[{"type":"reg3","zone":"wall","slots":[{"id":"flat","count":1},{"id":"steel1","count":2}],"leg":830},{"type":"sp_oat","zone":"center"},{"type":"sp_fd","count":2,"zone":"center"}],"unknown":[],"tip":"830 다리는 서서 요리하는 높이예요."}],["리빙쉘에 알루텍 93 두 개, 알루텍 68 하나, 쉘프컨테이너 25 두 개 다 벽쪽, 폴딩쉘프 메탈탑 하나.",{"tent":"living_shell","items":[{"type":"alu93","count":2,"zone":"wall"},{"type":"alu68","zone":"wall"},{"type":"sc25","count":2,"zone":"wall"},{"type":"fshelf_m","zone":"wall"}],"unknown":[],"tip":"수납은 벽을 따라 붙여 가운데를 비웠어요."}],["랜드네스트 쉘터에 IGT 레귤러, 오픈멀티펑션 L이랑 R 양쪽에. 칸은 플랫버너, 스텐트레이, 리드트레이, 스텐박스. 로우체어 쇼트 4개.",{"tent":"sp_landnest","items":[{"type":"reg3","zone":"wall","attach":[{"type":"open_L","shape":"line"},{"type":"open_R","shape":"line"}],"slots":[{"id":"flat","count":1},{"id":"steel1","count":1},{"id":"lid_half","count":1},{"id":"box_half","count":1}]},{"type":"sp_lowshort","count":4,"zone":"center"}],"unknown":[],"tip":""}],["콜맨 웨더마스터 와이드 2룸 코쿤 IV에 원액션테이블 롱, FD체어 4개.",{"tent":null,"items":[{"type":"sp_oat_l","zone":"center"},{"type":"sp_fd","count":4,"zone":"center"}],"unknown":["콜맨 웨더마스터 와이드 2룸 코쿤 IV"],"tip":"코쿤 IV는 아직 제원에 없어요. 비슷한 모델로 바꾸지 않았어요."}],["IGT 레귤러에 플랫버너 2개랑 스텐트레이 하나. 원액션 로우테이블, 로우체어 30 2개.",{"tent":null,"items":[{"type":"reg3","zone":"wall","slots":[{"id":"flat","count":2},{"id":"steel1","count":1}]},{"type":"sp_oat_low","zone":"center"},{"type":"sp_low30","count":2,"zone":"center"}],"unknown":[],"tip":""}],["쿠디 10.0에 냉장고 도메틱 45는 오른쪽 끝, 쉘프컨테이너 50은 왼쪽, 가운데 원액션테이블 롱에 FD체어 4개.",{"tent":"cd_100","items":[{"type":"cfx3_45","zone":"right"},{"type":"sc50","zone":"left"},{"type":"sp_oat_l","zone":"center"},{"type":"sp_fd","count":4,"zone":"center"}],"unknown":[],"tip":""}],["FD체어x4, 원액션테이블롱x1, 랜드록",{"tent":"landlock","items":[{"type":"sp_fd","count":4,"zone":"center"},{"type":"sp_oat_l","zone":"center"}],"unknown":[],"tip":""}],["리빙쉘 롱 프로, IGT 롱에 플랫버너 설봉원 우드테이블 W, IGT 앞엔 노가체어 2개. 원액션 로우테이블엔 로우체어 30 2개.",{"tent":"living_shell_long_pro","items":[{"type":"long4","zone":"wall","slots":[{"id":"flat","count":1},{"id":"seppou","count":1},{"id":"wood_w","count":1}]},{"type":"noga_chair","count":2,"zone":"center","at":"long4"},{"type":"sp_oat_low","zone":"center"},{"type":"sp_low30","count":2,"zone":"center","at":"sp_oat_low"}],"unknown":[],"tip":"요리 바와 낮은 거실을 나눴어요."}],["어메니티돔 M 이너룸에 스패로우 그랜드50, 거실엔 헬리녹스 테이블원에 체어원 2개.",{"tent":"sp_amenity_m","items":[{"type":"sparrow50","zone":"inner"},{"type":"hx_t1","zone":"center"},{"type":"hx_one","count":2,"zone":"center"}],"unknown":[],"tip":""}],["도쿄크래프트 윙 아래 IGT 레귤러 플랫버너, 원액션테이블 롱, 커밋체어 4개.",{"tent":"tc_wing","items":[{"type":"reg3","zone":"wall","slots":[{"id":"flat","count":1}]},{"type":"sp_oat_l","zone":"center"},{"type":"kermit","count":4,"zone":"center"}],"unknown":[],"tip":""}]];
 function aiSystem(){
   const tents=TENT_ORDER.filter(id=>id!=='none').map(id=>`${id}|${aiTentName(id)}${aiAl(id)}`).join('\n');
   const gear=aiIds().map(id=>`${id}|${CATALOG[id].name}|${CATALOG[id].group}${aiAl(id)}`).join('\n');
   const ext=AI_EXTS.map(id=>`${id}|${CATALOG[id].name}${aiAl(id)}`).join('\n');
   const slots=SLOT_ITEMS.map(t=>`${t.id}|${t.name}|${t.halves/2}유닛${aiAl(t.id)}`).join('\n');
   return `너는 캠핑 텐트 안 배치 도우미야. 사용자 글에서 장비와 원하는 위치를 읽고 아래 목록의 id로만 바꿔.
-JSON만 출력: {"tent":"텐트 id 또는 null","items":[{"type":"장비 id","count":1,"zone":"wall|center|inner|left|right|top|bottom","attach":[{"type":"결합 id","shape":"T|line"}],"slots":[{"id":"칸 파츠 id","count":1}],"leg":660}],"unknown":["목록에 없는 장비"],"tip":"배치 팁 한두 문장(한국어, 존댓말)"}
+JSON만 출력: {"tent":"텐트 id 또는 null","items":[{"type":"장비 id","count":1,"zone":"wall|center|inner|left|right|top|bottom","attach":[{"type":"결합 id","shape":"T|line"}],"slots":[{"id":"칸 파츠 id","count":1}],"leg":660,"at":"(체어만) 앉을 테이블·IGT id"}],"unknown":["목록에 없는 장비"],"tip":"배치 팁 한두 문장(한국어, 존댓말)"}
 규칙:
 - 사용자 글에 없는 장비는 절대 추가하지 마. 띄어쓰기·오타가 있어도 (=별칭)을 보고 맞춰 (예: 스탠마이테이블=mytable_s).
 - 수량이 없으면 1. 같은 id는 count로 합쳐. 목록에 없으면 unknown에 원래 이름 그대로.
@@ -48,6 +50,8 @@ JSON만 출력: {"tent":"텐트 id 또는 null","items":[{"type":"장비 id","co
 - 의자는 따로 흩어 두지 않아. 코드가 테이블(없으면 IGT 앞) 둘레에 앉혀 주니까 체어는 zone을 비우거나 center로.
 - 동선: 요리(IGT)는 벽쪽, 식탁 세트는 그 앞, 출입구에서 이너룸까지 길은 비워. tip에 이런 동선 팁을 짧게.
 - 텐트를 말하지 않으면 null.
+[예시] 입력 → 출력 (count 없으면 1)
+${AI_EXAMPLES.map(([q,o])=>q+' → '+JSON.stringify(o)).join('\n')}
 [텐트]
 ${tents}
 [장비]
@@ -104,10 +108,11 @@ function aiClean(o){const ids=new Set(aiIds()),exts=new Set(AI_EXTS),out={tent:n
     if(AI_SLOTS.includes(it.type)||AI_SLOTS.includes(it.id)){looseS.push({id:it.type||it.id,count:Math.min(8,Math.max(1,+it.count||1))});return;}
     if(!ids.has(it.type))return;
     const x={type:it.type,count:Math.min(AI_MAX_EACH,Math.max(1,Math.round(+it.count||1))),zone:AI_ZONES.includes(it.zone)?it.zone:null};
+    if(CATALOG[it.type].gtype==='chair'&&typeof it.at==='string'&&(ids.has(it.at)||AI_ROOTS.includes(it.at)))x.at=it.at;
     if(AI_ROOTS.includes(it.type)){x.attach=(Array.isArray(it.attach)?it.attach:[]).filter(a=>a&&exts.has(a.type)).slice(0,6).map(a=>({type:a.type,shape:a.shape==='T'?'T':'line'}));
       if([300,400,660,830].includes(+it.leg))x.leg=+it.leg;
       x.slots=(Array.isArray(it.slots)?it.slots:[]).filter(a=>a&&AI_SLOTS.includes(a.id)).slice(0,8).map(a=>({id:a.id,count:Math.min(8,Math.max(1,Math.round(+a.count||1)))}));}
-    const same=items.find(y=>y.type===x.type&&!x.attach?.length&&!y.attach?.length&&y.zone===x.zone);
+    const same=items.find(y=>y.type===x.type&&!x.attach?.length&&!y.attach?.length&&y.zone===x.zone&&y.at===x.at);
     if(same)same.count=Math.min(AI_MAX_EACH,same.count+x.count);else items.push(x);});
   if(loose.length||looseS.length){let f=items.find(i=>AI_ROOTS.includes(i.type));if(!f){f={type:'reg3',count:1,zone:null,attach:[],slots:[]};items.unshift(f);}
     f.attach=(f.attach||[]).concat(loose).slice(0,6);f.slots=(f.slots||[]).concat(looseS);}
@@ -143,7 +148,7 @@ function aiBuild(it){
       // 앉을 상판: 테이블 자체, IGT면 붙은 멀티펑션·코너·오픈멀티(없으면 IGT 앞, 버너가 있으니 10cm 띄움)
       const ext=set.filter(p=>p!==root&&CATALOG[p.type].kind==='ext'),fr=c.kind==='frame',host=fr&&ext.length?ext:fr?set.filter(p=>p===root||CATALOG[p.type].kind==='tray'):[root];
       const b=bbox(host.flatMap(p=>p._v)),W=b[1][0]-b[0][0],D=b[1][1]-b[0][1],horiz=W>=D,L=horiz?W:D;
-      const bar=fr&&!ext.length,IN=bar?-100:60,cwMax=Math.max(...it.seats.map(t=>CATALOG[t].w)),k=bar?Math.min(it.seats.length,3):Math.max(1,Math.floor((L+40)/(cwMax+40)));
+      const bar=fr&&!ext.length,IN=bar?-100:60,cwMax=Math.max(...it.seats.map(t=>CATALOG[t].w)),k=bar?Math.min(it.seats.length,3):Math.max(1,Math.floor((L+150)/(cwMax+20)));
       let sides=['+','-'];if(fr&&!ext.length){const ib=bbox(set.flatMap(p=>p._v)),fb=bbox(root._v),plus=horiz?ib[1][1]-fb[1][1]:ib[1][0]-fb[1][0],minus=horiz?fb[0][1]-ib[0][1]:fb[0][0]-ib[0][0];sides=[plus>=minus?'+':'-'];}
       const spots=[];for(let i=0;i<k;i++)sides.forEach(sd=>spots.push({sd,i}));if(!(fr&&!ext.length))spots.push({sd:'e+'},{sd:'e-'});
       const mid=[(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2],lo=horiz?b[0][0]:b[0][1],others=set.filter(p=>!host.includes(p)),taken=[];
@@ -193,7 +198,7 @@ function aiPlace(list){
       if(PS.some(pl=>doors.some(d=>satPen(pl,d)>3)))continue;
       if(PS.some(pl=>polyGap(pl,R.wall)<gapW))continue;
       if(strict&&lane&&it.zone!=='inner'&&PS.some(pl=>satPen(pl,lane)>3))continue;
-      const need=q=>Math.max(heat||q.heat?700:0,strict&&!(it.zone==='wall'&&q.zone==='wall')?WALK:60);
+      const need=q=>Math.max(heat||q.heat?(strict?700:300):0,strict&&!(it.zone==='wall'&&q.zone==='wall')?WALK:60);
       if(placed.some(q=>{const g=need(q);return PS.some(pl=>q.polys.some(qp=>satPen(pl,qp)>3||polyGap(pl,qp)<g));}))continue;
       const b=bbox(V),ce=[(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2];let s;
       if(it.zone==='wall')s=CV.reduce((a,v)=>a+aiEdgeDist(v,R.wall),0)/CV.length;
@@ -221,8 +226,12 @@ function aiApply(res){
   const isChair=u=>CATALOG[u.type].gtype==='chair'&&(!u.zone||u.zone==='center'||u.zone==='top'||u.zone==='bottom');
   const isTable=u=>{const c=CATALOG[u.type];return c.kind==='gear'&&c.gtype==='table'&&!['sp_kitchen','mytable','mytable_s'].includes(u.type)&&Math.max(c.w,c.d)>=500;};
   const chairs=units.filter(isChair),hosts=units.filter(isTable).sort((a,b)=>CATALOG[b.type].w*CATALOG[b.type].d-CATALOG[a.type].w*CATALOG[a.type].d);
-  if(!hosts.length){const f=units.find(u=>AI_ROOTS.includes(u.type));if(f)hosts.push(f);}
-  if(hosts.length&&chairs.length){const cap=h=>{const c=CATALOG[h.type];if(c.kind!=='gear')return 4;const cw=Math.max(...chairs.map(u=>CATALOG[u.type].w));return 2*Math.max(1,Math.floor((Math.max(c.w,c.d)+40)/(cw+40)))+2;};
+  const roots=units.filter(u=>AI_ROOTS.includes(u.type));
+  roots.filter(u=>(u.attach||[]).some(a=>CATALOG[a.type].kind!=='tray')).forEach(u=>hosts.push(u));
+  if(!hosts.length&&roots.length)hosts.push(roots[0]);
+  // "IGT 앞에" 처럼 자리를 지정한 의자 먼저
+  chairs.filter(u=>u.at).forEach(u=>{const h=units.find(v=>v.type===u.at&&v!==u);if(h){h.seats.push(u.type);units.splice(units.indexOf(u),1);chairs.splice(chairs.indexOf(u),1);}});
+  if(hosts.length&&chairs.length){const cap=h=>{const c=CATALOG[h.type];if(c.kind!=='gear')return 4;const cw=Math.max(...chairs.map(u=>CATALOG[u.type].w));return 2*Math.max(1,Math.floor((Math.max(c.w,c.d)+150)/(cw+20)))+2;};
     let hi=0;chairs.forEach(u=>{while(hi<hosts.length-1&&hosts[hi].seats.length>=cap(hosts[hi]))hi++;hosts[hi].seats.push(u.type);});chairs.forEach(u=>units.splice(units.indexOf(u),1));
     hosts.forEach(h=>{if(!h.zone&&!AI_ROOTS.includes(h.type))h.zone='center';});}
   const list=[];units.forEach(it=>{const b=aiBuild(it);list.push({type:it.type,zone:it.zone||aiZone(it.type),...b});
