@@ -1659,6 +1659,7 @@ const CATALOG={
   h020:{kind:'h020',group:'행거',name:'스텐박스행거 하프유닛',model:'CK-020',conf:'retailer',spec:'340×161mm',...h020Shape()},
 };
 /* free-standing gear: no mating edges, real footprint + height */
+function octPoly(w,d,k){return [[k,0],[w-k,0],[w,k],[w,d-k],[w-k,d],[k,d],[0,d-k],[0,k]];}
 function circPoly(r,n){const v=[];for(let k=0;k<n;k++){const a=k/n*Math.PI*2;v.push([r+r*Math.cos(a),r+r*Math.sin(a)]);}return v;}
 const gearShape=(w,d)=>shape(rect(w,d),[]);
 const HEAT_NOTE='이격 거리는 플래너 권장값이에요(천·가구에서 1m). 제품 설명서가 우선이에요.';
@@ -1748,6 +1749,8 @@ const GEAR={
     note:'46L 컴프레서 냉장고. 12/24V·220V. 바닥 크기는 35와 같고 높이만 높아요',href:'https://www.dometic.com/en/product/dometic-cfx3-45-9620009573',srcName:'도메틱 공식'},
   cfx3_55:{gtype:'fridge',group:'냉장고',name:'도메틱 CFX3 55',model:'CFX3 55',conf:'official',w:720,d:455,h:480,kg:21.2,sw:'#3B3F44',
     note:'55L 컴프레서 냉장고. 12/24V·220V',href:'https://www.dometic.com/en/product/dometic-cfx3-55-9620009574',srcName:'도메틱 공식'},
+  sp_jikaro:{gtype:'table',top:'steel',oct:true,group:'테이블',name:'스노우피크 지카로 테이블',model:'ST-050',conf:'official',w:1120,d:1120,h:400,kg:10.5,sw:'#B9BDC1',
+    note:'가운데 600×600mm가 뚫린 스테인리스 화로 테이블. 다리 위치를 바꾸면 890×890mm(구멍 370mm)로도 써요. 화로대는 별도',href:'https://www.snowpeak.com/products/jikaro-table',srcName:'스노우피크 공식'},
   sp_gs1000:{gtype:'burner',round:true,group:'버너',name:'스노우피크 강염버너',model:'GS-1000',conf:'retailer',w:350,d:350,h:420,kg:1.8,sw:'#8C9196',
     note:'바닥에 세우는 강염 스토브(삼발 다리). 삼발 지름 350mm, 높이 420mm, 8,500kcal. 화기라 천·텐트 벽에서 떨어뜨려 두세요',href:'https://campinglist.co.kr/product/%EC%8A%A4%EB%85%B8%EC%9A%B0%ED%94%BC%ED%81%AC-%EA%B0%95%EC%97%BC%EC%8A%A4%ED%86%A0%EB%B8%8C-gs-1000-%EA%B0%95%EC%97%BC%EB%B2%84%EB%84%88-%EA%B7%B8%EB%A6%AC%EB%93%A4%EB%B2%84%EB%84%88/124/',srcName:'캠핑리스트 상품 상세'},
 };
@@ -1755,7 +1758,7 @@ const GEAR_GROUPS=['쉘프컨테이너','알루미늄 박스','마이테이블',
 const GEAR_ORDER=Object.keys(GEAR);
 const gLink=g=>g.href||(g.src?SRC+g.src:null),gLinkName=g=>g.srcName||'아이엘캠프 상품 상세';
 const GEAR_CAT=Object.fromEntries(Object.entries(GEAR).map(([id,g])=>[id,{kind:'gear',...g,short:g.name,
-  spec:`${g.w}×${g.d}×${g.h}mm${g.sh?', 좌면 '+g.sh+'mm':''}${g.kg?', '+g.kg+'kg':''}`,...(g.gtype==='stove'||g.round?shape(circPoly(g.w/2,28),[]):gearShape(g.w,g.d))}]));
+  spec:`${g.w}×${g.d}×${g.h}mm${g.sh?', 좌면 '+g.sh+'mm':''}${g.kg?', '+g.kg+'kg':''}`,...(g.gtype==='stove'||g.round?shape(circPoly(g.w/2,28),[]):g.oct?shape(octPoly(g.w,g.d,g.w*.22),[]):gearShape(g.w,g.d))}]));
 const GROUPS=['IGT 프레임','세퍼레이트 IGT','멀티펑션','오픈멀티펑션','코너테이블','슬라이드 트레이','행거'];
 const ORDER=['reg3','long4','sep2','sep3','sep4','mf_reg','mf_long','open_L','open_R','corner_L','corner_R','slide_h','slide_hl','h020'];
 Object.assign(CATALOG,GEAR_CAT);
@@ -2061,6 +2064,8 @@ function gearBody(p,fine){const c=CATALOG[p.type],w=c.w,d=c.d;let o='';
     o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="16" fill="${bf}" stroke="${bs}" stroke-width="5"/><rect x="26" y="26" width="${w-52}" height="${d-52}" rx="10" fill="${bi}" stroke="${bs}" stroke-width="3"/>`;
     [[0,d/2],[w,d/2]].forEach(([x,y])=>{o+=`<rect x="${x-14}" y="${y-48}" width="28" height="96" rx="12" fill="#C9CDD0" stroke="#7F8489" stroke-width="3"/>`;});return o;}
   const fill=c.top==='steel'?'url(#steelL)':c.top==='black'?'#2B2E31':'url(#bamboo)',stroke=c.top==='bamboo'?'#A07A3C':'#4A4E52';
+  if(c.oct){const pts=octPoly(w,d,w*.22).map(v=>v.join(',')).join(' '),hs=w*.268;o+=`<polygon points="${pts}" fill="url(#steelL)" stroke="#4A4E52" stroke-width="5"/><rect x="${w/2-hs}" y="${d/2-hs}" width="${hs*2}" height="${hs*2}" rx="6" fill="#2A2C2E" stroke="#4A4E52" stroke-width="4"/>`;
+    [[w*.22,0,w*.22,d],[w*.78,0,w*.78,d]].forEach(([a,b,c2,e])=>{o+=`<line x1="${a}" y1="${b}" x2="${c2}" y2="${e}" stroke="rgba(60,64,68,.25)" stroke-width="3"/>`;});return o;}
   if(c.round){const r=w/2;o+=`<circle cx="${r}" cy="${r}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="5"/>`;if(c.top==='bamboo')o+=`<circle cx="${r}" cy="${r}" r="${r}" fill="url(#sheen)" opacity=".5" pointer-events="none"/>`;return o;}
   if(c.gtype==='shelf'){[0,w-30].forEach(x=>{o+=`<rect x="${x}" y="-6" width="30" height="${d+12}" rx="8" fill="#9EA3A7" stroke="#6E7378" stroke-width="3"/>`;});}
   o+=`<rect x="${c.gtype==='shelf'?18:0}" y="0" width="${c.gtype==='shelf'?w-36:w}" height="${d}" rx="20" fill="${fill}" stroke="${stroke}" stroke-width="5"/>`;
@@ -2828,6 +2833,8 @@ function igt3(THREE){
       else if(c.gtype==='fridge'){const fm=new THREE.MeshStandardMaterial({color:c.sw,roughness:.6,metalness:.2});grp.add(extrudePoly(THREE,R(0,0,w,d),0,h-30,fm));
         grp.add(extrudePoly(THREE,R(10,10,w-10,d-10),h-30,h,new THREE.MeshStandardMaterial({color:'#565B61',roughness:.5})));}
       else if(c.gtype==='fan'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h,M.fan));grp.add(extrudePoly(THREE,R(30,d-4,w-30,d+4),40,h*.5,M.grillF));}
+      else if(c.oct){const pts=octPoly(w,d,w*.22).map(X),hs=w*.268;grp.add(extrudePoly(THREE,pts,h-14,h,M.steel));grp.add(extrudePoly(THREE,R(w/2-hs,d/2-hs,w/2+hs,d/2+hs),h,h+2,M.dark));
+        [[w*.3,60],[w*.7,60],[w*.3,d-60],[w*.7,d-60]].forEach(q=>grp.add(cyl(THREE,X(q),0,h-14,10,M.leg)));}
       else if(c.round){const topM=c.top==='steel'?M.steel:c.top==='black'?M.dark:M.bamboo,ce=X([w/2,w/2]),me=new THREE.Mesh(new THREE.CylinderGeometry(mm(w/2),mm(w/2),mm(22),40),topM);
         me.position.set(mm(ce[0]),mm(h-11),mm(ce[1]));me.castShadow=true;grp.add(me);
         [[w*.25,w*.25],[w*.75,w*.25],[w*.25,w*.75],[w*.75,w*.75]].forEach(q=>grp.add(cyl(THREE,X(q),0,h-22,10,M.leg)));}

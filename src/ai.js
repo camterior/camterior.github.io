@@ -16,7 +16,7 @@ const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유�
   sep2:['세퍼레이트 2유닛','세퍼레이트 하프'],sep3:['세퍼레이트 3유닛','세퍼레이트 레귤러','세퍼레이트 IGT'],sep4:['세퍼레이트 4유닛','세퍼레이트 롱'],
   mf_reg:['멀티펑션','멀티펑션 테이블'],slide_h:['하프슬라이드','슬라이드하프','슬라이드 트레이'],slide_hl:['하프슬라이드 롱','슬라이드하프롱'],
   mytable_s:['스텐 마이테이블','스탠 마이테이블','스텐마이테이블','스탠마이테이블','스테인리스 마이테이블'],
-  flat:['플랫버너'],sp_gs1000:['강염버너','강염스토브','GS-1000','스노우피크 강염'],seppou:['설봉','그릴버너'],steel1:['원유닛 트레이','1유닛 트레이','스텐트레이','스텐 트레이','스탠트레이'],lid_half:['리드트레이'],box_half:['스텐박스'],
+  flat:['플랫버너'],sp_jikaro:['지카로','지카로테이블','지카로 테이블','ST-050'],sp_gs1000:['강염버너','강염스토브','GS-1000','스노우피크 강염'],seppou:['설봉','그릴버너'],steel1:['원유닛 트레이','1유닛 트레이','스텐트레이','스텐 트레이','스탠트레이'],lid_half:['리드트레이'],box_half:['스텐박스'],
   wood_s:['우드테이블 S','우드 S'],wood_w:['우드테이블 W','우드 W'],mesh_d1:['메쉬트레이 딥'],mesh_s1:['메쉬트레이'],mf_long:['멀티펑션 롱','멀티펑션롱'],open_L:['오픈멀티펑션 L'],open_R:['오픈멀티펑션 R'],corner_L:['코너테이블 L'],corner_R:['코너테이블 R'],
   sp_fd:['FD체어','에프디체어'],hx_one:['체어원'],omni230:['옴니','옴니230'],camp5000:['파세코 팬히터','캠프5000','파세코'],mk_stove:['MK스토브','화목난로','장작난로'],toyotomi_lcl53:['토요토미 팬히터','LC-L53'],sfh_bh900:['신일 900','신일 팬히터 900'],sfh1200:['신일 1200','신일 팬히터 1200'],cfx3_35:['도메틱 35','CFX3 35'],cfx3_45:['도메틱 45','CFX3 45'],cfx3_55:['도메틱 55','CFX3 55'],
   megamat_duo:['메가매트 듀오'],megamat:['메가매트'],cot_one:['코트원'],sp_oat_low:['원액션 로우'],sp_oat:['원액션테이블'],
@@ -42,9 +42,11 @@ JSON만 출력: {"tent":"텐트 id 또는 null","items":[{"type":"장비 id","co
 - 사용자 글에 없는 장비는 절대 추가하지 마. 띄어쓰기·오타가 있어도 (=별칭)을 보고 맞춰 (예: 스탠마이테이블=mytable_s).
 - 수량이 없으면 1. 같은 id는 count로 합쳐. 목록에 없으면 unknown에 원래 이름 그대로.
 - zone: 사용자가 말한 위치를 따름. 가운데/중앙=center, 벽쪽=wall, 오른쪽(끝)=right, 왼쪽=left, 위쪽/뒤쪽=top, 아래쪽/앞쪽=bottom, 이너룸/침실=inner. 말이 없으면 매트·코트=inner, IGT·선반·박스=wall, 체어·테이블·난로=center.
-- [결합] 목록의 멀티펑션·코너·오픈멀티펑션은 혼자 두지 말고 IGT 프레임 항목의 attach에 넣어. "T자/T모양"(IGT 긴 변에 직각)이면 shape "T", 일자로 길게 이으면(IGT 끝에 연결) "line". 말이 없으면 "line". IGT를 말하지 않았으면 reg3을 하나 만들어 붙여.
+- [결합] 목록의 멀티펑션·코너·오픈멀티펑션은 혼자 두지 말고 IGT 프레임 항목의 attach에 넣어. IGT 앞(긴 변)에 붙여 앞으로 내면 shape "T"(T자/앞에 붙여), 일자로 길게 이으면(IGT 끝에 연결) "line". 말이 없으면 "line". IGT를 말하지 않았으면 reg3을 하나 만들어 붙여.
 - [IGT 칸] 목록(버너·트레이·상판·수납)은 장비가 아니라 IGT 프레임 칸에 끼우는 파츠라 IGT 항목의 slots에 넣어. 슬라이드 트레이는 attach(shape line).
 - leg: IGT 다리 높이(300/400/660/830)를 말하면 IGT 항목에 넣어. 없으면 생략.
+- 의자는 따로 흩어 두지 않아. 코드가 테이블(없으면 IGT 앞) 둘레에 앉혀 주니까 체어는 zone을 비우거나 center로.
+- 동선: 요리(IGT)는 벽쪽, 식탁 세트는 그 앞, 출입구에서 이너룸까지 길은 비워. tip에 이런 동선 팁을 짧게.
 - 텐트를 말하지 않으면 null.
 [텐트]
 ${tents}
@@ -135,9 +137,22 @@ function aiBuild(it){
         const q=newPiece(a.type,{parent:root.uid,pEdge:pe.name,mEdge:m});set.push(q);if(pe.long)distributeLong(root,pe.name);
         if(!clash(q))return;set.pop();if(pe.long)distributeLong(root,pe.name);}
       over.push(a.type);});
-    computeAll();}
+    computeAll();
+    const coreN=set.length;set.coreN=coreN;set.left=[];
+    if(it.seats&&it.seats.length){const b=bbox(set.flatMap(p=>p._v)),W=b[1][0]-b[0][0],D=b[1][1]-b[0][1],horiz=W>=D,L=horiz?W:D;
+      const cwMax=Math.max(...it.seats.map(t=>CATALOG[t].w)),k=Math.max(1,Math.floor((L+40)/(cwMax+40)));let sides=['+','-'];
+      if(c.kind==='frame'){const fb=bbox(root._v),plus=horiz?b[1][1]-fb[1][1]:b[1][0]-fb[1][0],minus=horiz?fb[0][1]-b[0][1]:fb[0][0]-b[0][0];sides=[plus>=minus?'+':'-'];}
+      const spots=[];for(let i=0;i<k;i++)sides.forEach(sd=>spots.push({sd,i}));if(c.kind!=='frame')spots.push({sd:'e+'},{sd:'e-'});
+      const mid=[(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2],lo=horiz?b[0][0]:b[0][1],IN=60;
+      it.seats.forEach((t,j)=>{const sp=spots[j];if(!sp){set.left.push(t);return;}const ch=CATALOG[t],cd=ch.d,cc=centroid(ch.verts);let pos,n;
+        if(sp.sd==='+'||sp.sd==='-'){const a=lo+L*(sp.i+.5)/k,pp=sp.sd==='+'?(horiz?b[1][1]:b[1][0])+cd/2-IN:(horiz?b[0][1]:b[0][0])-cd/2+IN;
+          pos=horiz?[a,pp]:[pp,a];n=sp.sd==='+'?(horiz?[0,1]:[1,0]):(horiz?[0,-1]:[-1,0]);}
+        else{const e=sp.sd==='e+'?(horiz?b[1][0]:b[1][1])+cd/2-IN:(horiz?b[0][0]:b[0][1])-cd/2+IN;pos=horiz?[e,mid[1]]:[mid[0],e];n=sp.sd==='e+'?(horiz?[1,0]:[0,1]):(horiz?[-1,0]:[0,-1]);}
+        const rot=n[1]===1?180:n[1]===-1?0:n[0]===1?90:270;
+        set.push(newPiece(t,{ox:pos[0]-cc[0],oy:pos[1]-cc[1],rot,z:0}));});
+      computeAll();}}
   finally{state.pieces=keep;}
-  return {pieces:set,polys:set.map(p=>p._v.map(v=>v.slice())),heat:!!c.heat,over};}
+  return {pieces:set,polys:set.map(p=>p._v.map(v=>v.slice())),heat:!!c.heat,over,coreN:set.coreN,left:set.left,seated:set.length>set.coreN};}
 
 /* --- 자리 잡기 --- */
 function aiRotPolys(polys,rot,P){const th=rot*Math.PI/180,co=Math.cos(th),si=Math.sin(th);
@@ -153,27 +168,39 @@ function aiPlace(list){
   const rank={inner:0,wall:1,left:2,right:2,top:2,bottom:2,center:3};
   const area=x=>x.polys.reduce((s,pl)=>s+polyArea(pl),0);
   const queue=list.slice().sort((a,b)=>rank[a.zone]-rank[b.zone]||area(b)-area(a));
-  const STEP=100;
-  for(const it of queue){const heat=it.heat,gapO=heat?700:60,gapW=heat?600:40;let best=null;
+  const STEP=100,WALK=450;
+  // 동선: 이너룸이 있으면 가장 먼 출입구에서 이너룸까지 폭 70cm 길은 비워둠
+  let lane=null;if(ip&&doors.length){const ic=centroid(ip),far=doors.map(d=>centroid(d)).sort((a,b)=>dist(b,ic)-dist(a,ic))[0];
+    let best2=null;for(let k=0;k<ip.length;k++){const A=ip[k],B=ip[(k+1)%ip.length];for(let t=0;t<=1;t+=.1){const q=[A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t];if(!best2||dist(q,far)<dist(best2,far))best2=q;}}
+    const u=[best2[0]-far[0],best2[1]-far[1]],l=Math.hypot(...u)||1,nn=[-u[1]/l*350,u[0]/l*350];
+    lane=[[far[0]+nn[0],far[1]+nn[1]],[best2[0]+nn[0],best2[1]+nn[1]],[best2[0]-nn[0],best2[1]-nn[1]],[far[0]-nn[0],far[1]-nn[1]]];}
+  aiPlace.lane=lane;
+  const kitchen=()=>placed.filter(q=>q.frame);
+  for(const it of queue){const heat=it.heat,gapW=heat?600:40,core=it.coreN||it.polys.length;let best=null;
+    for(const strict of [true,false]){if(best)break;
     for(const rot of [0,90,180,270])for(let x=bb[0][0];x<=bb[1][0];x+=STEP)for(let y=bb[0][1];y<=bb[1][1];y+=STEP){
-      const PS=aiRotPolys(it.polys,rot,[x,y]),V=PS.flat();
+      const PS=aiRotPolys(it.polys,rot,[x,y]),V=PS.flat(),CV=PS.slice(0,core).flat();
       if(!V.every(v=>R.polys.some(pl=>pointInPoly(v,pl))))continue;
       if(it.zone==='inner'&&ip){if(!V.every(v=>pointInPoly(v,ip)))continue;}
       else if(ip&&PS.some(pl=>satPen(pl,ip)>3||pl.some(v=>pointInPoly(v,ip))))continue;
       if(PS.some(pl=>doors.some(d=>satPen(pl,d)>3)))continue;
       if(PS.some(pl=>polyGap(pl,R.wall)<gapW))continue;
-      if(placed.some(q=>PS.some(pl=>q.polys.some(qp=>satPen(pl,qp)>3||polyGap(pl,qp)<Math.max(gapO,q.heat?700:60)))))continue;
+      if(strict&&lane&&it.zone!=='inner'&&PS.some(pl=>satPen(pl,lane)>3))continue;
+      const need=q=>Math.max(heat||q.heat?700:0,strict&&!(it.zone==='wall'&&q.zone==='wall')?WALK:60);
+      if(placed.some(q=>{const g=need(q);return PS.some(pl=>q.polys.some(qp=>satPen(pl,qp)>3||polyGap(pl,qp)<g));}))continue;
       const b=bbox(V),ce=[(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2];let s;
-      if(it.zone==='wall')s=V.reduce((a,v)=>a+aiEdgeDist(v,R.wall),0)/V.length;
+      if(it.zone==='wall')s=CV.reduce((a,v)=>a+aiEdgeDist(v,R.wall),0)/CV.length;
       else if(it.zone==='inner'&&ip)s=V.reduce((a,v)=>a+aiEdgeDist(v,ip),0)/V.length;
       else if(it.zone==='right')s=(bb[1][0]-b[1][0])*3+Math.abs(ce[1]-R.center[1]);
       else if(it.zone==='left')s=(b[0][0]-bb[0][0])*3+Math.abs(ce[1]-R.center[1]);
       else if(it.zone==='top')s=(b[0][1]-bb[0][1])*3+Math.abs(ce[0]-R.center[0]);
       else if(it.zone==='bottom')s=(bb[1][1]-b[1][1])*3+Math.abs(ce[0]-R.center[0]);
-      else s=dist(ce,R.center)+(heat&&placed.length?-Math.min(...placed.map(q=>dist(ce,centroid(q.polys.flat()))),1500)*.3:0);
+      else{s=dist(ce,R.center)+(heat&&placed.length?-Math.min(...placed.map(q=>dist(ce,centroid(q.polys.flat()))),1500)*.3:0);
+        // 식탁 세트는 주방(IGT) 가까이: 사이 통로 약 80cm
+        if(it.seated&&kitchen().length){const g=Math.min(...kitchen().map(q=>Math.min(...PS.map(pl=>Math.min(...q.polys.map(qp=>polyGap(pl,qp)))))));s=s*.4+Math.abs(g-800)*1.2;}}
       s+=rot%180?1:0; // 같은 점수면 돌리지 않은 쪽
-      if(!best||s<best.s)best={s,rot,P:[x,y],PS};}
-    if(best){placed.push({polys:best.PS,heat});out.push({it,rot:best.rot,P:best.P});}else miss.push(it);}
+      if(!best||s<best.s)best={s,rot,P:[x,y],PS};}}
+    if(best){placed.push({polys:best.PS,heat,zone:it.zone,frame:CATALOG[it.type].kind==='frame'});out.push({it,rot:best.rot,P:best.P});}else miss.push(it);}
   let mx=bb[1][0]+700,my=bb[0][1];
   miss.forEach(it=>{const b=bbox(it.polys.flat()),w=b[1][0]-b[0][0],h=b[1][1]-b[0][1];out.push({it,rot:0,P:[mx-b[0][0],my-b[0][1]]});my+=h+150;});
   return {out,miss:miss.map(m=>m.type)};}
@@ -182,13 +209,24 @@ function aiApply(res){
   if(res.tent&&res.tent!==tent.id){const T=TENTS[res.tent];tent={id:res.tent,inner:T.innerDefault,canopy:false,custom:tent.custom};
     if(tarp.id)placeTarpDefault();renderTentList();renderTentOpts();}
   TW=tarpWorld();
-  const list=[];res.items.forEach(it=>{for(let k=0;k<it.count&&list.length<AI_MAX_TOTAL;k++){
-    const b=aiBuild(it);list.push({type:it.type,zone:it.zone||aiZone(it.type),...b});}});
+  // 의자는 테이블(없으면 IGT 앞)에 둘러앉히고, 남는 의자만 따로 둠
+  const units=[];res.items.forEach(it=>{for(let k=0;k<it.count&&units.length<AI_MAX_TOTAL;k++)units.push({...it,count:1,seats:[]});});
+  const isChair=u=>CATALOG[u.type].gtype==='chair'&&(!u.zone||u.zone==='center'||u.zone==='top'||u.zone==='bottom');
+  const isTable=u=>{const c=CATALOG[u.type];return c.kind==='gear'&&c.gtype==='table'&&!['sp_kitchen','mytable','mytable_s'].includes(u.type)&&Math.max(c.w,c.d)>=500;};
+  const chairs=units.filter(isChair),hosts=units.filter(isTable).sort((a,b)=>CATALOG[b.type].w*CATALOG[b.type].d-CATALOG[a.type].w*CATALOG[a.type].d);
+  if(!hosts.length){const f=units.find(u=>AI_ROOTS.includes(u.type));if(f)hosts.push(f);}
+  if(hosts.length&&chairs.length){const cap=h=>{const c=CATALOG[h.type];if(c.kind!=='gear')return 4;const cw=Math.max(...chairs.map(u=>CATALOG[u.type].w));return 2*Math.max(1,Math.floor((Math.max(c.w,c.d)+40)/(cw+40)))+2;};
+    let hi=0;chairs.forEach(u=>{while(hi<hosts.length-1&&hosts[hi].seats.length>=cap(hosts[hi]))hi++;hosts[hi].seats.push(u.type);});chairs.forEach(u=>units.splice(units.indexOf(u),1));
+    hosts.forEach(h=>{if(!h.zone&&!AI_ROOTS.includes(h.type))h.zone='center';});}
+  const list=[];units.forEach(it=>{const b=aiBuild(it);list.push({type:it.type,zone:it.zone||aiZone(it.type),...b});
+    (b.left||[]).forEach(t=>{const lb=aiBuild({type:t});list.push({type:t,zone:'center',...lb});});});
   const {out,miss}=aiPlace(list);aiApply.over=list.flatMap(x=>x.over||[]);
   state.pieces=[];sel=null;
   out.forEach(({it,rot,P})=>{const root=it.pieces[0],c=centroid(CATALOG[root.type].verts),map={};
     it.pieces.forEach(p=>{const q=newPiece(p.type,{parent:p.parent==null?null:map[p.parent],pEdge:p.pEdge,mEdge:p.mEdge,slide:p.slide});
-      if(p.parent==null){q.ox=P[0]-c[0];q.oy=P[1]-c[1];q.rot=rot;q.z=++Z_TOP;if(p.leg)q.leg=p.leg;}
+      if(p.parent==null&&p===root){q.ox=P[0]-c[0];q.oy=P[1]-c[1];q.rot=rot;q.z=++Z_TOP;if(p.leg)q.leg=p.leg;}
+      else if(p.parent==null){const cp=centroid(CATALOG[p.type].verts),lx=p.ox+cp[0],ly=p.oy+cp[1],th=rot*Math.PI/180,co=Math.cos(th),si=Math.sin(th);
+        q.ox=P[0]+co*lx-si*ly-cp[0];q.oy=P[1]+si*lx+co*ly-cp[1];q.rot=((p.rot||0)+rot)%360;q.z=++Z_TOP;}
       if(p.slots)q.slots=p.slots.map(x=>x&&{...x});
       map[p.uid]=q.uid;state.pieces.push(q);});});
   fitView();render();return miss;}
