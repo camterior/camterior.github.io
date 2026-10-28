@@ -2109,7 +2109,7 @@ function tentLayer(){
   // inner room
   if(inner){const ib=bbox(inner.poly),c=[(ib[0][0]+ib[1][0])/2,(ib[0][1]+ib[1][1])/2];
     const mov=inner.custom&&!tent.innerLock;
-    o+=`<polygon id="innerP" points="${pts(inner.poly)}" fill="url(#hatch)" stroke="${mov?COL.ai:COL.ink}" stroke-opacity=".75" stroke-width="${(mov?2:1.2)*k}" stroke-dasharray="${6*k} ${4*k}"${mov?` class="ctl" style="cursor:move" onpointerdown="innerDown(event)"`:''}>${mov?'<title>끌어서 이너를 옮겨요</title>':''}</polygon>`;
+    o+=`<polygon id="innerP" points="${pts(inner.poly)}" fill="url(#hatch)" stroke="${mov?COL.ai:COL.ink}" stroke-opacity=".75" stroke-width="${(mov?2:1.2)*k}" stroke-dasharray="${6*k} ${4*k}"${mov?` class="ctl" pointer-events="auto" style="cursor:move" onpointerdown="innerDown(event)"`:''}>${mov?'<title>끌어서 이너를 옮겨요</title>':''}</polygon>`;
     o+=`<text x="${c[0]}" y="${c[1]+60}" text-anchor="middle" font-family="Gowun Batang,serif" font-size="${Math.min(200,(ib[1][0]-ib[0][0])/3.2)}" fill="rgba(31,36,33,.22)">${inner.custom?'이너':(inner.label.replace('이너룸 ','')==inner.label?'이너룸':inner.label)}</text>`;
     if((ib[1][0]-ib[0][0])*SCALE>230)o+=`<text x="${c[0]}" y="${c[1]+60+26*k}" text-anchor="middle" font-size="${11.5*k}" fill="${COL.ink2}">${inner.size} cm${inner.posEst?' (위치 추정)':''}</text>`;}
   // doors

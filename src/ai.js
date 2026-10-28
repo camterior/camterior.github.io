@@ -295,6 +295,9 @@ async function aiRun(){
   if(fix&&!r.ok){btn.disabled=false;st.textContent='';AI_CHAT.log.push({who:'ai',t:r.fail==='limit'?'오늘 AI 사용량을 다 써서 고치지 못했어요. 끌어서 직접 다듬어 주세요.':'AI 연결이 안 돼서 고치지 못했어요. 잠시 뒤 다시 해보세요.'});aiChatUI();return;}
   inp.value='';
   if(r.ok){res=aiClean(r.ok);
+    // AI가 글에 없는 칸 파츠를 지어내면 빼기 (이름 맞추기로 찾은 파츠만 남김)
+    {const said=AI_CHAT.said+' '+text,ok=new Set(aiLocal(said).items.flatMap(x=>(x.slots||[]).map(q=>q.id)));
+     res.items.forEach(it=>{if(it.slots)it.slots=it.slots.filter(q=>ok.has(q.id));});}
     // AI가 모른다고 한 이름도 별칭으로 한 번 더 찾아보기
     res.unknown=res.unknown.filter(u=>{const l=aiLocal(u);if(l.inner&&!l.items.length){res.inner=res.inner||l.inner;return false;}if(!l.items.length)return true;
       l.items.forEach(x=>{if(x.slots&&x.slots.length||x.attach&&x.attach.length){let f=res.items.find(i=>AI_ROOTS.includes(i.type));if(f){f.slots=(f.slots||[]).concat(x.slots||[]);f.attach=(f.attach||[]).concat(x.attach||[]);return;}}
