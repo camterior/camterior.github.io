@@ -1863,11 +1863,17 @@ function satPen(A,B){let minO=Infinity;
   return minO;}
 const bbHit=(A,B)=>!(A[1][0]<=B[0][0]||B[1][0]<=A[0][0]||A[1][1]<=B[0][1]||B[1][1]<=A[0][1]);
 const pName=p=>{const c=CATALOG[p.type];return `${c.short||c.name}(${c.model})`;};
-function customInnerPoly(){const T=TENTS[tent.id],w=tent.custom.w*10,d=tent.custom.d*10,b=bbox(T.outer),cy=centroid(T.outer)[1];
+// 쉘터 안에 넣는 인기 이너텐트 (어느 텐트에나 뒤쪽 벽에 붙여 놓기)
+const INNER_PRESETS={
+  shell_duo:{name:'스노우피크 쉘이너 듀오',model:'SD-460',w:210,d:260,h:170,note:'2명, 2.7kg (오캠프 상품 상세)'},
+  geoair2:{name:'디얼스 지오 에어2',model:'Geo-Air 2',w:160,d:200,h:140,note:'에어 이너, 바닥 200×160cm (오캠프 상품 상세)'},
+  godong:{name:'캠빌 고동 2P 에어',model:'GoDong 2P Air',w:230,d:335,h:135,note:'룸 210×155cm, 앞 전실 포함 (캠빌 공식)'}};
+function customInnerPoly(w0,d0){const T=TENTS[tent.id],w=(w0||tent.custom.w)*10,d=(d0||tent.custom.d)*10,b=bbox(T.outer),cy=centroid(T.outer)[1];
   for(let x1=b[1][0]-120;x1-d>=b[0][0];x1-=50){const r=[[x1-d,cy-w/2],[x1,cy-w/2],[x1,cy+w/2],[x1-d,cy+w/2]];if(r.every(v=>pointInPoly(v,T.outer)))return r;}
   const cx=(b[0][0]+b[1][0])/2;return [[cx-d/2,cy-w/2],[cx+d/2,cy-w/2],[cx+d/2,cy+w/2],[cx-d/2,cy+w/2]];}
 function tentInner(){const T=TENTS[tent.id];if(!T.outer||!tent.inner)return null;
   if(tent.inner==='custom')return {label:'이너',model:'',size:`${tent.custom.w}×${tent.custom.d}`,poly:customInnerPoly(),custom:true};
+  if(typeof tent.inner==='string'&&tent.inner.startsWith('p:')){const P=INNER_PRESETS[tent.inner.slice(2)];if(P)return {label:P.name,model:P.model,size:`${P.w}×${P.d}`,poly:customInnerPoly(P.w,P.d),custom:true};}
   return T.inners[tent.inner]||null;}
 function doorZones(){const T=TENTS[tent.id];if(!T.outer)return [];
   return T.doors.filter(d=>d.zone).map(d=>{const A=d.a,B=d.b,L=dist(A,B);let n=[-(B[1]-A[1])/L,(B[0]-A[0])/L];
@@ -2470,6 +2476,8 @@ function renderTentOpts(){const T=TENTS[tent.id];
   let h=`<div class="opt"><span>이너룸</span><div class="seg">`;
   Object.entries(T.inners).forEach(([k,v])=>{h+=`<button aria-pressed="${tent.inner===k}" onclick="setInner('${k}')">${Object.keys(T.inners).length>1?v.label.replace('이너룸 ',''):'전용 이너'}</button>`;});
   h+=`<button aria-pressed="${tent.inner==='custom'}" onclick="setInner('custom')">직접 입력</button><button aria-pressed="${!tent.inner}" onclick="setInner(null)">없음</button></div>`;
+  h+=`<div class="opt" style="margin-top:6px"><span>이너텐트 넣기</span><div class="seg">${Object.entries(INNER_PRESETS).map(([k,P])=>`<button aria-pressed="${tent.inner==='p:'+k}" onclick="setInner('p:${k}')" title="${P.w}×${P.d}cm">${P.name.replace(/^(스노우피크|디얼스|캠빌) /,'')}</button>`).join('')}</div></div>`;
+  if(tent.inner&&tent.inner.startsWith&&tent.inner.startsWith('p:')){const P=INNER_PRESETS[tent.inner.slice(2)];if(P)h+=`<p class="muted" style="margin-top:4px">${P.name} ${P.w}×${P.d}cm · ${P.note}. 뒤쪽 벽에 붙여 놓아요.</p>`;}
   if(tent.inner==='custom')h+=`<div class="inrow"><label>폭 <input type="number" min="60" max="600" step="5" value="${tent.custom.w}" onchange="setCustom('w',this.value)" aria-label="이너 폭 cm"> cm</label>
     <label>깊이 <input type="number" min="60" max="600" step="5" value="${tent.custom.d}" onchange="setCustom('d',this.value)" aria-label="이너 깊이 cm"> cm</label></div>
     <p class="muted" style="margin-top:4px">뒤쪽 벽에 붙여서 놓아요. 폭은 텐트 가로 방향이에요.</p>`;
@@ -2847,7 +2855,7 @@ const num=(v,lo,hi,d)=>{v=Number(v);return Number.isFinite(v)?Math.max(lo,Math.m
 function parsePlan(o){
   if(!o||o.v!==1||!Array.isArray(o.pieces))throw new Error('배치 형식을 읽을 수 없어요');
   const tid=o.tent&&TENTS[o.tent.id]?o.tent.id:'landlock',T=TENTS[tid],ti=o.tent||{};
-  const inner=(ti.inner==='custom'&&T.outer)||ti.inner===null||(ti.inner&&T.inners[ti.inner])?ti.inner:T.innerDefault;
+  const inner=(ti.inner==='custom'&&T.outer)||(typeof ti.inner==='string'&&ti.inner.startsWith('p:')&&INNER_PRESETS[ti.inner.slice(2)]&&T.outer)||ti.inner===null||(ti.inner&&T.inners[ti.inner])?ti.inner:T.innerDefault;
   const nt={id:tid,inner,canopy:!!ti.canopy&&!!T.canopy,canopy2:!!ti.canopy2&&!!T.canopy2,custom:{w:num(ti.custom&&ti.custom.w,60,600,200),d:num(ti.custom&&ti.custom.d,60,600,210)}};
   const nTarp=o.tarp&&TARPS[o.tarp.id]?{id:o.tarp.id,x:num(o.tarp.x,-1e5,1e5,0),y:num(o.tarp.y,-1e5,1e5,0),rot:num(o.tarp.r,0,359,0)}:{id:null,x:0,y:0,rot:0};
   let list=[],seen=new Set();
