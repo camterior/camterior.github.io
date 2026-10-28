@@ -129,8 +129,8 @@ function aiLocal(text){
 async function aiAsk(text,ctx){
   const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),25000);
   try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,
-      body:JSON.stringify({system:aiSystem(ctx||text,!!ctx),prompt:(ctx?'':'내 장비: ')+text})});
-    const d=await r.json().catch(()=>({}));if(!r.ok||!d.text)return {fail:d.error==='limit'?'limit':'error'};
+      body:JSON.stringify({system:aiSystem(ctx||text,!!ctx),prompt:(ctx?'':'내 장비: ')+text,acct:(typeof acctCode==='function'&&acctCode())||undefined})});
+    const d=await r.json().catch(()=>({}));aiShowLeft(d);if(!r.ok||!d.text)return {fail:d.error==='limit'?'limit':d.error==='quota'?'quota':'error'};
     const o=JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim());return {ok:o};}
   catch(e){return {fail:'error'};}finally{clearTimeout(to);}}
 
@@ -329,6 +329,10 @@ function aiTidy(res,said,prev,now){const L=aiLocal(said),want={};
   res.unknown=(res.unknown||[]).filter(u=>!/^(igt|아이지티|타프|텐트|이너|이너텐트|매트|테이블|의자|체어)$/i.test(aiNorm(u)));
   if(added.length&&!(res.added&&res.added.length))res.added=added;
   if(res.inner&&!(prev&&prev.inner===res.inner)&&L.inner!==res.inner)res.inner=L.inner||null;}
+/* 오늘 남은 AI 횟수 (워커가 알려줄 때만 표시) */
+function aiShowLeft(d){const el=document.getElementById('aiLeft');if(!el||!d||d.left==null)return;
+  el.textContent=`오늘 남은 AI ${d.left}/${d.limit}회${d.vip?' · 초대 회원':''}`;el.hidden=false;}
+async function aiCheckLeft(){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({check:true,acct:(typeof acctCode==='function'&&acctCode())||undefined})});aiShowLeft(await r.json());}catch(e){}}
 /* 대화로 고치기: 첫 세팅 뒤에는 '고칠 점'만 적으면 지금 배치를 바탕으로 다시 세팅 */
 const AI_CHAT={log:[],last:null,said:''};
 const aiCompact=r=>({tent:r.tent,inner:r.inner||null,items:r.items.map(it=>{const o={type:it.type};if(it.count>1)o.count=it.count;if(it.zone)o.zone=it.zone;if(it.at)o.at=it.at;
@@ -348,6 +352,7 @@ async function aiRun(){
   AI_CHAT.log.push({who:'me',t:text});aiChatUI();
   const ask=fix?`지금 배치(JSON): ${JSON.stringify(aiCompact(AI_CHAT.last))}\n고칠 점: ${text}`:text;
   let r=await aiAsk(ask,(AI_CHAT.said+' '+text).slice(-1200)),res,via='ai';
+  if(r.fail==='quota'){btn.disabled=false;st.textContent='';AI_CHAT.log.push({who:'ai',t:'오늘 쓸 수 있는 AI 횟수를 다 썼어요. 지금 배치는 그대로 두었어요. 내일 다시 쓰거나, 내 장비 탭의 내 코드에 초대 코드를 넣어 주세요.'});aiChatUI();return;}
   if(fix&&!r.ok){btn.disabled=false;st.textContent='';AI_CHAT.log.push({who:'ai',t:r.fail==='limit'?'오늘 AI 사용량을 다 써서 고치지 못했어요. 끌어서 직접 다듬어 주세요.':'AI 연결이 안 돼서 고치지 못했어요. 잠시 뒤 다시 해보세요.'});aiChatUI();return;}
   inp.value='';
   if(r.ok){res=aiClean(r.ok);

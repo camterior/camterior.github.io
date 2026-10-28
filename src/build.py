@@ -73,7 +73,7 @@ AI_CARD = '''<div class="aiset" id="aiset" aria-labelledby="aiTitle">
   <label class="sr-only" for="aiIn">가진 장비</label>
   <textarea id="aiIn" rows="3" maxlength="600" placeholder="예: 랜드록, IGT 롱에 플랫버너, 원액션테이블 롱, FD체어 4개"></textarea>
   <div class="ai-row"><button class="btn primary" id="aiGo" type="button" onclick="aiRun()">✨ AI로 세팅하기</button><button class="btn ghost" id="aiNew" type="button" onclick="aiNew()" hidden>새로 시작</button><span class="ai-st" id="aiSt" role="status" aria-live="polite"></span>
-    <p class="ai-priv">Google Gemini로 보내져요 · 개인정보는 적지 마세요</p></div>
+    <p class="ai-priv">Google Gemini로 보내져요 · 개인정보는 적지 마세요 <span class="ai-left" id="aiLeft" hidden></span></p></div>
   <div class="ai-log" id="aiLog" hidden aria-live="polite"></div>
   <div class="ai-out" id="aiOut" hidden></div>
 </div>'''

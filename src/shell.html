@@ -76,14 +76,15 @@
         <h2 id="mnFindT">🔎 이름으로 찾기</h2>
         <label><span class="sr-only">장비 이름</span><input id="mineQ" type="search" placeholder="예: FD체어, 메락, IGT 롱, 파세코" oninput="mineSearch()"></label>
         <ul class="mn-find" id="mineFind"></ul>
+        <h3 class="mp-h">장비 제원에서 고르기</h3>
+        <div id="minePick"></div>
       </section>
     </div>
     <section class="mn-card mn-mine" aria-labelledby="mnListT">
       <div class="mn-head"><h2 id="mnListT">내가 가진 장비 <small id="mineCnt"></small></h2>
         <button type="button" class="btn-dark" id="mineUse" onclick="mineUse()" disabled>✨ 내 장비로 AI 세팅하기</button></div>
       <div id="mineList"></div>
-      <p class="mn-bk"><button type="button" onclick="mineCopy()">백업 코드 복사</button><button type="button" onclick="mineLoad()">코드로 불러오기</button><span id="mineBk" role="status"></span></p>
-      <p class="mn-note">이 기기(브라우저)에 저장돼요. 다른 기기에서 쓰려면 백업 코드로 옮겨 주세요.</p>
+      <div class="acct" id="acctBox"></div>
     </section>
   </div>
 </div>

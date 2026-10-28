@@ -13,6 +13,7 @@ function go(v,opts){opts=opts||{};v=LEGACY[v]||v;if(!VIEWS.includes(v))v='intro'
   VIEWS.forEach(k=>{document.getElementById('v-'+k).hidden=k!==v;});
   if(v==='board'&&typeof reqLoad==='function')reqLoad();
   if(v==='mine'&&typeof mineInit==='function')mineInit();
+  if(v==='plan'&&typeof aiCheckLeft==='function'&&!go._left){go._left=1;aiCheckLeft();}
   document.querySelectorAll('[data-tab]').forEach(a=>{if(a.dataset.tab===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v)history.pushState(null,'','#'+v);
   if(changed&&!opts.keepScroll)window.scrollTo(0,0);
@@ -156,9 +157,12 @@ function tentBrandOrder(){const n={};TENT_ORDER.forEach(id=>{const b=TENTS[id].b
 const T_OPEN=new Set();
 const tentBtn=id=>{const T=TENTS[id];return `<button class="tent" aria-pressed="${id===tent.id}" onclick="pickTent('${id}')">
   ${tentThumb(T,T.inners[T.innerDefault])}<span><span class="nm">${T.name}${T.est&&!T.drawn?'<span class="bdg est">도면 추정</span>':''}</span><br><span class="md">${T.outer?`${T.model}, ${T.size[0]}×${T.size[1]}cm`:'타프나 테이블만 놓을 때'}</span></span></button>`;};
+/* '내 장비만 보기'가 켜져 있으면 내 장비 탭에 등록한 것만 (mine.js) */
+function mineOwnSet(){try{if(typeof MINE_ONLY==='undefined'||!MINE_ONLY||typeof MYG==='undefined')return null;const s=new Set(Object.keys(MYG).map(k=>k.split(':')[1]));return s.size?s:null;}catch(e){return null;}}
 renderTentList=function(){const el=document.getElementById('tentList');if(!el)return;
   const q=((document.getElementById('tentQ')||{}).value||'').trim().toLowerCase();
-  const hit=id=>{const T=TENTS[id];return !q||`${T.name} ${T.model} ${T.brand||''}`.toLowerCase().includes(q);};
+  const own=mineOwnSet();
+  const hit=id=>{const T=TENTS[id];return (!own||own.has(id))&&(!q||`${T.name} ${T.model} ${T.brand||''}`.toLowerCase().includes(q));};
   let html='';
   const {main,minor}=tentBrandOrder();
   main.forEach(b=>{const ids=TENT_ORDER.filter(id=>TENTS[id].brand===b&&hit(id));if(!ids.length)return;
@@ -174,9 +178,9 @@ renderTentList=function(){const el=document.getElementById('tentList');if(!el)re
 /* 장비 목록: 분류별 접기 + 찾기 */
 const C_OPEN=new Set();
 renderCatalog=function(){const el=document.getElementById('catalog');if(!el)return;
-  const q=(document.getElementById('catQ').value||'').trim().toLowerCase();let html='';
+  const q=(document.getElementById('catQ').value||'').trim().toLowerCase();let html='';const own=mineOwnSet();
   CAT_GROUPS.forEach(([g,ids])=>{
-    const list=ids.filter(t=>{const c=CATALOG[t];return !q||(c.name+' '+c.model+' '+g+' '+(c.note||'')+' '+({stove:'난로 스토브',fan:'팬히터 히터 난로',wood:'화목난로 장작 난로',fridge:'냉장고 쿨러',box:'수납 박스',shelf:'선반 쉘프',table:'테이블',chair:'의자 체어',mat:'매트 자충 에어 침구',cot:'야전침대 코트 침대'}[c.gtype]||'')).toLowerCase().includes(q);});if(!list.length)return;
+    const list=ids.filter(t=>{const c=CATALOG[t];if(own&&!own.has(t))return false;return !q||(c.name+' '+c.model+' '+g+' '+(c.note||'')+' '+({stove:'난로 스토브',fan:'팬히터 히터 난로',wood:'화목난로 장작 난로',fridge:'냉장고 쿨러',box:'수납 박스',shelf:'선반 쉘프',table:'테이블',chair:'의자 체어',mat:'매트 자충 에어 침구',cot:'야전침대 코트 침대'}[c.gtype]||'')).toLowerCase().includes(q);});if(!list.length)return;
     const open=!!q||C_OPEN.has(g);
     html+=`<details class="fold" data-k="${esc(g)}"${open?' open':''}><summary><b>${esc(g)}</b><span>${list.length}</span></summary><div class="fold-in catalog-in">`;
     list.forEach(t=>{const c=CATALOG[t],b=bbox(c.verts),w=Math.round(b[1][0]-b[0][0]),d=Math.round(b[1][1]-b[0][1]);

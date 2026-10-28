@@ -2,6 +2,7 @@
 // - Gemini 키: Secret GEMINI_API_KEY
 // - 초대 코드: Secret INVITE_CODE (여러 개면 쉼표로: abc,def)
 // - 하루 횟수 세기: KV 바인딩 RL (없으면 제한 없이 동작)
+// - 내 코드(계정): 같은 KV의 'acct:XXXX-XXXX' 키 (내 장비 목록, 초대 회원 여부)
 // - 장비 추가요청 게시판: 같은 KV(RL)의 'reqs' 키에 저장. 관리용 Secret ADMIN_KEY
 const MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 앞에서부터 시도
 const ALLOWED_ORIGINS = ["https://camterior.github.io"];
@@ -27,6 +28,43 @@ function json(data, status, origin) {
 function codeOk(env, code) {
   if (!env.INVITE_CODE || !code) return false;
   return env.INVITE_CODE.split(",").map(s => s.trim()).filter(Boolean).includes(String(code).trim());
+}
+
+// 내 코드(계정): 개인정보 없이 코드 하나로 내 장비·초대 회원 여부를 기억
+const ACODE = /^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/;
+const ALPH = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+function newCode() { const b = crypto.getRandomValues(new Uint8Array(8)); let c = ""; for (let i = 0; i < 8; i++) { c += ALPH[b[i] % ALPH.length]; if (i === 3) c += "-"; } return c; }
+async function getAcct(env, code) { if (!env.RL || !ACODE.test(String(code || ""))) return null; const v = await env.RL.get("acct:" + code); return v ? JSON.parse(v) : null; }
+async function acct(a, env, request, origin) {
+  if (!env.RL) return json({ error: "acct-off" }, 503, origin);
+  const ip = request.headers.get("CF-Connecting-IP") || "0";
+  const day = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+  const bump = async (k, max) => { const n = parseInt(await env.RL.get(k)) || 0; if (n >= max) return false; await env.RL.put(k, String(n + 1), { expirationTtl: 172800 }); return true; };
+  if (a.op === "new") {
+    if (!(await bump(`an:${day}:${ip}`, 5))) return json({ error: "quota" }, 429, origin);
+    let code; for (let i = 0; i < 5; i++) { code = newCode(); if (!(await env.RL.get("acct:" + code))) break; }
+    const o = { gear: {}, vip: false, at: day };
+    await env.RL.put("acct:" + code, JSON.stringify(o));
+    return json({ code, gear: o.gear, vip: false }, 200, origin);
+  }
+  const code = String(a.code || "").toUpperCase().trim();
+  if ((parseInt(await env.RL.get(`am:${day}:${ip}`)) || 0) >= 30) return json({ error: "quota" }, 429, origin); // 코드 맞히기 막기
+  const o = await getAcct(env, code);
+  if (!o) { await bump(`am:${day}:${ip}`, 30); return json({ error: "nocode" }, 404, origin); }
+  if (a.op === "get") return json({ code, gear: o.gear || {}, vip: !!o.vip }, 200, origin);
+  if (a.op === "save") {
+    const g = a.gear && typeof a.gear === "object" ? a.gear : {}, out = {};
+    Object.keys(g).slice(0, 300).forEach(k => { const n = Math.round(+g[k]); if (/^[a-z]+:[a-z0-9_]{1,40}$/.test(k) && n >= 1 && n <= 20) out[k] = n; });
+    o.gear = out; o.up = day;
+    await env.RL.put("acct:" + code, JSON.stringify(o));
+    return json({ ok: true, vip: !!o.vip }, 200, origin);
+  }
+  if (a.op === "invite") {
+    if (!codeOk(env, a.invite)) return json({ error: "invite" }, 403, origin);
+    o.vip = true; await env.RL.put("acct:" + code, JSON.stringify(o));
+    return json({ ok: true, vip: true }, 200, origin);
+  }
+  return json({ error: "op" }, 400, origin);
 }
 
 // 게시판: 공지사항(관리자만) · 장비 요청 · 개발 요청
@@ -102,13 +140,17 @@ export default {
     try { body = await request.json(); } catch { return json({ error: "bad" }, 400, origin); }
 
     if (body.board) return board(body.board, env, request, origin);
+    if (body.acct && typeof body.acct === "object") return acct(body.acct, env, request, origin);
 
     // 하루 횟수
-    const vip = codeOk(env, body.code);
+    // 초대 회원: 요청에 초대 코드가 있거나, 내 코드(계정)가 초대 회원이면 하루 50회 (계정별로 셈)
+    const ac = typeof body.acct === "string" ? body.acct.toUpperCase() : "";
+    const acc = ac ? await getAcct(env, ac) : null;
+    const vip = codeOk(env, body.code) || !!(acc && acc.vip);
     const limit = vip ? LIMIT_CODE : LIMIT_FREE;
     const ip = request.headers.get("CF-Connecting-IP") || "0";
     const day = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
-    const rk = `${vip ? "c" : "f"}:${day}:${ip}`;
+    const rk = vip && acc ? `a:${day}:${ac}` : `${vip ? "c" : "f"}:${day}:${ip}`;
     let used = 0;
     if (env.RL) used = parseInt(await env.RL.get(rk)) || 0;
     if (body.check) return json({ left: Math.max(0, limit - used), limit, vip }, 200, origin); // 남은 횟수만 확인

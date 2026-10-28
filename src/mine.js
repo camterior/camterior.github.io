@@ -5,7 +5,8 @@
    ===================================================================== */
 const MYG_KEY='camMine';
 let MYG={};try{MYG=JSON.parse(localStorage.getItem(MYG_KEY)||'{}')||{};}catch(e){MYG={};}
-const mineSave=()=>{try{localStorage.setItem(MYG_KEY,JSON.stringify(MYG));}catch(e){}};
+const mineSaveLocal=()=>{try{localStorage.setItem(MYG_KEY,JSON.stringify(MYG));}catch(e){}};
+const mineSave=()=>{mineSaveLocal();if(typeof acctQueue==='function')acctQueue();};
 // 장비 제원 탭과 같은 분류 + 따로 쓰는 이너텐트
 function mineSecs(){const s=GSEC.map(x=>({k:x.k,t:x.t,ids:x.items().map(i=>i.id)}));
   s.splice(2,0,{k:'inner',t:'이너텐트',ids:Object.keys(INNER_PRESETS)});return s;}
@@ -16,7 +17,7 @@ function mineModel(k,id){try{const o=k==='tent'?TENTS[id]:k==='tarp'?TARPS[id]:k
 let MINE_ALL=null;const mineAll=()=>MINE_ALL||(MINE_ALL=mineSecs().flatMap(s=>s.ids.map(id=>({key:s.k+':'+id,k:s.k,id,sec:s.t,name:mineName(s.k,id),model:mineModel(s.k,id)}))));
 const mineByKey=k=>mineAll().find(x=>x.key===k);
 const mineCount=()=>Object.values(MYG).reduce((a,b)=>a+b,0);
-function mineAdd(key,n){MYG[key]=Math.max(0,Math.min(20,(MYG[key]||0)+(n||1)));if(!MYG[key])delete MYG[key];mineSave();mineRender();}
+function mineAdd(key,n){MYG[key]=Math.max(0,Math.min(20,(MYG[key]||0)+(n||1)));if(!MYG[key])delete MYG[key];mineSave();mineRender();if(document.getElementById('minePick'))minePickUI();}
 function mineRender(){const box=document.getElementById('mineList');if(!box)return;
   const keys=Object.keys(MYG).filter(k=>mineByKey(k));document.getElementById('mineCnt').textContent=keys.length?`${keys.length}종 · ${mineCount()}개`:'';
   document.getElementById('mineUse').disabled=!keys.length;
@@ -46,7 +47,7 @@ async function minePhoto(){const inp=document.getElementById('minePic'),st=docum
   const files=[...(inp.files||[])].slice(0,3);if(!files.length){st.textContent='사진을 먼저 골라 주세요';return;}
   btn.disabled=true;st.textContent='AI가 사진 속 장비를 찾는 중…';out.innerHTML='';MINE_FOUND=[];const unk=new Set();let fail=null;
   for(const f of files){let data;try{data=await mineShrink(f);}catch(e){fail='photo';continue;}
-    try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:mineSystem(),prompt:'이 사진 속 캠핑 장비를 찾아줘',image:{mime:'image/jpeg',data}})});
+    try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:mineSystem(),prompt:'이 사진 속 캠핑 장비를 찾아줘',image:{mime:'image/jpeg',data},acct:acctCode()||undefined})});
       const d=await r.json().catch(()=>({}));if(!r.ok||!d.text){fail=d.error||'error';continue;}
       const o=JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim());
       (o.found||[]).forEach(x=>{const it=mineByKey(String(x.key||''));if(!it)return;const c=Math.min(8,Math.max(1,+x.count||1)),old=MINE_FOUND.find(y=>y.key===it.key);if(old)old.count=Math.max(old.count,c);else MINE_FOUND.push({...it,count:c,sure:x.sure});});
@@ -65,10 +66,48 @@ function mineUse(){const keys=Object.keys(MYG).filter(k=>mineByKey(k));if(!keys.
   const txt=keys.map(k=>{const it=mineByKey(k),n=MYG[k];return it.name+(n>1?` ${n}개`:'');}).join(', ');
   go('plan');const inp=document.getElementById('aiIn');if(typeof aiNew==='function'&&AI_CHAT.last)aiNew();inp.value=txt+'. ';const st=document.getElementById('aiSt');if(st)st.textContent='내 장비를 넣었어요. 뒤에 원하는 위치를 덧붙이고 세팅해 보세요';
   setTimeout(()=>{inp.scrollIntoView({block:'center'});inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);},300);}
-// 백업 코드 (다른 기기로 옮기기)
-function mineCopy(){const code='CAMMINE-'+btoa(unescape(encodeURIComponent(JSON.stringify(MYG))));const st=document.getElementById('mineBk');
-  (navigator.clipboard?navigator.clipboard.writeText(code):Promise.reject()).then(()=>st.textContent='백업 코드를 복사했어요. 다른 기기의 “코드로 불러오기”에 붙여 넣으세요.',()=>{st.textContent=code;});}
-function mineLoad(){const c=(prompt('백업 코드를 붙여 넣어 주세요')||'').trim();if(!c)return;const st=document.getElementById('mineBk');
-  try{const o=JSON.parse(decodeURIComponent(escape(atob(c.replace(/^CAMMINE-/,'')))));Object.keys(o).forEach(k=>{if(mineByKey(k))MYG[k]=Math.min(20,Math.max(1,+o[k]||1));});mineSave();mineRender();st.textContent='불러왔어요';}
-  catch(e){st.textContent='코드가 맞지 않아요';}}
-function mineInit(){mineRender();}
+// ===== 내 코드(계정): 코드 하나로 다른 기기에서도 같은 장비·초대 회원 =====
+const ACCT_KEY='camAcct';
+const acctCode=()=>{try{return localStorage.getItem(ACCT_KEY)||'';}catch(e){return '';}};
+const acctSet=v=>{try{v?localStorage.setItem(ACCT_KEY,v):localStorage.removeItem(ACCT_KEY);}catch(e){}};
+let ACCT_VIP=false,ACCT_OFF=false,acctTimer=null;
+async function acctCall(a){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({acct:a})});const d=await r.json().catch(()=>({}));
+  if(!r.ok){if(!d.error||d.error==='acct-off'||d.error==='empty'||d.error==='bad')ACCT_OFF=true;return {fail:d.error||'error'};}ACCT_OFF=false;return d;}catch(e){ACCT_OFF=true;return {fail:'network'};}}
+async function acctEnsure(){if(acctCode())return acctCode();const d=await acctCall({op:'new'});if(d.code){acctSet(d.code);ACCT_VIP=false;acctUI();return d.code;}return '';}
+// 장비가 바뀌면 1.5초 뒤 한 번에 서버에 저장 (무료 저장 횟수 아끼기)
+function acctQueue(){clearTimeout(acctTimer);acctTimer=setTimeout(async()=>{const c=await acctEnsure();if(!c)return;const d=await acctCall({op:'save',code:c,gear:MYG});if(d.ok){ACCT_VIP=!!d.vip;acctUI();}},1500);}
+async function acctPull(){const c=acctCode();if(!c){acctUI();return;}const d=await acctCall({op:'get',code:c});
+  if(d.code){ACCT_VIP=!!d.vip;const srv=d.gear||{};if(Object.keys(srv).length){MYG=srv;mineSaveLocal();mineRender();}else if(Object.keys(MYG).length)acctQueue();}
+  else if(d.fail==='nocode'){acctSet('');}acctUI();}
+function acctUI(){const el=document.getElementById('acctBox');if(!el)return;const c=acctCode();
+  el.innerHTML=`<div class="ac-row"><span class="ac-lab">내 코드</span>${c?`<b class="ac-code">${aiEsc(c)}</b><button type="button" onclick="acctCopy()">복사</button>${ACCT_VIP?'<span class="ac-vip">초대 회원 · AI 하루 50회</span>':''}`
+    :`<span class="ac-none">${ACCT_OFF?'서버 설정이 끝나면 코드가 만들어져요 (지금은 이 기기에만 저장)':'장비를 넣으면 자동으로 만들어져요'}</span>`}</div>
+   <p class="ac-help">${c?'이 기기에서는 자동으로 들어와요. 다른 기기에서는 아래에 이 코드를 넣으면 같은 장비가 나와요. 캡처해 두세요.':''}</p>
+   <form class="ac-form" onsubmit="event.preventDefault();acctUse()"><label class="sr-only" for="acIn">다른 기기의 내 코드</label><input id="acIn" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="다른 기기의 코드 (예: 7KQ2-X9MD)"><button type="submit">불러오기</button></form>
+   ${ACCT_VIP?'':`<form class="ac-form" onsubmit="event.preventDefault();acctInvite()"><label class="sr-only" for="acInv">초대 코드</label><input id="acInv" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="초대 코드가 있으면 넣어 주세요"><button type="submit">적용</button></form>`}
+   <p class="ac-msg" id="acMsg" role="status"></p>`;}
+const acMsg=t=>{const m=document.getElementById('acMsg');if(m)m.textContent=t;};
+function acctCopy(){const c=acctCode();(navigator.clipboard?navigator.clipboard.writeText(c):Promise.reject()).then(()=>acMsg('코드를 복사했어요'),()=>acMsg('코드: '+c));}
+async function acctUse(){let v=(document.getElementById('acIn').value||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(v.length!==8){acMsg('코드는 8글자예요 (예: 7KQ2-X9MD)');return;}v=v.slice(0,4)+'-'+v.slice(4);
+  const d=await acctCall({op:'get',code:v});if(!d.code){acMsg(d.fail==='nocode'?'없는 코드예요':d.fail==='quota'?'오늘은 더 시도할 수 없어요':'서버에 연결하지 못했어요');return;}
+  acctSet(d.code);ACCT_VIP=!!d.vip;MYG=d.gear||{};mineSaveLocal();mineRender();acctUI();acMsg('불러왔어요. 이제 이 기기도 같은 코드를 써요');}
+async function acctInvite(){const v=(document.getElementById('acInv').value||'').trim();if(!v)return;const c=await acctEnsure();if(!c){acMsg('서버 설정이 끝나면 쓸 수 있어요');return;}
+  const d=await acctCall({op:'invite',code:c,invite:v});if(d.ok){ACCT_VIP=true;acctUI();acMsg('초대 코드가 적용됐어요. AI를 하루 50회까지 쓸 수 있어요');if(typeof aiCheckLeft==='function')aiCheckLeft();}else acMsg(d.fail==='invite'?'맞지 않는 초대 코드예요':'서버에 연결하지 못했어요');}
+// ===== 장비 제원에서 고르기 =====
+let PICK_SEC=null;
+function minePickUI(){const el=document.getElementById('minePick');if(!el)return;const secs=mineSecs();if(!PICK_SEC)PICK_SEC=secs[0].k;
+  el.innerHTML=`<div class="mp-chips" role="group" aria-label="장비 종류">${secs.map(s=>`<button type="button" aria-pressed="${s.k===PICK_SEC}" onclick="PICK_SEC='${s.k}';minePickUI()">${aiEsc(s.t)} <small>${s.ids.length}</small></button>`).join('')}</div>
+   <ul class="mn-find mp-list">${mineAll().filter(x=>x.k===PICK_SEC).map(x=>`<li><span class="mn-n"><b>${aiEsc(x.name)}</b>${x.model?`<small>${aiEsc(x.model)}</small>`:''}</span>${MYG[x.key]?`<span class="mn-q"><button type="button" aria-label="${aiEsc(x.name)} 하나 빼기" onclick="mineAdd('${x.key}',-1)">−</button><b>${MYG[x.key]}</b><button type="button" aria-label="${aiEsc(x.name)} 하나 더" onclick="mineAdd('${x.key}',1)">+</button></span>`:`<button type="button" class="mn-add" onclick="mineAdd('${x.key}',1)">+ 넣기</button>`}</li>`).join('')}</ul>`;}
+function mineInit(){mineRender();minePickUI();acctUI();acctPull();}
+
+// ===== 세팅 화면(텐트·장비 목록)에서 '내 장비만 보기' =====
+let MINE_ONLY=false;try{MINE_ONLY=localStorage.getItem('camMineOnly')==='1';}catch(e){}
+function mineOnlyBtns(){['tentQ','catQ'].forEach(id=>{const inp=document.getElementById(id);if(!inp)return;const lab=inp.closest('label')||inp;
+  let b=lab.previousElementSibling&&lab.previousElementSibling.classList.contains('mine-only')?lab.previousElementSibling:null;
+  if(!b){b=document.createElement('button');b.type='button';b.className='mine-only';b.onclick=mineOnlyToggle;lab.parentNode.insertBefore(b,lab);}
+  const n=Object.keys(MYG).length;b.setAttribute('aria-pressed',MINE_ONLY&&n?'true':'false');b.innerHTML=`<span class="mo-dot"></span>내 장비만 보기${n?` <small>${n}</small>`:''}`;});}
+function mineOnlyToggle(){if(!Object.keys(MYG).length){if(confirm('아직 등록한 장비가 없어요. 내 장비 탭에서 등록할까요?'))go('mine');return;}
+  MINE_ONLY=!MINE_ONLY;try{localStorage.setItem('camMineOnly',MINE_ONLY?'1':'0');}catch(e){}mineOnlyBtns();renderTentList();renderCatalog();}
+(function(){const _r=mineRender;mineRender=function(){_r();mineOnlyBtns();if(MINE_ONLY){renderTentList();renderCatalog();}};
+  mineOnlyBtns();if(MINE_ONLY){renderTentList();renderCatalog();}
+  if(acctCode())acctPull();})();
