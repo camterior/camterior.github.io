@@ -1750,9 +1750,123 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
   np('np_air_docking','에어 도킹 쉘터','Air Docking Shelter',3750,3650,210,'19.6kg','8명','34522',o,null,[{a:[0,800],b:[0,2850],label:'전면 출입',zone:true},{a:[3750,700],b:[3750,2950],label:'차량 도킹',zone:false}],'판매처 도면(본체 305×365cm, 도킹 플랩 70cm)으로 그렸어요.',{prof:T2.PROF.cabin});}
 }
 
+/* ===== A그룹 추가 2차 (노스피크 에어, 제이크라, 헬리녹스, 하임플래닛, 스노우라인, 쿠디, 기타) ===== */
+{const IN=(id,o)=>T2.add(id,o),OCN='오캠프 상품 상세',OLMN='아웃도어랜드마크 상품 상세',CDYN2='쿠디 공식몰 상품 상세';
+ const sideD=(L,W,x0,x1,lab)=>[T2.side(x0,x1,0,lab||'측면 도어'),T2.side(x0,x1,W,lab||'측면 도어')];
+ const np=(id,name,model,L,W,H,kg,cap,no,o,inner,doors,est,extra)=>IN(id,Object.assign({brand:'노스피크',name,model,size:[L/10,W/10,H],weight:kg,cap,href:OLM+no,srcName:OLMN,drawn:true,est,outer:o,
+   inners:inner?{std:{label:'이너텐트',model:'',size:inner[0],poly:Array.isArray(inner[1][0])?inner[1]:T2.rect(...inner[1])}}:{},innerNote:inner?undefined:NOFLOOR,doors,color:'#CFC3A6',prof:T2.PROF.tunnel},extra||{}));
+ const a7=(id,name,model,no)=>{const L=6100,W=3880,o=T2.tun(L,W,950,3100,950,3100);
+  np(id,name,model,L,W,215,'32.2kg','5–6명',no,o,['220×310',[3900,385,6100-300,3495]],[T2.front(W,3100,'전면 도어'),...sideD(L,W,1300,2500)],'판매처 도면(610×388cm, 끝 310cm, 95·140·145·135·95cm 구간, 이너 220×310cm)으로 그렸어요.');};
+ a7('np_a7_60','A7 6.0','A7 6.0','34521');a7('np_a7_exp','A7 EX+','A7 EX+','34518');
+ {const L=7900,W=4700,o=[[0,375],[L,0],[L,W],[0,W-375]];
+  np('np_a9','A9','A9',L,W,215,'32kg (플라이)','6–7명','34515',o,['220×415',[5600,275,7800,4425]],[{a:[0,700],b:[0,W-700],label:'전면 도어',zone:true},...sideD(L,W,1800,3200)],'판매처 도면(790cm, 앞 395cm, 뒤 470cm, 이너 220×415cm)으로 그렸어요.',{prof:T2.PROF.cabin});}
+ np('np_air_living','에어 리빙 쉘터','Air Living Shelter',3750,2730,213,'17.3kg','6명','34512',T2.rect(0,0,3750,2730),null,[{a:[300,0],b:[1700,0],label:'출입문',zone:true},{a:[2050,0],b:[3450,0],label:'출입문',zone:true}],'판매처 도면(375×273×213cm)으로 그렸어요. 긴 면에 문이 2개예요.',{innerNote:'바닥 일체형 에어 쉘터예요.',prof:T2.PROF.cabin});
+ {const L=4400,W=3500,o=T2.tun(L,W,600,2600,600,2600);
+  np('np_goldstone_x','골드스톤 라이트 X','Goldstone Lite X',L,W,210,'15.6kg','판매처 미표기','34509',o,null,[T2.front(W,2600,'전면 도어'),T2.rear(L,W,2600,'후면 도어',true)],'판매처 도면(440cm, 가운데 350cm, 끝 260cm)으로 그렸어요.',{prof:T2.PROF.dome});}
+ {const o=[[0,0],[2400,0],[3300,600],[3300,2150],[2400,2750],[0,2750]];
+  np('np_halo','헤일로 에어돔','Halo Airdome',3300,2750,185,'14kg','2–4명','34506',o,null,[{a:[3300,700],b:[3300,2050],label:'전면 출입',zone:true}],'판매처 도면(330×275×185cm, 침실 영역 210×275cm)으로 그렸어요.',{innerNote:'바닥 일체형 에어 돔이에요.',prof:T2.PROF.dome});}
+ np('np_mona','모나','Mona',4400,2500,185,'16.8kg','8명','34505',T2.rect(0,0,4400,2500),null,[{a:[400,2500],b:[1800,2500],label:'출입문',zone:true},{a:[2600,2500],b:[4000,2500],label:'출입문',zone:true}],'판매처 도면(440×250×185cm, 바닥 일체형)으로 그렸어요. 문 위치는 사진 기준이에요.',{innerNote:'바닥 일체형 에어텐트예요.',prof:T2.PROF.cabin});
+ {const L=6500,W=4000,o=T2.tun(L,W,600,3300,600,3100);
+  np('np_acadia','아케디아 맥스+','Acadia Max+',L,W,220,'34.2kg','5–6명','34502',o,['220×350',[4100,250,6300,3750]],[T2.front(W,3300,'전면 도어'),...sideD(L,W,1500,2900)],'판매처 도면(650×400cm, 끝 330·310cm, 이너 220×350cm)으로 그렸어요.');}
+ {const L=6400,W=4000,o=T2.tun(L,W,1500,3100,1500,3100);
+  np('np_yellowstone_hb','옐로우스톤 하이브리드','Yellowstone Hybrid',L,W,220,'29.7kg','5명','34499',o,['220×345',[[4000,275],[4950,275],[6250,800],[6250,3200],[4950,3725],[4000,3725]]],[T2.front(W,3100,'전면 도어'),...sideD(L,W,1600,2600)],'판매처 도면(640×400cm, 150·105·130·105·150cm 구간, 이너 220×345cm)으로 그렸어요.');}
+ {const L=5050,W=3150,o=T2.tun(L,W,300,2900,300,2750);
+  np('np_a5rs','A5 RS','A5 RS',L,W,205,'23kg','4명','34493',o,['220×265',[2700,300,4900,2850]],[T2.front(W,2900,'전면 도어'),...sideD(L,W,1100,2300)],'판매처 도면(505cm, 앞 315cm, 뒤 275cm, 이너 220×265cm)으로 그렸어요.');}
+
+ /* 제이크라 */
+ {const D=5000,o=T2.poly(8,D,D/2,D/2);
+  IN('jk_jcrown5',{brand:'제이크라',name:'제이크라운 5.0',model:'J.Crown 5.0',size:[500,500,275],weight:'26.47kg',cap:'판매처 미표기',href:OC+'15235',srcName:OCN,drawn:true,
+   est:'판매처 도면(지름 500cm, 평변 사이 460cm, 한 변 190cm 팔각, 높이 275cm)으로 그렸어요.',outer:o,innerNote:NOFLOOR,
+   doors:[T2.door(o,'front','출입문',true),T2.door(o,'rear','출입문',false)],living:[D/2,D/2],color:'#B39A76',prof:T2.PROF.dome});}
+ IN('jk_jtunnel',{brand:'제이크라',name:'제이 터널',model:'J.Tunnel',size:[148,300,190],weight:'7.27kg',cap:'판매처 미표기',href:OC+'15960',srcName:OCN,drawn:true,
+  est:'판매처 도면(폭 300 × 길이 148 × 높이 190cm, 본체만)으로 그렸어요. 익스텐션은 따로 팔아요.',outer:T2.rect(0,0,1480,3000),innerNote:NOFLOOR,
+  doors:[{a:[0,300],b:[0,2700],label:'전면 도어',zone:true},{a:[1480,300],b:[1480,2700],label:'후면 도어',zone:true}],living:[740,1500],color:'#5B6B6E',prof:T2.PROF.tunnel});
+ const jsq=(id,name,L,W,t,f,H,kg,no)=>{const o=[[0,(W-f)/2],[t,0],[L-t,0],[L,(W-f)/2],[L,(W+f)/2],[L-t,W],[t,W],[0,(W+f)/2]];
+  IN(id,{brand:'제이크라',name,model:name.replace('제이스퀘어돔','J.Square Dome'),size:[L/10,W/10,H],weight:kg,cap:'판매처 미표기',href:OC+no,srcName:OCN,drawn:true,
+   est:`판매처 도면(${L/10}×${W/10}cm, 끝 평변 ${f/10}cm)으로 그렸어요. 앞뒤가 크게 열려요.`,outer:o,innerNote:'이너텐트는 따로 팔아요.',
+   doors:[{a:[0,(W-f)/2+100],b:[0,(W+f)/2-100],label:'전면 출입',zone:true},{a:[L,(W-f)/2+100],b:[L,(W+f)/2-100],label:'후면 출입',zone:true}],living:[L/2,W/2],color:'#5E7C68',prof:T2.PROF.dome});};
+ jsq('jk_jsquare_l','제이스퀘어돔 L',4000,3150,900,2250,182,'5.58kg','15246');
+ jsq('jk_jsquare_m','제이스퀘어돔 M',2940,2500,630,1550,147,'3.09kg','15245');
+
+ /* 헬리녹스 · 하임플래닛 */
+ IN('hx_field_tunnel',{brand:'헬리녹스',name:'택티컬 필드 터널 4.35',model:'Tac. Field Tunnel 4.35',size:[435,300,220],weight:'14.6kg',cap:'6명',href:OC+'16075',srcName:OCN,drawn:true,
+  est:'판매처 제원(435×300×220cm 터널 쉘터)으로 그렸어요.',outer:T2.rect(0,0,4350,3000),innerNote:NOFLOOR,
+  doors:[{a:[0,300],b:[0,2700],label:'전면 개방',zone:true},{a:[4350,300],b:[4350,2700],label:'후면 개방',zone:true},...sideD(4350,3000,1200,3100,'메쉬 패널')],living:[2175,1500],color:'#2C2E30',prof:T2.PROF.tunnel});
+ {const L=3600,W=3300,o=[[0,850],[700,0],[2900,0],[3600,850],[3600,2450],[2900,3300],[700,3300],[0,2450]];
+  IN('hx_4p_dome',{brand:'헬리녹스',name:'4P 돔',model:'4P Dome',size:[360,330,158],weight:'6.87kg',cap:'4명',href:OC+'20785',srcName:OCN,drawn:true,
+   est:'판매처 도면(330×360×158cm, 이너 240×225cm 가운데)으로 그렸어요. 네 면이 모두 열려요.',outer:o,
+   inners:{std:{label:'이너텐트',model:'',size:'225×240',poly:T2.rect(675,450,2925,2850)}},
+   doors:[{a:[0,1000],b:[0,2300],label:'출입문',zone:true},{a:[3600,1000],b:[3600,2300],label:'출입문',zone:true},T2.side(900,2700,0,'출입문',false),T2.side(900,2700,W,'출입문',false)],living:[1800,1650],color:'#2C2E30',prof:T2.PROF.dome});}
+ {const L=4700,W=2300,o=T2.tun(L,W,700,1500,700,1500);
+  IN('hx_hshack',{brand:'헬리녹스',name:'에이치쉑 3.5p',model:'H-Shack 3.5P',size:[470,230,155],weight:'5.52kg',cap:'3명',href:OC+'16559',srcName:OCN,drawn:true,
+   est:'판매처 도면(470×230×155cm 터널)으로 그렸어요.',outer:o,innerNote:NOINNER,doors:[T2.front(W,1500,'전면 출입'),T2.rear(L,W,1500,'후면 출입',true)],color:'#2C2E30'});}
+ {const o=T2.poly(7,4500,2250,2350);
+  IN('hp_cloudbreak',{brand:'하임플래닛',name:'클라우드브레이크 쉘터',model:'Cloudbreak Shelter',size:[470,450,232],weight:'15.44kg',cap:'판매처 미표기',href:OC+'19538',srcName:OCN,drawn:true,
+   est:'판매처 도면(470×450cm 칠각형, 바닥 14.5㎡, 높이 232cm)으로 그렸어요. 출입문 3곳 중 2곳을 표시했어요.',outer:o,innerNote:NOFLOOR,
+   doors:[T2.door(o,'front','출입문',true),T2.door(o,'rear','출입문',false)],living:[2300,2250],color:'#4A4E52',prof:T2.PROF.dome});}
+
+ /* 스노우라인 · 쿠디 */
+ IN('sl_endurance2',{brand:'스노우라인',name:'인듀어런스 2.0',model:'SNJ5ULT011',size:[600,360,220],weight:'24.8kg',cap:'판매처 미표기',href:OLM+'36170',srcName:OLMN,drawn:true,
+  est:'판매처 제원(600×360×220cm 터널, 입구 높이 190cm)으로 그렸어요.',outer:T2.tun(6000,3600,300,3000,300,3000),innerNote:NOINNER,
+  doors:[T2.front(3600,3000,'전면 도어'),T2.rear(6000,3600,3000,'후면 도어',true),...sideD(6000,3600,1500,2700)],color:'#2E2F31'});
+ {const o=T2.poly(8,3000,1500,1500);
+  IN('sl_crossdome',{brand:'스노우라인',name:'크로스돔쉘터',model:'Cross Dome Shelter',size:[300,300,150],weight:'판매처 미표기',cap:'판매처 미표기',href:OLM+'23780',srcName:OLMN,drawn:true,
+   est:'판매처 도면(300×300×150cm 팔각)으로 그렸어요.',outer:o,innerNote:NOFLOOR,doors:[T2.door(o,'front','출입문',true),T2.door(o,'rear','출입문',false)],living:[1500,1500],color:'#2E2F31',prof:T2.PROF.dome});}
+ IN('sl_saturn_lite',{brand:'스노우라인',name:'새턴 쉘터 라이트',model:'SNE5ULT002',size:[520,340,210],weight:'12kg',cap:'판매처 미표기',href:OC+'5041',srcName:OCN,drawn:true,
+  est:'판매처 도면(520cm, 가운데 340cm, 끝 240cm)으로 그렸어요. 이너텐트는 따로 팔아요.',outer:T2.tun(5200,3400,800,2400,800,2400),innerNote:NOFLOOR,
+  doors:[T2.front(3400,2400,'전면 도어'),T2.rear(5200,3400,2400,'후면 도어',true),...sideD(5200,3400,2000,3200)],color:'#8C7B66'});
+ IN('cd_yustona',{brand:'쿠디',name:'유스토나',model:'Yustona',size:[260,240,200],weight:'20.7kg',cap:'판매처 미표기',href:CDY+'281',srcName:CDYN2,drawn:true,
+  est:'쿠디 공식 제원(240×260×200cm, 바닥 일체형 면텐트)으로 그렸어요.',outer:T2.box(2600,2400,200),innerNote:'바닥 일체형 에어텐트예요.',
+  doors:[T2.front(2400,1900,'전면 도어'),T2.rear(2600,2400,1900,'후면 도어',true)],color:'#DCCFB6',prof:T2.PROF.cabin});
+ IN('cd_58',{brand:'쿠디',name:'5.8',model:'Coody 5.8',size:[240,240,180],weight:'7kg',cap:'판매처 미표기',href:CDY+'103',srcName:CDYN2,drawn:true,
+  est:'쿠디 공식 제원(240×240×180cm, 바닥 일체형)으로 그렸어요.',outer:T2.box(2400,2400,200),innerNote:'바닥 일체형 에어텐트예요.',
+  doors:[T2.front(2400,1900,'전면 도어')],color:'#DCCFB6',prof:T2.PROF.cabin});
+
+ /* 기타 */
+ IN('mt_cubex28',{brand:'몬테라',name:'큐벡스 2.8 에어 쉘터',model:'Cubex 2.8 Air',size:[280,280,210],weight:'16kg',cap:'판매처 미표기',href:'https://bigtentoutdoors.com/products/monterra-cubex-28-air-shelter',srcName:'BigTent 제원',
+  est:'제원(280×280×210cm 큐브형 에어 쉘터)으로 그렸어요. 문 위치는 사진 기준이에요.',outer:T2.rect(0,0,2800,2800),innerNote:NOFLOOR,
+  doors:[{a:[0,400],b:[0,2400],label:'전면 도어',zone:true}],living:[1400,1400],color:'#2E3238',prof:T2.PROF.cabin});
+ IN('dm_hub',{brand:'도메틱',name:'허브',model:'HUB',size:[230,230,230],weight:'13.8kg',cap:'판매처 미표기',href:OLM+'29644',srcName:'도메틱 공식 제원',
+  est:'도메틱 공식 제원(230×230×230cm 에어 쉘터)으로 그렸어요. 네 면 패널로 차량에 연결할 수 있어요.',outer:T2.rect(0,0,2300,2300),innerNote:NOFLOOR,
+  doors:[{a:[0,300],b:[0,2000],label:'패널 출입',zone:true},{a:[2300,300],b:[2300,2000],label:'패널·도킹',zone:false}],living:[1150,1150],color:'#3E4246',prof:T2.PROF.cabin});
+ {const D=4500,o=T2.poly(8,D,D/2,D/2);
+  IN('ww_arctic6',{brand:'위너웰',name:'아틱 6인 핫텐트',model:'Arctic 6P',size:[450,450,270],weight:'15.8kg',cap:'6명',href:OLM+'33956',srcName:'위너웰 공식 제원',
+   est:'위너웰 공식 제원(지름 450cm, 높이 270cm 티피)으로 그렸어요. 바닥은 팔각으로 그렸어요.',outer:o,innerNote:NOFLOOR,
+   doors:[T2.door(o,'front','출입문',true)],living:[D/2,D/2],color:'#7B7A5E',prof:T2.PROF.tipi});}
+ {const D=4600,o=T2.poly(10,D,D/2,D/2);
+  IN('gc_acorn475',{brand:'그라운드커버',name:'아콘하우스 4.75',model:'Acorn House 4.75',size:[475,455,200],weight:'12.5kg',cap:'4–6명',href:OC+'11105',srcName:OCN,drawn:true,
+   est:'판매처 도면(475×455×200cm 십각 돔)으로 그렸어요.',outer:o,innerNote:'바닥 일체형 돔이에요.',doors:[T2.door(o,'front','출입문',true)],living:[D/2,D/2],color:'#A08868',prof:T2.PROF.dome});}
+ {const o=[[0,1525],[860,0],[2590,0],[3450,1525],[2590,3050],[860,3050]];
+  IN('gc_acorn345',{brand:'그라운드커버',name:'아콘하우스 3.45',model:'Acorn House 3.45',size:[345,305,152],weight:'6.1kg',cap:'3–4명',href:OC+'11100',srcName:OCN,drawn:true,
+   est:'판매처 도면(345×305×152.5cm 육각 돔)으로 그렸어요.',outer:o,innerNote:'바닥 일체형 돔이에요.',doors:[tipDoor(o,0,'출입문',true)],living:[1725,1525],color:'#5F6B4E',prof:T2.PROF.dome});}
+ const var_=(id,name,D,ext,H,kg,cap,no)=>{const o0=T2.poly(8,D,ext+D/2,D/2),f=Math.round(D*Math.tan(Math.PI/8)),o=o0;
+  IN(id,{brand:'헬스포츠',name,model:name.replace('바랑에르 캠프','Varanger Camp'),size:[(D+ext)/10,D/10,H],weight:kg,cap,href:OC+no,srcName:OCN,drawn:true,
+   est:`판매처 도면(팔각 ${D/10}cm, 앞 출입부 ${ext/10}cm, 높이 ${H}cm)으로 그렸어요.`,outer:o,
+   canopy:[[ext,D/2-f/2],[0,D/2-f/2+150],[0,D/2+f/2-150],[ext,D/2+f/2]],canopyLabel:`출입부 (${ext/10}cm)`,canopyName:'출입부',
+   doors:[T2.door(o,'front','출입문',true)],living:[ext+D/2,D/2],color:'#5E6B44',prof:T2.PROF.tipi});};
+ var_('hs_varanger_camp8','바랑에르 캠프 8-10',4350,1150,300,'12.2kg','8–10명','3891');
+ var_('hs_varanger_camp12','바랑에르 캠프 12-14',5150,1300,350,'15.1kg','12–14명','3893');
+ {const D=5100,o=T2.poly(10,D,D/2,D/2);
+  IN('tr_hector',{brand:'트로이',name:'헥토르 2026',model:'Hector',size:[510,510,230],weight:'16kg',cap:'12명',href:OC+'19959',srcName:OCN,
+   est:'판매처 제원(지름 510cm, 실내 높이 230cm, 문 3개)으로 그렸어요. 바닥은 십각으로 그렸어요.',outer:o,innerNote:NOFLOOR,
+   doors:[T2.door(o,'front','출입문',true),T2.door(o,'rear','출입문',false)],living:[D/2,D/2],color:'#7A93A8',prof:T2.PROF.dome});}
+ {const o=[[0,0],[3000,0],[5800,0],[5800,2500],[3000,2500],[0,2750],[-900,1375]].map(q=>[q[0]+900,q[1]]);
+  IN('mb_moonlight_cabin4',{brand:'몽벨',name:'문라이트 캐빈 4',model:'Moonlight Cabin 4',size:[580,275,213],weight:'12kg',cap:'4명',href:OC+'15620',srcName:OCN,drawn:true,
+   est:'판매처 도면(580cm, 앞 275cm, 뒤 250cm, 거실 300 + 이너 210 + 후실 70cm)으로 그렸어요.',outer:T2.tun(5800,2750,300,2600,300,2400),
+   inners:{std:{label:'이너룸',model:'',size:'210×250',poly:T2.rect(3000,150,5100,2600)}},doors:[T2.front(2750,2600,'전면 도어')],color:'#CDBF9E'});}
+ {const L=7000,W=3200,o=T2.tun(L,W,500,2600,400,2600);
+  IN('us_easycabin_pro',{brand:'어반사이드',name:'이지캐빈 프로',model:'Easy Cabin Pro',size:[700,320,230],weight:'판매처 미표기',cap:'판매처 미표기',href:OC+'18438',srcName:OCN,
+   est:'판매처 제원(700×320×230cm 에어텐트)으로 그렸어요. 도면이 없어 모서리는 비율이에요.',outer:o,innerNote:NOINNER,
+   doors:[T2.front(W,2600,'전면 도어'),...sideD(L,W,1500,2700)],color:'#6E6B55'});}
+ {const L=6000,W=3400,o=T2.tun(L,W,500,2800,400,2800);
+  IN('us_easytrain_pro',{brand:'어반사이드',name:'이지트레인 프로',model:'Easy Train Pro',size:[600,340,220],weight:'판매처 미표기',cap:'판매처 미표기',href:OC+'18706',srcName:OCN,
+   est:'판매처 제원(600×340×220cm 에어 리빙쉘)으로 그렸어요. 도면이 없어 모서리는 비율이에요.',outer:o,innerNote:NOINNER,
+   doors:[T2.front(W,2800,'전면 도어'),...sideD(L,W,1300,2500)],color:'#5F6366'});}
+}
+
 TENT_ORDER.splice(0,TENT_ORDER.length,'landlock','landlock_x','living_shell','living_shell_long_pro','merak_pro','hb_atlas','hb_keron4gt','hx_nona','hx_vtarp','hp_backdoor','hp_cave','hp_mavericks',...T2.ids,'none');
 TENTS.none.brand='';
-const BRANDS=['스노우피크','힐레베르그','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸','미니멀웍스','제인아츠','콜맨','텐트마크디자인'];
+const BRANDS=['스노우피크','힐레베르그','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸','미니멀웍스','제인아츠','콜맨','텐트마크디자인','제이크라','그라운드커버','헬스포츠','몽벨','도메틱','위너웰','트로이'];
 
 let tent={id:'landlock',inner:'std',canopy:false,custom:{w:200,d:210}};
 
