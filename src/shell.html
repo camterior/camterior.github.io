@@ -67,6 +67,7 @@
         <h2 id="mnPhotoT">📷 사진으로 찾기</h2>
         <p class="mn-d">장비 사진(최대 3장)을 올리면 AI가 장비 제원에서 같은 제품을 찾아요. 세팅 사진도 돼요.</p>
         <label class="mn-pick"><input type="file" id="minePic" accept="image/*" multiple onchange="minePicked()"><span>사진 고르기</span><small id="minePicN"></small></label>
+        <div class="mn-prev" id="minePrev" aria-label="고른 사진"></div>
         <button type="button" class="btn-dark" id="mineGo" onclick="minePhoto()">✨ 사진 속 장비 찾기</button>
         <p class="mn-st" id="mineSt" role="status"></p>
         <div id="mineRes"></div>

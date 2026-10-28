@@ -35,11 +35,14 @@ function mineSearch(){const q=aiNorm(document.getElementById('mineQ').value||'')
 function mineShrink(file){return new Promise((ok,no)=>{const img=new Image(),u=URL.createObjectURL(file);img.onload=()=>{const s=Math.min(1,1280/Math.max(img.width,img.height)),c=document.createElement('canvas');
   c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);ok(c.toDataURL('image/jpeg',.82).split(',')[1]);};img.onerror=()=>{URL.revokeObjectURL(u);no();};img.src=u;});}
 function mineSystem(){return `너는 캠핑 장비 사진을 보고 아래 [목록]에서 같은 제품을 찾는 도우미야. JSON만 출력:
-{"found":[{"key":"목록의 키","count":1,"sure":"high|mid|low"}],"unknown":["목록에 없는 장비의 이름(브랜드·종류)"],"tip":"한 문장"}
+{"seen":["사진에 실제로 보이는 물건을 하나씩 짧게 묘사"],"found":[{"key":"목록의 키","count":1,"sure":"high|mid|low","why":"seen 중 어떤 물건인지"}],"unknown":["목록에 없는 장비의 이름(브랜드·종류)"],"tip":"한 문장"}
+순서: 먼저 seen에 사진 속 물건을 모양·재질·색으로 적고, 그다음 seen의 각 물건을 [목록]과 맞춰.
 규칙:
-- 사진에 실제로 보이는 장비만. 목록에 없는 장비는 비슷한 걸로 바꾸지 말고 unknown에 적어.
-- 같은 제품이 여러 개 보이면 count로. 확실하지 않으면 sure를 low로.
-- 텐트는 모양·로고·색이 맞을 때만. 사람·자동차·나무는 무시.
+- found에는 seen에 적은 물건만. 사진에 없는 장비를 목록에서 골라 넣지 마. 확실하지 않으면 sure를 low로.
+- 목록에 없는 장비는 비슷한 걸로 바꾸지 말고 unknown에 적어.
+- 같은 제품이 여러 개 보이면 count로.
+- 텐트·타프는 사진에 텐트·타프가 실제로 보이고 모양·색이 맞을 때만. 사람·자동차·나무·잔디·음식·그릇은 무시.
+- 스노우피크 IGT 구별법: IGT 프레임은 스테인리스 사각 틀에 유닛(플랫버너=틀에 끼운 버너, 멀티펑션 테이블=대나무 판·구멍 뚫린 판, 스테인리스 트레이)을 끼워 쓰는 테이블. 세퍼레이트 IGT는 틀이 2~4칸으로 나뉜 것(칸 수=유닛). 코너테이블 L/R은 IGT 끝에 붙는 1/4 원 모양 대나무 판. 행잉랙은 IGT 위에 세우는 걸이 선반.
 [목록] (키: 이름 / 모델 / 분류)
 ${mineAll().map(x=>`${x.key}: ${x.name} / ${x.model} / ${x.sec}`).join('\n')}`;}
 let MINE_FOUND=[];
@@ -50,7 +53,7 @@ async function minePhoto(){const inp=document.getElementById('minePic'),st=docum
     try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:mineSystem(),prompt:'이 사진 속 캠핑 장비를 찾아줘',image:{mime:'image/jpeg',data},acct:acctCode()||undefined})});
       const d=await r.json().catch(()=>({}));if(!r.ok||!d.text){fail=d.error||'error';continue;}
       const o=JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim());
-      (o.found||[]).forEach(x=>{const it=mineByKey(String(x.key||''));if(!it)return;const c=Math.min(8,Math.max(1,+x.count||1)),old=MINE_FOUND.find(y=>y.key===it.key);if(old)old.count=Math.max(old.count,c);else MINE_FOUND.push({...it,count:c,sure:x.sure});});
+      (o.found||[]).forEach(x=>{if(!x||(Array.isArray(o.seen)&&o.seen.length&&!x.why))return;const it=mineByKey(String(x.key||''));if(!it)return;const c=Math.min(8,Math.max(1,+x.count||1)),old=MINE_FOUND.find(y=>y.key===it.key);if(old)old.count=Math.max(old.count,c);else MINE_FOUND.push({...it,count:c,sure:x.sure});});
       (o.unknown||[]).forEach(u=>typeof u==='string'&&u.trim()&&unk.add(u.trim().slice(0,40)));}catch(e){fail='error';}}
   btn.disabled=false;if(typeof camEv==='function')camEv('mine-photo','내 장비 사진 인식');
   if(!MINE_FOUND.length&&!unk.size){st.textContent=fail==='limit'?'오늘 AI 사용량이 많아요. 잠시 뒤 다시 해보세요.':fail?'사진 인식은 서버 설정이 끝나면 열려요. 지금은 이름으로 찾아서 넣어 주세요.':'사진에서 장비를 찾지 못했어요. 장비가 크게 보이게 다시 찍어 보세요.';return;}
@@ -60,7 +63,10 @@ async function minePhoto(){const inp=document.getElementById('minePic'),st=docum
     (unk.size?`<div class="ai-unk"><p class="ai-warn">장비 제원에 아직 없는 장비예요. 비슷한 걸로 바꾸지 않았어요.</p><p>${[...unk].map(u=>`<button type="button" class="rq-ask" data-n="${aiEsc(u)}" onclick="reqAsk(this)">${aiEsc(u)} · 추가 요청</button>`).join('')}</p></div>`:'');}
 function mineTake(){document.querySelectorAll('#mineRes input[type=checkbox]').forEach(c=>{if(!c.checked)return;const x=MINE_FOUND[+c.dataset.i];MYG[x.key]=Math.max(MYG[x.key]||0,x.count);});
   mineSave();mineRender();document.getElementById('mineRes').innerHTML='';document.getElementById('mineSt').textContent='내 장비에 넣었어요';document.getElementById('minePic').value='';minePicked();}
-function minePicked(){const f=document.getElementById('minePic').files||[],l=document.getElementById('minePicN');if(l)l.textContent=f.length?`사진 ${Math.min(3,f.length)}장 선택됨`:'';}
+let MINE_PREV=[];
+function minePicked(){const f=[...(document.getElementById('minePic').files||[])].slice(0,3),l=document.getElementById('minePicN'),pv=document.getElementById('minePrev');
+  if(l)l.textContent=f.length?`사진 ${f.length}장 선택됨`:'';MINE_PREV.forEach(u=>URL.revokeObjectURL(u));MINE_PREV=f.map(x=>URL.createObjectURL(x));
+  if(pv)pv.innerHTML=MINE_PREV.map((u,i)=>`<img src="${u}" alt="고른 사진 ${i+1}">`).join('');}
 // 내 장비로 AI 세팅: 장비 이름을 AI 입력칸에 채워서 내부 구성으로
 function mineUse(){const keys=Object.keys(MYG).filter(k=>mineByKey(k));if(!keys.length)return;
   const txt=keys.map(k=>{const it=mineByKey(k),n=MYG[k];return it.name+(n>1?` ${n}개`:'');}).join(', ');
