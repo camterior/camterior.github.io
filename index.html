@@ -1977,9 +1977,39 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
    doors:[T2.front(W,2800,'전면 도어'),...sideD(L,W,1300,2500)],color:'#5F6366'});}
 }
 
+/* ===== 스프링바 (커크햄): 제조사 공식 페이지 치수. 바닥 일체형 캔버스 텐트, 앞(x=0) 벽에 출입문 ===== */
+{const SB='https://www.springbar.com/products/',SBN='제조사 공식 페이지',NOIN='바닥 일체형 캔버스 텐트라 따로 넣는 이너가 없어요. 안에 바로 매트·코트를 깔아요.';
+ // L=앞뒤 깊이, W=문 있는 벽 길이(mm). door=[문 시작 y, 문 폭], win=창문들
+ const sb=(id,name,model,L,W,H,kg,cap,slug,door,wins,est,extra)=>{const o=T2.rect(0,0,L,W);
+  T2.add(id,Object.assign({brand:'스프링바',name,model,size:[L/10,W/10,H],weight:kg,cap,href:SB+slug,srcName:SBN,drawn:true,
+   est,outer:o,innerNote:NOIN,doors:door,windows:wins,living:[Math.round(L*.42),Math.round(W/2)],color:'#CDBB98',prof:T2.PROF.cabin},extra||{}));};
+ const fd=(y,w,label)=>({a:[0,y],b:[0,y+w],label:label||'출입문',zone:true}),rw=(L,y0,y1)=>({a:[L,y0],b:[L,y1],label:'뒤 창문'}),
+   ew=(L,y,label)=>({a:[Math.round(L*.3),y],b:[Math.round(L*.7),y],label:label||'옆 삼각 창문'});
+ sb('sbar_compact','컴팩트','Compact',1830,2440,132,'15kg','1–2명 (제조사 표기)','compact',
+   [fd(870,700,'앞 출입문'),{a:[1830,870],b:[1830,1570],label:'뒤 출입문',zone:true}],[],
+   '제조사 치수(6×8ft = 183×244cm, 높이 132cm, 앞뒤 롤업 도어)로 그렸어요.');
+ sb('sbar_outfitter','아웃피터','Outfitter',2130,2740,188,'18.1kg','2–3명 (제조사 표기)','outfitter',
+   [fd(760,660)],[rw(2130,700,2040)],
+   '제조사 치수(7×9ft = 213×274cm, 높이 188cm)로 그렸어요. 문 위치는 사진 비율 추정이에요.');
+ sb('sbar_vagabond','배가본드','Vagabond',2440,3050,198,'27.2kg','2–4명 (제조사 표기)','vagabond',
+   [fd(900,660)],[rw(2440,500,2550)],
+   '제조사 치수(8×10ft = 244×305cm, 높이 198cm)로 그렸어요. 문 위치는 사진 비율 추정이에요.');
+ sb('sbar_traveler','트래블러','Traveler',3050,3050,198,'32.7kg','2–6명 (제조사 표기)','traveler',
+   [fd(900,660)],[{a:[0,1800],b:[0,2700],label:'앞 창문'},rw(3050,700,2350),ew(3050,3050)],
+   '제조사 치수(10×10ft = 305×305cm, 높이 198cm, 앞 어닝 183×183cm)로 그렸어요. 문·창문 위치는 사진 비율 추정이에요.');
+ sb('sbar_classicjack100','클래식 잭 100 (구 하이라인 6)','Classic Jack 100 · Highline 6',3050,3050,198,'29.9kg','2–6명 (제조사 표기)','springbar-tent-classic-jack-100',
+   [fd(800,860)],[{a:[0,1850],b:[0,2700],label:'앞 창문'},rw(3050,700,2350),ew(3050,0),ew(3050,3050)],
+   '제조사 치수(10×10ft = 305×305cm, 높이 198cm, 문 폭 86cm, 앞 어닝 183×183cm)로 그렸어요. 하이라인 6의 후속 모델이에요. 문 위치는 사진 비율 추정이에요.');
+ sb('sbar_familycamper','패밀리 캠퍼','Family Camper',3050,4270,198,'36.7kg','2–8명 (제조사 표기)','family-camper',
+   [fd(1300,660)],[{a:[0,2300],b:[0,3300],label:'앞 창문'},rw(3050,900,3370),ew(3050,4270)],
+   '제조사 치수(10×14ft = 305×427cm, 높이 198cm, 앞 어닝 183×213cm)로 그렸어요. 문·창문 위치는 사진 비율 추정이에요.');
+ sb('sbar_skyliner','스카이라이너','Skyliner',3050,4270,196,'44kg','2–8명 (제조사 표기)','skyliner',
+   [fd(1200,1300,'앞 양문 도어')],[rw(3050,500,1900),rw(3050,2370,3770),ew(3050,0)],
+   '제조사 치수(10×14ft = 305×427cm, 높이 196cm, 앞뒤 처마 어닝, 한쪽 끝 화목난로 구멍)로 그렸어요. 문 위치는 사진 비율 추정이에요.');
+}
 TENT_ORDER.splice(0,TENT_ORDER.length,'landlock','landlock_x','living_shell','living_shell_long_pro','merak_pro','hb_atlas','hb_keron4gt','hx_nona','hx_vtarp','hp_backdoor','hp_cave','hp_mavericks',...T2.ids,'none');
 TENTS.none.brand='';
-const BRANDS=['스노우피크','힐레베르그','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸','미니멀웍스','제인아츠','콜맨','텐트마크디자인','제이크라','그라운드커버','헬스포츠','몽벨','도메틱','위너웰','트로이'];
+const BRANDS=['스노우피크','힐레베르그','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸','미니멀웍스','제인아츠','콜맨','텐트마크디자인','제이크라','그라운드커버','헬스포츠','몽벨','도메틱','위너웰','트로이','스프링바'];
 
 let tent={id:'landlock',inner:'std',canopy:false,custom:{w:200,d:210}};
 
