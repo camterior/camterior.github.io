@@ -1002,6 +1002,14 @@
 .mn-th{width:46px;height:46px;flex:none;border-radius:9px;background:var(--paper-2,#f3f1ea);display:grid;place-items:center;overflow:hidden}
 .mn-th img{width:100%;height:100%;object-fit:cover;display:block}.mn-th svg{width:88%;height:88%;display:block}
 .pc .pv img.pv-ph{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
+.code-ask{border:0;border-radius:20px;padding:0;width:min(92vw,400px);max-width:calc(100vw - 32px);box-shadow:0 20px 60px rgba(0,0,0,.25);color:var(--ink,#16190f)}
+.code-ask::backdrop{background:rgba(14,16,12,.45)}
+.ca-in{padding:24px 22px 20px;display:grid;gap:10px}.ca-in h2{margin:0;font-size:20px}.ca-in p{margin:0;color:var(--ink-2);font-size:14.5px;line-height:1.6}
+.ca-in input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;font-size:16px;letter-spacing:.04em}
+.ca-msg{min-height:1.2em;font-size:13.5px!important;color:#B2421B!important}.ca-msg.ok{color:#2F6B3A!important}
+.ca-btns{display:flex;gap:8px}.ca-btns button{flex:1;min-height:46px;border-radius:12px;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
+.ca-no{border:1px solid var(--line);background:#fff}.ca-go{border:0;background:#0F120D;color:#fff}.ca-go:disabled{opacity:.5}
+.ca-in small{color:var(--ink-3);font-size:12.5px;text-align:center}
 </style>
 
 </head>
@@ -5015,7 +5023,7 @@ async function acctPull(){const c=acctCode();if(!c){acctUI();return;}const d=awa
   if(d.code){ACCT_VIP=!!d.vip;const srv=d.gear||{};if(Object.keys(srv).length){MYG=srv;mineSaveLocal();mineRender();}else if(Object.keys(MYG).length)acctQueue();}
   else if(d.fail==='nocode'){acctSet('');}acctUI();}
 function acctUI(){const el=document.getElementById('acctBox');if(!el)return;const c=acctCode();
-  el.innerHTML=`<div class="ac-row"><span class="ac-lab">내 코드</span>${c?`<b class="ac-code">${aiEsc(c)}</b><button type="button" onclick="acctCopy()">복사</button>${ACCT_VIP?'<span class="ac-vip">초대 회원 · AI 하루 20회</span>':''}`
+  el.innerHTML=`<div class="ac-row"><span class="ac-lab">내 코드</span>${c?`<b class="ac-code">${aiEsc(c)}</b><button type="button" onclick="acctCopy()">복사</button>${ACCT_VIP?'<span class="ac-vip">초대 회원 · AI 하루 50회</span>':''}`
     :`<span class="ac-none">${ACCT_OFF?'서버 설정이 끝나면 코드가 만들어져요 (지금은 이 기기에만 저장)':'장비를 넣으면 자동으로 만들어져요'}</span>`}</div>
    <p class="ac-help">${c?'이 기기에서는 자동으로 들어와요. 다른 기기에서는 아래에 이 코드를 넣으면 같은 장비가 나와요. 캡처해 두세요.':''}</p>
    <form class="ac-form" onsubmit="event.preventDefault();acctUse()"><label class="sr-only" for="acIn">다른 기기의 내 코드</label><input id="acIn" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="다른 기기의 코드 (예: 7KQ2-X9MD)"><button type="submit">불러오기</button></form>
@@ -5023,11 +5031,37 @@ function acctUI(){const el=document.getElementById('acctBox');if(!el)return;cons
    <p class="ac-msg" id="acMsg" role="status"></p>`;}
 const acMsg=t=>{const m=document.getElementById('acMsg');if(m)m.textContent=t;};
 function acctCopy(){const c=acctCode();(navigator.clipboard?navigator.clipboard.writeText(c):Promise.reject()).then(()=>acMsg('코드를 복사했어요'),()=>acMsg('코드: '+c));}
-async function acctUse(){let v=(document.getElementById('acIn').value||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(v.length!==8){acMsg('코드는 8글자예요 (예: 7KQ2-X9MD)');return;}v=v.slice(0,4)+'-'+v.slice(4);
-  const d=await acctCall({op:'get',code:v});if(!d.code){acMsg(d.fail==='nocode'?'없는 코드예요':d.fail==='quota'?'오늘은 더 시도할 수 없어요':'서버에 연결하지 못했어요');return;}
-  acctSet(d.code);ACCT_VIP=!!d.vip;MYG=d.gear||{};mineSaveLocal();mineRender();acctUI();acMsg('불러왔어요. 이제 이 기기도 같은 코드를 써요');}
-async function acctInvite(){const v=(document.getElementById('acInv').value||'').trim();if(!v)return;const c=await acctEnsure();if(!c){acMsg('서버 설정이 끝나면 쓸 수 있어요');return;}
-  const d=await acctCall({op:'invite',code:c,invite:v});if(d.ok){ACCT_VIP=true;acctUI();acMsg('초대 코드가 적용됐어요. AI를 하루 20회까지 쓸 수 있어요');if(typeof aiCheckLeft==='function')aiCheckLeft();}else acMsg(d.fail==='invite'?'맞지 않는 초대 코드예요':'서버에 연결하지 못했어요');}
+// 코드 하나로: 다른 기기의 내 코드(XXXX-XXXX)면 불러오고, 아니면 초대 코드로 적용. 결과 문장을 돌려줌
+async function acctLoad(raw){const v8=String(raw||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(v8.length!==8)return {ok:false,msg:'코드는 8글자예요 (예: 7KQ2-X9MD)'};
+  const v=v8.slice(0,4)+'-'+v8.slice(4);const d=await acctCall({op:'get',code:v});
+  if(!d.code)return {ok:false,miss:d.fail==='nocode',msg:d.fail==='nocode'?'없는 코드예요':d.fail==='quota'?'오늘은 더 시도할 수 없어요':'서버에 연결하지 못했어요'};
+  acctSet(d.code);ACCT_VIP=!!d.vip;MYG=d.gear||{};mineSaveLocal();mineRender();acctUI();if(typeof mineOnlyBtns==='function')mineOnlyBtns();return {ok:true,msg:'불러왔어요. 이제 이 기기도 같은 코드를 써요'};}
+async function acctInviteCode(raw){const v=String(raw||'').trim();if(!v)return {ok:false,msg:'코드를 넣어 주세요'};const c=await acctEnsure();if(!c)return {ok:false,msg:'서버에 연결하지 못했어요. 잠시 뒤 다시 해보세요'};
+  const d=await acctCall({op:'invite',code:c,invite:v});if(d.ok){ACCT_VIP=true;acctUI();if(typeof aiCheckLeft==='function')aiCheckLeft();return {ok:true,msg:'초대 코드가 적용됐어요. AI를 하루 50회까지 쓸 수 있어요'};}
+  return {ok:false,msg:d.fail==='invite'?'맞지 않는 코드예요':'서버에 연결하지 못했어요'};}
+async function acctAny(raw){const v=String(raw||'').trim();if(!v)return {ok:false,msg:'코드를 넣어 주세요'};
+  if(/^[A-Za-z0-9]{4}-?[A-Za-z0-9]{4}$/.test(v)){const r=await acctLoad(v);if(r.ok||!r.miss)return r;}
+  return acctInviteCode(v);}
+async function acctUse(){acMsg('확인하는 중…');acMsg((await acctLoad(document.getElementById('acIn').value)).msg);}
+async function acctInvite(){acMsg('확인하는 중…');acMsg((await acctInviteCode(document.getElementById('acInv').value)).msg);}
+// ===== 처음 들어왔을 때 '코드 있어요?' 팝업 (한 번만) =====
+const ASK_KEY='camCodeAsked';
+function codeAskDone(){try{localStorage.setItem(ASK_KEY,'1');}catch(e){}}
+function codeAskOpen(){let dl=document.getElementById('codeAsk');if(!dl){dl=document.createElement('dialog');dl.id='codeAsk';dl.className='code-ask';dl.setAttribute('aria-labelledby','caT');document.body.appendChild(dl);
+    dl.addEventListener('close',codeAskDone);}
+  dl.innerHTML=`<form method="dialog" class="ca-in" onsubmit="return codeAskGo(event)">
+    <h2 id="caT" tabindex="-1" autofocus style="outline:none">코드가 있나요?</h2>
+    <p>초대 코드나, 다른 기기에서 쓰던 <b>내 코드</b>가 있으면 넣어 주세요. 없어도 바로 쓸 수 있어요.</p>
+    <label class="sr-only" for="caIn">코드</label><input id="caIn" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="예: 7KQ2-X9MD 또는 초대 코드">
+    <p class="ca-msg" id="caMsg" role="status"></p>
+    <div class="ca-btns"><button type="button" class="ca-no" onclick="document.getElementById('codeAsk').close()">코드 없어요</button><button type="submit" class="ca-go" id="caGo">넣기</button></div>
+    <small>나중에 <b>내 장비</b> 탭 아래에서도 넣을 수 있어요.</small></form>`;
+  try{dl.showModal();}catch(e){dl.setAttribute('open','');}}
+async function codeAskGo(ev){ev.preventDefault();const m=document.getElementById('caMsg'),b=document.getElementById('caGo');b.disabled=true;m.textContent='확인하는 중…';
+  const r=await acctAny(document.getElementById('caIn').value);b.disabled=false;m.textContent=r.msg;m.classList.toggle('ok',!!r.ok);
+  if(r.ok){codeAskDone();setTimeout(()=>{const d=document.getElementById('codeAsk');if(d&&d.open)d.close();},1400);}return false;}
+function codeAskMaybe(){try{if(IN_CLAUDE||acctCode()||localStorage.getItem(ASK_KEY))return;}catch(e){return;}setTimeout(codeAskOpen,700);}
+codeAskMaybe();
 // ===== 장비 제원에서 고르기 =====
 let PICK_SEC=null;
 function minePickUI(){const el=document.getElementById('minePick');if(!el)return;const secs=mineSecs();if(!PICK_SEC)PICK_SEC=secs[0].k;

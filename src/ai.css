@@ -124,4 +124,12 @@
 .mn-th{width:46px;height:46px;flex:none;border-radius:9px;background:var(--paper-2,#f3f1ea);display:grid;place-items:center;overflow:hidden}
 .mn-th img{width:100%;height:100%;object-fit:cover;display:block}.mn-th svg{width:88%;height:88%;display:block}
 .pc .pv img.pv-ph{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
+.code-ask{border:0;border-radius:20px;padding:0;width:min(92vw,400px);max-width:calc(100vw - 32px);box-shadow:0 20px 60px rgba(0,0,0,.25);color:var(--ink,#16190f)}
+.code-ask::backdrop{background:rgba(14,16,12,.45)}
+.ca-in{padding:24px 22px 20px;display:grid;gap:10px}.ca-in h2{margin:0;font-size:20px}.ca-in p{margin:0;color:var(--ink-2);font-size:14.5px;line-height:1.6}
+.ca-in input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;font-size:16px;letter-spacing:.04em}
+.ca-msg{min-height:1.2em;font-size:13.5px!important;color:#B2421B!important}.ca-msg.ok{color:#2F6B3A!important}
+.ca-btns{display:flex;gap:8px}.ca-btns button{flex:1;min-height:46px;border-radius:12px;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
+.ca-no{border:1px solid var(--line);background:#fff}.ca-go{border:0;background:#0F120D;color:#fff}.ca-go:disabled{opacity:.5}
+.ca-in small{color:var(--ink-3);font-size:12.5px;text-align:center}
 </style>
