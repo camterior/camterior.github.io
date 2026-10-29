@@ -2109,7 +2109,7 @@ const SLOT_ITEMS=[
   {id:'mesh_s1',grp:'수납',name:'메쉬트레이 1유닛 샤로',model:'CK-250',w:245,d:356,halves:2,draw:'mesh',conf:'retailer'},
   {id:'mesh_hd',grp:'수납',name:'메쉬트레이 하프 딥',model:'CK-226',w:120,d:356,halves:1,draw:'meshh',deep:true,conf:'retailer'},
   {id:'mesh_hs',grp:'수납',name:'메쉬트레이 하프 샤로',model:'CK-251',w:120,d:356,halves:1,draw:'meshh',conf:'retailer'},
-  {id:'flat',grp:'화기',name:'플랫버너',model:'GS-450R-K',w:270,d:410,halves:2,draw:'flat',conf:'retailer'},
+  {id:'flat',grp:'화기',name:'스노우피크 플랫버너',short:'플랫버너',model:'GS-450R-K',w:270,d:410,halves:2,draw:'flat',conf:'retailer'},
   {id:'seppou',grp:'화기',name:'그릴버너 설봉원',model:'GS-355',w:249,d:358,halves:2,draw:'seppou',conf:'official'},
 ];
 const getItem=id=>SLOT_ITEMS.find(t=>t.id===id);
@@ -2327,7 +2327,7 @@ function frameBody(p,fine){const c=CATALOG[p.type],u=c.units,w=frameW(u);
     o+=`<text x="${c.style==='classic'?END+44:108}" y="43" font-size="22" font-weight="600" fill="${tcol}" pointer-events="none">${c.short} ${c.model}</text>`;}
   return o;}
 function itemLabel(it,cx,Y,d,col){const halo=`stroke="rgba(249,249,246,.85)" stroke-width="5" paint-order="stroke"`;
-  if(it.halves>=2)return `<text x="${cx}" y="${Y+d-20}" text-anchor="middle" font-size="19" font-weight="600" fill="${col}" ${halo} pointer-events="none">${it.name}</text>`;
+  if(it.halves>=2)return `<text x="${cx}" y="${Y+d-20}" text-anchor="middle" font-size="19" font-weight="600" fill="${col}" ${halo} pointer-events="none">${it.short||it.name}</text>`;
   return `<text transform="translate(${cx+7} ${SEAT_CY}) rotate(-90)" text-anchor="middle" font-size="18" font-weight="600" fill="${col}" ${halo} pointer-events="none">${it.model}</text>`;}
 function drawItem(it,x0,spanW,uid,i,fine){
   const cx=x0+spanW/2,cy=SEAT_CY,w=it.w,d=it.d,X=cx-w/2,Y=cy-d/2;
@@ -2351,7 +2351,7 @@ function drawItem(it,x0,spanW,uid,i,fine){
     g+=`<rect x="${X}" y="${Y}" width="${w}" height="${d}" rx="14" fill="#3E3B38" stroke="#26292C" stroke-width="4"/>`;
     const gx0=X+24,gx1=X+w-24,gy0=Y+28,gy1=Y+d-50;g+=`<rect x="${gx0}" y="${gy0}" width="${gx1-gx0}" height="${gy1-gy0}" rx="14" fill="#4C443E"/>`;
     for(let k=1;k<7;k++){const gx=gx0+(gx1-gx0)*k/7;g+=`<line x1="${gx.toFixed(1)}" y1="${gy0+12}" x2="${gx.toFixed(1)}" y2="${gy1-12}" stroke="#332D28" stroke-width="8" stroke-linecap="round"/>`;}
-    if(fine)g+=`<text x="${cx}" y="${Y+d-18}" text-anchor="middle" font-size="18" fill="#E8EAEC" pointer-events="none">${it.name}</text>`;}
+    if(fine)g+=`<text x="${cx}" y="${Y+d-18}" text-anchor="middle" font-size="18" fill="#E8EAEC" pointer-events="none">${it.short||it.name}</text>`;}
   return g+'</g>';}
 function emptyCell(x0,uid,i,selected){
   let o=`<rect x="${x0+7}" y="${SEAT_Y0+24}" width="${HALF-14}" height="${SEAT-48}" rx="10" fill="rgba(255,255,255,.35)" stroke="#AEB2AD" stroke-width="2.5" stroke-dasharray="12 9"/>`;
@@ -2519,7 +2519,7 @@ function openParts(uid){const r=byId(uid);if(!r)return;partsRoot=uid;const isl=o
   frames.forEach((p,fi)=>{const c=CATALOG[p.type],H=c.units*2;
     html+=`<div class="mgroup">${c.short} ${c.model}${frames.length>1?` · ${fi+1}번`:''} — 칸을 눌러 상판·메쉬·버너를 넣어요 (한 칸 = 0.5유닛)</div><div class="strip" style="grid-template-columns:repeat(${H},1fr)">`;
     for(let i=0;i<H;){const s=p.slots[i];
-      if(s&&s.head){const it=getItem(s.id);html+=`<button class="on" style="grid-column:span ${it.halves}" onclick="pending=null;openSlot(${p.uid},${i})">${it.name}</button>`;i+=it.halves;}
+      if(s&&s.head){const it=getItem(s.id);html+=`<button class="on" style="grid-column:span ${it.halves}" onclick="pending=null;openSlot(${p.uid},${i})">${it.short||it.name}</button>`;i+=it.halves;}
       else{html+=`<button onclick="openSlot(${p.uid},${i})">+</button>`;i++;}}
     html+=`</div><div class="prow"><button onclick="openRack(${p.uid})">${p.rack?'행잉랙 '+p.rack.id:'행잉랙 걸기'}</button>${c.style==='separate'?`<button onclick="swapRail(${p.uid});openParts(${uid})">레일 ${c.units}→${CATALOG[SEP_CYCLE[p.type]].units}유닛</button>`:''}</div>`;});
   if(frames.length)html+=`<div class="mgroup">IGT 다리 높이</div><div class="prow">${[300,400,660,830].map(v=>`<button aria-pressed="${(r.leg||660)===v}" onclick="setLeg(${uid},${v});openParts(${uid})">${v}</button>`).join('')}</div>`;
