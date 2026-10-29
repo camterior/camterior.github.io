@@ -52,7 +52,7 @@ function mineSystem(){return `너는 캠핑 장비 사진을 보고 아래 [목�
 - 구별법:
   · IGT: 검은/스테인리스 사각 틀에 유닛(대나무 판·버너·트레이)을 끼우는 테이블. 한 장짜리 틀이면 IGT 프레임(3유닛)·롱(4유닛), 틀이 칸마다 따로 조립된 것(칸 사이 이음새·접이 다리)은 세퍼레이트 IGT(칸 수=유닛). 칸 수를 세어서 골라.
   · IGT에 붙는 대나무 판: 1/4 원(둥근 모서리) 판=코너테이블, 직사각형 판=멀티펑션 테이블, 가운데가 뚫려 버너를 넣는 판=오픈멀티펑션. 플랫버너=틀 칸에 끼운 납작한 스테인리스 버너, 설봉원=그릴 모양 버너.
-  · 따로 서는 테이블: X자 접이 다리+대나무 상판=원액션테이블(낮으면 로우), 접이 다리 낮은 대나무 상판=싱글액션 로우, 알루미늄 롤 상판=알루텍, 천 받침 프레임+하드탑=헬리녹스 테이블원. 마이테이블=작은 1인용 접이 테이블(큰 테이블에 쓰지 마).
+  · 따로 서는 테이블: X자 접이 다리+대나무 상판=원액션테이블(낮으면 로우), 접이 다리 낮은 대나무 상판=싱글액션 로우, 알루미늄 롤 상판=알루텍, 천 받침 프레임+하드탑=헬리녹스 테이블원. 마이테이블=작은 1인용 접이 테이블(큰 테이블에 쓰지 마). 원목·월넛·나무 살(롤) 상판처럼 대나무가 아닌 테이블은 목록에 같은 게 없으면 unknown으로.
   · 체어: 팔걸이가 나무인 낮은 천 의자=스노우피크 로우체어, 접이식 감독 의자(팔걸이 쿠션·X 프레임)=FD체어, 등받이 높은 접이 의자=테이크체어, 폴 프레임에 천 씌운 의자=헬리녹스.
   · 매트·침대: 바닥에 까는 에어매트·자충매트는 목록의 매트(제백 에어리스=두꺼운 직사각 에어매트, 엑스페드 메가매트, 스패로우)에서, 다리 달린 침대=코트.
   · 난방: 연통 달린 검은 철제 화목난로=스노우피크 MK스토브, 원통형 석유난로=토요토미 옴니, 상자형 팬히터=신일·파세코·토요토미 팬히터.
@@ -81,7 +81,8 @@ async function minePhoto(){const inp=document.getElementById('minePic'),st=docum
   const bare=t=>aiNorm(String(t).replace(/스노우피크|snow\s*peak/gi,''));
   [...unk].forEach(u=>{const n=bare(u);if(n.length<2)return;let best=null,bl=0;
     mineAll().forEach(it=>{const m=bare(it.name);if(m.length<3)return;if((m===n||(it.k!=='tent'&&n.includes(m)))&&m.length>bl){best=it;bl=m.length;}});
-    if(best){unk.delete(u);if(!MINE_FOUND.find(y=>y.key===best.key))MINE_FOUND.push({...best,count:1,sure:'mid'});}});
+    if(!best&&n.length>=4)mineAll().forEach(it=>{if(it.k==='tent')return;const m=bare(it.name);if(m.startsWith(n)&&(!best||m.length<bare(best.name).length))best=it;});
+    if(best){unk.delete(u);if(!MINE_FOUND.find(y=>y.key===best.key||mineFam(y.key).includes(best.key)))MINE_FOUND.push({...best,count:1,sure:'mid'});}});
   btn.disabled=false;if(typeof camEv==='function')camEv('mine-photo','내 장비 사진 인식');
   if(!MINE_FOUND.length&&!unk.size){st.textContent=fail==='limit'?'오늘 AI 사용량이 많아요. 잠시 뒤 다시 해보세요.':fail?'사진 인식은 서버 설정이 끝나면 열려요. 지금은 이름으로 찾아서 넣어 주세요.':'사진에서 장비를 찾지 못했어요. 장비가 크게 보이게 다시 찍어 보세요.';return;}
   st.textContent=`찾은 장비 ${MINE_FOUND.length}가지 · 맞는 것만 체크해서 넣어 주세요`;
