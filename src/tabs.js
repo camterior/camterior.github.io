@@ -185,7 +185,7 @@ renderCatalog=function(){const el=document.getElementById('catalog');if(!el)retu
     html+=`<details class="fold" data-k="${esc(g)}"${open?' open':''}><summary><b>${esc(g)}</b><span>${list.length}</span></summary><div class="fold-in catalog-in">`;
     list.forEach(t=>{const c=CATALOG[t],b=bbox(c.verts),w=Math.round(b[1][0]-b[0][0]),d=Math.round(b[1][1]-b[0][1]);
       const size=c.kind==='gear'?`${c.w}×${c.d}×${c.h}`:`${w}×${d}`;
-      html+=`<button type="button" class="pc" onclick="catAdd('${t}')" aria-label="${esc(c.name)} 놓기"><span class="pv">${catPreview(t)}</span>
+      html+=`<button type="button" class="pc" onclick="catAdd('${t}')" aria-label="${esc(c.name)} 놓기"><span class="pv">${GEAR_ART.has(t)?`<img class="pv-ph" src="img/gear/${t}.webp" alt="" loading="lazy">`:catPreview(t)}</span>
         <span><span class="pn">${esc(c.name)}</span><br><span class="pm">${size}mm</span></span></button>`;});
     html+='</div></details>';});
   el.innerHTML=html||`<div class="cat-empty">‘${esc(q)}’에 맞는 장비가 없어요.</div>`;

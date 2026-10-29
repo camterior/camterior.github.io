@@ -15,6 +15,12 @@ function mineName(k,id){try{
   if(k==='parts')return getItem(id).name;if(k==='inner')return INNER_PRESETS[id].name;return CATALOG[id].name;}catch(e){return id;}}
 function mineModel(k,id){try{const o=k==='tent'?TENTS[id]:k==='tarp'?TARPS[id]:k==='parts'?getItem(id):k==='inner'?INNER_PRESETS[id]:CATALOG[id];return o.model||'';}catch(e){return '';}}
 let MINE_ALL=null;const mineAll=()=>MINE_ALL||(MINE_ALL=mineSecs().flatMap(s=>s.ids.map(id=>({key:s.k+':'+id,k:s.k,id,sec:s.t,name:mineName(s.k,id),model:mineModel(s.k,id)}))));
+// 장비 제원 탭과 같은 사진(없으면 도면 그림)을 작게
+const MINE_PV={};
+function mineThumb(it){if(!it)return '';const ph=it.k!=='tent'&&typeof GEAR_ART!=='undefined'&&GEAR_ART.has(it.id);
+  if(ph)return `<span class="mn-th"><img src="img/gear/${it.id}.webp" alt="" loading="lazy"></span>`;
+  if(!(it.key in MINE_PV)){let svg='';try{const s=GSEC.find(x=>x.k===it.k),g=s&&s.items().find(i=>i.id===it.id);const m=g&&g.html.match(/<svg[\s\S]*?<\/svg>/);svg=m?m[0]:'';}catch(e){}MINE_PV[it.key]=svg;}
+  return `<span class="mn-th">${MINE_PV[it.key]}</span>`;}
 const mineByKey=k=>mineAll().find(x=>x.key===k);
 const mineCount=()=>Object.values(MYG).reduce((a,b)=>a+b,0);
 function mineAdd(key,n){MYG[key]=Math.max(0,Math.min(20,(MYG[key]||0)+(n||1)));if(!MYG[key])delete MYG[key];mineSave();mineRender();if(document.getElementById('minePick'))minePickUI();}
@@ -23,13 +29,13 @@ function mineRender(){const box=document.getElementById('mineList');if(!box)retu
   document.getElementById('mineUse').disabled=!keys.length;
   if(!keys.length){box.innerHTML='<p class="mn-empty">아직 등록한 장비가 없어요. 사진을 올리거나 이름으로 찾아서 넣어 보세요.</p>';return;}
   const by={};keys.forEach(k=>{const it=mineByKey(k);(by[it.sec]=by[it.sec]||[]).push(it);});
-  box.innerHTML=mineSecs().filter(s=>by[s.t]).map(s=>`<section class="mn-sec"><h3>${aiEsc(s.t)} <small>${by[s.t].length}</small></h3><ul>${by[s.t].map(it=>`<li><span class="mn-n"><b>${aiEsc(it.name)}</b>${it.model?`<small>${aiEsc(it.model)}</small>`:''}</span>
+  box.innerHTML=mineSecs().filter(s=>by[s.t]).map(s=>`<section class="mn-sec"><h3>${aiEsc(s.t)} <small>${by[s.t].length}</small></h3><ul>${by[s.t].map(it=>`<li>${mineThumb(it)}<span class="mn-n"><b>${aiEsc(it.name)}</b>${it.model?`<small>${aiEsc(it.model)}</small>`:''}</span>
     <span class="mn-q"><button type="button" aria-label="${aiEsc(it.name)} 하나 빼기" onclick="mineAdd('${it.key}',-1)">−</button><b>${MYG[it.key]}</b><button type="button" aria-label="${aiEsc(it.name)} 하나 더" onclick="mineAdd('${it.key}',1)">+</button></span></li>`).join('')}</ul></section>`).join('');}
 // 이름으로 찾기
 function mineSearch(){const q=aiNorm(document.getElementById('mineQ').value||''),out=document.getElementById('mineFind');
   if(q.length<2){out.innerHTML='';return;}
   const hit=mineAll().filter(x=>aiNorm(x.name+' '+x.model+' '+x.sec).includes(q)).slice(0,12);
-  out.innerHTML=hit.length?hit.map(x=>`<li><span class="mn-n"><b>${aiEsc(x.name)}</b><small>${aiEsc(x.sec)}${x.model?' · '+aiEsc(x.model):''}</small></span><button type="button" class="mn-add" onclick="mineAdd('${x.key}',1);this.textContent='넣었어요 ✓'">${MYG[x.key]?'하나 더':'+ 넣기'}</button></li>`).join('')
+  out.innerHTML=hit.length?hit.map(x=>`<li>${mineThumb(x)}<span class="mn-n"><b>${aiEsc(x.name)}</b><small>${aiEsc(x.sec)}${x.model?' · '+aiEsc(x.model):''}</small></span><button type="button" class="mn-add" onclick="mineAdd('${x.key}',1);this.textContent='넣었어요 ✓'">${MYG[x.key]?'하나 더':'+ 넣기'}</button></li>`).join('')
     :`<li class="mn-none">장비 제원에 없는 장비예요. <button type="button" class="rq-ask" data-n="${aiEsc(document.getElementById('mineQ').value.trim())}" onclick="reqAsk(this)">추가 요청</button></li>`;}
 // 사진으로 찾기: 긴 변 1280px JPEG로 줄여서 AI(Gemini)에 보냄
 function mineShrink(file){return new Promise((ok,no)=>{const img=new Image(),u=URL.createObjectURL(file);img.onload=()=>{const s=Math.min(1,1280/Math.max(img.width,img.height)),c=document.createElement('canvas');
@@ -63,7 +69,7 @@ async function minePhoto(){const inp=document.getElementById('minePic'),st=docum
   btn.disabled=false;if(typeof camEv==='function')camEv('mine-photo','내 장비 사진 인식');
   if(!MINE_FOUND.length&&!unk.size){st.textContent=fail==='limit'?'오늘 AI 사용량이 많아요. 잠시 뒤 다시 해보세요.':fail?'사진 인식은 서버 설정이 끝나면 열려요. 지금은 이름으로 찾아서 넣어 주세요.':'사진에서 장비를 찾지 못했어요. 장비가 크게 보이게 다시 찍어 보세요.';return;}
   st.textContent=`찾은 장비 ${MINE_FOUND.length}가지 · 맞는 것만 체크해서 넣어 주세요`;
-  out.innerHTML=(MINE_FOUND.length?`<ul class="mn-found">${MINE_FOUND.map((x,i)=>`<li><label><input type="checkbox" data-i="${i}" ${x.sure==='low'?'':'checked'}><span class="mn-n"><b>${aiEsc(x.name)}</b><small>${aiEsc(x.sec)} · ${x.count}개${x.sure==='low'?' · 확실하지 않음':''}</small></span></label></li>`).join('')}</ul>
+  out.innerHTML=(MINE_FOUND.length?`<ul class="mn-found">${MINE_FOUND.map((x,i)=>`<li><label><input type="checkbox" data-i="${i}" ${x.sure==='low'?'':'checked'}>${mineThumb(x)}<span class="mn-n"><b>${aiEsc(x.name)}</b><small>${aiEsc(x.sec)} · ${x.count}개${x.sure==='low'?' · 확실하지 않음':''}</small></span></label></li>`).join('')}</ul>
     <button type="button" class="btn-dark" onclick="mineTake()">체크한 장비 넣기</button>`:'')+
     (unk.size?`<p class="mn-other">장비 제원에 없어서 뺀 것: ${[...unk].map(aiEsc).join(', ')}</p>`:'');}
 function mineTake(){document.querySelectorAll('#mineRes input[type=checkbox]').forEach(c=>{if(!c.checked)return;const x=MINE_FOUND[+c.dataset.i];MYG[x.key]=Math.max(MYG[x.key]||0,x.count);});
@@ -108,7 +114,7 @@ async function acctInvite(){const v=(document.getElementById('acInv').value||'')
 let PICK_SEC=null;
 function minePickUI(){const el=document.getElementById('minePick');if(!el)return;const secs=mineSecs();if(!PICK_SEC)PICK_SEC=secs[0].k;
   el.innerHTML=`<div class="mp-chips" role="group" aria-label="장비 종류">${secs.map(s=>`<button type="button" aria-pressed="${s.k===PICK_SEC}" onclick="PICK_SEC='${s.k}';minePickUI()">${aiEsc(s.t)} <small>${s.ids.length}</small></button>`).join('')}</div>
-   <ul class="mn-find mp-list">${mineAll().filter(x=>x.k===PICK_SEC).map(x=>`<li><span class="mn-n"><b>${aiEsc(x.name)}</b>${x.model?`<small>${aiEsc(x.model)}</small>`:''}</span>${MYG[x.key]?`<span class="mn-q"><button type="button" aria-label="${aiEsc(x.name)} 하나 빼기" onclick="mineAdd('${x.key}',-1)">−</button><b>${MYG[x.key]}</b><button type="button" aria-label="${aiEsc(x.name)} 하나 더" onclick="mineAdd('${x.key}',1)">+</button></span>`:`<button type="button" class="mn-add" onclick="mineAdd('${x.key}',1)">+ 넣기</button>`}</li>`).join('')}</ul>`;}
+   <ul class="mn-find mp-list">${mineAll().filter(x=>x.k===PICK_SEC).map(x=>`<li>${mineThumb(x)}<span class="mn-n"><b>${aiEsc(x.name)}</b>${x.model?`<small>${aiEsc(x.model)}</small>`:''}</span>${MYG[x.key]?`<span class="mn-q"><button type="button" aria-label="${aiEsc(x.name)} 하나 빼기" onclick="mineAdd('${x.key}',-1)">−</button><b>${MYG[x.key]}</b><button type="button" aria-label="${aiEsc(x.name)} 하나 더" onclick="mineAdd('${x.key}',1)">+</button></span>`:`<button type="button" class="mn-add" onclick="mineAdd('${x.key}',1)">+ 넣기</button>`}</li>`).join('')}</ul>`;}
 function mineInit(){mineRender();minePickUI();acctUI();acctPull();}
 
 // ===== 세팅 화면(텐트·장비 목록)에서 '내 장비만 보기' =====
