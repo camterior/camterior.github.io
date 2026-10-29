@@ -133,4 +133,6 @@
 .ca-no{border:1px solid var(--line);background:#fff}.ca-go{border:0;background:#0F120D;color:#fff}.ca-go:disabled{opacity:.5}
 .ca-in small{color:var(--ink-3);font-size:12.5px;text-align:center}
 .ac-row .ac-out{color:#B2421B;border-color:#E9C7B9}
+.mn-found li{flex-wrap:wrap}.mn-fam{display:flex!important;align-items:center;gap:8px;width:100%;flex:none!important;padding-left:30px;font-size:13px;color:var(--ink-2)}
+.mn-fam select{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:16px;background:#fff;color:var(--ink,#16190f)}
 </style>
