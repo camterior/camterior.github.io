@@ -6,7 +6,7 @@
 // - 장비 추가요청 게시판: 같은 KV(RL)의 'reqs' 키에 저장. 관리용 Secret ADMIN_KEY
 const MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 앞에서부터 시도
 const ALLOWED_ORIGINS = ["https://camterior.github.io"];
-const LIMIT_FREE = 10, LIMIT_CODE = 50; // 하루 횟수 (한국 시간 기준)
+const LIMIT_FREE = 10, LIMIT_CODE = 20; // 하루 횟수 (한국 시간 기준)
 const MAX_INPUT_CHARS = 8000;
 const MAX_SYSTEM_CHARS = 40000; // 사진 인식은 장비 목록 전체를 보내서 길어요
 const MAX_IMAGE_CHARS = 3000000; // base64 약 2.2MB

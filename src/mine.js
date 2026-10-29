@@ -91,7 +91,7 @@ async function acctPull(){const c=acctCode();if(!c){acctUI();return;}const d=awa
   if(d.code){ACCT_VIP=!!d.vip;const srv=d.gear||{};if(Object.keys(srv).length){MYG=srv;mineSaveLocal();mineRender();}else if(Object.keys(MYG).length)acctQueue();}
   else if(d.fail==='nocode'){acctSet('');}acctUI();}
 function acctUI(){const el=document.getElementById('acctBox');if(!el)return;const c=acctCode();
-  el.innerHTML=`<div class="ac-row"><span class="ac-lab">내 코드</span>${c?`<b class="ac-code">${aiEsc(c)}</b><button type="button" onclick="acctCopy()">복사</button>${ACCT_VIP?'<span class="ac-vip">초대 회원 · AI 하루 50회</span>':''}`
+  el.innerHTML=`<div class="ac-row"><span class="ac-lab">내 코드</span>${c?`<b class="ac-code">${aiEsc(c)}</b><button type="button" onclick="acctCopy()">복사</button>${ACCT_VIP?'<span class="ac-vip">초대 회원 · AI 하루 20회</span>':''}`
     :`<span class="ac-none">${ACCT_OFF?'서버 설정이 끝나면 코드가 만들어져요 (지금은 이 기기에만 저장)':'장비를 넣으면 자동으로 만들어져요'}</span>`}</div>
    <p class="ac-help">${c?'이 기기에서는 자동으로 들어와요. 다른 기기에서는 아래에 이 코드를 넣으면 같은 장비가 나와요. 캡처해 두세요.':''}</p>
    <form class="ac-form" onsubmit="event.preventDefault();acctUse()"><label class="sr-only" for="acIn">다른 기기의 내 코드</label><input id="acIn" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="다른 기기의 코드 (예: 7KQ2-X9MD)"><button type="submit">불러오기</button></form>
@@ -103,7 +103,7 @@ async function acctUse(){let v=(document.getElementById('acIn').value||'').toUpp
   const d=await acctCall({op:'get',code:v});if(!d.code){acMsg(d.fail==='nocode'?'없는 코드예요':d.fail==='quota'?'오늘은 더 시도할 수 없어요':'서버에 연결하지 못했어요');return;}
   acctSet(d.code);ACCT_VIP=!!d.vip;MYG=d.gear||{};mineSaveLocal();mineRender();acctUI();acMsg('불러왔어요. 이제 이 기기도 같은 코드를 써요');}
 async function acctInvite(){const v=(document.getElementById('acInv').value||'').trim();if(!v)return;const c=await acctEnsure();if(!c){acMsg('서버 설정이 끝나면 쓸 수 있어요');return;}
-  const d=await acctCall({op:'invite',code:c,invite:v});if(d.ok){ACCT_VIP=true;acctUI();acMsg('초대 코드가 적용됐어요. AI를 하루 50회까지 쓸 수 있어요');if(typeof aiCheckLeft==='function')aiCheckLeft();}else acMsg(d.fail==='invite'?'맞지 않는 초대 코드예요':'서버에 연결하지 못했어요');}
+  const d=await acctCall({op:'invite',code:c,invite:v});if(d.ok){ACCT_VIP=true;acctUI();acMsg('초대 코드가 적용됐어요. AI를 하루 20회까지 쓸 수 있어요');if(typeof aiCheckLeft==='function')aiCheckLeft();}else acMsg(d.fail==='invite'?'맞지 않는 초대 코드예요':'서버에 연결하지 못했어요');}
 // ===== 장비 제원에서 고르기 =====
 let PICK_SEC=null;
 function minePickUI(){const el=document.getElementById('minePick');if(!el)return;const secs=mineSecs();if(!PICK_SEC)PICK_SEC=secs[0].k;
