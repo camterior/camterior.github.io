@@ -51,18 +51,18 @@ function mineSystem(){return `너는 캠핑 장비 사진을 보고 아래 [목�
 - 크기·방향만 다른 형제 제품(일반/롱, L/R, 25/50, 240~300, 2·3·4유닛 등)은 사진만으로 구별이 어려워. 가장 비슷한 하나만 고르고 sure는 mid로 (사용자가 화면에서 크기를 고를 수 있어). 형제 제품을 여러 개 동시에 넣지 마.
 - 구별법:
   · IGT: 검은/스테인리스 사각 틀에 유닛(대나무 판·버너·트레이)을 끼우는 테이블. 한 장짜리 틀이면 IGT 프레임(3유닛)·롱(4유닛), 틀이 칸마다 따로 조립된 것(칸 사이 이음새·접이 다리)은 세퍼레이트 IGT(칸 수=유닛). 칸 수를 세어서 골라.
-  · IGT에 붙는 대나무 판: 1/4 원(둥근 모서리) 판=코너테이블, 직사각형 판=멀티펑션 테이블, 가운데가 뚫려 버너를 넣는 판=오픈멀티펑션. 플랫버너=틀 칸에 끼운 납작한 스테인리스 버너, 설봉원=그릴 모양 버너.
+  · IGT에 붙는 대나무 판: 1/4 원(둥근 모서리) 판=코너테이블, IGT 틀 옆면에서 밖으로 빼낸 작은 대나무 판(자체 다리 없이 틀에 매달림)=슬라이드하프, 자체 다리가 있는 직사각형 판=멀티펑션 테이블, 가운데가 뚫려 버너를 넣는 판=오픈멀티펑션. 플랫버너=틀 칸에 끼운 납작한 스테인리스 버너, 설봉원=그릴 모양 버너.
   · 따로 서는 테이블: X자 접이 다리+대나무 상판=원액션테이블(낮으면 로우), 접이 다리 낮은 대나무 상판=싱글액션 로우, 알루미늄 롤 상판=알루텍, 천 받침 프레임+하드탑=헬리녹스 테이블원. 마이테이블=작은 1인용 접이 테이블(큰 테이블에 쓰지 마). 원목·월넛·나무 살(롤) 상판처럼 대나무가 아닌 테이블은 목록에 같은 게 없으면 unknown으로.
-  · 체어: 팔걸이가 나무인 낮은 천 의자=스노우피크 로우체어, 접이식 감독 의자(팔걸이 쿠션·X 프레임)=FD체어, 등받이 높은 접이 의자=테이크체어, 폴 프레임에 천 씌운 의자=헬리녹스.
+  · 체어: 로우체어=등받이 천이 길고 뒤로 비스듬히 누운 낮은 의자, 팔걸이가 나무 막대. FD체어=등받이가 짧은 직사각형 천으로 똑바로 서 있고, 팔걸이가 천/쿠션으로 감싼 검은 철 프레임인 감독 의자(팔걸이가 나무가 아니면 FD체어 쪽). 같은 의자 여러 개는 한 종류로 count만 늘려, 등받이 높은 접이 의자=테이크체어, 폴 프레임에 천 씌운 의자=헬리녹스.
   · 매트·침대: 바닥에 까는 에어매트·자충매트는 목록의 매트(제백 에어리스=두꺼운 직사각 에어매트, 엑스페드 메가매트, 스패로우)에서, 다리 달린 침대=코트.
   · 난방: 연통 달린 검은 철제 화목난로=스노우피크 MK스토브, 원통형 석유난로=토요토미 옴니, 상자형 팬히터=신일·파세코·토요토미 팬히터.
-  · 버너: 다리 셋 달린 둥근 스테인리스 버너=강염버너. 냉장고: 회색 상자형 컴프레서 냉장고=도메틱 CFX3.
+  · 버너: 다리 셋 달린 둥근 스테인리스 버너=강염버너. IGT 칸의 버너는 하나면 하나만(플랫버너와 설봉원을 같이 넣지 마). 아이스박스·쿨러·스티로폼 박스는 쉘프컨테이너가 아니야(목록에 없으면 unknown). 냉장고: 회색 상자형 컴프레서 냉장고=도메틱 CFX3.
 - 사진에 상표(snow peak, Helinox, 라디트 등)나 가격표 글씨가 보이면 참고해.
 [목록] (키: 이름 / 모델 / 분류)
 ${mineAll().map(x=>`${x.key}: ${x.name} / ${x.model} / ${x.sec}`).join('\n')}`;}
 let MINE_FOUND=[];
 // 크기·방향만 다른 형제 제품: 사진 결과에서 고를 수 있게
-const MINE_FAMS=[['igt:reg3','igt:long4','igt:sep2','igt:sep3','igt:sep4'],['igt:mf_reg','igt:mf_long'],['igt:open_L','igt:open_R'],['igt:corner_L','igt:corner_R'],['igt:slide_h','igt:slide_hl'],['parts:mesh_d1','parts:mesh_s1','parts:mesh_hd','parts:mesh_hs'],['parts:steel1','parts:lid_half','parts:box_half'],['parts:wood_s','parts:wood_w'],['parts:flat','parts:seppou'],['gear:sc25','gear:sc50'],['gear:fshelf','gear:fshelf_l','gear:fshelf_m'],['gear:mytable','gear:mytable_s'],['gear:sp_oat','gear:sp_oat_l','gear:sp_oat_low','gear:sp_chabu'],['gear:hx_t1','gear:hx_t1l','gear:hx_t0lt','gear:noga_table','gear:hx_cafe'],['gear:alu48','gear:alu68','gear:alu93'],['sleep:megamat','sleep:megamat_duo','sleep:sparrow50'],['sleep:zebec_pro240','sleep:zebec_pro260','sleep:zebec_pro280','sleep:zebec_pro300'],['chair:sp_low30','chair:sp_lowshort'],['chair:hx_one','chair:hx_zero','chair:noga_chair','chair:hx_sunset'],['heat:sfh1200','heat:sfh300','heat:sfh_bh900','heat:camp5000','heat:toyotomi_lcl53'],['cool:cfx3_35','cool:cfx3_45','cool:cfx3_55'],['tarp:hexa_m','tarp:hexa_l','tarp:recta_m','tarp:recta_l']];
+const MINE_FAMS=[['igt:reg3','igt:long4','igt:sep2','igt:sep3','igt:sep4'],['igt:mf_reg','igt:mf_long','igt:slide_h','igt:slide_hl'],['igt:open_L','igt:open_R'],['igt:corner_L','igt:corner_R'],['parts:mesh_d1','parts:mesh_s1','parts:mesh_hd','parts:mesh_hs'],['parts:steel1','parts:lid_half','parts:box_half'],['parts:wood_s','parts:wood_w'],['parts:flat','parts:seppou'],['gear:sc25','gear:sc50'],['gear:fshelf','gear:fshelf_l','gear:fshelf_m'],['gear:mytable','gear:mytable_s'],['gear:sp_oat','gear:sp_oat_l','gear:sp_oat_low','gear:sp_chabu'],['gear:hx_t1','gear:hx_t1l','gear:hx_t0lt','gear:noga_table','gear:hx_cafe'],['gear:alu48','gear:alu68','gear:alu93'],['sleep:megamat','sleep:megamat_duo','sleep:sparrow50'],['sleep:zebec_pro240','sleep:zebec_pro260','sleep:zebec_pro280','sleep:zebec_pro300'],['chair:sp_fd','chair:sp_low30','chair:sp_lowshort','chair:sp_take'],['chair:hx_one','chair:hx_zero','chair:noga_chair','chair:hx_sunset'],['heat:sfh1200','heat:sfh300','heat:sfh_bh900','heat:camp5000','heat:toyotomi_lcl53'],['cool:cfx3_35','cool:cfx3_45','cool:cfx3_55'],['tarp:hexa_m','tarp:hexa_l','tarp:recta_m','tarp:recta_l']];
 const mineFam=k=>(MINE_FAMS.find(a=>a.includes(k))||[]).filter(x=>mineByKey(x));
 // AI가 'hx_t1'처럼 분류 없이 준 키도 받기
 const mineKeyFix=k=>{k=String(k||'').trim();if(mineByKey(k))return k;const id=k.split(':').pop(),it=mineAll().find(x=>x.id===id);return it?it.key:k;};
@@ -70,13 +70,17 @@ function mineFamPick(i,k){const it=mineByKey(k);if(!it)return;const old=MINE_FOU
   const li=document.querySelector(`#mineRes li[data-i="${i}"]`);if(!li)return;li.querySelector('.mn-n b').textContent=it.name;const th=li.querySelector('.mn-th');if(th)th.outerHTML=mineThumb(it);const cb=li.querySelector('input[type=checkbox]');if(cb)cb.checked=true;}
 async function minePhoto(){const inp=document.getElementById('minePic'),st=document.getElementById('mineSt'),btn=document.getElementById('mineGo'),out=document.getElementById('mineRes');
   const files=[...(inp.files||[])].slice(0,3);if(!files.length){st.textContent='사진을 먼저 골라 주세요';return;}
-  btn.disabled=true;st.textContent='AI가 사진 속 장비를 찾는 중…';out.innerHTML='';MINE_FOUND=[];const unk=new Set();let fail=null;
+  btn.disabled=true;st.textContent='AI가 사진 속 장비를 찾는 중…';out.innerHTML='';MINE_FOUND=[];const unk=new Set();let fail=null;const PER=[];
   for(const f of files){let data;try{data=await mineShrink(f);}catch(e){fail='photo';continue;}
     try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:mineSystem(),prompt:'이 사진 속 캠핑 장비를 찾아줘',image:{mime:'image/jpeg',data},acct:acctCode()||undefined})});
       const d=await r.json().catch(()=>({}));if(!r.ok||!d.text){fail=d.error||'error';continue;}
       const o=JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim());
-      (o.found||[]).forEach(x=>{if(!x||(Array.isArray(o.seen)&&o.seen.length&&!x.why))return;const it=mineByKey(mineKeyFix(x.key));if(!it)return;const c=Math.min(8,Math.max(1,+x.count||1)),old=MINE_FOUND.find(y=>y.key===it.key);if(old)old.count=Math.max(old.count,c);else MINE_FOUND.push({...it,count:c,sure:x.sure});});
+      const one={};(o.found||[]).forEach(x=>{if(!x||(Array.isArray(o.seen)&&o.seen.length&&!x.why))return;const it=mineByKey(mineKeyFix(x.key));if(!it)return;const c=Math.min(8,Math.max(1,+x.count||1));
+        if(!one[it.key]||one[it.key].count<c)one[it.key]={...it,count:c,sure:x.sure};});PER.push(Object.values(one));
       (o.unknown||[]).forEach(u=>typeof u==='string'&&u.trim()&&unk.add(u.trim().slice(0,40)));}catch(e){fail='error';}}
+  // 여러 장이면 장마다 표를 모아서: 같은 형제 묶음(예: FD체어/로우체어, 플랫버너/설봉원)에서는 더 많은 사진에 나온 것만 남김
+  const vote={};PER.forEach(list=>list.forEach(it=>{const g=(MINE_FAMS.find(a=>a.includes(it.key))||[it.key])[0];(vote[g]=vote[g]||{});const v=vote[g][it.key]=vote[g][it.key]||{it,n:0,count:0,sure:it.sure};v.n++;v.count=Math.max(v.count,it.count);if(it.sure==='high')v.sure='high';}));
+  Object.values(vote).forEach(g=>{const top=Math.max(...Object.values(g).map(v=>v.n));Object.values(g).filter(v=>v.n===top||PER.length<2).forEach(v=>MINE_FOUND.push({...v.it,count:v.count,sure:v.sure}));});
   // AI가 목록에 없다고 한 이름도 장비 제원 이름과 같으면 찾은 장비로 옮김 (예: '스노우피크 플랫버너' → 플랫버너)
   const bare=t=>aiNorm(String(t).replace(/스노우피크|snow\s*peak/gi,''));
   [...unk].forEach(u=>{const n=bare(u);if(n.length<2)return;let best=null,bl=0;
