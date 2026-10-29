@@ -155,6 +155,7 @@ function codeAskOpen(){let dl=document.getElementById('codeAsk');if(!dl){dl=docu
     <label class="sr-only" for="caIn">코드</label><input id="caIn" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="예: 7KQ2-X9MD 또는 초대 코드">
     <p class="ca-msg" id="caMsg" role="status"></p>
     <div class="ca-btns"><button type="button" class="ca-no" onclick="document.getElementById('codeAsk').close()">코드 없어요</button><button type="submit" class="ca-go" id="caGo">넣기</button></div>
+    <a class="ca-dm" href="https://ig.me/m/hj_ironcamp" target="_blank" rel="noopener"><span class="ca-dm-ic" aria-hidden="true"></span><span><b>초대 코드가 없나요?</b><br>인스타그램 <b>@hj_ironcamp</b>로 DM(쪽지) 보내 주시면 코드를 드려요</span></a>
     <small>나중에 <b>내 장비</b> 탭 아래에서도 넣을 수 있어요.</small></form>`;
   try{dl.showModal();}catch(e){dl.setAttribute('open','');}}
 async function codeAskGo(ev){ev.preventDefault();const m=document.getElementById('caMsg'),b=document.getElementById('caGo');b.disabled=true;m.textContent='확인하는 중…';

@@ -135,4 +135,7 @@
 .ac-row .ac-out{color:#B2421B;border-color:#E9C7B9}
 .mn-found li{flex-wrap:wrap}.mn-fam{display:flex!important;align-items:center;gap:8px;width:100%;flex:none!important;padding-left:30px;font-size:13px;color:var(--ink-2)}
 .mn-fam select{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:16px;background:#fff;color:var(--ink,#16190f)}
+.ca-dm{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:#FFF4EE;border:1px solid #F6D3C2;color:var(--ink,#16190f);text-decoration:none;font-size:13.5px;line-height:1.5}
+.ca-dm b{font-weight:700}.ca-dm-ic{flex:none;width:30px;height:30px;border-radius:9px;background:linear-gradient(45deg,#F58529,#DD2A7B 55%,#8134AF);position:relative}
+.ca-dm-ic::before{content:'';position:absolute;inset:7px;border:2px solid #fff;border-radius:6px}.ca-dm-ic::after{content:'';position:absolute;left:12px;top:12px;width:6px;height:6px;border:2px solid #fff;border-radius:50%}
 </style>
