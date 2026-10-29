@@ -331,7 +331,7 @@ function aiTidy(res,said,prev,now){const L=aiLocal(said),want={};
   if(res.inner&&!(prev&&prev.inner===res.inner)&&L.inner!==res.inner)res.inner=L.inner||null;}
 /* 오늘 남은 AI 횟수 (워커가 알려줄 때만 표시) */
 function aiShowLeft(d){const el=document.getElementById('aiLeft');if(!el||!d||d.left==null)return;
-  el.textContent=`오늘 남은 AI ${d.left}/${d.limit}회${d.vip?' · 초대 회원':''}`;el.hidden=false;}
+  el.textContent=d.admin?'관리자 · AI 제한 없음':`오늘 남은 AI ${d.left}/${d.limit}회${d.vip?' · 초대 회원':''}`;el.hidden=false;}
 async function aiCheckLeft(){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({check:true,acct:(typeof acctCode==='function'&&acctCode())||undefined})});aiShowLeft(await r.json());}catch(e){}}
 /* 대화로 고치기: 첫 세팅 뒤에는 '고칠 점'만 적으면 지금 배치를 바탕으로 다시 세팅 */
 const AI_CHAT={log:[],last:null,said:''};

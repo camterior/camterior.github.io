@@ -4841,7 +4841,7 @@ function aiTidy(res,said,prev,now){const L=aiLocal(said),want={};
   if(res.inner&&!(prev&&prev.inner===res.inner)&&L.inner!==res.inner)res.inner=L.inner||null;}
 /* 오늘 남은 AI 횟수 (워커가 알려줄 때만 표시) */
 function aiShowLeft(d){const el=document.getElementById('aiLeft');if(!el||!d||d.left==null)return;
-  el.textContent=`오늘 남은 AI ${d.left}/${d.limit}회${d.vip?' · 초대 회원':''}`;el.hidden=false;}
+  el.textContent=d.admin?'관리자 · AI 제한 없음':`오늘 남은 AI ${d.left}/${d.limit}회${d.vip?' · 초대 회원':''}`;el.hidden=false;}
 async function aiCheckLeft(){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({check:true,acct:(typeof acctCode==='function'&&acctCode())||undefined})});aiShowLeft(await r.json());}catch(e){}}
 /* 대화로 고치기: 첫 세팅 뒤에는 '고칠 점'만 적으면 지금 배치를 바탕으로 다시 세팅 */
 const AI_CHAT={log:[],last:null,said:''};
@@ -5014,25 +5014,25 @@ function mineUse(){const keys=Object.keys(MYG).filter(k=>mineByKey(k));if(!keys.
 const ACCT_KEY='camAcct';
 const acctCode=()=>{try{return localStorage.getItem(ACCT_KEY)||'';}catch(e){return '';}};
 const acctSet=v=>{try{v?localStorage.setItem(ACCT_KEY,v):localStorage.removeItem(ACCT_KEY);}catch(e){}};
-let ACCT_VIP=false,ACCT_OFF=false,acctTimer=null;
+let ACCT_VIP=false,ACCT_ADMIN=false,ACCT_OFF=false,acctTimer=null;
 async function acctCall(a){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({acct:a})});const d=await r.json().catch(()=>({}));
   if(!r.ok){if(!d.error||d.error==='acct-off'||d.error==='empty'||d.error==='bad')ACCT_OFF=true;return {fail:d.error||'error'};}ACCT_OFF=false;return d;}catch(e){ACCT_OFF=true;return {fail:'network'};}}
 async function acctEnsure(){if(acctCode())return acctCode();const d=await acctCall({op:'new'});if(d.code){acctSet(d.code);ACCT_VIP=false;acctUI();return d.code;}return '';}
 // 장비가 바뀌면 1.5초 뒤 한 번에 서버에 저장 (무료 저장 횟수 아끼기)
-function acctQueue(){clearTimeout(acctTimer);acctTimer=setTimeout(async()=>{const c=await acctEnsure();if(!c)return;const d=await acctCall({op:'save',code:c,gear:MYG});if(d.ok){ACCT_VIP=!!d.vip;acctUI();}},1500);}
+function acctQueue(){clearTimeout(acctTimer);acctTimer=setTimeout(async()=>{const c=await acctEnsure();if(!c)return;const d=await acctCall({op:'save',code:c,gear:MYG});if(d.ok){ACCT_VIP=!!d.vip;ACCT_ADMIN=!!d.admin;acctUI();}},1500);}
 async function acctPull(){const c=acctCode();if(!c){acctUI();return;}const d=await acctCall({op:'get',code:c});
-  if(d.code){ACCT_VIP=!!d.vip;const srv=d.gear||{};if(Object.keys(srv).length){MYG=srv;mineSaveLocal();mineRender();}else if(Object.keys(MYG).length)acctQueue();}
+  if(d.code){ACCT_VIP=!!d.vip;ACCT_ADMIN=!!d.admin;const srv=d.gear||{};if(Object.keys(srv).length){MYG=srv;mineSaveLocal();mineRender();}else if(Object.keys(MYG).length)acctQueue();}
   else if(d.fail==='nocode'){acctSet('');}acctUI();}
 function acctUI(){const el=document.getElementById('acctBox');if(!el)return;const c=acctCode();
-  el.innerHTML=`<div class="ac-row"><span class="ac-lab">내 코드</span>${c?`<b class="ac-code">${aiEsc(c)}</b><button type="button" onclick="acctCopy()">복사</button><button type="button" class="ac-out" onclick="acctOut(this)">이 기기에서 빼기</button>${ACCT_VIP?'<span class="ac-vip">초대 회원 · AI 하루 50회</span>':''}`
+  el.innerHTML=`<div class="ac-row"><span class="ac-lab">내 코드</span>${c?`<b class="ac-code">${aiEsc(c)}</b><button type="button" onclick="acctCopy()">복사</button><button type="button" class="ac-out" onclick="acctOut(this)">이 기기에서 빼기</button>${ACCT_ADMIN?'<span class="ac-vip">관리자 · AI 제한 없음</span>':ACCT_VIP?'<span class="ac-vip">초대 회원 · AI 하루 50회</span>':''}`
     :`<span class="ac-none">${ACCT_OFF?'서버 설정이 끝나면 코드가 만들어져요 (지금은 이 기기에만 저장)':'장비를 넣으면 자동으로 만들어져요'}</span>`}</div>
    <p class="ac-help">${c?'이 기기에서는 자동으로 들어와요. 다른 기기에서는 아래에 이 코드를 넣으면 같은 장비가 나와요. 캡처해 두세요.':''}</p>
    <form class="ac-form" onsubmit="event.preventDefault();acctUse()"><label class="sr-only" for="acIn">다른 기기의 내 코드</label><input id="acIn" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="다른 기기의 코드 (예: 7KQ2-X9MD)"><button type="submit">불러오기</button></form>
-   ${ACCT_VIP?'':`<form class="ac-form" onsubmit="event.preventDefault();acctInvite()"><label class="sr-only" for="acInv">초대 코드</label><input id="acInv" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="초대 코드가 있으면 넣어 주세요"><button type="submit">적용</button></form>`}
+   ${ACCT_ADMIN?'':`<form class="ac-form" onsubmit="event.preventDefault();acctInvite()"><label class="sr-only" for="acInv">초대 코드</label><input id="acInv" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="초대 코드가 있으면 넣어 주세요"><button type="submit">적용</button></form>`}
    <p class="ac-msg" id="acMsg" role="status"></p>`;}
 // 잘못 불러온 코드를 이 기기에서 빼기(로그아웃): 두 번 눌러야 빠짐. 서버의 장비는 그대로
 function acctOut(b){if(!b.dataset.sure){b.dataset.sure='1';b.textContent='한 번 더 누르면 빠져요';setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.textContent='이 기기에서 빼기';}},4000);return;}
-  clearTimeout(acctTimer);acctSet('');ACCT_VIP=false;MYG={};mineSaveLocal();mineRender();acctUI();if(typeof mineOnlyBtns==='function')mineOnlyBtns();if(typeof aiCheckLeft==='function')aiCheckLeft();
+  clearTimeout(acctTimer);acctSet('');ACCT_VIP=false;ACCT_ADMIN=false;MYG={};mineSaveLocal();mineRender();acctUI();if(typeof mineOnlyBtns==='function')mineOnlyBtns();if(typeof aiCheckLeft==='function')aiCheckLeft();
   acMsg('이 기기에서 코드를 뺐어요. 코드를 다시 넣으면 그 코드의 장비가 나와요');}
 const acMsg=t=>{const m=document.getElementById('acMsg');if(m)m.textContent=t;};
 function acctCopy(){const c=acctCode();(navigator.clipboard?navigator.clipboard.writeText(c):Promise.reject()).then(()=>acMsg('코드를 복사했어요'),()=>acMsg('코드: '+c));}
@@ -5040,9 +5040,9 @@ function acctCopy(){const c=acctCode();(navigator.clipboard?navigator.clipboard.
 async function acctLoad(raw){const v8=String(raw||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(v8.length!==8)return {ok:false,msg:'코드는 8글자예요 (예: 7KQ2-X9MD)'};
   const v=v8.slice(0,4)+'-'+v8.slice(4);const d=await acctCall({op:'get',code:v});
   if(!d.code)return {ok:false,miss:d.fail==='nocode',msg:d.fail==='nocode'?'없는 코드예요':d.fail==='quota'?'오늘은 더 시도할 수 없어요':'서버에 연결하지 못했어요'};
-  acctSet(d.code);ACCT_VIP=!!d.vip;MYG=d.gear||{};mineSaveLocal();mineRender();acctUI();if(typeof mineOnlyBtns==='function')mineOnlyBtns();return {ok:true,msg:'불러왔어요. 이제 이 기기도 같은 코드를 써요'};}
+  acctSet(d.code);ACCT_VIP=!!d.vip;ACCT_ADMIN=!!d.admin;MYG=d.gear||{};mineSaveLocal();mineRender();acctUI();if(typeof mineOnlyBtns==='function')mineOnlyBtns();return {ok:true,msg:'불러왔어요. 이제 이 기기도 같은 코드를 써요'};}
 async function acctInviteCode(raw){const v=String(raw||'').trim();if(!v)return {ok:false,msg:'코드를 넣어 주세요'};const c=await acctEnsure();if(!c)return {ok:false,msg:'서버에 연결하지 못했어요. 잠시 뒤 다시 해보세요'};
-  const d=await acctCall({op:'invite',code:c,invite:v});if(d.ok){ACCT_VIP=true;acctUI();if(typeof aiCheckLeft==='function')aiCheckLeft();return {ok:true,msg:'초대 코드가 적용됐어요. AI를 하루 50회까지 쓸 수 있어요'};}
+  const d=await acctCall({op:'invite',code:c,invite:v});if(d.ok){ACCT_VIP=true;ACCT_ADMIN=!!d.admin;acctUI();if(typeof aiCheckLeft==='function')aiCheckLeft();return {ok:true,msg:d.admin?'관리자 계정이 됐어요. AI를 제한 없이 쓸 수 있어요':'초대 코드가 적용됐어요. AI를 하루 50회까지 쓸 수 있어요'};}
   return {ok:false,msg:d.fail==='invite'?'맞지 않는 코드예요':'서버에 연결하지 못했어요'};}
 async function acctAny(raw){const v=String(raw||'').trim();if(!v)return {ok:false,msg:'코드를 넣어 주세요'};
   if(/^[A-Za-z0-9]{4}-?[A-Za-z0-9]{4}$/.test(v)){const r=await acctLoad(v);if(r.ok||!r.miss)return r;}

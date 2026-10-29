@@ -6,7 +6,7 @@
 // - 장비 추가요청 게시판: 같은 KV(RL)의 'reqs' 키에 저장. 관리용 Secret ADMIN_KEY
 const MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 앞에서부터 시도
 const ALLOWED_ORIGINS = ["https://camterior.github.io"];
-const LIMIT_FREE = 10, LIMIT_CODE = 50; // 하루 횟수 (한국 시간 기준)
+const LIMIT_FREE = 10, LIMIT_CODE = 50, LIMIT_ADMIN = 100000; // 하루 횟수 (한국 시간 기준). 관리자 계정은 사실상 제한 없음
 const MAX_INPUT_CHARS = 8000;
 const MAX_SYSTEM_CHARS = 40000; // 사진 인식은 장비 목록 전체를 보내서 길어요
 const MAX_IMAGE_CHARS = 3000000; // base64 약 2.2MB
@@ -51,15 +51,20 @@ async function acct(a, env, request, origin) {
   if ((parseInt(await env.RL.get(`am:${day}:${ip}`)) || 0) >= 30) return json({ error: "quota" }, 429, origin); // 코드 맞히기 막기
   const o = await getAcct(env, code);
   if (!o) { await bump(`am:${day}:${ip}`, 30); return json({ error: "nocode" }, 404, origin); }
-  if (a.op === "get") return json({ code, gear: o.gear || {}, vip: !!o.vip }, 200, origin);
+  if (a.op === "get") return json({ code, gear: o.gear || {}, vip: !!o.vip, admin: !!o.admin }, 200, origin);
   if (a.op === "save") {
     const g = a.gear && typeof a.gear === "object" ? a.gear : {}, out = {};
     Object.keys(g).slice(0, 300).forEach(k => { const n = Math.round(+g[k]); if (/^[a-z]+:[a-z0-9_]{1,40}$/.test(k) && n >= 1 && n <= 20) out[k] = n; });
     o.gear = out; o.up = day;
     await env.RL.put("acct:" + code, JSON.stringify(o));
-    return json({ ok: true, vip: !!o.vip }, 200, origin);
+    return json({ ok: true, vip: !!o.vip, admin: !!o.admin }, 200, origin);
   }
   if (a.op === "invite") {
+    // 관리 키(ADMIN_KEY)를 초대 코드 칸에 넣으면 이 코드가 관리자 계정(AI 제한 없음)이 됨
+    if (env.ADMIN_KEY && String(a.invite || "").trim() === env.ADMIN_KEY) {
+      o.vip = true; o.admin = true; await env.RL.put("acct:" + code, JSON.stringify(o));
+      return json({ ok: true, vip: true, admin: true }, 200, origin);
+    }
     if (!codeOk(env, a.invite)) return json({ error: "invite" }, 403, origin);
     o.vip = true; await env.RL.put("acct:" + code, JSON.stringify(o));
     return json({ ok: true, vip: true }, 200, origin);
@@ -147,14 +152,15 @@ export default {
     const ac = typeof body.acct === "string" ? body.acct.toUpperCase() : "";
     const acc = ac ? await getAcct(env, ac) : null;
     const vip = codeOk(env, body.code) || !!(acc && acc.vip);
-    const limit = vip ? LIMIT_CODE : LIMIT_FREE;
+    const admin = !!(acc && acc.admin);
+    const limit = admin ? LIMIT_ADMIN : vip ? LIMIT_CODE : LIMIT_FREE;
     const ip = request.headers.get("CF-Connecting-IP") || "0";
     const day = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
     const rk = vip && acc ? `a:${day}:${ac}` : `${vip ? "c" : "f"}:${day}:${ip}`;
     let used = 0;
     if (env.RL) used = parseInt(await env.RL.get(rk)) || 0;
-    if (body.check) return json({ left: Math.max(0, limit - used), limit, vip }, 200, origin); // 남은 횟수만 확인
-    if (env.RL && used >= limit) return json({ error: "quota", left: 0, limit, vip }, 429, origin);
+    if (body.check) return json({ left: Math.max(0, limit - used), limit, vip, admin }, 200, origin); // 남은 횟수만 확인
+    if (env.RL && used >= limit) return json({ error: "quota", left: 0, limit, vip, admin }, 429, origin);
 
     const prompt = String(body.prompt || "").slice(0, MAX_INPUT_CHARS);
     const system = String(body.system || "").slice(0, MAX_SYSTEM_CHARS); // 장비·텐트 목록과 예시가 들어가서 길게
@@ -191,6 +197,6 @@ export default {
     if (env.RL) await env.RL.put(rk, String(used + 1), { expirationTtl: 172800 });
     const data = await res.json();
     const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join("") || "";
-    return json({ text, left: Math.max(0, limit - used - 1), limit, vip }, 200, origin);
+    return json({ text, left: Math.max(0, limit - used - 1), limit, vip, admin }, 200, origin);
   },
 };
