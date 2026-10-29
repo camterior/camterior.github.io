@@ -153,7 +153,7 @@ label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:cen
 
       <section class="cam" id="reqAdm">
         <h2>게시판 관리 <small>공지 쓰기 · 요청 승인 (일요일 반영 예정만 반영)</small></h2>
-        <form class="row" id="rqKeyForm" autocomplete="off"><input type="password" id="rqKey" placeholder="게시판 관리 키 (워커 ADMIN_KEY)" aria-label="게시판 관리 키"><button type="submit">열기</button></form>
+        <form class="row" id="rqKeyForm" autocomplete="off"><input type="password" id="rqKey" placeholder="게시판 관리 키 (워커 ADMIN_KEY)" aria-label="게시판 관리 키"><button type="submit">열기</button><button type="button" id="rqKeyDel">키 지우기</button></form>
         <p class="rq-hint" id="rqMsg"></p>
         <div id="rqBody" hidden>
           <h3 class="rq-h">공지 쓰기</h3>
@@ -388,6 +388,7 @@ setPeriod(period); view();
       $i('rqAdm-'+kind).innerHTML=L.length?L.map(function(r){return '<li><span class="nm"><b>'+esc(r.name)+'</b>'+(r.link?' · <a href="'+esc(r.link)+'" target="_blank" rel="noopener">링크</a>':'')+'<small>'+esc(r.at||'')+' · '+(r.from==='ai'?'AI에서':'게시판')+(r.note?' · '+esc(r.note):'')+'</small><input class="rp" data-rp="'+esc(r.id)+'" maxlength="200" placeholder="답글 (엔터로 저장)" value="'+esc(r.reply||'')+'"></span><span>+'+(r.n||1)+'</span><select data-id="'+esc(r.id)+'">'+Object.keys(ST).map(function(s){return '<option value="'+s+'"'+(s===r.st?' selected':'')+'>'+ST[s]+'</option>'}).join('')+'</select></li>'}).join(''):'<li class="empty">요청이 없어요</li>';});}
   function run(b){if(!k()){$i('rqMsg').textContent='관리 키를 넣어주세요.';return;}
     call(b).then(function(d){if(d.fail){$i('rqMsg').textContent=d.fail==='key'?'관리 키가 맞지 않아요.':d.fail==='board-off'?'워커에 KV(RL)가 아직 연결되지 않았어요.':'게시판 서버에 연결하지 못했어요 ('+d.fail+').';return;}draw(d)});}
+  $i('rqKeyDel').addEventListener('click',function(){try{localStorage.removeItem(KS)}catch(x){}$i('rqMsg').textContent='관리 키를 지웠어요. 맞는 키를 다시 넣어 주세요.';});
   $i('rqKeyForm').addEventListener('submit',function(e){e.preventDefault();var v=$i('rqKey').value.trim();try{localStorage.setItem(KS,v)}catch(x){}$i('rqKey').value='';run({op:'admin'});});
   $i('ntForm').addEventListener('submit',function(e){e.preventDefault();run({op:'notice',act:'add',title:$i('ntTitle').value,body:$i('ntBody').value,pin:$i('ntPin').checked});$i('ntTitle').value='';$i('ntBody').value='';$i('ntPin').checked=false;});
   $i('reqAdm').addEventListener('change',function(e){var t=e.target;if(t.tagName==='SELECT'&&t.dataset.id)run({op:'admin',id:t.dataset.id,st:t.value});});

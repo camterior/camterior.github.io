@@ -97,12 +97,16 @@ async function acctPull(){const c=acctCode();if(!c){acctUI();return;}const d=awa
   if(d.code){ACCT_VIP=!!d.vip;const srv=d.gear||{};if(Object.keys(srv).length){MYG=srv;mineSaveLocal();mineRender();}else if(Object.keys(MYG).length)acctQueue();}
   else if(d.fail==='nocode'){acctSet('');}acctUI();}
 function acctUI(){const el=document.getElementById('acctBox');if(!el)return;const c=acctCode();
-  el.innerHTML=`<div class="ac-row"><span class="ac-lab">내 코드</span>${c?`<b class="ac-code">${aiEsc(c)}</b><button type="button" onclick="acctCopy()">복사</button>${ACCT_VIP?'<span class="ac-vip">초대 회원 · AI 하루 50회</span>':''}`
+  el.innerHTML=`<div class="ac-row"><span class="ac-lab">내 코드</span>${c?`<b class="ac-code">${aiEsc(c)}</b><button type="button" onclick="acctCopy()">복사</button><button type="button" class="ac-out" onclick="acctOut(this)">이 기기에서 빼기</button>${ACCT_VIP?'<span class="ac-vip">초대 회원 · AI 하루 50회</span>':''}`
     :`<span class="ac-none">${ACCT_OFF?'서버 설정이 끝나면 코드가 만들어져요 (지금은 이 기기에만 저장)':'장비를 넣으면 자동으로 만들어져요'}</span>`}</div>
    <p class="ac-help">${c?'이 기기에서는 자동으로 들어와요. 다른 기기에서는 아래에 이 코드를 넣으면 같은 장비가 나와요. 캡처해 두세요.':''}</p>
    <form class="ac-form" onsubmit="event.preventDefault();acctUse()"><label class="sr-only" for="acIn">다른 기기의 내 코드</label><input id="acIn" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="다른 기기의 코드 (예: 7KQ2-X9MD)"><button type="submit">불러오기</button></form>
    ${ACCT_VIP?'':`<form class="ac-form" onsubmit="event.preventDefault();acctInvite()"><label class="sr-only" for="acInv">초대 코드</label><input id="acInv" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="초대 코드가 있으면 넣어 주세요"><button type="submit">적용</button></form>`}
    <p class="ac-msg" id="acMsg" role="status"></p>`;}
+// 잘못 불러온 코드를 이 기기에서 빼기(로그아웃): 두 번 눌러야 빠짐. 서버의 장비는 그대로
+function acctOut(b){if(!b.dataset.sure){b.dataset.sure='1';b.textContent='한 번 더 누르면 빠져요';setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.textContent='이 기기에서 빼기';}},4000);return;}
+  clearTimeout(acctTimer);acctSet('');ACCT_VIP=false;MYG={};mineSaveLocal();mineRender();acctUI();if(typeof mineOnlyBtns==='function')mineOnlyBtns();if(typeof aiCheckLeft==='function')aiCheckLeft();
+  acMsg('이 기기에서 코드를 뺐어요. 코드를 다시 넣으면 그 코드의 장비가 나와요');}
 const acMsg=t=>{const m=document.getElementById('acMsg');if(m)m.textContent=t;};
 function acctCopy(){const c=acctCode();(navigator.clipboard?navigator.clipboard.writeText(c):Promise.reject()).then(()=>acMsg('코드를 복사했어요'),()=>acMsg('코드: '+c));}
 // 코드 하나로: 다른 기기의 내 코드(XXXX-XXXX)면 불러오고, 아니면 초대 코드로 적용. 결과 문장을 돌려줌

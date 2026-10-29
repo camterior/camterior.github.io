@@ -132,4 +132,5 @@
 .ca-btns{display:flex;gap:8px}.ca-btns button{flex:1;min-height:46px;border-radius:12px;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
 .ca-no{border:1px solid var(--line);background:#fff}.ca-go{border:0;background:#0F120D;color:#fff}.ca-go:disabled{opacity:.5}
 .ca-in small{color:var(--ink-3);font-size:12.5px;text-align:center}
+.ac-row .ac-out{color:#B2421B;border-color:#E9C7B9}
 </style>
