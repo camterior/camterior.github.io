@@ -143,7 +143,7 @@ export default {
     if (body.acct && typeof body.acct === "object") return acct(body.acct, env, request, origin);
 
     // 하루 횟수
-    // 초대 회원: 요청에 초대 코드가 있거나, 내 코드(계정)가 초대 회원이면 하루 50회 (계정별로 셈)
+    // 초대 회원: 요청에 초대 코드가 있거나, 내 코드(계정)가 초대 회원이면 하루 20회 (계정별로 셈)
     const ac = typeof body.acct === "string" ? body.acct.toUpperCase() : "";
     const acc = ac ? await getAcct(env, ac) : null;
     const vip = codeOk(env, body.code) || !!(acc && acc.vip);
