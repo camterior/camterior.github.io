@@ -5011,19 +5011,6 @@ function mineSystem(){return `너는 캠핑 장비 사진을 보고 아래 [목�
 - 사진에 상표(snow peak, Helinox, 라디트 등)나 가격표 글씨가 보이면 참고해.
 [목록] (키: 이름 / 모델 / 분류)
 ${mineAll().map(x=>`${x.key}: ${x.name} / ${x.model} / ${x.sec}`).join('\n')}`;}
-// 체어 다시 보기: 첫 결과에 FD체어·로우체어류가 있으면, 참고 사진 4장을 옆에 붙여 체어 종류만 한 번 더 물어봄 (짧은 질문이라 빠름)
-const MINE_CHAIR_REF=[['chair:sp_fd','참고1 FD체어','짧은 사각 등받이·천 감싼 팔걸이·X자 다리'],['chair:sp_low30','참고2 로우체어30','긴 등받이·나무 팔걸이·은색 다리'],['chair:sp_lowshort','참고3 로우체어 쇼트','짧고 낮은 등받이·나무 팔걸이'],['chair:sp_take','참고4 테이크체어','팔걸이 없음·바구니형 천']];
-async function mineChairCheck(data){try{const load=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src;});
-  const im=await load('data:image/jpeg;base64,'+data),H=Math.max(720,Math.min(1100,im.height)),W=Math.round(im.width*H/im.height),RW=260,c=document.createElement('canvas');c.width=W+RW;c.height=H;
-  const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,W,H);g.fillStyle='#d00';g.fillRect(W,0,3,H);const rh=H/4;
-  for(let k=0;k<4;k++){const r=await load('img/gear/'+MINE_CHAIR_REF[k][0].split(':')[1]+'.webp'),sz=Math.min(RW-16,rh-46),rw=sz*r.width/r.height>RW-16?RW-16:sz*r.width/r.height;
-    g.drawImage(r,W+8,k*rh+6,rw,rw*r.height/r.width);g.fillStyle='#000';g.font='bold 15px sans-serif';g.fillText(MINE_CHAIR_REF[k][1],W+8,k*rh+rh-24);g.font='11px sans-serif';g.fillText(MINE_CHAIR_REF[k][2],W+8,k*rh+rh-8);}
-  const sys=`캠핑 의자 구별 도우미야. JSON만: {"chairs":[{"key":"키","count":1}]}
-사진 왼쪽(빨간 선 왼쪽)에 있는 의자들만 보고, 오른쪽 참고1~4와 팔걸이 재질(천/나무)·등받이 길이·다리 모양을 하나씩 비교해서 같은 종류의 키로 개수를 세. 참고 칸은 세지 마. 참고와 다른 의자(헬리녹스·원목 등)는 넣지 마.
-키: ${MINE_CHAIR_REF.map(x=>x[0]+'='+x[1].replace(/참고\d /,'')).join(', ')}`;
-  const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sys,prompt:'왼쪽 사진 속 의자 종류와 개수',image:{mime:'image/jpeg',data:c.toDataURL('image/jpeg',.82).split(',')[1]},acct:acctCode()||undefined})});
-  const d=await r.json().catch(()=>({}));if(!r.ok||!d.text)return null;const o=JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim());
-  const ok=new Set(MINE_CHAIR_REF.map(x=>x[0]));return (o.chairs||[]).filter(x=>x&&ok.has(mineKeyFix(x.key))).map(x=>({key:mineKeyFix(x.key),count:Math.min(8,Math.max(1,+x.count||1))}));}catch(e){return null;}}
 let MINE_FOUND=[];
 // 크기·방향만 다른 형제 제품: 사진 결과에서 고를 수 있게
 const MINE_FAMS=[['igt:reg3','igt:long4','igt:sep2','igt:sep3','igt:sep4'],['igt:mf_reg','igt:mf_long','igt:slide_h','igt:slide_hl'],['igt:open_L','igt:open_R'],['igt:corner_L','igt:corner_R'],['parts:mesh_d1','parts:mesh_s1','parts:mesh_hd','parts:mesh_hs'],['parts:steel1','parts:lid_half','parts:box_half'],['parts:wood_s','parts:wood_w'],['parts:flat','parts:seppou'],['gear:sc25','gear:sc50'],['gear:fshelf','gear:fshelf_l','gear:fshelf_m'],['gear:mytable','gear:mytable_s'],['gear:sp_oat','gear:sp_oat_l','gear:sp_oat_low','gear:sp_chabu'],['gear:hx_t1','gear:hx_t1l','gear:hx_t0lt','gear:noga_table','gear:hx_cafe'],['gear:alu48','gear:alu68','gear:alu93'],['sleep:megamat','sleep:megamat_duo','sleep:sparrow50'],['sleep:zebec_pro240','sleep:zebec_pro260','sleep:zebec_pro280','sleep:zebec_pro300'],['chair:sp_fd','chair:sp_low30','chair:sp_lowshort','chair:sp_take'],['chair:hx_one','chair:hx_zero','chair:noga_chair','chair:hx_sunset'],['heat:sfh1200','heat:sfh300','heat:sfh_bh900','heat:camp5000','heat:toyotomi_lcl53'],['cool:cfx3_35','cool:cfx3_45','cool:cfx3_55'],['tarp:hexa_m','tarp:hexa_l','tarp:recta_m','tarp:recta_l']];
@@ -5041,8 +5028,6 @@ async function minePhoto(){const inp=document.getElementById('minePic'),st=docum
       const o=JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim());
       const one={};(o.found||[]).forEach(x=>{if(!x||(Array.isArray(o.seen)&&o.seen.length&&!x.why))return;const it=mineByKey(mineKeyFix(x.key));if(!it)return;const c=Math.min(8,Math.max(1,+x.count||1));
         if(!one[it.key]||one[it.key].count<c)one[it.key]={...it,count:c,sure:x.sure};});
-      const CH=new Set(MINE_CHAIR_REF.map(x=>x[0]));if(Object.keys(one).some(k=>CH.has(k))){const cc=await mineChairCheck(data);
-        if(cc&&cc.length){Object.keys(one).forEach(k=>{if(CH.has(k))delete one[k];});cc.forEach(x=>{const it=mineByKey(x.key);if(it)one[it.key]={...it,count:x.count,sure:'high'};});}}
       PER.push(Object.values(one));
       (o.unknown||[]).forEach(u=>typeof u==='string'&&u.trim()&&unk.add(u.trim().slice(0,40)));}catch(e){fail='error';}}
   // 여러 장이면 장마다 표를 모아서: 같은 형제 묶음(예: FD체어/로우체어, 플랫버너/설봉원)에서는 더 많은 사진에 나온 것만 남김
