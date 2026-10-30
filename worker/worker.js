@@ -5,6 +5,7 @@
 // - 내 코드(계정): 같은 KV의 'acct:XXXX-XXXX' 키 (내 장비 목록, 초대 회원 여부)
 // - 장비 추가요청 게시판: 같은 KV(RL)의 'reqs' 키에 저장. 관리용 Secret ADMIN_KEY
 const MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 앞에서부터 시도
+const MODELS_IMAGE = ["gemini-flash-latest", "gemini-flash-lite-latest"]; // 사진 인식은 더 정확한 모델 먼저 (한도 걸리면 lite)
 const ALLOWED_ORIGINS = ["https://camterior.github.io"];
 const LIMIT_FREE = 10, LIMIT_CODE = 50, LIMIT_ADMIN = 100000; // 하루 횟수 (한국 시간 기준). 관리자 계정은 사실상 제한 없음
 const MAX_INPUT_CHARS = 8000;
@@ -181,13 +182,18 @@ export default {
     if (system) payload.systemInstruction = { parts: [{ text: system }] };
 
     let res = null;
-    for (const m of MODELS) {
+    // 사진이면 flash 먼저. 관리자는 시험용으로 model:'lite'|'flash'를 고를 수 있음
+    let order = body.image ? MODELS_IMAGE : MODELS;
+    if (admin && body.model === "lite") order = MODELS; else if (admin && body.model === "flash") order = MODELS_IMAGE;
+    let usedModel = "";
+    for (const m of order) {
+      usedModel = m;
       res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
         body: JSON.stringify(payload),
       });
-      if (res.status !== 404) break; // 모델 이름이 없을 때만 다음 모델로
+      if (res.status !== 404 && !(res.status === 429 && m !== order[order.length - 1])) break; // 모델이 없거나(404) 앞 모델 한도(429)면 다음 모델로
     }
     if (res.status === 429) return json({ error: "limit" }, 429, origin);
     if (res.status === 404) return json({ error: "model" }, 502, origin);
@@ -197,6 +203,6 @@ export default {
     if (env.RL) await env.RL.put(rk, String(used + 1), { expirationTtl: 172800 });
     const data = await res.json();
     const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join("") || "";
-    return json({ text, left: Math.max(0, limit - used - 1), limit, vip, admin }, 200, origin);
+    return json({ text, left: Math.max(0, limit - used - 1), limit, vip, admin, model: usedModel }, 200, origin);
   },
 };
