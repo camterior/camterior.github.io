@@ -5,7 +5,7 @@
 // - 내 코드(계정): 같은 KV의 'acct:XXXX-XXXX' 키 (내 장비 목록, 초대 회원 여부)
 // - 장비 추가요청 게시판: 같은 KV(RL)의 'reqs' 키에 저장. 관리용 Secret ADMIN_KEY
 const MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 앞에서부터 시도
-const MODELS_IMAGE = ["gemini-flash-latest", "gemini-flash-lite-latest"]; // 사진 인식은 더 정확한 모델 먼저 (한도 걸리면 lite)
+const MODELS_IMAGE = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 사진도 lite 먼저 (flash는 긴 장비 목록+사진에 20초 넘게 걸려서 실사용 불가, 2026-10-30 측정)
 const ALLOWED_ORIGINS = ["https://camterior.github.io"];
 const LIMIT_FREE = 10, LIMIT_CODE = 50, LIMIT_ADMIN = 100000; // 하루 횟수 (한국 시간 기준). 관리자 계정은 사실상 제한 없음
 const MAX_INPUT_CHARS = 8000;
@@ -182,9 +182,9 @@ export default {
     if (system) payload.systemInstruction = { parts: [{ text: system }] };
 
     let res = null;
-    // 사진이면 flash 먼저. 관리자는 시험용으로 model:'lite'|'flash'를 고를 수 있음
+    // 관리자는 시험용으로 model:'lite'|'flash'를 고를 수 있음
     let order = body.image ? MODELS_IMAGE : MODELS;
-    if (admin && body.model === "lite") order = MODELS; else if (admin && body.model === "flash") order = MODELS_IMAGE;
+    if (admin && body.model === "lite") order = MODELS; else if (admin && body.model === "flash") order = ["gemini-flash-latest", "gemini-flash-lite-latest"];
     let usedModel = "";
     for (const m of order) {
       usedModel = m;
