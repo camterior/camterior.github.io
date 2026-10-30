@@ -931,8 +931,8 @@ TENTS.hb_atlas={brand:'힐레베르그',name:'아틀라스',model:'Atlas',size:[
   inners:{i6:{label:'이너 6인',model:'015133B',size:'약 310×408 (추정)',poly:[[1250,70],[3160,70],[4280,1080],[4280,3120],[3160,4130],[1250,4130]],posEst:true},
           i8:{label:'이너 8인',model:'015133A',size:'바닥 전체',poly:inset(ATLAS_O,70)}},
   innerDefault:'i6',
-  // 아틀라스 커넥터(별매, 01517, 0.7kg): 출입문 천을 떼고 문끼리 짧은 고리 모양 천으로 이어요. 판매처 사진상 두 동이 거의 맞닿아 길이는 20~50cm로 추정
-  twin:{gaps:[200,300,500],gap:300,inner:'i6',door:[1350,2850],label:'아틀라스 1동 더 연결 (커넥터, 별매)',name:'아틀라스 2동 연결'},
+  // 아틀라스 커넥터(별매, 01517, 0.7kg): 출입문 천을 떼고 문끼리 짧은 고리 모양 천으로 이어요. 판매처 사진상 길이는 공식 치수가 없어 50·80·120cm 중 고르게(기본 80cm, 홍중 검토)
+  twin:{gaps:[500,800,1200],gap:800,inner:'i6',door:[1350,2850],label:'아틀라스 1동 더 연결 (커넥터, 별매)',name:'아틀라스 2동 연결'},
   doors:[{a:[0,1350],b:[0,2850],label:'출입문',zone:true,est:true},{a:[4350,1350],b:[4350,2850],label:'출입문',zone:false,est:true}],
   living:[640,2100],h3d:2000,inH3:1750,color:'#E7E4DC',prof:[[1,1,0],[.97,.97,.38],[.8,.8,.76],[.4,.4,1]]};
 TENTS.hb_keron4gt={brand:'힐레베르그',name:'케론 4 GT',model:'Keron 4 GT',size:[508,230,120],weight:'6.4kg (수납)',cap:'4명',href:OC+'18216',srcName:'판매처 상품 상세',
@@ -2874,7 +2874,7 @@ function renderTentOpts(){const T=TENTS[tent.id];
   if(T.canopy)h+=`<label class="check"><input type="checkbox" ${tent.canopy?'checked':''} onchange="setCanopy(this.checked)">${T.canopyLabel||'캐노피 올리기'}</label>`;
   if(T.canopy2)h+=`<label class="check"><input type="checkbox" ${tent.canopy2?'checked':''} onchange="setCanopy2(this.checked)">${T.canopy2Label||'확장 달기'}</label>`;
   if(T.twin){h+=`<label class="check"><input type="checkbox" ${tent.twin?'checked':''} onchange="setTwin(this.checked)">${T.twin.label}</label>`;
-    if(tent.twin)h+=`<div class="opt" style="margin-top:6px"><span>커넥터 길이</span><div class="seg">${T.twin.gaps.map(g=>`<button aria-pressed="${(tent.twinGap||T.twin.gap)===g}" onclick="setTwinGap(${g})">${g/10}cm</button>`).join('')}</div><p class="muted" style="margin-top:4px">출입문 천을 떼고 1동 오른쪽 문과 2동 왼쪽 문을 짧은 커넥터로 이어요. 두 동이 거의 맞닿아요. 길이는 공식 치수가 없어 사진으로 추정했어요. 위 이너룸은 1동, 아래는 2동이에요.</p></div><div class="opt" style="margin-top:6px"><span>2동 이너룸</span><div class="seg">${Object.entries(T.inners).map(([k,v])=>`<button aria-pressed="${tent.twinInner===k}" onclick="setTwinInner('${k}')">${v.label.replace('이너 ','')}</button>`).join('')}<button aria-pressed="${!tent.twinInner}" onclick="setTwinInner(null)">없음</button></div></div>`;}
+    if(tent.twin)h+=`<div class="opt" style="margin-top:6px"><span>커넥터 길이</span><div class="seg">${T.twin.gaps.map(g=>`<button aria-pressed="${(tent.twinGap||T.twin.gap)===g}" onclick="setTwinGap(${g})">${g/10}cm</button>`).join('')}</div><p class="muted" style="margin-top:4px">출입문 천을 떼고 1동 오른쪽 문과 2동 왼쪽 문을 커넥터로 이어요. 길이는 공식 치수가 없어 추정이에요. 위 이너룸은 1동, 아래는 2동이에요.</p></div><div class="opt" style="margin-top:6px"><span>2동 이너룸</span><div class="seg">${Object.entries(T.inners).map(([k,v])=>`<button aria-pressed="${tent.twinInner===k}" onclick="setTwinInner('${k}')">${v.label.replace('이너 ','')}</button>`).join('')}<button aria-pressed="${!tent.twinInner}" onclick="setTwinInner(null)">없음</button></div></div>`;}
   document.getElementById('tentOpts').innerHTML=h;renderTentSpec();}
 function stageTitle(){const T=TENTS[tent.id],t=TARPS[tarp.id];const names=[T.outer?(twinDx(T)?T.twin.name:T.name):null,t?t.name:null].filter(Boolean);
   document.getElementById('stageTitle').innerHTML=`${names.length?names.join(' + '):'빈 사이트'}<span class="s">단위 cm, 바닥 기준</span>`;}
