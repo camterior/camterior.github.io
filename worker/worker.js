@@ -188,12 +188,21 @@ export default {
     let usedModel = "";
     for (const m of order) {
       usedModel = m;
-      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
-        body: JSON.stringify(payload),
-      });
-      if (res.status !== 404 && !(res.status === 429 && m !== order[order.length - 1])) break; // 모델이 없거나(404) 앞 모델 한도(429)면 다음 모델로
+      const last = m === order[order.length - 1];
+      // 앞 모델은 20초 안에 답이 없으면 끊고 다음 모델로 (flash가 붐빌 때 사진 인식이 오래 멈추지 않게)
+      const ctl = new AbortController(), to = last ? null : setTimeout(() => ctl.abort(), 20000);
+      try {
+        res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
+          // flash는 생각(thinking)을 끄면 훨씬 빨라짐 (사진 인식은 생각 없이도 충분)
+          body: JSON.stringify(m.includes("lite") ? payload : { ...payload, generationConfig: { ...payload.generationConfig, thinkingConfig: { thinkingBudget: 0 } } }),
+          signal: ctl.signal,
+        });
+      } catch (e) { res = new Response("", { status: 504 }); }
+      if (to) clearTimeout(to);
+      if (res.ok || last) break;
+      // 앞 모델이 실패하면(모델 없음·한도·붐빔·시간 초과·설정 거부) 다음 모델로
     }
     if (res.status === 429) return json({ error: "limit" }, 429, origin);
     if (res.status === 404) return json({ error: "model" }, 502, origin);
