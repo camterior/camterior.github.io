@@ -1,4 +1,4 @@
-// 캠테리어 AI 중계 서버 v2 (Cloudflare Worker)
+// 캠테리어 AI 중계 서버 v3 (Cloudflare Worker) — 2026-10-30: 몰릴 때 한 번 더 시도, 오류 이유 기록
 // - Gemini 키: Secret GEMINI_API_KEY
 // - 초대 코드: Secret INVITE_CODE (여러 개면 쉼표로: abc,def)
 // - 하루 횟수 세기: KV 바인딩 RL (없으면 제한 없이 동작)
@@ -181,33 +181,43 @@ export default {
     };
     if (system) payload.systemInstruction = { parts: [{ text: system }] };
 
-    let res = null;
+    let res = null, why = "";
     // 관리자는 시험용으로 model:'lite'|'flash'를 고를 수 있음
     let order = body.image ? MODELS_IMAGE : MODELS;
     if (admin && body.model === "lite") order = MODELS; else if (admin && body.model === "flash") order = ["gemini-flash-latest", "gemini-flash-lite-latest"];
     let usedModel = "";
-    for (const m of order) {
-      usedModel = m;
-      const last = m === order[order.length - 1];
-      // 앞 모델은 20초 안에 답이 없으면 끊고 다음 모델로 (flash가 붐빌 때 사진 인식이 오래 멈추지 않게)
-      const ctl = new AbortController(), to = last ? null : setTimeout(() => ctl.abort(), 20000);
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    const call = async (m, think, ms) => {
+      // ms 안에 답이 없으면 끊고 다음으로 (flash가 붐빌 때 오래 멈추지 않게)
+      const ctl = new AbortController(), to = ms ? setTimeout(() => ctl.abort(), ms) : null;
       try {
-        res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
+        return await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
-          // flash는 생각(thinking)을 끄면 훨씬 빨라짐 (사진 인식은 생각 없이도 충분)
-          body: JSON.stringify(m.includes("lite") ? payload : { ...payload, generationConfig: { ...payload.generationConfig, thinkingConfig: { thinkingBudget: 0 } } }),
+          // flash는 생각(thinking)을 끄면 훨씬 빨라짐. 모델이 이 설정을 거부(400)하면 설정 없이 다시 보냄
+          body: JSON.stringify(think ? { ...payload, generationConfig: { ...payload.generationConfig, thinkingConfig: { thinkingBudget: 0 } } } : payload),
           signal: ctl.signal,
         });
-      } catch (e) { res = new Response("", { status: 504 }); }
-      if (to) clearTimeout(to);
+      } catch (e) { return new Response("", { status: 504 }); }
+      finally { if (to) clearTimeout(to); }
+    };
+    for (const m of order) {
+      usedModel = m;
+      const last = m === order[order.length - 1], lite = m.includes("lite");
+      res = await call(m, !lite, last ? 0 : 20000);
+      // 사람이 몰려서 막힘(429)·구글 붐빔(503): 잠깐 쉬고 같은 모델로 한 번 더
+      if (res.status === 429 || res.status === 503) { await wait(1500); res = await call(m, !lite, last ? 0 : 20000); }
+      // 생각 끄기 설정을 거부하면(400) 설정 없이 한 번 더
+      if (res.status === 400 && !lite) res = await call(m, false, last ? 0 : 20000);
+      if (!res.ok) { why = (await res.text().catch(() => "")).slice(0, 300); console.log("gemini", m, res.status, why); }
       if (res.ok || last) break;
       // 앞 모델이 실패하면(모델 없음·한도·붐빔·시간 초과·설정 거부) 다음 모델로
     }
-    if (res.status === 429) return json({ error: "limit" }, 429, origin);
+    // busy: 잠깐 몰림(조금 뒤 다시) / model·key·server: 설정 문제
+    if (res.status === 429 || res.status === 503 || res.status === 504) return json({ error: "busy", status: res.status }, 503, origin);
     if (res.status === 404) return json({ error: "model" }, 502, origin);
-    if (res.status === 400 || res.status === 403) return json({ error: "key", status: res.status }, 502, origin);
-    if (!res.ok) return json({ error: "server", status: res.status }, 502, origin);
+    if (res.status === 400 || res.status === 403) return json({ error: "key", status: res.status, why }, 502, origin);
+    if (!res.ok) return json({ error: "server", status: res.status, why }, 502, origin);
 
     if (env.RL) await env.RL.put(rk, String(used + 1), { expirationTtl: 172800 });
     const data = await res.json();

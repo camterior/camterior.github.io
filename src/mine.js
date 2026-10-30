@@ -72,8 +72,11 @@ async function minePhoto(){const inp=document.getElementById('minePic'),st=docum
   const files=[...(inp.files||[])].slice(0,3);if(!files.length){st.textContent='사진을 먼저 골라 주세요';return;}
   btn.disabled=true;st.textContent='AI가 사진 속 장비를 찾는 중…';out.innerHTML='';MINE_FOUND=[];const unk=new Set();let fail=null;const PER=[];
   for(const f of files){let data;try{data=await mineShrink(f);}catch(e){fail='photo';continue;}
-    try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:mineSystem(),prompt:'이 사진 속 캠핑 장비를 찾아줘',image:{mime:'image/jpeg',data},acct:acctCode()||undefined})});
-      const d=await r.json().catch(()=>({}));if(!r.ok||!d.text){fail=d.error||'error';continue;}
+    try{const ask=()=>fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:mineSystem(),prompt:'이 사진 속 캠핑 장비를 찾아줘',image:{mime:'image/jpeg',data},acct:acctCode()||undefined})});
+      let r=await ask(),d=await r.json().catch(()=>({}));
+      // 사람이 몰려 잠깐 막히면 몇 초 뒤 자동으로 한 번 더
+      if(!r.ok&&(d.error==='busy'||d.error==='limit')){st.textContent='지금 AI를 쓰는 사람이 많아요. 잠깐 기다렸다 다시 시도하는 중…';await new Promise(z=>setTimeout(z,4000));r=await ask();d=await r.json().catch(()=>({}));st.textContent='AI가 사진 속 장비를 찾는 중…';}
+      if(!r.ok||!d.text){fail=d.error==='limit'?'busy':d.error||'error';continue;}
       const o=JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim());
       const one={};(o.found||[]).forEach(x=>{if(!x||(Array.isArray(o.seen)&&o.seen.length&&!x.why))return;const it=mineByKey(mineKeyFix(x.key));if(!it)return;const c=Math.min(8,Math.max(1,+x.count||1));
         if(!one[it.key]||one[it.key].count<c)one[it.key]={...it,count:c,sure:x.sure};});
@@ -89,7 +92,7 @@ async function minePhoto(){const inp=document.getElementById('minePic'),st=docum
     if(!best&&n.length>=4)mineAll().forEach(it=>{if(it.k==='tent')return;const m=bare(it.name);if(m.startsWith(n)&&(!best||m.length<bare(best.name).length))best=it;});
     if(best){unk.delete(u);if(!MINE_FOUND.find(y=>y.key===best.key||mineFam(y.key).includes(best.key)))MINE_FOUND.push({...best,count:1,sure:'mid'});}});
   btn.disabled=false;if(typeof camEv==='function')camEv('mine-photo','내 장비 사진 인식');
-  if(!MINE_FOUND.length&&!unk.size){st.textContent=fail==='limit'?'오늘 AI 사용량이 많아요. 잠시 뒤 다시 해보세요.':fail?'사진 인식은 서버 설정이 끝나면 열려요. 지금은 이름으로 찾아서 넣어 주세요.':'사진에서 장비를 찾지 못했어요. 장비가 크게 보이게 다시 찍어 보세요.';return;}
+  if(!MINE_FOUND.length&&!unk.size){st.textContent=fail==='busy'?'지금 AI를 쓰는 사람이 많아요. 30초쯤 뒤에 다시 눌러 주세요.':fail==='quota'?'오늘 쓸 수 있는 AI 횟수를 다 썼어요. 내일 다시 해보거나 초대 코드를 넣어 주세요.':fail==='photo'?'사진을 읽지 못했어요. 다른 사진으로 해보세요.':fail?'AI 연결이 잠깐 안 돼요. 잠시 뒤 다시 해보거나, 이름으로 찾아서 넣어 주세요.':'사진에서 장비를 찾지 못했어요. 장비가 크게 보이게 다시 찍어 보세요.';return;}
   st.textContent=`찾은 장비 ${MINE_FOUND.length}가지 · 맞는 것만 체크해서 넣어 주세요`;
   out.innerHTML=(MINE_FOUND.length?`<ul class="mn-found">${MINE_FOUND.map((x,i)=>`<li data-i="${i}"><label><input type="checkbox" data-i="${i}" ${x.sure==='low'?'':'checked'}>${mineThumb(x)}<span class="mn-n"><b>${aiEsc(x.name)}</b><small>${aiEsc(x.sec)} · ${x.count}개${x.sure==='low'?' · 확실하지 않음':''}</small></span></label>${mineFam(x.key).length>1?`<label class="mn-fam"><span>크기·종류</span><select onchange="mineFamPick(${i},this.value)">${mineFam(x.key).map(k=>`<option value="${k}"${k===x.key?' selected':''}>${aiEsc(mineByKey(k).name)}</option>`).join('')}</select></label>`:''}</li>`).join('')}</ul>
     <p class="mn-other">크기만 다른 제품은 사진으로 구별이 어려워요. 다르면 '크기·종류'에서 골라 주세요.</p>

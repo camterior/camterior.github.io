@@ -135,13 +135,18 @@ function aiLocal(text){
   return res;}
 
 /* --- AI 호출 --- */
-async function aiAsk(text,ctx){
-  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),25000);
+async function aiAsk(text,ctx,again){
+  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),45000);let out;
   try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,
       body:JSON.stringify({system:aiSystem(ctx||text,!!ctx),prompt:(ctx?'':'내 장비: ')+text,acct:(typeof acctCode==='function'&&acctCode())||undefined})});
-    const d=await r.json().catch(()=>({}));aiShowLeft(d);if(!r.ok||!d.text)return {fail:d.error==='limit'?'limit':d.error==='quota'?'quota':'error'};
-    const o=JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim());return {ok:o};}
-  catch(e){return {fail:'error'};}finally{clearTimeout(to);}}
+    const d=await r.json().catch(()=>({}));aiShowLeft(d);
+    if(!r.ok||!d.text)out={fail:d.error==='quota'?'quota':(d.error==='busy'||d.error==='limit')?'busy':'error'};
+    else out={ok:JSON.parse(d.text.replace(/^```(json)?|```$/g,'').trim())};}
+  catch(e){out={fail:'error'};}finally{clearTimeout(to);}
+  // 사람이 몰려 잠깐 막히면 몇 초 뒤 자동으로 한 번 더
+  if(out.fail==='busy'&&!again){const st=document.getElementById('aiSt');if(st)st.textContent='지금 AI를 쓰는 사람이 많아요. 잠깐 기다렸다 다시 시도하는 중…';
+    await new Promise(r=>setTimeout(r,4000));return aiAsk(text,ctx,true);}
+  return out;}
 
 function aiClean(o){const ids=new Set(aiIds()),exts=new Set(AI_EXTS),out={tent:null,items:[],unknown:[],tip:''};
   if(o&&typeof o.tent==='string'&&TENTS[o.tent]&&o.tent!=='none')out.tent=o.tent;
@@ -372,14 +377,14 @@ async function aiRun(){
   const ask=fix?`지금 배치(JSON): ${JSON.stringify(aiCompact(AI_CHAT.last))}\n고칠 점: ${text}`:text;
   let r=await aiAsk(ask,(AI_CHAT.said+' '+text).slice(-1200)),res,via='ai';
   if(r.fail==='quota'){btn.disabled=false;st.textContent='';AI_CHAT.log.push({who:'ai',t:'오늘 쓸 수 있는 AI 횟수를 다 썼어요. 지금 배치는 그대로 두었어요. 내일 다시 쓰거나, 내 장비 탭의 내 코드에 초대 코드를 넣어 주세요.'});aiChatUI();return;}
-  if(fix&&!r.ok){btn.disabled=false;st.textContent='';AI_CHAT.log.push({who:'ai',t:r.fail==='limit'?'오늘 AI 사용량을 다 써서 고치지 못했어요. 끌어서 직접 다듬어 주세요.':'AI 연결이 안 돼서 고치지 못했어요. 잠시 뒤 다시 해보세요.'});aiChatUI();return;}
+  if(fix&&!r.ok){btn.disabled=false;st.textContent='';AI_CHAT.log.push({who:'ai',t:r.fail==='busy'?'지금 AI를 쓰는 사람이 많아서 고치지 못했어요. 30초쯤 뒤에 다시 눌러 주세요. 그동안 끌어서 직접 다듬을 수도 있어요.':'AI 연결이 안 돼서 고치지 못했어요. 잠시 뒤 다시 해보세요.'});aiChatUI();return;}
   inp.value='';
   if(r.ok){res=aiClean(r.ok);
     // AI가 모른다고 한 이름도 별칭으로 한 번 더 찾아보기
     res.unknown=res.unknown.filter(u=>{const l=aiLocal(u);if(l.inner&&!l.items.length){res.inner=res.inner||l.inner;return false;}if(!l.items.length)return true;
       l.items.forEach(x=>{if(x.slots&&x.slots.length||x.attach&&x.attach.length){let f=res.items.find(i=>AI_ROOTS.includes(i.type));if(f){f.slots=(f.slots||[]).concat(x.slots||[]);f.attach=(f.attach||[]).concat(x.attach||[]);return;}}
         if(x.type==='reg3'&&(x.slots||x.attach))return;const same=res.items.find(i=>i.type===x.type);if(same)return;res.items.push({type:x.type,count:x.count,zone:null});});return false;});if(!res.items.length&&!res.tent){const l=aiLocal(text);if(l.items.length){res=l;via='local';}}}
-  else{res=aiLocal(text);via=r.fail==='limit'?'limit':'local';}
+  else{res=aiLocal(text);via=r.fail==='busy'?'busy':'local';}
   if(via==='ai')aiTidy(res,AI_CHAT.said+' '+text,fix?AI_CHAT.last:null,text);
   btn.disabled=false;
   if(!res.items.length&&!res.tent){st.textContent='';box.hidden=false;
@@ -391,7 +396,7 @@ async function aiRun(){
   st.textContent=via==='ai'?'세팅했어요. 끌어서 다듬어 보세요':'기본 자동 배치로 세팅했어요';
   const nm=id=>aiEsc(CATALOG[id].name),ZN={center:'가운데',wall:'벽쪽',inner:'이너룸',left:'왼쪽',right:'오른쪽',top:'위쪽',bottom:'아래쪽'};
   let h='';
-  if(via!=='ai')h+=`<p class="ai-note">${via==='limit'?'오늘 AI 사용량이 많아서':'AI 연결이 안 돼서'} 이름이 같은 장비만 찾아 놓았어요.</p>`;
+  if(via!=='ai')h+=`<p class="ai-note">${via==='busy'?'지금 AI를 쓰는 사람이 많아서':'AI 연결이 안 돼서'} 이름이 같은 장비만 찾아 놓았어요.${via==='busy'?' 30초쯤 뒤에 ‘새로 하기’로 다시 해보면 AI가 배치해 줘요.':''}</p>`;
   h+=`<ul class="ai-got">${res.tent?`<li class="ai-tent">⛺ ${aiEsc(aiTentName(res.tent))}</li>`:''}${res.inner?`<li class="ai-tent">⛺ 이너: ${aiEsc(INNER_PRESETS[res.inner].name)}</li>`:''}${res.items.map(it=>`<li>${nm(it.type)}${it.attach&&it.attach.length?' + '+Object.entries(it.attach.reduce((m,a)=>{const k=nm(a.type)+(a.shape==='T'?' (T자)':'');m[k]=(m[k]||0)+1;return m;},{})).map(([k,n])=>k+(n>1?' ×'+n:'')).join(' + '):''}${it.count>1?` <b>×${it.count}</b>`:''}${it.slots&&it.slots.length?' · 칸: '+it.slots.map(sl=>aiEsc(aiSlotName(sl.id))+(sl.count>1?' ×'+sl.count:'')).join(', '):''}${it.leg?` · ${it.leg}다리`:''}${it.zone&&it.zone!==aiZone(it.type)?` · ${ZN[it.zone]}`:''}</li>`).join('')}</ul>`;
   if(aiApply.over&&aiApply.over.length)h+=`<p class="ai-warn">자리가 모자라 IGT에 못 붙인 파츠: ${[...new Set(aiApply.over)].map(id=>aiEsc(CATALOG[id]?CATALOG[id].name:aiSlotName(id))).join(', ')}</p>`;
   if(miss.length)h+=`<p class="ai-warn">자리가 모자라 텐트 밖 오른쪽에 둔 장비: ${[...new Set(miss)].map(nm).join(', ')}</p>`;
