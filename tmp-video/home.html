@@ -1,0 +1,35 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+@font-face{font-family:P;src:url(assets/pretendard.woff2) format('woff2')}
+*{box-sizing:border-box;margin:0}
+body{width:360px;height:640px;overflow:hidden;font-family:P,sans-serif;color:#fff;background:#1b2a24 url(img/night.webp) center/cover}
+body::before{content:'';position:fixed;inset:0;background:linear-gradient(180deg,rgba(10,15,12,.35),rgba(10,15,12,.55))}
+.st{position:relative;display:flex;justify-content:space-between;padding:10px 22px 0;font-size:14px;font-weight:700}
+.grid{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:22px 0;padding:34px 14px 0}
+.ap{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11.5px;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.ic{width:58px;height:58px;border-radius:15px;display:grid;place-items:center;font-size:28px;box-shadow:0 3px 10px rgba(0,0,0,.3);transition:transform .25s}
+.ic img{width:100%;height:100%;border-radius:15px}
+.dock{position:absolute;left:12px;right:12px;bottom:14px;height:86px;border-radius:28px;background:rgba(255,255,255,.22);backdrop-filter:blur(14px);display:grid;grid-template-columns:repeat(4,1fr);place-items:center}
+#tap{position:fixed;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,255,255,.45);border:2px solid #fff;opacity:0;transform:scale(.4);transition:transform .35s,opacity .35s;z-index:9}
+#tap.on{opacity:1;transform:scale(1)}
+#splash{position:fixed;inset:0;background:#F05A22;display:grid;place-items:center;opacity:0;transform:scale(.2);transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s;z-index:20}
+#splash.on{opacity:1;transform:scale(1)}#splash img{width:120px;height:120px;border-radius:28px}
+</style></head><body>
+<div class="st"><span>10:41</span><span>●●● 5G ▮</span></div>
+<div class="grid">
+<div class="ap"><div class="ic" style="background:#3b82f6">📅</div>캘린더</div>
+<div class="ap"><div class="ic" style="background:#f59e0b">🌤️</div>날씨</div>
+<div class="ap"><div class="ic" style="background:#10b981">🗺️</div>지도</div>
+<div class="ap"><div class="ic" style="background:#ec4899">📷</div>카메라</div>
+<div class="ap"><div class="ic" style="background:#8b5cf6">🎵</div>음악</div>
+<div class="ap"><div class="ic" style="background:#64748b">⚙️</div>설정</div>
+<div class="ap"><div class="ic" id="cam"><img src="assets/icon-192.png" alt=""></div>캠테리어</div>
+<div class="ap"><div class="ic" style="background:#eab308">📝</div>메모</div>
+<div class="ap"><div class="ic" style="background:#06b6d4">🛒</div>쇼핑</div>
+<div class="ap"><div class="ic" style="background:#ef4444">🎬</div>영상</div>
+<div class="ap"><div class="ic" style="background:#22c55e">💬</div>메시지</div>
+<div class="ap"><div class="ic" style="background:#a3a3a3">🧮</div>계산기</div>
+</div>
+<div class="dock"><div class="ic" style="background:#22c55e">📞</div><div class="ic" style="background:#3b82f6">🌐</div><div class="ic" style="background:#f97316">✉️</div><div class="ic" style="background:#111">🎧</div></div>
+<div id="tap"></div><div id="splash"><img src="assets/icon-512.png" alt=""></div>
+</body></html>
