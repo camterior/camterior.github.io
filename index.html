@@ -4990,7 +4990,13 @@ function mineRender(){const box=document.getElementById('mineList');if(!box)retu
 // 이름으로 찾기
 function mineSearch(){const q=aiNorm(document.getElementById('mineQ').value||''),out=document.getElementById('mineFind');
   if(q.length<2){out.innerHTML='';return;}
-  const hit=mineAll().filter(x=>aiNorm(x.name+' '+x.model+' '+x.sec).includes(q)).slice(0,12);
+  // 이름·모델·분류·흔히 부르는 이름(별칭)까지 보고, 통째로 안 맞으면 띄어쓴 낱말별로 가장 많이 맞는 것 (예: '스노우피크 슬라이드 하프 롱' → 슬라이드하프롱)
+  const hay=x=>x._h||(x._h=aiNorm([x.name,x.model,x.sec,...((typeof AI_ALIAS!=='undefined'&&AI_ALIAS[x.id])||[])].join(' ')));
+  let hit=mineAll().filter(x=>hay(x).includes(q));
+  if(!hit.length){const toks=[...new Set((document.getElementById('mineQ').value||'').split(/[\s,·/]+/).map(aiNorm).filter(Boolean))];
+    if(toks.length>1){const sc=mineAll().map(x=>[x,toks.filter(t=>hay(x).includes(t)).length]),top=Math.max(...sc.map(a=>a[1]));
+      if(top>=2)hit=sc.filter(a=>a[1]===top).map(a=>a[0]).sort((a,b)=>a.name.length-b.name.length);}}
+  hit=hit.slice(0,12);
   out.innerHTML=hit.length?hit.map(x=>`<li>${mineThumb(x)}<span class="mn-n"><b>${aiEsc(x.name)}</b><small>${aiEsc(x.sec)}${x.model?' · '+aiEsc(x.model):''}</small></span><button type="button" class="mn-add" onclick="mineAdd('${x.key}',1);this.textContent='넣었어요 ✓'">${MYG[x.key]?'하나 더':'+ 넣기'}</button></li>`).join('')
     :`<li class="mn-none">장비 제원에 없는 장비예요. <button type="button" class="rq-ask" data-n="${aiEsc(document.getElementById('mineQ').value.trim())}" onclick="reqAsk(this)">추가 요청</button></li>`;}
 // 사진으로 찾기: 긴 변 1280px JPEG로 줄여서 AI(Gemini)에 보냄
