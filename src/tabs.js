@@ -112,7 +112,7 @@ function renderGear(){const nav=document.getElementById('gearNav'),body=document
     if(s.k==='tent'){const {main,minor}=tentBrandOrder(),g2=new Map();main.forEach(b=>{if(groups.has(b))g2.set(b,groups.get(b));});
       const etc=minor.flatMap(b=>groups.get(b)||[]);if(etc.length)g2.set(T_ETC,etc);groups.forEach((v,b)=>{if(!g2.has(b)&&!minor.includes(b))g2.set(b,v);});groups=g2;}
     const solo=GEAR_F===s.k&&groups.size===1;
-    html+=`<section class="gsec" id="g-${s.k}"><div class="ghead"><img src="${s.img}" alt="" loading="lazy"><div class="gtt"><h2>${s.t}</h2><span>${s.list.length}</span></div></div>
+    html+=`<section class="gsec" id="g-${s.k}"><div class="ghead"><picture><source media="(min-width:900px)" srcset="${s.img.replace('img/','img/wide/')}"><img src="${s.img}" alt="" loading="lazy"></picture><div class="gtt"><h2>${s.t}</h2><span>${s.list.length}</span></div></div>
       ${[...groups].map(([b,items])=>{const key=s.k+'|'+b,open=q||solo||G_OPEN.has(key);
         return `<details class="gbrand" data-k="${esc(key)}"${open?' open':''}><summary><b>${esc(b)}</b><span>${items.length}</span></summary>
         <div class="ggrid">${items.map(it=>`<article class="gcard">${gArt(it)}</article>`).join('')}</div></details>`;}).join('')}</section>`;});
