@@ -4773,10 +4773,12 @@ ${slots}
 
 /* --- AI 없이: 이름 맞추기 --- */
 const aiNorm=s=>String(s).toLowerCase().replace(/(\d)\s*[x×]\s*(?=\d)/g,'$1').replace(/[\s·×\-_,./()]+/g,'');
+// 이름 일부로 맞출 때 흔한 말 하나만으로는 맞추지 않음 (예: '커넥트타프'가 '타프 익스텐션 텐트'로 잡히던 문제)
+const AI_GENERIC=new Set(['타프','텐트','쉘터','익스텐션','테이블','체어','의자','돔','에어','프로','롱','쇼트','미니','라이트','베스티블','커넥터','이너','매트','버너','선반','박스','스크린','하우스','캐빈','룸','패밀리','그랜드','오토','쿨러','침대','코트']);
 function aiKeys(ids,nameOf,modelOf){const own={},map={};
   ids.forEach(id=>{const nm=nameOf(id),w=nm.split(/\s+/);own[aiNorm(nm)]=id;
     const ks=new Set([aiNorm(modelOf(id)||'')]);(AI_ALIAS[id]||[]).forEach(a=>{const k=aiNorm(a);own[k]=id;ks.add(k);});
-    for(let a=0;a<Math.min(2,w.length);a++)for(let b=w.length;b>a;b--)ks.add(aiNorm(w.slice(a,b).join(' ')));
+    for(let a=0;a<Math.min(2,w.length);a++)for(let b=w.length;b>a;b--){const k=aiNorm(w.slice(a,b).join(' '));if(!AI_GENERIC.has(k))ks.add(k);}
     ks.forEach(k=>{if(k.length<2||/^[\d.]+$/.test(k))return;(map[k]=map[k]||new Set()).add(id);});});
   return Object.entries(map).map(([k,s])=>own[k]?[own[k],k]:s.size===1?[[...s][0],k]:null).filter(Boolean).sort((a,b)=>b[1].length-a[1].length);}
 function aiLocal(text){
@@ -5054,7 +5056,7 @@ async function aiRun(){
   inp.value='';
   if(r.ok){res=aiClean(r.ok);
     // AI가 모른다고 한 이름도 별칭으로 한 번 더 찾아보기
-    res.unknown=res.unknown.filter(u=>{const l=aiLocal(u);if(l.inner&&!l.items.length){res.inner=res.inner||l.inner;return false;}if(!l.items.length)return true;
+    res.unknown=res.unknown.filter(u=>{const l=aiLocal(u);if(l.inner&&!l.items.length){res.inner=res.inner||l.inner;return false;}if(l.tent&&!l.items.length){res.tent=res.tent||l.tent;return false;}if(!l.items.length)return true;
       l.items.forEach(x=>{if(x.slots&&x.slots.length||x.attach&&x.attach.length){let f=res.items.find(i=>AI_ROOTS.includes(i.type));if(f){f.slots=(f.slots||[]).concat(x.slots||[]);f.attach=(f.attach||[]).concat(x.attach||[]);return;}}
         if(x.type==='reg3'&&(x.slots||x.attach))return;const same=res.items.find(i=>i.type===x.type);if(same)return;res.items.push({type:x.type,count:x.count,zone:null});});return false;});if(!res.items.length&&!res.tent){const l=aiLocal(text);if(l.items.length){res=l;via='local';}}}
   else{res=aiLocal(text);via=r.fail==='busy'?'busy':'local';}
