@@ -6,5 +6,6 @@ compat 2026-10-26 flags [] usage standard observability True
 schedules []
 OK
 before 29
-dryrun OK
-ref refs/heads/work/worker-ci sha 38410e7e86a3573d31c35892d980b5eaee68ff48 run 41174367054
+deploy OK
+after 29 (before 29)
+ref refs/heads/main sha 38410e7e86a3573d31c35892d980b5eaee68ff48 run 41174416267
