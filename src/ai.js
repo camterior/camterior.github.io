@@ -25,6 +25,7 @@ const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유�
   lg_roomtv:['룸앤티비','룸앤TV','룸앤 티비','룸앤 TV'],pf_cot75:['플랜포티','피콧','P-COT','플랜포티 야전침대','피콧 75'],alpicool_k25:['알피쿨','알피쿨 K25','K25'],
   ck_oakdome_mini:['오크돔 미니','오크돔미니'],ck_oakdome_m:['오크돔 M','오크돔m'],ck_makadome:['마카돔'],ck_makaplus:['마카플러스','마카 플러스'],ck_oakbell:['오크벨'],ck_ruby_double:['루비 더블','루비더블'],ck_alpberg:['알페르그','알페르그쉘터'],ck_custom_s:['커스텀쉘터 S','커스텀쉘터s'],
   mt_monte:['몽뜨','몽뜨 쉘터','몬테라 몽뜨'],bs_1360:['브런스카일','1360 텐트','브런스카일 1360'],ttp_zirkon15:['지르콘','지르콘 15','텐티피'],hb_altai:['알타이','알타이 UL','알타이ul'],sp_kayad_m:['카야드','카야드 M','카야드m'],
+  tt_horizon:['선셋 호라이즌','선셋호라이즌','썬셋 호라이즌','텐터 호라이즌'],tt_little_sunset:['리틀선셋','리틀 선셋','리틀썬셋'],tt_ortus_s_mk2:['오르투스 S','오르투스S','오르투스 마크2','오르투스S 마크2','S마크2','오르투스 레이싱'],tt_ortus_v:['오르투스 V','오르투스V'],tt_ortus_x:['오르투스 X','오르투스X','오르투스 엑스'],
   merak_pro:['메락'],landlock:['랜드락'],living_shell_long_pro:['리빙쉘 롱 프로','리빙쉘롱'],living_shell:['리빙쉘']};
 const AI_INNER_AL={shell_duo:['쉘이너','쉘이너 듀오','쉘 이너'],geoair2:['지오에어','지오 에어','지오에어2','지오 에어2'],godong:['고동','고동텐트','고동 텐트','고동 이너','고동이너텐트']};
 const aiTentName=id=>{const T=TENTS[id];return ((T.brand?T.brand+' ':'')+T.name).trim();};
