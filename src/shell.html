@@ -115,16 +115,21 @@
     <div class="wrap vh-in">
       <p class="eyebrow">Board</p>
       <h1 id="boardTitle">게시판</h1>
-      <p>공지사항을 보고, 필요한 장비나 기능을 요청해 주세요. 매주 일요일에 확인해서 반영해요.</p>
+      <p>공지사항을 보고, 캠핑 후기를 나누고, 필요한 장비나 기능을 요청해 주세요. 요청은 매주 일요일에 확인해서 반영해요.</p>
     </div>
   </header>
   <div class="wrap bdwrap">
     <div class="bd-tabs" role="tablist" aria-label="게시판 종류">
       <button type="button" role="tab" id="bdt-notice" aria-selected="true" onclick="bdShow('notice')">공지사항</button>
+      <button type="button" role="tab" id="bdt-review" aria-selected="false" onclick="bdShow('review')">캠핑 후기</button>
       <button type="button" role="tab" id="bdt-gear" aria-selected="false" onclick="bdShow('gear')">장비 요청</button>
       <button type="button" role="tab" id="bdt-dev" aria-selected="false" onclick="bdShow('dev')">개발 요청</button>
     </div>
     <section class="bd-pane" id="bd-notice" role="tabpanel" aria-labelledby="bdt-notice"><ul class="nt-list" id="ntList"><li class="rq-empty">불러오는 중…</li></ul></section>
+    <section class="bd-pane" id="bd-review" role="tabpanel" aria-labelledby="bdt-review" hidden>
+      <div class="rv-head"><p>캠테리어로 짠 배치와 실제로 펼친 모습을 나란히 올려 주세요. 궁금한 건 댓글로 물어보고, 마음에 드는 배치는 그대로 불러와요.</p><button type="button" class="rv-go" onclick="rvWrite()">＋ 후기 쓰기</button></div>
+      <div class="rv-grid" id="rvList"></div>
+    </section>
     <section class="bd-pane reqb" id="bd-gear" role="tabpanel" aria-labelledby="bdt-gear" hidden>
       <div class="rq-head"><h2>찾는 장비가 없나요?</h2><p>장비 제원에 없는 장비를 알려주세요. 모아서 확인한 뒤 <b>매주 일요일</b>에 한 번에 넣어요.</p></div>
       <form class="rq-form" onsubmit="event.preventDefault();reqSend('gear')">
@@ -160,12 +165,11 @@
     </div>
   </header>
   <div class="wrap">
-    <ol class="flow3" aria-label="캠핑 준비 흐름"><li><b>예약</b><span>CARO</span></li><li><b>배치</b><span>캠테리어</span></li><li class="soon"><b>챙김</b><span>준비 중</span></li><li class="soon"><b>기록</b><span>준비 중</span></li></ol>
+    <ol class="flow3" aria-label="캠핑 준비 흐름"><li><b>예약</b><span>CARO</span></li><li><b>배치</b><span>캠테리어</span></li><li class="soon"><b>챙김</b><span>준비 중</span></li><li><b>기록</b><span>후기</span></li></ol>
     <div class="hubgrid two">
       <a class="hubcard big" href="https://caro-camp.github.io/" target="_blank" rel="noopener">
         <img src="img/caro-hero.webp" alt="" loading="lazy"><div class="hc-b"><span class="tag">웹앱 · 누구나</span><h2>CARO</h2><p>캠핑장 예약이 <b>열리는 시각</b>을 날짜별로 찾아 캘린더 알림으로 걸어줘요. 캠핏·땡큐캠핑·숲나들e 등 900여 곳.</p><span class="go">caro-camp.github.io ↗</span></div></a>
-      <a class="hubcard" href="https://claude.ai/artifact/Hs7t6BE96BRWWebJK8Skxc" target="_blank" rel="noopener">
-        <img src="img/autumn.webp" alt="" loading="lazy"><div class="hc-b"><span class="tag">Claude 로그인</span><h2>캠테리어 함께 쓰기</h2><p>배치를 계정에 저장하고, 모두의 배치와 ‘계획 vs 실제’ 후기를 올릴 수 있는 버전이에요.</p><span class="go">열기 ↗</span></div></a>
+      <a class="hubcard" href="#review" data-go="review"><img src="img/night.webp" alt="" loading="lazy"><div class="hc-b"><span class="tag">누구나 · 무료</span><h2>캠핑 후기</h2><p>계획한 배치와 실제로 친 모습을 나란히 올리고, 댓글로 서로 물어봐요. 마음에 드는 배치는 그대로 열어볼 수 있어요.</p><span class="go">후기 보러 가기 →</span></div></a>
     </div>
     <a class="instacard" href="https://www.instagram.com/hj_ironcamp/" target="_blank" rel="noopener">
       <img src="img/night.webp" alt="" loading="lazy">

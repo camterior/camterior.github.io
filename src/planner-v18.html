@@ -3780,7 +3780,7 @@ function setTOD(m){V3.tod=m;document.querySelectorAll('.tod button').forEach(b=>
   if(V3.tentMat){V3.tentMat.emissive.set('#FFB46B');V3.tentMat.emissiveIntensity=t.glow;}}
 
 /* ---- Instagram-size share card (1080×1350) ---- */
-async function exportCard(){
+async function exportCard(ret){
   try{await document.fonts.load('800 60px Pretendard');}catch(e){}
   const W=1080,H=1350,PX=60,PY=318,PW=W-PX*2,PH=840;const keep={SCALE,viewX,viewY,sel};sel=null;
   computeAll();const b=sceneBox(true),m=60;SCALE=Math.min((PW-2*m)/(b[1][0]-b[0][0]),(PH-2*m)/(b[1][1]-b[0][1]));
@@ -3803,7 +3803,7 @@ async function exportCard(){
     let x=PX,y=PY+PH+92;g.font=F(700,24);
     gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-70)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
     g.fillStyle='#5F6E66';g.font=F(500,20);g.fillText('camterior.github.io · 규격: 판매처·제조사 공개 치수, 일부 추정',PX,H-34);
-    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));await offerFile(`camterior-card-${stamp()}.png`,blob);}
+    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));if(ret)return blob;await offerFile(`camterior-card-${stamp()}.png`,blob);}
   finally{URL.revokeObjectURL(url);}}
 
 (function v17boot(){renderPresets();HIST.last=JSON.stringify(planObj());updUndo();})();
