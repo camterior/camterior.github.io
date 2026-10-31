@@ -1,0 +1,91 @@
+name: 워커 배포
+# worker/ 가 바뀐 채로 main에 들어오면 Cloudflare 워커(camterior-ai)를 자동 배포.
+# work/worker-* 브랜치에서는 설정 확인 + 시험 빌드만 (배포 안 함).
+# 지금 워커 설정(KV 연결·호환 날짜·플래그)을 Cloudflare에서 그대로 읽어 wrangler.toml을 만들기 때문에
+# 연결이 빠져 계정·게시판이 비어 보이는 일을 막아요. 비밀값(키)은 건드리지 않아요.
+on:
+  push:
+    branches: [main, 'work/worker-*']
+    paths: ['worker/**', '.github/workflows/worker-deploy.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: worker
+  cancel-in-progress: false
+env:
+  ACC: 8cf1f16a17a83e1f07cec8f8a202029c
+  NAME: camterior-ai
+  URL: https://camterior-ai.ghdwnd2.workers.dev
+jobs:
+  worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 지금 워커 설정 읽어서 wrangler.toml 만들기
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -e
+          curl -sf -H "Authorization: Bearer $T" "https://api.cloudflare.com/client/v4/accounts/$ACC/workers/scripts/$NAME/settings" > settings.json
+          curl -s -H "Authorization: Bearer $T" "https://api.cloudflare.com/client/v4/accounts/$ACC/workers/scripts/$NAME/schedules" > sched.json || echo '{}' > sched.json
+          python3 - <<'EOF'
+          import json,sys
+          r=json.load(open('settings.json'))['result']
+          info=[]; toml=['name = "camterior-ai"','main = "worker.js"','keep_vars = true','workers_dev = true']
+          cd=r.get('compatibility_date') or '2024-09-01'
+          toml.append(f'compatibility_date = "{cd}"')
+          fl=r.get('compatibility_flags') or []
+          if fl: toml.append('compatibility_flags = '+json.dumps(fl))
+          ob=r.get('observability') or {}
+          kv=[]; bad=[]
+          for b in r.get('bindings',[]):
+            t=b.get('type'); n=b.get('name')
+            info.append(f'binding {t} {n}')
+            if t=='kv_namespace': kv.append(f'{{ binding = "{n}", id = "{b["namespace_id"]}" }}')
+            elif t in ('secret_text','plain_text'): pass
+            else: bad.append(f'{t}:{n}')
+          if kv: toml.append('kv_namespaces = ['+', '.join(kv)+']')
+          if ob.get('enabled'): toml+=['','[observability]','enabled = true']
+          info.append(f'compat {cd} flags {fl} usage {r.get("usage_model")} observability {ob.get("enabled")}')
+          try: info.append('schedules '+json.dumps((json.load(open('sched.json')).get('result') or {}).get('schedules')))
+          except Exception: pass
+          open('worker/wrangler.toml','w').write('\n'.join(toml)+'\n')
+          open('ci-worker.txt','w').write('\n'.join(info)+'\n'+('UNKNOWN '+' '.join(bad) if bad else 'OK')+'\n')
+          print('\n'.join(info))
+          if bad: print('모르는 연결이 있어 멈춰요:',bad); sys.exit(4)
+          if not any(b.get('type')=='kv_namespace' and b.get('name')=='RL' for b in r.get('bindings',[])): print('RL 연결이 없어 멈춰요'); sys.exit(5)
+          EOF
+          cat worker/wrangler.toml | sed 's/id = "[0-9a-f]*"/id = "(숨김)"/'
+      - name: 배포 전 게시판 개수 기록
+        run: |
+          curl -s -X POST "$URL" -H 'Content-Type: application/json' -H 'Origin: https://camterior.github.io' -d '{"board":{"op":"list"}}' | python3 -c "import json,sys;d=json.load(sys.stdin);print(len(d.get('items',[])))" > before.txt || echo -1 > before.txt
+          echo "before $(cat before.txt)" | tee -a ci-worker.txt
+      - name: 시험 빌드 (작업 브랜치)
+        if: github.ref != 'refs/heads/main'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.ACC }}
+        run: cd worker && npx -y wrangler@3 deploy --dry-run --outdir ../dist && echo "dryrun OK" | tee -a ../ci-worker.txt
+      - name: 배포 (main)
+        if: github.ref == 'refs/heads/main'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.ACC }}
+        run: cd worker && npx -y wrangler@3 deploy && echo "deploy OK" | tee -a ../ci-worker.txt
+      - name: 배포 뒤 게시판·계정 확인
+        if: github.ref == 'refs/heads/main'
+        run: |
+          sleep 8
+          A=$(curl -s -X POST "$URL" -H 'Content-Type: application/json' -H 'Origin: https://camterior.github.io' -d '{"board":{"op":"list"}}' | python3 -c "import json,sys;d=json.load(sys.stdin);print(len(d.get('items',[])))" || echo -1)
+          B=$(cat before.txt); echo "after $A (before $B)" | tee -a ci-worker.txt
+          if [ "$A" -lt "$B" ] || [ "$A" -lt 1 ]; then echo "게시판 개수가 줄었어요 — 확인 필요" | tee -a ci-worker.txt; exit 6; fi
+      - name: 결과 남기기 (ci-info 브랜치)
+        if: always()
+        run: |
+          echo "ref ${{ github.ref }} sha ${{ github.sha }} run ${{ github.run_id }}" >> ci-worker.txt
+          cp ci-worker.txt /tmp/ci.txt
+          git config user.name ci && git config user.email ci@users.noreply.github.com
+          git fetch origin ci-info 2>/dev/null && git checkout -B ci-info origin/ci-info || git checkout --orphan ci-info
+          git rm -rq --cached . 2>/dev/null || true
+          cp /tmp/ci.txt worker.txt && git add worker.txt && git commit -qm "worker ${{ github.run_id }}" && git push -q origin ci-info
