@@ -1,5 +1,5 @@
 // 캠테리어 서비스워커: 화면(index.html)은 네트워크 우선, 이미지·폰트는 캐시 우선
-const V='camterior-v4';
+const V='camterior-v5';
 const SHELL=['./','index.html','manifest.webmanifest','assets/pretendard.woff2','assets/icon-64.png','img/intro.webp'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
