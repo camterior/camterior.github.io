@@ -56,7 +56,7 @@ const GSEC=[
       <div class="gb"><div><h3>${t.name}</h3><span class="md">${t.model}</span></div>
       <dl><dt>원단 크기</dt><dd>${fmt(t.L)}×${fmt(t.W)}mm</dd><dt>설영 면적</dt><dd>${(t.F[0]/1000).toFixed(1)}×${(t.F[1]/1000).toFixed(1)}m</dd><dt>폴</dt><dd>${t.poles.map(p=>fmt(p)).join(' / ')}mm</dd><dt>무게</dt><dd>${t.weight}</dd>${t.cap?`<dt>정원</dt><dd>${t.cap}</dd>`:''}</dl>
       ${t.note?`<p class="nt">${t.note}</p>`:''}
-      <div class="ga"><button type="button" onclick="gearUse('tarp','${id}')">이 타프로 배치</button>${t.src?`<a href="${SRC+t.src}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};})},
+      <div class="ga"><button type="button" onclick="gearUse('tarp','${id}')">이 타프로 배치</button>${t.href||t.src?`<a href="${t.href||SRC+t.src}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};})},
   {k:'igt',t:'IGT 프레임·테이블',img:'img/g-igt.webp',d:'0.5유닛(124mm) 단위로 이어 붙는 아이언 그릴 테이블 시스템. 프레임과 확장 테이블의 실제 윤곽이에요.',
    items:()=>Object.keys(CATALOG).filter(k=>CATALOG[k].kind!=='gear').map(id=>{const c=CATALOG[id],b=bbox(c.verts),w=Math.round(b[1][0]-b[0][0]),d=Math.round(b[1][1]-b[0][1]);
      return {id,b:c.group,q:`${c.name} ${c.model} ${c.group} igt`,html:`<div class="gpv"><span class="bt">${c.group}</span>${confBadge(c.conf)}${catPreview(id)}</div>
@@ -94,11 +94,11 @@ function gearCard(id){const g=GEAR[id];
     <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.sh?`<dt>좌면 높이</dt><dd>${fmt(g.sh)}mm</dd>`:''}${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}</dl>
     ${g.note?`<p class="nt">${g.note}</p>`:''}
     <div class="ga"><button type="button" onclick="gearUse('item','${id}')">배치에 놓기</button>${gLink(g)?`<a href="${gLink(g)}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};}
-const GBRANDS=['스노우피크','헬리녹스','커밋','토요토미','파세코','신일','엑스페드','스패로우','도메틱','알루텍','코베아','제백'];
+const GBRANDS=['스노우피크','헬리녹스','커밋','헤카','카즈미','베른','LG','플랜포티','알피쿨','토요토미','파세코','신일','엑스페드','스패로우','도메틱','알루텍','코베아','제백'];
 function gearBrand(g){const n=g.name||'';return GBRANDS.find(b=>n.startsWith(b))||'스노우피크';}
 let GEAR_F='all';const G_OPEN=new Set();
 /* 장비 카드 그림: 힉스필드로 만든 제품 사진풍 그림이 있으면 도형 대신 보여줌 (텐트·타프는 도면 그대로) */
-const GEAR_ART=new Set(["zebec_pro240","zebec_pro260","zebec_pro280","zebec_pro300","reg3", "long4", "sep2", "sep3", "sep4", "mf_reg", "mf_long", "open_L", "open_R", "corner_L", "corner_R", "slide_h", "slide_hl", "h020", "wood_s", "wood_w", "steel1", "lid_half", "box_half", "mesh_d1", "mesh_s1", "mesh_hd", "mesh_hs", "flat", "seppou", "CK-230", "CK-220", "legs", "sc25", "sc50", "mytable", "mytable_s", "fshelf", "fshelf_l", "fshelf_m", "sp_oat", "sp_oat_l", "sp_oat_low", "sp_chabu", "sp_kitchen", "hx_t1", "hx_t1l", "hx_t0lt", "hx_cafe", "kermit_t", "noga_table", "alu48", "alu68", "alu93", "sp_jikaro", "megamat", "megamat_duo", "sparrow50", "cot_one", "sp_low30", "sp_lowshort", "sp_fd", "sp_take", "hx_one", "hx_zero", "hx_sunset", "kermit", "noga_chair", "omni230", "camp5000", "sfh1200", "sfh300", "mk_stove", "toyotomi_lcl53", "sfh_bh900", "sp_gs1000", "cfx3_35", "cfx3_45", "cfx3_55"]);
+const GEAR_ART=new Set(["alpicool_k25", "heka", "hx_swivel", "kzm_castanets", "kzm_lettino", "lg_roomtv", "pf_cot75", "sp_conn", "sp_entry_igt", "sp_ext_igt", "verne_maestro", "zebec_pro240","zebec_pro260","zebec_pro280","zebec_pro300","reg3", "long4", "sep2", "sep3", "sep4", "mf_reg", "mf_long", "open_L", "open_R", "corner_L", "corner_R", "slide_h", "slide_hl", "h020", "wood_s", "wood_w", "steel1", "lid_half", "box_half", "mesh_d1", "mesh_s1", "mesh_hd", "mesh_hs", "flat", "seppou", "CK-230", "CK-220", "legs", "sc25", "sc50", "mytable", "mytable_s", "fshelf", "fshelf_l", "fshelf_m", "sp_oat", "sp_oat_l", "sp_oat_low", "sp_chabu", "sp_kitchen", "hx_t1", "hx_t1l", "hx_t0lt", "hx_cafe", "kermit_t", "noga_table", "alu48", "alu68", "alu93", "sp_jikaro", "megamat", "megamat_duo", "sparrow50", "cot_one", "sp_low30", "sp_lowshort", "sp_fd", "sp_take", "hx_one", "hx_zero", "hx_sunset", "kermit", "noga_chair", "omni230", "camp5000", "sfh1200", "sfh300", "mk_stove", "toyotomi_lcl53", "sfh_bh900", "sp_gs1000", "cfx3_35", "cfx3_45", "cfx3_55"]);
 function gArt(it){if(!GEAR_ART.has(it.id))return it.html;
   return it.html.replace(/<svg[\s\S]*?<\/svg>/,`<img class="gart" src="img/gear/${it.id}.webp" alt="" loading="lazy"><span class="gart-ai">AI 그림</span>`);}
 function renderGear(){const nav=document.getElementById('gearNav'),body=document.getElementById('gearBody');if(!body)return;

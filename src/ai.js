@@ -20,6 +20,11 @@ const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유�
   wood_s:['우드테이블 S','우드 S'],wood_w:['우드테이블 W','우드 W'],mesh_d1:['메쉬트레이 딥'],mesh_s1:['메쉬트레이'],mf_long:['멀티펑션 롱','멀티펑션롱'],open_L:['오픈멀티펑션 L'],open_R:['오픈멀티펑션 R'],corner_L:['코너테이블 L'],corner_R:['코너테이블 R'],
   sp_fd:['FD체어','에프디체어'],hx_one:['체어원','헬리녹스 체어원','헬리녹스체어원'],hx_zero:['체어제로','헬리녹스 체어제로'],omni230:['옴니','옴니230'],camp5000:['파세코 팬히터','캠프5000','파세코'],mk_stove:['MK스토브','화목난로','장작난로'],toyotomi_lcl53:['토요토미 팬히터','LC-L53'],sfh_bh900:['신일 900','신일 팬히터 900'],sfh1200:['신일 1200','신일 팬히터 1200'],cfx3_35:['도메틱 35','CFX3 35'],cfx3_45:['도메틱 45','CFX3 45'],cfx3_55:['도메틱 55','CFX3 55'],
   megamat_duo:['메가매트 듀오','메가메트 듀오'],megamat:['메가매트','메가메트'],zebec_pro240:['에어리스 프로 240','제백 프로 240'],zebec_pro260:['에어리스 프로 260','제백 프로 260','제백 에어매트','에어리스 프로','제백 프로'],zebec_pro280:['에어리스 프로 280','제백 프로 280'],zebec_pro300:['에어리스 프로 300','제백 프로 300'],cot_one:['코트원'],sp_oat_low:['원액션 로우'],sp_oat:['원액션테이블'],
+  heka:['헤카체어','헤카 체어','헤카'],kzm_lettino:['레티노체어','레티노 체어','레티노'],hx_swivel:['스위블체어','스위블 체어','스위블'],kzm_castanets:['캐스터네츠체어','캐스터네츠 체어','캐스터네츠'],
+  sp_conn:['커넥션 테이블','커넥션테이블'],verne_maestro:['마에스트로','베른 IGT','베른igt','베른 테이블','베른igt테이블','VST 마에스트로'],sp_entry_igt:['엔트리 IGT','엔트리igt','엔트리 아이지티'],sp_ext_igt:['익스텐션 IGT','익스텐션igt'],
+  lg_roomtv:['룸앤티비','룸앤TV','룸앤 티비','룸앤 TV'],pf_cot75:['플랜포티','피콧','P-COT','플랜포티 야전침대','피콧 75'],alpicool_k25:['알피쿨','알피쿨 K25','K25'],
+  ck_oakdome_mini:['오크돔 미니','오크돔미니'],ck_oakdome_m:['오크돔 M','오크돔m'],ck_makadome:['마카돔'],ck_makaplus:['마카플러스','마카 플러스'],ck_oakbell:['오크벨'],ck_ruby_double:['루비 더블','루비더블'],ck_alpberg:['알페르그','알페르그쉘터'],ck_custom_s:['커스텀쉘터 S','커스텀쉘터s'],
+  mt_monte:['몽뜨','몽뜨 쉘터','몬테라 몽뜨'],bs_1360:['브런스카일','1360 텐트','브런스카일 1360'],ttp_zirkon15:['지르콘','지르콘 15','텐티피'],hb_altai:['알타이','알타이 UL','알타이ul'],sp_kayad_m:['카야드','카야드 M','카야드m'],
   merak_pro:['메락'],landlock:['랜드락'],living_shell_long_pro:['리빙쉘 롱 프로','리빙쉘롱'],living_shell:['리빙쉘']};
 const AI_INNER_AL={shell_duo:['쉘이너','쉘이너 듀오','쉘 이너'],geoair2:['지오에어','지오 에어','지오에어2','지오 에어2'],godong:['고동','고동텐트','고동 텐트','고동 이너','고동이너텐트']};
 const aiTentName=id=>{const T=TENTS[id];return ((T.brand?T.brand+' ':'')+T.name).trim();};
@@ -37,7 +42,7 @@ const AI_EXAMPLES=[["랜드록 안에 IGT 롱 하나 벽쪽에 두고 양쪽 끝
 // AI 중계 서버가 지시문을 8000자에서 자르므로, 텐트는 글에 나온 후보만, 예시는 글과 비슷한 것부터 남는 자리만큼 넣음
 const AI_SYS_MAX=7800;
 // 타프: 이름을 글에서 찾기 (크기 없이 '헥사타프'면 M)
-const AI_TARP_AL={hexa_l:['헥사타프l','헥사타프라지','헥사l','헥사라지','tp862','hexal'],hexa_m:['헥사타프m','헥사타프미디엄','헥사m','헥사미디엄','tp861','hexam','헥사타프','헥사'],
+const AI_TARP_AL={hexa_evo:['헥사에보','헥사 에보','헥사에보프로','헥사에보 프로','tp250r','hexaevo'],hexa_l:['헥사타프l','헥사타프라지','헥사l','헥사라지','tp862','hexal'],hexa_m:['헥사타프m','헥사타프미디엄','헥사m','헥사미디엄','tp861','hexam','헥사타프','헥사'],
   recta_l:['렉타타프l','렉타타프라지','렉타l','렉타라지','tp842','rectal'],recta_m:['렉타타프m','렉타타프미디엄','렉타m','렉타미디엄','tp841','rectam','렉타타프','렉타']};
 function aiTarpLocal(text){const t=aiNorm(text);if(/타프(없이|빼|제거|안|없음|치워)/.test(t))return 'none';
   let best=null,bl=0;for(const [id,al] of Object.entries(AI_TARP_AL))for(const a of al)if(t.includes(a)&&a.length>bl){best=id;bl=a.length;}return best;}
