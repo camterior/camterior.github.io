@@ -12,5 +12,5 @@ jobs:
         run: |
           if [ -z "$T" ]; then echo "RESULT: 토큰 없음"; exit 1; fi
           echo "토큰 길이: ${#T}"
-          curl -s -H "Authorization: Bearer $T" https://api.cloudflare.com/client/v4/user/tokens/verify | python3 -c "import json,sys;d=json.load(sys.stdin);print('RESULT:', 'OK' if d.get('success') else 'FAIL', (d.get('result') or {}).get('status'), [e.get('message') for e in d.get('errors',[])])"
-          curl -s -H "Authorization: Bearer $T" "https://api.cloudflare.com/client/v4/accounts/8cf1f16a17a83e1f07cec8f8a202029c/workers/scripts" | python3 -c "import json,sys;d=json.load(sys.stdin);print('WORKERS:', d.get('success'), [s.get('id') for s in (d.get('result') or [])], [e.get('message') for e in d.get('errors',[])])"
+          curl -s -H "Authorization: Bearer $T" https://api.cloudflare.com/client/v4/user/tokens/verify | python3 -c "import json,sys;d=json.load(sys.stdin);print('RESULT:', 'OK' if d.get('success') else 'FAIL', (d.get('result') or {}).get('status'), [e.get('message') for e in d.get('errors',[])]);sys.exit(0 if d.get('success') else 2)"
+          curl -s -H "Authorization: Bearer $T" "https://api.cloudflare.com/client/v4/accounts/8cf1f16a17a83e1f07cec8f8a202029c/workers/scripts" | python3 -c "import json,sys;d=json.load(sys.stdin);ids=[s.get('id') for s in (d.get('result') or [])];print('WORKERS:', d.get('success'), ids);sys.exit(0 if 'camterior-ai' in ids else 3)"
