@@ -2215,7 +2215,7 @@ function customInnerPoly(w0,d0){const T=TENTS[tent.id];let w=(w0||tent.custom.w)
 function tentInner(){const T=TENTS[tent.id];if(!T.outer||!tent.inner)return null;
   const mv=pl=>{const o=tent.innerOff;return o&&(o[0]||o[1])?pl.map(v=>[v[0]+o[0],v[1]+o[1]]):pl;};
   if(tent.inner==='custom')return {label:'이너',model:'',size:`${tent.custom.w}×${tent.custom.d}`,poly:mv(customInnerPoly()),custom:true};
-  if(typeof tent.inner==='string'&&tent.inner.startsWith('p:')){const P=INNER_PRESETS[tent.inner.slice(2)];if(P)return {label:P.name,model:P.model,size:`${P.w}×${P.d}`,poly:mv(customInnerPoly(P.w,P.d)),custom:true};}
+  if(typeof tent.inner==='string'&&tent.inner.startsWith('p:')){const P=INNER_PRESETS[tent.inner.slice(2)];if(P)return {label:P.name,model:P.model,size:`${P.w}×${P.d}`,poly:mv(customInnerPoly(P.w,P.d)),custom:true,h:P.h*10};}
   return T.inners[tent.inner]||null;}
 function doorZones(){const T=TENTS[tent.id];if(!T.outer)return [];
   return T.doors.filter(d=>d.zone).map(d=>{const A=d.a,B=d.b,L=dist(A,B);let n=[-(B[1]-A[1])/L,(B[0]-A[0])/L];
@@ -3129,6 +3129,15 @@ function tent3(THREE,T){
       const g2=new THREE.BufferGeometry();g2.setAttribute('position',new THREE.Float32BufferAttribute(ps,3));g2.setIndex(ix);g2.computeVertexNormals();
       const im2=im.clone();im2.side=THREE.DoubleSide;grp.add(new THREE.Mesh(g2,im2));
       P.forEach((v,i)=>grp.add(lineOf(THREE,[[mm(v[0]),0,mm(v[1])],[mm(v[0]),mm(ws[i]),mm(v[1])],[mm(ax),mm(AH),mm(ay)]],'#7A6F5C',.6)));}
+    else if(inner.h){// 따로 넣는 이너(쉘이너·지오에어·고동): 실제 높이의 낮은 돔 모양
+      const P=inner.poly,n2=P.length,c=centroid(P),H2=inner.h,rings=[[0,0],[.55,.1],[.88,.3],[1,.5]],ps=[],ix=[];
+      rings.forEach(([hf,sh])=>P.forEach(v=>ps.push(mm(v[0]+(c[0]-v[0])*sh),mm(H2*hf),mm(v[1]+(c[1]-v[1])*sh))));
+      for(let r=0;r<rings.length-1;r++)for(let i=0;i<n2;i++){const j=(i+1)%n2,a=r*n2;ix.push(a+i,a+j,a+n2+j,a+i,a+n2+j,a+n2+i);}
+      const tp=(rings.length-1)*n2;for(let i=1;i<n2-1;i++)ix.push(tp,tp+i,tp+i+1);
+      const g2=new THREE.BufferGeometry();g2.setAttribute('position',new THREE.Float32BufferAttribute(ps,3));g2.setIndex(ix);g2.computeVertexNormals();
+      const im2=im.clone();im2.side=THREE.DoubleSide;grp.add(new THREE.Mesh(g2,im2));
+      P.forEach(v=>grp.add(lineOf(THREE,rings.map(([hf,sh])=>[mm(v[0]+(c[0]-v[0])*sh),mm(H2*hf),mm(v[1]+(c[1]-v[1])*sh)]),'#7A6F5C',.6)));
+      grp.add(lineOf(THREE,P.concat([P[0]]).map(v=>[mm(v[0]+(c[0]-v[0])*.5),mm(H2),mm(v[1]+(c[1]-v[1])*.5)]),'#7A6F5C',.7));}
     else{const me=extrudePoly(THREE,inner.poly,0,T.inH3||1800,im);me.castShadow=false;grp.add(me);
     grp.add(lineOf(THREE,inner.poly.concat([inner.poly[0]]).map(v=>[mm(v[0]),mm(T.inH3||1800),mm(v[1])]),'#7A6F5C',.7));}}
   return grp;}
