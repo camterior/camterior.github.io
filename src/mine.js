@@ -23,7 +23,9 @@ function mineThumb(it){if(!it)return '';const ph=it.k!=='tent'&&typeof GEAR_ART!
   return `<span class="mn-th">${MINE_PV[it.key]}</span>`;}
 const mineByKey=k=>mineAll().find(x=>x.key===k);
 const mineCount=()=>Object.values(MYG).reduce((a,b)=>a+b,0);
-function mineAdd(key,n){MYG[key]=Math.max(0,Math.min(20,(MYG[key]||0)+(n||1)));if(!MYG[key])delete MYG[key];mineSave();mineRender();if(document.getElementById('minePick'))minePickUI();}
+function mineAdd(key,n){const pk=document.getElementById('minePick'),t0=pk?pk.getBoundingClientRect().top:null;
+  MYG[key]=Math.max(0,Math.min(20,(MYG[key]||0)+(n||1)));if(!MYG[key])delete MYG[key];mineSave();mineRender();if(pk)minePickUI();
+  if(pk&&t0!=null){const d=pk.getBoundingClientRect().top-t0;if(Math.abs(d)>1)window.scrollBy(0,d);}}
 function mineRender(){const box=document.getElementById('mineList');if(!box)return;
   const keys=Object.keys(MYG).filter(k=>mineByKey(k));document.getElementById('mineCnt').textContent=keys.length?`${keys.length}종 · ${mineCount()}개`:'';
   document.getElementById('mineUse').disabled=!keys.length;
@@ -217,8 +219,10 @@ function tourPlace(){const o=document.getElementById('tour');if(!o)return;const 
 // ===== 장비 제원에서 고르기 =====
 let PICK_SEC=null;
 function minePickUI(){const el=document.getElementById('minePick');if(!el)return;const secs=mineSecs();if(!PICK_SEC)PICK_SEC=secs[0].k;
+  const oc=el.querySelector('.mp-chips'),ol=el.querySelector('.mp-list'),sx=oc?oc.scrollLeft:0,sy=ol?ol.scrollTop:0,sameSec=el.dataset.sec===PICK_SEC;el.dataset.sec=PICK_SEC;
   el.innerHTML=`<div class="mp-chips" role="group" aria-label="장비 종류">${secs.map(s=>`<button type="button" aria-pressed="${s.k===PICK_SEC}" onclick="PICK_SEC='${s.k}';minePickUI()">${aiEsc(s.t)} <small>${s.ids.length}</small></button>`).join('')}</div>
-   <ul class="mn-find mp-list">${mineAll().filter(x=>x.k===PICK_SEC).map(x=>`<li>${mineThumb(x)}<span class="mn-n"><b>${aiEsc(x.name)}</b>${x.model?`<small>${aiEsc(x.model)}</small>`:''}</span>${MYG[x.key]?`<span class="mn-q"><button type="button" aria-label="${aiEsc(x.name)} 하나 빼기" onclick="mineAdd('${x.key}',-1)">−</button><b>${MYG[x.key]}</b><button type="button" aria-label="${aiEsc(x.name)} 하나 더" onclick="mineAdd('${x.key}',1)">+</button></span>`:`<button type="button" class="mn-add" onclick="mineAdd('${x.key}',1)">+ 넣기</button>`}</li>`).join('')}</ul>`;}
+   <ul class="mn-find mp-list">${mineAll().filter(x=>x.k===PICK_SEC).map(x=>`<li>${mineThumb(x)}<span class="mn-n"><b>${aiEsc(x.name)}</b>${x.model?`<small>${aiEsc(x.model)}</small>`:''}</span>${MYG[x.key]?`<span class="mn-q"><button type="button" aria-label="${aiEsc(x.name)} 하나 빼기" onclick="mineAdd('${x.key}',-1)">−</button><b>${MYG[x.key]}</b><button type="button" aria-label="${aiEsc(x.name)} 하나 더" onclick="mineAdd('${x.key}',1)">+</button></span>`:`<button type="button" class="mn-add" onclick="mineAdd('${x.key}',1)">+ 넣기</button>`}</li>`).join('')}</ul>`;
+  const nc=el.querySelector('.mp-chips'),nl=el.querySelector('.mp-list');if(nc){nc.scrollLeft=sx;const on=nc.querySelector('[aria-pressed=true]');if(on&&!sameSec)on.scrollIntoView({block:'nearest',inline:'nearest'});}if(nl&&sameSec)nl.scrollTop=sy;}
 function mineInit(){mineRender();minePickUI();acctUI();acctPull();}
 
 // ===== 세팅 화면(텐트·장비 목록)에서 '내 장비만 보기' =====
