@@ -2241,8 +2241,32 @@ function heatLocal(c){const h=c.heat;if(!h)return null;
 function segDist(p,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],L=dx*dx+dy*dy;let t=L?((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L:0;t=Math.max(0,Math.min(1,t));return Math.hypot(p[0]-a[0]-t*dx,p[1]-a[1]-t*dy);}
 function polyGap(A,B){let m=Infinity;[[A,B],[B,A]].forEach(([P,Q])=>P.forEach(p=>{for(let k=0;k<Q.length;k++)m=Math.min(m,segDist(p,Q[k],Q[(k+1)%Q.length]));}));return m;}
 const pieceH=p=>{const c=CATALOG[p.type];return c.kind==='gear'?c.h:(rootOf(p).leg||660);};
+/* ---------- 위에 올리기 (선반·테이블·박스 위에 장비 놓기) ---------- */
+const STACK_BASE=c=>c.kind==='frame'||c.kind==='ext'||(c.kind==='gear'&&['table','shelf','box','fridge'].includes(c.gtype));
+const STACK_TOP=c=>c.kind==='gear'&&!c.heat&&!c.sleep&&!['chair','mat','cot'].includes(c.gtype);
+const STACK_FIRE=c=>c.kind==='gear'&&['burner','stove','wood'].includes(c.gtype);
+function invT(T,w){const x=w[0]-T.tx,y=w[1]-T.ty;return [T.cos*x+T.sin*y,-T.sin*x+T.cos*y];}
+function stackRoot(p){let q=p,n=0;while(q&&q.on!=null&&n++<40){const b=byId(q.on);if(!b)break;q=rootOf(b);}return rootOf(q);}
+function stackKids(rootUid){return state.pieces.filter(p=>p.on!=null&&p.uid!==rootUid&&stackRoot(p).uid===rootUid);}
+function stackLevel(p){let n=0,q=p;while(q&&q.on!=null&&n<40){q=byId(q.on);n++;}return n;}
+// p의 가운데 아래에 있는 받침 (가장 높은 것)
+function stackBaseAt(p){const c=CATALOG[p.type];if(!STACK_TOP(c)||p.parent!=null||!p._v)return null;
+  const ce=centroid(p._v),mine=new Set([p.uid,...stackKids(p.uid).map(q=>q.uid)]),area=polyArea(p._v);let best=null;
+  state.pieces.forEach(q=>{if(mine.has(q.uid)||mine.has(rootOf(q).uid)||!q._v)return;const cq=CATALOG[q.type];if(!STACK_BASE(cq)||!pointInPoly(ce,q._v))return;
+    if(cq.kind==='gear'&&area>polyArea(q._v)*1.15)return;const z=(q._z||0)+pieceH(q);if(!best||z>best.z)best={q,z};});
+  return best&&best.q;}
+// 높은 테이블 밑에 들어가는 박스·냉장고는 '아래 수납'이 기본
+function stackPreferUnder(p,q){const c=CATALOG[p.type],cq=CATALOG[q.type];const top=pieceH(q);
+  return (c.gtype==='box'||c.gtype==='fridge')&&(cq.kind!=='gear'||cq.gtype==='table')&&top>=500&&c.h<=top-60&&!q.on;}
+function stackSet(p,q){p.on=q.uid;p.onC=invT(q._T,centroid(p._v)).map(v=>Math.round(v));p.onR=Math.round((p.rot||0)-Math.atan2(q._T.sin,q._T.cos)*180/Math.PI);p.floor=false;}
+function stackAuto(p){if(!p||p.floor||p.parent!=null)return false;const q=stackBaseAt(p);if(!q||stackPreferUnder(p,q))return false;stackSet(p,q);return true;}
+function stackAfterMove(r){if(!r||r.parent!=null)return;const was=r.on;if(r.on!=null){delete r.on;}computeAll();
+  if(stackAuto(r)){const b=byId(r.on);showToast(`${CATALOG[b.type].short||CATALOG[b.type].name} 위에 올렸어요`);}else if(was!=null)showToast('바닥에 내려놨어요');}
+function stackUp(uid){const p=byId(uid);if(!p)return;p.floor=false;computeAll();const q=stackBaseAt(p);if(q){stackSet(p,q);showToast('위에 올렸어요');}else showToast('아래에 올릴 선반·테이블이 없어요. 위로 끌어다 놓아 보세요');render();}
+function stackDown(uid){const p=byId(uid);if(!p)return;delete p.on;p.floor=true;showToast('바닥에 내렸어요');render();}
 function computeAll(){
-  orderPieces().forEach(p=>{
+  state.pieces.forEach(p=>{p._z=0;});
+  const one=p=>{
     if(p.parent==null){const th=(p.rot||0)*Math.PI/180,cos=Math.cos(th),sin=Math.sin(th);const c=centroid(CATALOG[p.type].verts);
       p._T={cos,sin,tx:(p.ox||0)+c[0]-(cos*c[0]-sin*c[1]),ty:(p.oy||0)+c[1]-(sin*c[0]+cos*c[1])};}
     else{const par=byId(p.parent),e=edgeOf(par.type,p.pEdge);
@@ -2251,7 +2275,16 @@ function computeAll(){
       if(p.slide){p.slide=Math.max(-mx,Math.min(mx,p.slide));const L=dist(A,B);p._T.tx+=(B[0]-A[0])/L*p.slide;p._T.ty+=(B[1]-A[1])/L*p.slide;}}
     p._v=CATALOG[p.type].verts.map(v=>applyT(p._T,v));p._bb=bbox(p._v);
     const hz=heatLocal(CATALOG[p.type]);p._heat=hz?hz.map(v=>applyT(p._T,v)):null;
-  });
+  };
+  // 위에 올린 장비(p.on)는 받침이 먼저 계산된 뒤 받침 기준 자리(onC·onR)로 놓음
+  orderPieces().forEach(p=>{if(p.on==null||p.parent!=null)one(p);});
+  let pend=state.pieces.filter(p=>p.on!=null&&p.parent==null);
+  for(let guard=0;pend.length&&guard<40;guard++)pend=pend.filter(p=>{const b=byId(p.on);
+    if(!b||b===p){delete p.on;one(p);return false;}
+    if(pend.includes(b)||(b.parent!=null&&pend.includes(rootOf(b))))return true;
+    const a=Math.atan2(b._T.sin,b._T.cos)*180/Math.PI,w=applyT(b._T,p.onC||[0,0]),c=centroid(CATALOG[p.type].verts);
+    p.rot=(((a+(p.onR||0))%360)+360)%360;p.ox=w[0]-c[0];p.oy=w[1]-c[1];one(p);p._z=(b._z||0)+pieceH(b);return false;});
+  pend.forEach(p=>{delete p.on;one(p);});
   state.pieces.filter(p=>p.parent==null).forEach(r=>{const isl=state.pieces.filter(p=>rootOf(p).uid===r.uid);
     r._isl=isl;const bb=bbox(isl.flatMap(p=>p._v));r._bbox=bb;r._foot=[Math.round(bb[1][0]-bb[0][0]),Math.round(bb[1][1]-bb[0][1])];});
   TW=tarpWorld();
@@ -2320,12 +2353,23 @@ function checkRules(){
   state.pieces.forEach(p=>{p._ov=false;p._under=false;});
   for(let a=0;a<state.pieces.length;a++)for(let b=a+1;b<state.pieces.length;b++){
     const P=state.pieces[a],Q=state.pieces[b];if(!bbHit(P._bb,Q._bb))continue;
+    if((P._z||0)!==(Q._z||0))continue; // 높이가 다른 층(위에 올린 것)은 겹침 아님
     const d=satPen(P._v,Q._v);if(d<=3)continue;
-    // low gear tucked under an IGT table is fine
+    // low gear tucked under an IGT table (or a high gear table) is fine
     const cp=CATALOG[P.type],cq=CATALOG[Q.type];let g=null,t=null;
     if(cp.kind==='gear'&&cq.kind!=='gear'){g=P;t=Q;}else if(cq.kind==='gear'&&cp.kind!=='gear'){g=Q;t=P;}
-    if(g&&!CATALOG[g.type].heat&&CATALOG[g.type].h<=pieceH(t)-60){g._under=true;I.push(`아래 수납: ${pName(g)}, ${pName(t)} 밑 (높이 ${CATALOG[g.type].h/10} / ${pieceH(t)/10}cm)`);continue;}
+    else if(cp.kind==='gear'&&cq.kind==='gear'){const tb=c=>c.gtype==='table'||c.gtype==='shelf';
+      if(tb(cq)&&!tb(cp)&&cq.h>cp.h){g=P;t=Q;}else if(tb(cp)&&!tb(cq)&&cp.h>cq.h){g=Q;t=P;}}
+    if(g&&!CATALOG[g.type].heat&&!['chair','mat','cot'].includes(CATALOG[g.type].gtype)){const gh=CATALOG[g.type].h,th=pieceH(t);
+      if(gh<=th-60){g._under=true;I.push(`아래 수납: ${pName(g)}, ${pName(t)} 밑에 들어가요 (높이 ${gh/10} / ${th/10}cm)`);continue;}
+      if(['box','fridge'].includes(CATALOG[g.type].gtype)){P._ov=Q._ov=true;W.push(`<b>높이</b> ${pName(g)}를 ${pName(t)} 아래에 넣기엔 ${Math.ceil((gh-th+60)/10)}cm 높아요 (위에 올리려면 ⬆ 올리기)`);continue;}}
     P._ov=Q._ov=true;W.push(`<b>겹침</b> ${pName(P)}와 ${pName(Q)}, 약 ${Math.round(d/10)}cm`);}
+  // 위에 올린 장비: 받침보다 크면 경고, 나무 상판 위 화기는 주의
+  state.pieces.forEach(p=>{if(p.on==null)return;const b=byId(p.on);if(!b)return;const cb=CATALOG[b.type],c=CATALOG[p.type];
+    const isl=b.parent!=null||cb.kind!=='gear'?rootOf(b)._isl||[b]:[b],out=p._v.filter(v=>!isl.some(q=>pointInPoly(v,q._v))).length;
+    if(out){p._ov=true;W.push(`<b>올림</b> ${pName(p)}가 ${pName(b)}보다 커서 밖으로 나가요`);}
+    else I.push(`올림: ${pName(p)}, ${pName(b)} 위 (바닥에서 ${Math.round((p._z||0)/10)}cm)`);
+    if(STACK_FIRE(c)&&(cb.top==='bamboo'||cb.wood||cb.kind==='ext'))I.push(`${pName(p)}: 나무 상판 위 화기예요. 열판이나 스테인리스 상판 위에서 쓰세요`);});
   // heaters: keep 1m from fabric and gear
   const heaters=state.pieces.filter(p=>p._heat);
   heaters.forEach(h=>{const c=CATALOG[h.type],hb=bbox(h._heat),dist1=c.heat.type==='round'?'사방 1m':'앞 1m·옆뒤 30cm';
@@ -2638,7 +2682,7 @@ function renderDock(){const el=document.getElementById('dock');if(!el)return;let
   if(sel==='tarp'&&TARPS[tarp.id]){h=`<span class="nm">${TARPS[tarp.id].name}</span><button onclick="rotTarp(-15)" aria-label="왼쪽으로 15도">⟲</button><button onclick="rotTarp(15)" aria-label="오른쪽으로 15도">⟳</button><button onclick="rotTarp(90)">90°</button><button class="del" onclick="pickTarp(null)">빼기</button><button onclick="sel=null;render()" aria-label="선택 해제">✕</button>`;}
   else if(typeof sel==='number'&&byId(sel)){const r=byId(sel),c=CATALOG[r.type];
     const hasParts=c.kind!=='gear';
-    h=`<span class="nm${hasParts?' hm':''}">${c.kind==='gear'?c.name:c.name+' 세트'}</span>${hasParts?`<button class="pri" onclick="openParts(${r.uid})">파츠·붙이기</button>`:''}<button onclick="zoomToRoot(${r.uid},true)" aria-label="이 장비로 확대">🔍</button><button class="hm" onclick="onRotate(${r.uid},-15)" aria-label="왼쪽으로 15도">⟲</button><button onclick="onRotate(${r.uid},15)" aria-label="오른쪽으로 15도">⟳</button><button onclick="onRotate(${r.uid},90)">90°</button><button class="del" onclick="killSet(${r.uid});render()">삭제</button><button onclick="sel=null;render()" aria-label="선택 해제">✕</button>`;}
+    h=`<span class="nm${hasParts?' hm':''}">${c.kind==='gear'?c.name:c.name+' 세트'}</span>${hasParts?`<button class="pri" onclick="openParts(${r.uid})">파츠·붙이기</button>`:''}<button onclick="zoomToRoot(${r.uid},true)" aria-label="이 장비로 확대">🔍</button><button class="hm" onclick="onRotate(${r.uid},-15)" aria-label="왼쪽으로 15도">⟲</button><button onclick="onRotate(${r.uid},15)" aria-label="오른쪽으로 15도">⟳</button><button onclick="onRotate(${r.uid},90)">90°</button>${c.kind==='gear'?stackBtn(r,''):''}<button class="del" onclick="killSet(${r.uid});render()">삭제</button><button onclick="sel=null;render()" aria-label="선택 해제">✕</button>`;}
   else h=`<button class="pri" onclick="openAddMain()">+ IGT</button><button class="pri" onclick="openAddGear()">+ 선반·난로</button>`;
   el.innerHTML=h;}
 function hostSize(){const h=document.getElementById('svgHost');return [h.clientWidth,h.clientHeight];}
@@ -2675,11 +2719,12 @@ function buildSVG(size){
     body+=`<polygon points="${pts(p._heat)}" fill="${p._ov?'rgba(142,47,56,.10)':'rgba(200,100,46,.07)'}" stroke="#C8642E" stroke-opacity=".7" stroke-width="${1.3*k}" stroke-dasharray="${6*k} ${4*k}" pointer-events="none"/>`;
     const lp=c.heat.type==='round'?[ce[0],p._bb[0][1]-c.heat.c+16*k]:applyT(p._T,[c.w/2,c.d+c.heat.front-10*k]);
     body+=`<text x="${lp[0].toFixed(0)}" y="${lp[1].toFixed(0)}" text-anchor="middle" font-size="${10.5*k}" fill="#A04F22" font-weight="600" pointer-events="none">난방 안전거리 ${c.heat.type==='round'?'1m':'앞 1m'}</text>`;});
-  const roots=state.pieces.filter(p=>p.parent==null).sort((a,b)=>(a.z||0)-(b.z||0));
+  const roots=state.pieces.filter(p=>p.parent==null).sort((a,b)=>(a._z||0)-(b._z||0)||(a.z||0)-(b.z||0));
   let top='';
   roots.forEach(r=>{
     const selected=r.uid===sel,isl=orderPieces().filter(p=>rootOf(p).uid===r.uid);
     let g=`<g class="isl" id="isl-${r.uid}" onpointerdown="startDrag(event,${r.uid})">`;
+    if(r.on!=null)g+=`<polygon points="${pts(r._v.map(v=>[v[0]+7*k,v[1]+9*k]))}" fill="rgba(20,24,20,.25)" pointer-events="none"/>`;
     const rank=p=>({tray:0,h020:0,ext:1,gear:1,frame:2})[CATALOG[p.type].kind];
     isl.slice().sort((a,b)=>rank(a)-rank(b)).forEach(p=>{const c=CATALOG[p.type];
       g+=`<g transform="${matStr(p._T)}"${p._under?' opacity=".5"':''}>`+(c.kind==='frame'?frameBody(p,fine)+slotsLocal(p,selected,fineSlot):extBody(p,fine))+`</g>`;
@@ -2689,6 +2734,8 @@ function buildSVG(size){
       const ce=centroid(p._v),m=Math.min(p._bb[1][0]-p._bb[0][0],p._bb[1][1]-p._bb[0][1])*SCALE;if(m<46)return;
       g+=`<text x="${ce[0].toFixed(1)}" y="${(ce[1]+4*k).toFixed(1)}" text-anchor="middle" font-size="${11.5*k}" font-weight="600" fill="#3a2c17" stroke="rgba(249,249,246,.75)" stroke-width="${3*k}" paint-order="stroke" pointer-events="none">${c.kind==='gear'?c.name.replace('토요토미 ','').replace('파세코 ','').replace(' 팬히터',''):c.name}${isWeak(c.conf)?' *':''}</text>`;});
     isl.forEach(p=>{if(!p._ov)return;g+=`<polygon points="${pts(p._v)}" fill="rgba(142,47,56,.12)" stroke="${COL.maple}" stroke-width="${2.4*k}" stroke-dasharray="${8*k} ${5*k}" pointer-events="none"/>`;});
+    if(r.on!=null){const lv=stackLevel(r),b=byId(r.on),same=b&&CATALOG[b.type].gtype==='box'&&CATALOG[r.type].gtype==='box',t=same?`⬆ ${lv+1}단`:'⬆ 위',x=r._bb[0][0],y=r._bb[0][1];
+      g+=`<g pointer-events="none"><rect x="${(x-4*k).toFixed(1)}" y="${(y-15*k).toFixed(1)}" width="${(same?40:30)*k}" height="${15*k}" rx="${7*k}" fill="${COL.ai}"/><text x="${(x+(same?16:11)*k).toFixed(1)}" y="${(y-4.5*k).toFixed(1)}" text-anchor="middle" font-size="${9.5*k}" font-weight="700" fill="#fff">${t}</text></g>`;}
     if(selected){isl.forEach(p=>{g+=`<polygon points="${pts(p._v)}" fill="none" stroke="${COL.ai}" stroke-width="${2*k}" stroke-opacity=".7" pointer-events="none"/>`;});}
     g+='</g>';body+=g;
     if(selected){top+=clearanceLayer(r);top+=controlsFor(isl);}
@@ -2756,12 +2803,13 @@ function rotDown(e,uid){if(e.button!==undefined&&e.button!==0)return;e.stopPropa
   const r=byId(uid),pv=rootPivot(r),host=document.getElementById('svgHost').getBoundingClientRect(),seq=gestSeq;
   const toW=ev=>[viewX+(ev.clientX-host.left)/SCALE,viewY+(ev.clientY-host.top)/SCALE];
   const a0=(()=>{const w=toW(e);return Math.atan2(w[1]-pv[1],w[0]-pv[0]);})(),rot0=r.rot||0,g=document.getElementById('isl-'+uid);let delta=0,raf=0,last=e;
+  const kg=stackKids(uid).map(p=>document.getElementById('isl-'+p.uid)).filter(Boolean);
   const show=()=>{raf=0;const w=toW(last);let d=(Math.atan2(w[1]-pv[1],w[0]-pv[0])-a0)*180/Math.PI;const st=last.shiftKey?1:15;
-    delta=Math.round((((rot0+d)%360+360)%360)/st)*st-rot0;g.setAttribute('transform',`rotate(${delta.toFixed(2)} ${pv[0].toFixed(1)} ${pv[1].toFixed(1)})`);
+    delta=Math.round((((rot0+d)%360+360)%360)/st)*st-rot0;const tf=`rotate(${delta.toFixed(2)} ${pv[0].toFixed(1)} ${pv[1].toFixed(1)})`;g.setAttribute('transform',tf);kg.forEach(k=>k.setAttribute('transform',tf));
     showToast(`${(((rot0+delta)%360)+360)%360}°`);};
   const onMove=ev=>{if(seq!==gestSeq)return;last=ev;if(!raf)raf=requestAnimationFrame(show);};
   const onUp=()=>{window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);window.removeEventListener('pointercancel',onUp);
-    if(raf)cancelAnimationFrame(raf);if(seq!==gestSeq)return;r.rot=(((rot0+delta)%360)+360)%360;justDragged=true;setTimeout(()=>justDragged=false,80);render();};
+    if(raf)cancelAnimationFrame(raf);if(seq!==gestSeq)return;if(r.on!=null)r.onR=(r.onR||0)+delta;r.rot=(((rot0+delta)%360)+360)%360;justDragged=true;setTimeout(()=>justDragged=false,80);render();};
   window.addEventListener('pointermove',onMove);window.addEventListener('pointerup',onUp);window.addEventListener('pointercancel',onUp);}
 let toastT=0;function showToast(t){const el=document.getElementById('hint');el.textContent=t;el.style.display='block';clearTimeout(toastT);
   toastT=setTimeout(()=>{el.style.display=state.pieces.length?'none':'block';el.textContent=HINT0;},700);}
@@ -2782,12 +2830,14 @@ function tarpDown(e){if(e.button!==undefined&&e.button!==0)return;
 function onWheel(e){e.preventDefault();const r=document.getElementById('svgHost').getBoundingClientRect();zoomAt(e.deltaY<0?1.12:1/1.12,e.clientX-r.left,e.clientY-r.top);render();}
 function startDrag(e,rootUid){if(e.button!==undefined&&e.button!==0)return;
   const seq=gestSeq;drag={rootUid,sx:e.clientX,sy:e.clientY,moved:false};const g=document.getElementById('isl-'+rootUid);let raf=0,lx=0,ly=0;
+  const kg=stackKids(rootUid).map(p=>document.getElementById('isl-'+p.uid)).filter(Boolean);
   const onMove=ev=>{if(seq!==gestSeq||!drag)return;const dx=ev.clientX-drag.sx,dy=ev.clientY-drag.sy;if(!drag.moved&&Math.hypot(dx,dy)<5)return;drag.moved=true;g.classList.add('drag');
-    lx=dx;ly=dy;if(!raf)raf=requestAnimationFrame(()=>{raf=0;g.setAttribute('transform',`translate(${(lx/SCALE).toFixed(2)} ${(ly/SCALE).toFixed(2)})`);});};
+    lx=dx;ly=dy;if(!raf)raf=requestAnimationFrame(()=>{raf=0;const t=`translate(${(lx/SCALE).toFixed(2)} ${(ly/SCALE).toFixed(2)})`;g.setAttribute('transform',t);kg.forEach(k=>k.setAttribute('transform',t));});};
   const onUp=ev=>{window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);if(raf)cancelAnimationFrame(raf);
     if(seq!==gestSeq){drag=null;return;}
     if(!drag)return;
     if(drag.moved){const r=byId(drag.rootUid);r.ox=snap((r.ox||0)+(ev.clientX-drag.sx)/SCALE);r.oy=snap((r.oy||0)+(ev.clientY-drag.sy)/SCALE);sel=drag.rootUid;
+      if(CATALOG[r.type].kind==='gear'){r.floor=false;stackAfterMove(r);}
       justDragged=true;setTimeout(()=>justDragged=false,80);render();}
     else if(sel!==drag.rootUid){sel=drag.rootUid;justDragged=true;setTimeout(()=>justDragged=false,80);render();}
     drag=null;};
@@ -2814,7 +2864,7 @@ function addMain(type){const T=TENTS[tent.id],c=centroid(CATALOG[type].verts),n=
   let L=T.outer?T.living:(tarp.id?[tarp.x,tarp.y]:[0,0]);const [hw,hh]=hostSize(),vc=[viewX+hw/SCALE/2,viewY+hh/SCALE/2];
   if(L[0]<viewX||L[0]>viewX+hw/SCALE||L[1]<viewY||L[1]>viewY+hh/SCALE)L=vc;
   const p=newPiece(type,{ox:L[0]-c[0]+n*220,oy:L[1]-c[1]+n*220,rot:0,z:++Z_TOP});if(CATALOG[type].kind!=='gear')p.leg=660;state.pieces.push(p);sel=p.uid;closeModal();render();zoomToRoot(p.uid,true);}
-function onRotate(uid,deg){const r=byId(uid);r.rot=((r.rot||0)+deg+360)%360;render();}
+function onRotate(uid,deg){const r=byId(uid);if(r.on!=null)r.onR=(r.onR||0)+deg;r.rot=((r.rot||0)+deg+360)%360;render();}
 function onZ(uid){byId(uid).z=++Z_TOP;render();}
 function onSlide(e,uid,dir){e.stopPropagation();if(justDragged)return;const p=byId(uid),mx=slideMax(p);p.slide=Math.max(-mx,Math.min(mx,(p.slide||0)+dir*25));render();}
 function onAdd(e,uid,edge){e.stopPropagation();if(justDragged)return;openAdd(uid,edge);}
@@ -2974,6 +3024,8 @@ function renderTentSpec(){const T=TENTS[tent.id],inner=tentInner();
     <dt>출처</dt><dd><a href="${T.href||SRC+T.src}" target="_blank" rel="noopener">${T.srcName||'판매처 상품 상세'}</a></dd>
     ${T.est?`<dt></dt><dd class="muted" style="text-align:left;margin-top:4px">${T.est}</dd>`:''}`;}
 function setLeg(uid,v){byId(uid).leg=v;render();}
+function stackBtn(r,cls){const c=CATALOG[r.type];if(!STACK_TOP(c))return '';if(r.on!=null)return `<button class="${cls}" onclick="stackDown(${r.uid})">⬇ 내리기</button>`;
+  return stackBaseAt(r)?`<button class="${cls}" onclick="stackUp(${r.uid})">⬆ 올리기</button>`:'';}
 function renderSel(){const el=document.getElementById('selPanel');
   if(sel==='tarp'&&TARPS[tarp.id]){const t=TARPS[tarp.id];
     el.innerHTML=`<div class="selbox"><h3>${t.name}</h3><p>타프를 끌어서 옮기고, 아래 버튼으로 돌려요. 방향 ${Math.round(tarp.rot)}°.</p>
@@ -2986,7 +3038,7 @@ function renderSel(){const el=document.getElementById('selPanel');
   if(c.kind==='gear'){el.innerHTML=`<div class="selbox"><h3>${c.name}${badge(c.conf)}</h3><p>${c.model}, ${c.spec}. ${c.note}${c.heat?'. '+HEAT_NOTE:''}</p>
     <div class="btnrow"><button class="btn small" onclick="onRotate(${r.uid},-15)">⟲ 15°</button><button class="btn small" onclick="onRotate(${r.uid},15)">⟳ 15°</button>
     <button class="btn small" onclick="onRotate(${r.uid},90)">90° 돌리기</button><button class="btn small" onclick="onZ(${r.uid})">맨 위로</button>
-    <button class="btn small danger" onclick="killSet(${r.uid});render()">빼기</button></div>${gLink(c)?`<p class="muted" style="margin-top:8px"><a href="${gLink(c)}" target="_blank" rel="noopener">${gLinkName(c)}</a></p>`:''}</div>`;return;}
+    ${stackBtn(r,'btn small')}<button class="btn small danger" onclick="killSet(${r.uid});render()">빼기</button></div>${gLink(c)?`<p class="muted" style="margin-top:8px"><a href="${gLink(c)}" target="_blank" rel="noopener">${gLinkName(c)}</a></p>`:''}</div>`;return;}
   el.innerHTML=`<div class="selbox"><h3>${c.name} 세트</h3><p>조각 ${isl.length}개, 바닥 ${Math.round(r._foot[0]/10)}×${Math.round(r._foot[1]/10)}cm. 변의 동그라미를 눌러 이어 붙여요.${HALF*SCALE<22&&isl.some(p=>CATALOG[p.type].kind==='frame')?' 프레임 칸에 상판을 넣으려면 확대하세요.':''}</p>
     <div class="btnrow"><button class="btn small" onclick="onRotate(${r.uid},-15)">⟲ 15°</button><button class="btn small" onclick="onRotate(${r.uid},15)">⟳ 15°</button>
     <button class="btn small" onclick="onRotate(${r.uid},90)">90° 돌리기</button><button class="btn small" onclick="onZ(${r.uid})">맨 위로</button>
@@ -3274,13 +3326,14 @@ function legPoints(p){const c=CATALOG[p.type],vs=c.verts,ce=centroid(vs),n=p.par
   for(const q of cand){if(pick.length>=n)break;if(pick.every(o=>dist(o,q.v)>span*.55))pick.push(q.v);}
   return pick.map(v=>{const d=dist(v,ce),k=Math.min(1,45/(d||1));return applyT(p._T,[v[0]+(ce[0]-v[0])*k,v[1]+(ce[1]-v[1])*k]);});}
 function igt3(THREE){
-  const grp=new THREE.Group(),SM=o=>new THREE.MeshStandardMaterial(o);
+  const GRP=new THREE.Group(),SM=o=>new THREE.MeshStandardMaterial(o);
   const M={alu:SM({color:'#C9CDD0',metalness:.55,roughness:.38}),dark:SM({color:'#2B2E31',metalness:.3,roughness:.6}),cap:SM({color:'#26292B',roughness:.7}),
     bamboo:SM({color:'#C99A5B',roughness:.72}),steel:SM({color:'#C3C7CA',metalness:.6,roughness:.33}),mesh:SM({color:'#9EA3A7',metalness:.5,roughness:.5,transparent:true,opacity:.55}),
     burner:SM({color:'#55595D',metalness:.4,roughness:.5}),grill:SM({color:'#3E3B38',roughness:.8}),leg:SM({color:'#B7BBBE',metalness:.6,roughness:.33}),
     cont:SM({color:'#6B6E68',metalness:.35,roughness:.55}),cont2:SM({color:'#5A5D57',metalness:.35,roughness:.55}),stove:SM({color:'#3B3F3A',metalness:.3,roughness:.55}),
     glow:SM({color:'#E07A3A',emissive:'#C8501E',emissiveIntensity:.9,roughness:.4}),fan:SM({color:'#2E3134',roughness:.5}),grillF:SM({color:'#8A8F94',metalness:.5,roughness:.4})};
   state.pieces.forEach(p=>{const c=CATALOG[p.type],Hh=rootOf(p).leg||660,X=v=>applyT(p._T,v);
+    const grp=p._z?(()=>{const g=new THREE.Group();g.position.y=mm(p._z);GRP.add(g);return g;})():GRP;
     if(c.kind==='frame'){const w=frameW(c.units);
       const outer=[[0,0],[w,0],[w,D],[0,D]].map(X),hole=[[END,RAIL],[w-END,RAIL],[w-END,D-RAIL],[END,D-RAIL]].map(X);
       grp.add(extrudePoly(THREE,outer,Hh-30,Hh,c.style==='classic'?M.alu:M.dark,[hole]));
@@ -3332,7 +3385,7 @@ function igt3(THREE){
     else{const top=c.kind==='tray'?Hh-30:Hh;grp.add(extrudePoly(THREE,c.verts.map(X),top-25,top,M.bamboo));
       if(c.kind==='ext')legPoints(p).forEach(q=>grp.add(cyl(THREE,q,0,top-25,13,M.leg)));}
   });
-  return grp;}
+  return GRP;}
 
 /* =====================================================================
    13. SAVE & SHARE — codes, my layouts (db or this browser), gallery (db), files
@@ -3347,7 +3400,7 @@ function planObj(){return {v:1,
   tarp:tarp.id?{id:tarp.id,x:Math.round(tarp.x),y:Math.round(tarp.y),r:Math.round(tarp.rot)}:null,
   pieces:state.pieces.map(p=>{const o={u:p.uid,t:p.type};
     if(p.parent!=null){o.p=p.parent;o.pe=p.pEdge;o.me=p.mEdge;if(p.slide)o.s=Math.round(p.slide);}
-    else{o.x=Math.round(p.ox||0);o.y=Math.round(p.oy||0);if(p.rot)o.r=p.rot;o.z=p.z||0;if(p.leg&&p.leg!==660)o.l=p.leg;}
+    else{o.x=Math.round(p.ox||0);o.y=Math.round(p.oy||0);if(p.rot)o.r=p.rot;o.z=p.z||0;if(p.leg&&p.leg!==660)o.l=p.leg;if(p.on!=null){o.on=p.on;o.oc=(p.onC||[0,0]).map(v=>Math.round(v));o.or=Math.round(p.onR||0);}if(p.floor)o.fl=1;}
     if(p.slots){const h=[];p.slots.forEach((s,i)=>{if(s&&s.head)h.push([i,s.id]);});if(h.length)o.sl=h;}
     if(p.rack)o.rk=[p.rack.id,p.rack.pos||0];return o;})};}
 const num=(v,lo,hi,d)=>{v=Number(v);return Number.isFinite(v)?Math.max(lo,Math.min(hi,v)):d;};
@@ -3361,7 +3414,8 @@ function parsePlan(o){
   o.pieces.slice(0,200).forEach(q=>{if(!q||!CATALOG[q.t]||!Number.isInteger(q.u)||q.u<1||seen.has(q.u))return;seen.add(q.u);
     const c=CATALOG[q.t],p={uid:q.u,type:q.t,parent:null,pEdge:null,mEdge:null};
     if(q.p!=null){if(!Number.isInteger(q.p))return;p.parent=q.p;p.pEdge=String(q.pe);p.mEdge=String(q.me);if(q.s)p.slide=num(q.s,-5000,5000,0);}
-    else{p.ox=num(q.x,-1e5,1e5,0);p.oy=num(q.y,-1e5,1e5,0);p.rot=num(q.r,-360,360,0);p.z=num(q.z,-1e6,1e6,0);p.leg=[300,400,660,830].includes(q.l)?q.l:660;}
+    else{p.ox=num(q.x,-1e5,1e5,0);p.oy=num(q.y,-1e5,1e5,0);p.rot=num(q.r,-360,360,0);p.z=num(q.z,-1e6,1e6,0);p.leg=[300,400,660,830].includes(q.l)?q.l:660;
+      if(Number.isInteger(q.on)&&q.on!==q.u&&Array.isArray(q.oc)){p.on=q.on;p.onC=[num(q.oc[0],-2e4,2e4,0),num(q.oc[1],-2e4,2e4,0)];p.onR=num(q.or,-720,720,0);}if(q.fl)p.floor=true;}
     if(c.kind==='frame'){const H=c.units*2;p.slots=Array(H).fill(null);
       (Array.isArray(q.sl)?q.sl:[]).forEach(a=>{if(!Array.isArray(a))return;const i=a[0],it=getItem(a[1]);if(!it||!Number.isInteger(i)||i<0||i+it.halves>H)return;
         for(let k=i;k<i+it.halves;k++)if(p.slots[k])return;for(let k=0;k<it.halves;k++)p.slots[i+k]={id:it.id,head:k===0};});

@@ -258,9 +258,9 @@ function trackPointer(e,onMove,onEnd){const id=e.pointerId,seq=gestSeq;let done=
 const multiTouch=e=>e.pointerType!=='mouse'&&PT.size>1;
 function toWorld(ev){const r=document.getElementById('svgHost').getBoundingClientRect();return [viewX+(ev.clientX-r.left)/SCALE,viewY+(ev.clientY-r.top)/SCALE];}
 function nearPiece(e){const w=toWorld(e),tol=TOUCH_TOL/SCALE;let best=null,bd=Infinity;
-  state.pieces.forEach(p=>{if(!p._v)return;let d=pointInPoly(w,p._v)?0:Infinity;
+  let bz=-1;state.pieces.forEach(p=>{if(!p._v)return;let d=pointInPoly(w,p._v)?0:Infinity;
     if(d)for(let k=0;k<p._v.length;k++)d=Math.min(d,segDist(w,p._v[k],p._v[(k+1)%p._v.length]));
-    if(d<bd){bd=d;best=rootOf(p).uid;}});
+    if(d<bd||(d===bd&&(p._z||0)>bz)){bd=d;bz=p._z||0;best=rootOf(p).uid;}});
   return bd<=tol?best:null;}
 startPan=function(e,onClick){if(e.button>0||multiTouch(e))return;
   if(e.pointerType!=='mouse'&&!onClick){const hit=nearPiece(e);if(hit!=null){startDrag(e,hit);return;}}
@@ -270,11 +270,13 @@ startPan=function(e,onClick){if(e.button>0||multiTouch(e))return;
       if(moved){justDragged=true;setTimeout(()=>justDragged=false,80);render();}else if(onClick)onClick();else if(sel!=null){sel=null;render();}});};
 startDrag=function(e,rootUid){if(e.button>0||multiTouch(e))return;e.stopPropagation();
   drag={rootUid,sx:e.clientX,sy:e.clientY,moved:false};const g=document.getElementById('isl-'+rootUid);let raf=0,lx=0,ly=0;
+  const kg=stackKids(rootUid).map(p=>document.getElementById('isl-'+p.uid)).filter(Boolean);
   trackPointer(e,ev=>{if(!drag)return;const dx=ev.clientX-drag.sx,dy=ev.clientY-drag.sy;if(!drag.moved&&Math.hypot(dx,dy)<6)return;drag.moved=true;g&&g.classList.add('drag');
-      lx=dx;ly=dy;if(!raf)raf=requestAnimationFrame(()=>{raf=0;g&&g.setAttribute('transform',`translate(${(lx/SCALE).toFixed(2)} ${(ly/SCALE).toFixed(2)})`);});},
+      lx=dx;ly=dy;if(!raf)raf=requestAnimationFrame(()=>{raf=0;const t=`translate(${(lx/SCALE).toFixed(2)} ${(ly/SCALE).toFixed(2)})`;g&&g.setAttribute('transform',t);kg.forEach(k=>k.setAttribute('transform',t));});},
     (ev,cancel)=>{if(raf)cancelAnimationFrame(raf);const d=drag;drag=null;if(!d)return;
-      if(cancel){if(g){g.removeAttribute('transform');g.classList.remove('drag');}return;}
+      if(cancel){if(g){g.removeAttribute('transform');g.classList.remove('drag');}kg.forEach(k=>k.removeAttribute('transform'));return;}
       if(d.moved){const r=byId(d.rootUid);r.ox=snap((r.ox||0)+(ev.clientX-d.sx)/SCALE);r.oy=snap((r.oy||0)+(ev.clientY-d.sy)/SCALE);sel=d.rootUid;
+        if(CATALOG[r.type].kind==='gear'){r.floor=false;stackAfterMove(r);}
         justDragged=true;setTimeout(()=>justDragged=false,80);render();}
       else if(sel!==d.rootUid){sel=d.rootUid;justDragged=true;setTimeout(()=>justDragged=false,80);render();}});};
 tarpDown=function(e){if(e.button>0||multiTouch(e))return;
