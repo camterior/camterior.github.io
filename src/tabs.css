@@ -252,4 +252,15 @@
     .ghead::after{background:linear-gradient(90deg,rgba(8,12,9,.6),rgba(8,12,9,0) 45%)}
     .ghead .gtt h2{font-size:28px}
   }
+  .ss-mine{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:var(--paper-2,#F4F1EA)}
+  .ss-mine b{font-size:15px}
+  .ss-mine p{margin:4px 0 8px;font-size:13px;color:var(--ink-3)}
+  .ss-mine ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;max-height:200px;overflow:auto}
+  .ss-mine label{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
+  .ss-mine input{width:18px;height:18px;flex:none}
+  .ss-mine small{color:var(--ink-3)}
+  .ss-mine-b{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+  .ss-mine-ok{margin:0;font-size:14px;font-weight:700;color:#2E6B3F}
+  /* 사이트 버전: 예전 'Claude 함께 쓰기' 후기·모두의 배치 칸은 숨기고 새 후기 탭으로 */
+  body:not(:has([data-art])) #journal,body:not(:has([data-art])) #commons{display:none}
 </style>

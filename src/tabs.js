@@ -147,6 +147,27 @@ const _setStatus=setStatus;
 setStatus=function(...a){_setStatus(...a);const sh=document.getElementById('sheetSt'),st=document.getElementById('saveStatus');if(sh&&st)sh.innerHTML=st.innerHTML;};
 const _startFresh=startFresh;startFresh=async function(){await _startFresh();closeSave();};
 const _loadPlanCode2=loadPlanCode;loadPlanCode=async function(...a){const ok=await _loadPlanCode2(...a);if(ok)closeSave();return ok;};
+/* 저장하면: 이 배치 장비 중 내 장비에 아직 없는 것만 골라 추가할지 묻기 */
+function planGearKeys(){if(typeof mineAll!=='function')return [];const all=mineAll(),cnt=new Map(),put=k=>{if(all.some(x=>x.key===k))cnt.set(k,(cnt.get(k)||0)+1);};
+  const T=TENTS[tent.id];if(T&&T.outer)put('tent:'+tent.id);
+  if(typeof tent.inner==='string'&&tent.inner.startsWith('p:'))put('inner:'+tent.inner.slice(2));
+  if(tarp.id)put('tarp:'+tarp.id);
+  state.pieces.forEach(p=>{const it=all.find(x=>x.id===p.type&&!['tent','tarp','inner','parts'].includes(x.k));if(it)put(it.key);
+    (p.slots||[]).forEach(s=>{if(s&&s.head)put('parts:'+s.id);});});
+  return [...cnt].filter(([k])=>!MYG[k]).map(([k,n])=>({...mineByKey(k),count:n}));}
+function ssMineOffer(){const box=document.getElementById('ssMine');if(!box)return;const list=planGearKeys();
+  if(!list.length){box.hidden=true;box.innerHTML='';return;}
+  box.hidden=false;box.innerHTML=`<div class="ss-mine"><b>내 장비에도 넣을까요?</b><p>이 배치에서 내 장비에 아직 없는 ${list.length}가지예요. 빼고 싶은 건 체크를 풀어 주세요.</p>
+    <ul>${list.map((x,i)=>`<li><label><input type="checkbox" checked data-i="${i}"> ${esc(x.name)}${x.count>1?` <small>${x.count}개</small>`:''}</label></li>`).join('')}</ul>
+    <div class="ss-mine-b"><button type="button" class="btn small" onclick="ssMineSkip()">괜찮아요</button><button type="button" class="btn primary small" onclick="ssMineTake()">내 장비에 추가</button></div></div>`;
+  box._list=list;setTimeout(()=>box.scrollIntoView({block:'end',behavior:'smooth'}),80);}
+function ssMineTake(){const box=document.getElementById('ssMine'),l=box._list||[];let n=0;
+  box.querySelectorAll('input[type=checkbox]').forEach(c=>{if(!c.checked)return;const x=l[+c.dataset.i];MYG[x.key]=Math.max(MYG[x.key]||0,x.count);n++;});
+  if(n){mineSave();if(typeof mineRender==='function')mineRender();if(document.getElementById('minePick')&&typeof minePickUI==='function')minePickUI();}
+  box.innerHTML=`<p class="ss-mine-ok">${n?`내 장비에 ${n}가지 넣었어요.`:'추가하지 않았어요.'}</p>`;}
+function ssMineSkip(){const b=document.getElementById('ssMine');b.hidden=true;b.innerHTML='';}
+const _saveMine=saveMine;saveMine=async function(...a){await _saveMine(...a);if(!IN_CLAUDE)ssMineOffer();};
+const _openSave=openSave;openSave=function(){_openSave();ssMineSkip();};
 const _renderMine=renderMine;renderMine=function(){_renderMine();const e=document.querySelector('#myList .empty');if(e)e.textContent='아직 없어요. 위의 저장하기를 눌러보세요.';};
 
 /* 텐트 브랜드 정리: 스노우피크 먼저, 나머지는 텐트 많은 순. 3종 이하 브랜드는 '그 외 브랜드' 하나로 묶음 */
