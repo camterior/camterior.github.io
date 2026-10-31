@@ -727,7 +727,7 @@
       <div class="t" id="stageTitle">랜드록</div>
       <div class="acts">
         <div class="ur" role="group" aria-label="실행 취소"><button type="button" id="undoB" onclick="undo()" aria-label="되돌리기" title="되돌리기 (⌘Z / Ctrl+Z)" disabled>↶</button><button type="button" id="redoB" onclick="redo()" aria-label="다시 하기" title="다시 하기 (⇧⌘Z / Ctrl+Y)" disabled>↷</button></div>
-        <button type="button" class="savepill" onclick="openSave()">💾 저장</button>
+        <button type="button" class="savepill" onclick="openSave()">💾 저장</button><button type="button" class="savepill" onclick="openLoad()">📂 불러오기</button>
         <div class="mode" role="group" aria-label="보기 방식"><button type="button" aria-pressed="true">평면</button><button type="button" aria-pressed="false" onclick="open3D()">입체</button></div>
         <div class="zoom">
           <button onclick="zoomBy(1/1.25)" aria-label="축소">−</button>
@@ -825,6 +825,20 @@
   <div class="v3hint">끌어서 돌리기, 휠이나 두 손가락으로 확대, 오른쪽 버튼으로 이동</div>
 </div>
 
+<div class="scrim sheetwrap" id="loadSheet" onclick="if(event.target===this)closeLoad()">
+  <div class="modal savesheet" role="dialog" aria-modal="true" aria-labelledby="lsTitle">
+    <div class="mh"><span class="t" id="lsTitle">내 세팅 불러오기</span><button class="x" aria-label="닫기" onclick="closeLoad()">×</button></div>
+    <div class="ss-in">
+      <p class="muted" id="loadWhere" style="margin:0"></p>
+      <ul class="plist" id="loadList" aria-label="저장한 세팅"></ul>
+      <div class="ss-grid" role="group" aria-label="다른 곳에서 불러오기">
+        <button type="button" onclick="closeLoad();openSave();toggleImport()"><i>📥</i>코드로 열기</button>
+        <label for="importFile" onclick="closeLoad()"><i>📂</i>파일 열기</label>
+        <button type="button" id="lsReview" onclick="closeLoad();go('review')"><i>🏕️</i>후기에서 찾기</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="scrim sheetwrap" id="saveSheet" onclick="if(event.target===this)closeSave()">
   <div class="modal savesheet" role="dialog" aria-modal="true" aria-labelledby="ssTitle">
     <div class="mh"><span class="t" id="ssTitle">저장하기</span><button class="x" aria-label="닫기" onclick="closeSave()">×</button></div>
@@ -3317,11 +3331,19 @@ async function delMine(id,btn){if(btn.dataset.armed!=='1'){btn.dataset.armed='1'
   if(mineInDb){try{await DB.collection('data/users/'+UID).doc(id).delete();setStatus('지웠어요.');}catch(e){setStatus('지우지 못했어요. 잠시 뒤 다시 해주세요.');}return;}
   LS.set('campPlanner.saved',JSON.stringify(localSaved().filter(r=>r.id!==id)));renderMine();setStatus('지웠어요.');}
 function openMine(id){const r=mineRows().find(x=>x.id===id);if(r)loadPlanCode(r.code,`'${r.name}'`);}
+function openLoad(){renderLoad();const rb=document.getElementById('lsReview');if(rb)rb.hidden=!document.getElementById('bd-review');document.getElementById('loadSheet').classList.add('open');}
+function closeLoad(){document.getElementById('loadSheet')?.classList.remove('open');}
+function renderLoad(){const el=document.getElementById('loadList');if(!el)return;const rows=mineRows();
+  document.getElementById('loadWhere').textContent=rows.length?`저장한 세팅 ${rows.length}개 · ${mineInDb?'내 계정':'이 기기(브라우저)'}에 있어요. 눌러서 그대로 열어요.`:'';
+  el.innerHTML=rows.length?rows.map(r=>`<li><div class="pl-t"><b>${esc(r.name)}</b><span>${esc(r.summary)} · ${new Date(r.savedAt).toLocaleDateString('ko-KR',{month:'short',day:'numeric'})}</span></div>
+    <div class="pl-a"><button class="btn small primary" onclick="closeLoad();openMine('${esc(r.id)}')">열기</button><button class="btn small danger" onclick="delMine('${esc(r.id)}',this)">지우기</button></div></li>`).join('')
+    :`<li class="empty">아직 저장한 세팅이 없어요. 💾 저장을 누르면 여기에 모여서, 다음에 그대로 불러올 수 있어요.</li>`;}
+addEventListener('keydown',e=>{if(e.key==='Escape')closeLoad();});
 function renderMine(){const el=document.getElementById('myList'),rows=mineRows();
   document.getElementById('saveWhere').textContent=mineInDb?'내 계정에 저장돼서 다른 기기에서도 열려요. 나만 볼 수 있어요.':'이 브라우저에 저장돼요. 다른 기기에서 열려면 공유 코드를 쓰세요.';
   el.innerHTML=rows.length?rows.map(r=>`<li><div class="pl-t"><b>${esc(r.name)}</b><span>${esc(r.summary)} · ${new Date(r.savedAt).toLocaleDateString('ko-KR',{month:'short',day:'numeric'})}</span></div>
     <div class="pl-a"><button class="btn small" onclick="openMine('${esc(r.id)}')">열기</button><button class="btn small danger" onclick="delMine('${esc(r.id)}',this)">지우기</button></div></li>`).join('')
-    :`<li class="empty">저장한 배치가 아직 없어요. 이름을 적고 저장을 눌러보세요.</li>`;}
+    :`<li class="empty">저장한 배치가 아직 없어요. 이름을 적고 저장을 눌러보세요.</li>`;if(document.getElementById('loadSheet')?.classList.contains('open'))renderLoad();}
 
 /* share code */
 async function copyCode(){const box=document.getElementById('codeOut');if(!CURRENT_CODE)CURRENT_CODE=await encodePlan(planObj());box.value=CURRENT_CODE;
