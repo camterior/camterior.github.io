@@ -1,22 +1,23 @@
 /* =====================================================================
    CAMTERIOR — app tabs, gear spec catalog, share links
    ===================================================================== */
-const VIEWS=['intro','plan','mine','gear','board','hub'];
+const VIEWS=['intro','plan','mine','gear','board','review','hub'];
 const LEGACY={top:'intro',features:'intro',how:'intro',lineup:'gear',journal:'hub',commons:'hub'};
 let CUR='intro',planFitted=false;
 const IN_CLAUDE=!!window.claude||!!document.querySelector('[data-art]');
 const appbar=document.getElementById('appbar');
 function updBar(){const h=document.getElementById('top');appbar.classList.toggle('solid',CUR!=='intro'||window.scrollY>(h?h.offsetHeight-80:0));}
 addEventListener('scroll',updBar,{passive:true});
-function go(v,opts){opts=opts||{};v=LEGACY[v]||v;if(!VIEWS.includes(v))v='intro';
+function go(v,opts){opts=opts||{};v=LEGACY[v]||v;if(/^review\//.test(v||''))v='review';if(!VIEWS.includes(v))v='intro';
   const changed=v!==CUR;CUR=v;document.body.dataset.view=v;
   VIEWS.forEach(k=>{document.getElementById('v-'+k).hidden=k!==v;});
   if(v==='board'&&typeof reqLoad==='function')reqLoad();
+  if(v==='review'&&typeof rvLoad==='function')rvLoad();
   if(v==='mine'&&typeof mineInit==='function')mineInit();
   if(v==='plan'&&typeof aiCheckLeft==='function'&&!go._left){go._left=1;aiCheckLeft();}
   if(v==='plan'&&typeof tourMaybe==='function')tourMaybe();
   document.querySelectorAll('[data-tab]').forEach(a=>{if(a.dataset.tab===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
-  if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v)history.pushState(null,'','#'+v);
+  if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v&&!(v==='review'&&location.hash.startsWith('#review/')))history.pushState(null,'','#'+v);
   if(changed&&!opts.keepScroll)window.scrollTo(0,0);
   if(v==='plan')requestAnimationFrame(()=>{if(!planFitted){fitView();planFitted=true;}render();});
   if(v==='gear')renderGear();

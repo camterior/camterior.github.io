@@ -63,7 +63,7 @@ META = '''<meta name="description" content="캠테리어(CAMTERIOR) — 텐트 �
 <link rel="icon" href="assets/icon-64.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://camterior.goatcounter.com; connect-src 'self' https://cdn.jsdelivr.net https://camterior-ai.ghdwnd2.workers.dev https://camterior.goatcounter.com; worker-src 'self'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://camterior.goatcounter.com https://camterior-ai.ghdwnd2.workers.dev; connect-src 'self' https://cdn.jsdelivr.net https://camterior-ai.ghdwnd2.workers.dev https://camterior.goatcounter.com; worker-src 'self'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="no-referrer">'''
 head = head.replace('<meta name="viewport" content="width=device-width, initial-scale=1">',
                     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' + META)
@@ -135,6 +135,7 @@ js = js.replace("모두의 배치는 공유된 페이지에서 로그인하면 �
 tail = (HERE / 'tabs.js').read_text(encoding='utf-8')
 tail += '\n' + (HERE / 'ai.js').read_text(encoding='utf-8')
 tail += '\n' + (HERE / 'mine.js').read_text(encoding='utf-8')
+tail += '\n' + (HERE / 'review.js').read_text(encoding='utf-8')
 js = js.replace('</script>\n</body>', '</script>\n<script>\n' + tail + '\n</script>\n</body>')
 assert '<script>\n' + tail in js, 'tail not injected'
 

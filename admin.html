@@ -163,6 +163,11 @@ label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:cen
           <h3 class="rq-h">개발 요청</h3><ul class="list rq" id="rqAdm-dev"></ul>
         </div>
       </section>
+      <section class="cam" id="rvAdm">
+        <h2>캠핑 후기 관리 <small>신고 3번이면 자동 숨김 · 위 관리 키로 열려요</small></h2>
+        <p class="rq-hint" id="rvMsg">관리 키를 넣으면 보여요.</p>
+        <ul class="list rq" id="rvAdmList"></ul>
+      </section>
 
       <div class="two">
         <section class="cam"><h2>많이 고른 텐트</h2><ul class="list" id="tents"><li class="empty">불러오는 중…</li></ul></section>
@@ -395,6 +400,19 @@ setPeriod(period); view();
   $i('reqAdm').addEventListener('keydown',function(e){var t=e.target;if(e.key==='Enter'&&t.dataset&&t.dataset.rp){e.preventDefault();run({op:'admin',id:t.dataset.rp,reply:t.value});}});
   $i('reqAdm').addEventListener('click',function(e){var t=e.target;if(t.dataset&&t.dataset.del){if(confirm('이 공지를 지울까요?'))run({op:'notice',act:'del',id:t.dataset.del});}else if(t.dataset&&t.dataset.pin)run({op:'notice',act:'pin',id:t.dataset.pin});});
   if(k())run({op:'admin'});
+})();
+/* 캠핑 후기 관리 */
+(function(){function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  var W='https://camterior-ai.ghdwnd2.workers.dev';function $i(id){return document.getElementById(id)}
+  function k(){try{return localStorage.getItem('camRqKey')||''}catch(e){return ''}}
+  function call(v){v.key=k();return fetch(W,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({review:v})}).then(function(r){return r.json().then(function(d){return r.ok?d:{fail:d.error||r.status}})}).catch(function(){return {fail:'net'}})}
+  function load(){if(!k())return;call({op:'list'}).then(function(d){if(d.fail){$i('rvMsg').textContent=d.fail==='off'?'워커에 후기 기능이 아직 없어요 (워커 배포 필요).':'후기를 불러오지 못했어요 ('+d.fail+').';return;}
+    var L=d.items||[],hid=L.filter(function(r){return r.hide}).length;$i('rvMsg').textContent='후기 '+(d.total||L.length)+'개 · 숨김 '+hid+'개';
+    $i('rvAdmList').innerHTML=L.length?L.map(function(r){return '<li><span class="nm">'+(r.hide?'🙈 ':'')+'<b><a href="./#review/'+esc(r.id)+'" target="_blank" rel="noopener">'+esc(r.title)+'</a></b><small>'+esc(r.nick)+' · '+new Date(r.at).toLocaleDateString('ko-KR')+' · ♥'+r.likes+' · 💬'+r.nc+(r.rep?' · 신고 '+r.rep:'')+'</small></span><button class="x" data-rvh="'+esc(r.id)+'" data-v="'+(r.hide?'0':'1')+'">'+(r.hide?'다시 보이기':'숨기기')+'</button><button class="x" data-rvd="'+esc(r.id)+'">지우기</button></li>'}).join(''):'<li class="empty">아직 후기가 없어요</li>';});}
+  $i('rvAdm').addEventListener('click',function(e){var t=e.target;
+    if(t.dataset&&t.dataset.rvh)call({op:'hide',id:t.dataset.rvh,hide:t.dataset.v==='1'}).then(load);
+    else if(t.dataset&&t.dataset.rvd){if(confirm('이 후기를 지울까요? 사진과 댓글도 같이 지워져요.'))call({op:'del',id:t.dataset.rvd}).then(load);}});
+  $i('rqKeyForm').addEventListener('submit',function(){setTimeout(load,300)});load();
 })();
 </script>
 </body>

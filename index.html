@@ -20,7 +20,7 @@
 <link rel="icon" href="assets/icon-64.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://camterior.goatcounter.com; connect-src 'self' https://cdn.jsdelivr.net https://camterior-ai.ghdwnd2.workers.dev https://camterior.goatcounter.com; worker-src 'self'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://camterior.goatcounter.com https://camterior-ai.ghdwnd2.workers.dev; connect-src 'self' https://cdn.jsdelivr.net https://camterior-ai.ghdwnd2.workers.dev https://camterior.goatcounter.com; worker-src 'self'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <title>캠테리어 · 캠핑 인테리어 플래너</title>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -667,8 +667,8 @@
   .tabbar{display:none}
   @media (max-width:860px){
     .appbar .nav,.appbar .pill{display:none}
-    .tabbar{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:rgba(255,255,255,.94);backdrop-filter:saturate(160%) blur(16px);-webkit-backdrop-filter:saturate(160%) blur(16px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
-    .tabbar a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;color:var(--ink-3);text-decoration:none;font-size:11.5px;font-weight:700;border-radius:12px;min-height:48px}
+    .tabbar{display:grid;grid-template-columns:repeat(7,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:rgba(255,255,255,.94);backdrop-filter:saturate(160%) blur(16px);-webkit-backdrop-filter:saturate(160%) blur(16px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+    .tabbar a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;color:var(--ink-3);text-decoration:none;font-size:11px;letter-spacing:-.02em;white-space:nowrap;font-weight:700;border-radius:12px;min-height:48px}
     .tabbar svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
     .tabbar a[aria-current="page"]{color:var(--accent)}
     body{padding-bottom:calc(68px + env(safe-area-inset-bottom,0px))}
@@ -883,6 +883,22 @@
   @media (max-width:640px){.instacard{flex-wrap:wrap;padding:20px;margin-top:-40px}.instacard .ic-ico{width:52px;height:52px}.instacard .go{width:100%;text-align:center}}
   .foot-ig{display:inline-flex;align-items:center;gap:5px;color:inherit;font-weight:700;text-decoration:none;border-bottom:1px solid currentColor}
   .foot-ig .ig{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2}
+
+  /* PC: 머리 사진·분류 사진을 통째로 잘라 쓰지 않고 액자처럼 오른쪽에 (넓은 화면에서 사진이 너무 확대돼 알아볼 수 없던 문제) */
+  @media (min-width:900px){
+    .vhero{min-height:300px;align-items:center}
+    .vhero>img{inset:auto;top:50%;right:max(32px,calc(50% - 512px));width:auto;height:236px;aspect-ratio:4/3;transform:translateY(-50%);border-radius:20px;opacity:1;animation:none;object-fit:cover;box-shadow:0 18px 44px rgba(0,0,0,.4)}
+    .vhero::after{display:none}
+    .vh-in{padding-block:44px}
+    .vh-in h1,.vh-in p,.vh-in .eyebrow{max-width:calc(100% - 400px)}
+    .ghead{height:auto;background:var(--night);display:grid;grid-template-columns:minmax(0,1fr) 240px;align-items:end}
+    .ghead img{position:static;width:240px;height:180px;object-fit:cover;grid-column:2;grid-row:1}
+    .ghead::after{display:none}
+    .ghead .gtt{position:static;grid-column:1;grid-row:1;padding:0 0 20px 24px}
+    .ghead .gtt h2{font-size:28px}
+  }
+  /* 사이트 버전: 예전 'Claude 함께 쓰기' 후기·모두의 배치 칸은 숨기고 새 후기 탭으로 */
+  body:not(:has([data-art])) #journal,body:not(:has([data-art])) #commons{display:none}
 </style>
 
 <style>
@@ -1039,6 +1055,71 @@
 .tour-next{background:#16190f;color:#fff}
 .tour-again{border:0;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline;cursor:pointer}
 @media (prefers-reduced-motion:reduce){.tour-hole,.tour-card{transition:none}}
+.rvwrap{padding-top:22px;padding-bottom:40px}
+.rv-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.rv-head p{margin:0;color:#5b615b;font-size:14px}
+.rv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:14px}
+.rv-card{display:flex;flex-direction:column;text-align:left;border:1px solid #e6e8e3;background:#fff;border-radius:16px;overflow:hidden;padding:0;font:inherit;color:inherit;cursor:pointer;min-width:0}
+.rv-ph{position:relative;aspect-ratio:4/3;background:#EEF0EC;display:block}
+.rv-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.rv-badge{position:absolute;left:10px;top:10px;background:rgba(12,24,19,.82);color:#fff;font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px}
+.rv-b{display:flex;flex-direction:column;gap:3px;padding:12px 14px 14px;min-width:0}
+.rv-b b{font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-b small{color:#6a706a;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-meta{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12.5px;color:#7a807a;margin-top:4px}
+.rv-st{color:#FF5A1F;letter-spacing:1px}
+.rv-empty{grid-column:1/-1;text-align:center;color:#6a706a;padding:40px 0}
+.rv-more{grid-column:1/-1;justify-self:center;border:1px solid #d9dcd5;background:#fff;border-radius:999px;padding:10px 22px;font:inherit;font-weight:700;cursor:pointer}
+.rv-dlg{border:0;border-radius:20px;padding:0;width:min(94vw,640px);max-width:calc(100vw - 20px);max-height:calc(100dvh - 40px);color:#16190f;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.rv-dlg::backdrop{background:rgba(14,16,12,.5)}
+.rv-in{padding:16px 18px 20px;display:flex;flex-direction:column;gap:10px}
+.rv-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.rv-top h2{margin:0;font-size:20px}
+.rv-x{margin-left:auto;border:0;background:#EEF0EC;border-radius:50%;width:36px;height:36px;font-size:22px;line-height:1;cursor:pointer}
+.rv-pics{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -18px;padding:0 18px}
+.rv-pics figure{margin:0;flex:0 0 86%;scroll-snap-align:start}
+.rv-pics img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px;background:#EEF0EC;display:block}
+.rv-pics figcaption{font-size:12.5px;color:#6a706a;margin-top:4px}
+.rv-in h2#rvT{margin:4px 0 0;font-size:21px}
+.rv-sub,.rv-by{margin:0;font-size:14px;color:#5b615b}
+.rv-gear{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0}
+.rv-gear span{background:#EEF0EC;border-radius:999px;padding:4px 10px;font-size:12.5px}
+.rv-sec h4{margin:4px 0 2px;font-size:14px;color:#3c423c}
+.rv-sec p{margin:0;font-size:15px;line-height:1.55;white-space:pre-wrap}
+.rv-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px}
+.rv-acts button{min-height:42px}
+.rv-like,.rv-link,.rv-rep,.rv-del{border:1px solid #d9dcd5;background:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer}
+.rv-like.on{border-color:#FF5A1F;color:#FF5A1F}
+.rv-rep,.rv-del{margin-left:auto;color:#7a807a}
+.rv-cm{border-top:1px solid #eceee9;margin-top:8px;padding-top:10px}
+.rv-cm h3{margin:0 0 8px;font-size:16px}.rv-cm h3 small{color:#7a807a;font-weight:600}
+.rv-cm ul{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:8px}
+.rv-cm li{display:flex;flex-wrap:wrap;gap:2px 8px;font-size:14px;line-height:1.5;background:#F6F7F4;border-radius:12px;padding:8px 12px}
+.rv-cm li span{flex:1 1 100%;white-space:pre-wrap}.rv-cm li small{color:#8a908a;font-size:12px}
+.rv-cm li.rv-none{color:#7a807a;background:none;padding:0}
+.rv-cm form{display:grid;grid-template-columns:minmax(0,110px) minmax(0,1fr) auto;gap:6px}
+.rv-cm input,.rv-form input,.rv-form textarea{font:inherit;font-size:15px;border:1px solid #d9dcd5;border-radius:10px;padding:10px 12px;min-width:0;width:100%;box-sizing:border-box;background:#fff}
+.rv-msg{margin:0;font-size:13.5px;color:#8E2F38;min-height:1em}
+.rv-form label{display:flex;flex-direction:column;gap:4px;font-size:13.5px;font-weight:700;color:#3c423c;min-width:0}
+.rv-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.rv-rate{border:0;margin:0;padding:0;display:flex;align-items:flex-end;gap:2px;min-width:0}
+.rv-rate legend{font-size:13.5px;font-weight:700;color:#3c423c;padding:0;margin-bottom:4px}
+.rv-rate label{flex-direction:row}.rv-rate input{position:absolute;opacity:0;width:1px;height:1px}
+.rv-rate span{font-size:28px;color:#d6d9d2;cursor:pointer;line-height:1.2}
+.rv-rate:has(input:checked) span{color:#FF5A1F}.rv-rate label:has(input:checked)~label span{color:#d6d9d2}
+.rv-form .rv-chk{flex-direction:row;align-items:flex-start;gap:10px;background:#F6F7F4;border-radius:12px;padding:12px;font-weight:500}
+.rv-chk input{width:20px;height:20px;margin-top:2px;flex:none}
+.rv-chk small{display:block;color:#6a706a;font-weight:400;font-size:12.5px;margin-top:2px}
+.rv-pick{display:inline-flex!important;flex-direction:row!important;align-items:center;justify-content:center;border:1.5px dashed #c9cdc4;border-radius:12px;padding:12px;cursor:pointer;font-weight:700}
+.rv-prev{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.rv-prev span{position:relative}.rv-prev img{width:72px;height:72px;object-fit:cover;border-radius:10px;display:block}
+.rv-prev button{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:50%;border:0;background:#16190f;color:#fff;cursor:pointer;line-height:1}
+.rv-note{margin:0;font-size:12.5px;color:#6a706a}
+@media (max-width:520px){.rv-row{grid-template-columns:minmax(0,1fr)}.rv-cm form{grid-template-columns:minmax(0,1fr) auto}.rv-cm form #rvCN{grid-column:1/-1}.rv-head{flex-direction:column;align-items:stretch}}
+.rv-go{border:0;background:#16190f;color:#fff;border-radius:999px;padding:10px 18px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;min-height:44px}
+.rv-go:disabled{opacity:.55}
+.rv-no{border:1px solid #d9dcd5;background:#fff;border-radius:999px;padding:10px 18px;font:inherit;font-size:15px;cursor:pointer;min-height:44px}
+.rv-form input,.rv-form textarea,.rv-cm input{font-weight:400}
 </style>
 
 </head>
@@ -1052,6 +1133,7 @@
     <a href="#mine" data-go="mine" data-tab="mine">내 장비</a>
     <a href="#gear" data-go="gear" data-tab="gear">장비 제원</a>
     <a href="#board" data-go="board" data-tab="board">게시판</a>
+    <a href="#review" data-go="review" data-tab="review">후기</a>
     <a href="#hub" data-go="hub" data-tab="hub">캠핑 허브</a>
   </nav>
   <a class="pill ink" href="#plan" data-go="plan">배치 시작</a>
@@ -1279,6 +1361,22 @@
   </div>
 </div>
 
+<!-- ============ 후기 ============ -->
+<div class="view" id="v-review" data-view="review" hidden>
+  <header class="vhero" aria-labelledby="rvHeroTitle">
+    <img src="img/night.webp" alt="" aria-hidden="true">
+    <div class="wrap vh-in">
+      <p class="eyebrow">Reviews</p>
+      <h1 id="rvHeroTitle">캠핑 후기</h1>
+      <p>캠테리어로 짠 배치와 실제로 펼친 모습을 나란히 올려 주세요. 궁금한 건 댓글로 서로 물어봐요.</p>
+    </div>
+  </header>
+  <div class="wrap rvwrap">
+    <div class="rv-head"><p>계획한 배치 · 실제 사진 · 바꾼 점까지 한 번에</p><button type="button" class="rv-go" onclick="rvWrite()">＋ 후기 쓰기</button></div>
+    <div class="rv-grid" id="rvList"></div>
+  </div>
+</div>
+
 <!-- ============ 5. 캠핑 허브 ============ -->
 <div class="view" id="v-hub" data-view="hub" hidden>
   <header class="vhero hubhero" aria-labelledby="hubTitle">
@@ -1290,12 +1388,11 @@
     </div>
   </header>
   <div class="wrap">
-    <ol class="flow3" aria-label="캠핑 준비 흐름"><li><b>예약</b><span>CARO</span></li><li><b>배치</b><span>캠테리어</span></li><li class="soon"><b>챙김</b><span>준비 중</span></li><li class="soon"><b>기록</b><span>준비 중</span></li></ol>
+    <ol class="flow3" aria-label="캠핑 준비 흐름"><li><b>예약</b><span>CARO</span></li><li><b>배치</b><span>캠테리어</span></li><li class="soon"><b>챙김</b><span>준비 중</span></li><li><b>기록</b><span>후기</span></li></ol>
     <div class="hubgrid two">
       <a class="hubcard big" href="https://caro-camp.github.io/" target="_blank" rel="noopener">
         <img src="img/caro-hero.webp" alt="" loading="lazy"><div class="hc-b"><span class="tag">웹앱 · 누구나</span><h2>CARO</h2><p>캠핑장 예약이 <b>열리는 시각</b>을 날짜별로 찾아 캘린더 알림으로 걸어줘요. 캠핏·땡큐캠핑·숲나들e 등 900여 곳.</p><span class="go">caro-camp.github.io ↗</span></div></a>
-      <a class="hubcard" href="https://claude.ai/artifact/Hs7t6BE96BRWWebJK8Skxc" target="_blank" rel="noopener">
-        <img src="img/autumn.webp" alt="" loading="lazy"><div class="hc-b"><span class="tag">Claude 로그인</span><h2>캠테리어 함께 쓰기</h2><p>배치를 계정에 저장하고, 모두의 배치와 ‘계획 vs 실제’ 후기를 올릴 수 있는 버전이에요.</p><span class="go">열기 ↗</span></div></a>
+      <a class="hubcard" href="#review" data-go="review"><img src="img/night.webp" alt="" loading="lazy"><div class="hc-b"><span class="tag">누구나 · 무료</span><h2>캠핑 후기</h2><p>계획한 배치와 실제로 친 모습을 나란히 올리고, 댓글로 서로 물어봐요. 마음에 드는 배치는 그대로 열어볼 수 있어요.</p><span class="go">후기 보러 가기 →</span></div></a>
     </div>
     <a class="instacard" href="https://www.instagram.com/hj_ironcamp/" target="_blank" rel="noopener">
       <img src="img/night.webp" alt="" loading="lazy">
@@ -1349,6 +1446,7 @@
   <a href="#mine" data-go="mine" data-tab="mine"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5h16v11H4z"/><path d="M9 8.5V6a3 3 0 0 1 6 0v2.5"/><path d="M4 12.5h16"/></svg><span>내 장비</span></a>
   <a href="#gear" data-go="gear" data-tab="gear"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="11" rx="2"/><path d="M7.5 7v11M12 7v11M16.5 7v11M3 12.5h18"/></svg><span>장비 제원</span></a>
   <a href="#board" data-go="board" data-tab="board"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v10H9l-5 4v-14Z"/><path d="M8 9.5h8M8 12.5h5"/></svg><span>게시판</span></a>
+  <a href="#review" data-go="review" data-tab="review"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m4 17 5-4.5 4 3.5 3-2.5 4 3.5"/></svg><span>후기</span></a>
   <a href="#hub" data-go="hub" data-tab="hub"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11 15.7 7M8.3 13l7.4 4"/></svg><span>캠핑 허브</span></a>
 </nav>
 
@@ -4261,7 +4359,7 @@ function setTOD(m){V3.tod=m;document.querySelectorAll('.tod button').forEach(b=>
   if(V3.tentMat){V3.tentMat.emissive.set('#FFB46B');V3.tentMat.emissiveIntensity=t.glow;}}
 
 /* ---- Instagram-size share card (1080×1350) ---- */
-async function exportCard(){
+async function exportCard(ret){
   try{await document.fonts.load('800 60px Pretendard');}catch(e){}
   const W=1080,H=1350,PX=60,PY=318,PW=W-PX*2,PH=840;const keep={SCALE,viewX,viewY,sel};sel=null;
   computeAll();const b=sceneBox(true),m=60;SCALE=Math.min((PW-2*m)/(b[1][0]-b[0][0]),(PH-2*m)/(b[1][1]-b[0][1]));
@@ -4284,7 +4382,7 @@ async function exportCard(){
     let x=PX,y=PY+PH+92;g.font=F(700,24);
     gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-70)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
     g.fillStyle='#5F6E66';g.font=F(500,20);g.fillText('camterior.github.io · 규격: 판매처·제조사 공개 치수, 일부 추정',PX,H-34);
-    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));await offerFile(`camterior-card-${stamp()}.png`,blob);}
+    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));if(ret)return blob;await offerFile(`camterior-card-${stamp()}.png`,blob);}
   finally{URL.revokeObjectURL(url);}}
 
 (function v17boot(){renderPresets();HIST.last=JSON.stringify(planObj());updUndo();})();
@@ -4293,22 +4391,23 @@ async function exportCard(){
 /* =====================================================================
    CAMTERIOR — app tabs, gear spec catalog, share links
    ===================================================================== */
-const VIEWS=['intro','plan','mine','gear','board','hub'];
+const VIEWS=['intro','plan','mine','gear','board','review','hub'];
 const LEGACY={top:'intro',features:'intro',how:'intro',lineup:'gear',journal:'hub',commons:'hub'};
 let CUR='intro',planFitted=false;
 const IN_CLAUDE=!!window.claude||!!document.querySelector('[data-art]');
 const appbar=document.getElementById('appbar');
 function updBar(){const h=document.getElementById('top');appbar.classList.toggle('solid',CUR!=='intro'||window.scrollY>(h?h.offsetHeight-80:0));}
 addEventListener('scroll',updBar,{passive:true});
-function go(v,opts){opts=opts||{};v=LEGACY[v]||v;if(!VIEWS.includes(v))v='intro';
+function go(v,opts){opts=opts||{};v=LEGACY[v]||v;if(/^review\//.test(v||''))v='review';if(!VIEWS.includes(v))v='intro';
   const changed=v!==CUR;CUR=v;document.body.dataset.view=v;
   VIEWS.forEach(k=>{document.getElementById('v-'+k).hidden=k!==v;});
   if(v==='board'&&typeof reqLoad==='function')reqLoad();
+  if(v==='review'&&typeof rvLoad==='function')rvLoad();
   if(v==='mine'&&typeof mineInit==='function')mineInit();
   if(v==='plan'&&typeof aiCheckLeft==='function'&&!go._left){go._left=1;aiCheckLeft();}
   if(v==='plan'&&typeof tourMaybe==='function')tourMaybe();
   document.querySelectorAll('[data-tab]').forEach(a=>{if(a.dataset.tab===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
-  if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v)history.pushState(null,'','#'+v);
+  if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v&&!(v==='review'&&location.hash.startsWith('#review/')))history.pushState(null,'','#'+v);
   if(changed&&!opts.keepScroll)window.scrollTo(0,0);
   if(v==='plan')requestAnimationFrame(()=>{if(!planFitted){fitView();planFitted=true;}render();});
   if(v==='gear')renderGear();
@@ -5236,6 +5335,110 @@ function mineOnlyToggle(){if(!Object.keys(MYG).length){if(confirm('아직 등록
 (function(){const _r=mineRender;mineRender=function(){_r();mineOnlyBtns();if(MINE_ONLY){renderTentList();renderCatalog();}};
   mineOnlyBtns();if(MINE_ONLY){renderTentList();renderCatalog();}
   if(acctCode())acctPull();})();
+
+/* =====================================================================
+   캠핑 후기 — 배치 사진 + 실제 사진 + 댓글 (워커 KV에 저장)
+   ===================================================================== */
+const RV_IMG=k=>AI_URL+'/img/'+k;
+let RV={items:null,page:0,more:false,open:null,photos:[]};
+const rvNick=v=>{try{if(v!==undefined)localStorage.setItem('camNick',v);return localStorage.getItem('camNick')||'';}catch(e){return '';}};
+const rvOwn=(id,v)=>{try{const o=JSON.parse(localStorage.getItem('camRvOwn')||'{}');if(v!==undefined){o[id]=v;localStorage.setItem('camRvOwn',JSON.stringify(o));}return o[id]||'';}catch(e){return '';}};
+async function rvCall(v){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({review:v})});const d=await r.json().catch(()=>({}));return r.ok?d:{fail:d.error||'error'};}catch(e){return {fail:'error'};}}
+const rvStars=n=>'★'.repeat(n||0)+'☆'.repeat(5-(n||0));
+const rvDate=t=>{const d=new Date(t);return `${d.getMonth()+1}월 ${d.getDate()}일`;};
+const rvCover=r=>r.nimg?RV_IMG(r.id+'/0'):(r.hasPlanImg?RV_IMG(r.id+'/p'):'');
+
+async function rvLoad(more){const box=document.getElementById('rvList');if(!box)return;
+  if(!more&&RV.items){rvRender();return;}
+  if(!more){RV.page=0;box.innerHTML='<p class="rv-empty">불러오는 중…</p>';}
+  const d=await rvCall({op:'list',page:more?RV.page+1:0});
+  if(d.fail){box.innerHTML='<p class="rv-empty">후기를 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.</p>';return;}
+  if(more){RV.page++;RV.items=RV.items.concat(d.items);}else RV.items=d.items;RV.more=d.more;rvRender();
+  const m=location.hash.match(/^#review\/([a-z0-9]+)/);if(m&&!more)rvOpen(m[1]);}
+function rvRender(){const box=document.getElementById('rvList');if(!box)return;
+  if(!RV.items.length){box.innerHTML='<p class="rv-empty">아직 올라온 후기가 없어요. 첫 후기를 남겨 주세요!</p>';return;}
+  box.innerHTML=RV.items.map(r=>`<button type="button" class="rv-card" onclick="rvOpen('${r.id}')">
+    <span class="rv-ph">${rvCover(r)?`<img src="${rvCover(r)}" alt="" loading="lazy">`:''}${r.nimg&&r.hasPlanImg?'<span class="rv-badge">배치+실제</span>':r.hasPlanImg?'<span class="rv-badge">배치</span>':''}</span>
+    <span class="rv-b"><b>${aiEsc(r.title)}</b><small>${aiEsc([r.site,r.tent].filter(Boolean).join(' · '))}</small>
+    <span class="rv-meta"><span class="rv-st">${rvStars(r.rating)}</span><span>${aiEsc(r.nick)} · ${rvDate(r.at)}</span><span>♥ ${r.likes} · 💬 ${r.nc}</span></span></span></button>`).join('')
+    +(RV.more?'<button type="button" class="rv-more" onclick="rvLoad(true)">더 보기</button>':'');}
+
+// ----- 후기 보기 -----
+async function rvOpen(id){const dl=rvDialog();dl.innerHTML='<div class="rv-in"><p class="rv-empty">불러오는 중…</p></div>';rvShow(dl);
+  const d=await rvCall({op:'get',id});if(d.fail){dl.innerHTML=`<div class="rv-in"><p class="rv-empty">후기를 찾지 못했어요.</p><button type="button" class="rv-no" onclick="rvClose()">닫기</button></div>`;return;}
+  RV.open=d;if(!IN_CLAUDE&&location.hash!=='#review/'+id)history.replaceState(null,'','#review/'+id);rvDetail();}
+function rvDetail(){const {item:r,comments:cm}=RV.open,dl=document.getElementById('rvDlg');
+  const pics=(r.hasPlanImg?[['p','계획한 배치']]:[]).concat(Array.from({length:r.nimg},(_,k)=>[k,'실제 사진 '+(k+1)]));
+  const sec=(t,v)=>v?`<div class="rv-sec"><h4>${t}</h4><p>${aiEsc(v)}</p></div>`:'';
+  dl.innerHTML=`<div class="rv-in">
+    <div class="rv-top"><button type="button" class="rv-x" aria-label="닫기" onclick="rvClose()">×</button></div>
+    <div class="rv-pics">${pics.map(([k,l])=>`<figure><img src="${RV_IMG(r.id+'/'+k)}" alt="${l}" loading="lazy"><figcaption>${l}</figcaption></figure>`).join('')}</div>
+    <h2 id="rvT">${aiEsc(r.title)}</h2>
+    <p class="rv-sub"><span class="rv-st">${rvStars(r.rating)}</span> ${aiEsc([r.site,r.date,r.tent].filter(Boolean).join(' · '))}</p>
+    <p class="rv-by">${aiEsc(r.nick)} · ${rvDate(r.at)}</p>
+    ${r.gear&&r.gear.length?`<p class="rv-gear">${r.gear.map(g=>`<span>${aiEsc(g)}</span>`).join('')}</p>`:''}
+    ${sec('좋았던 점',r.good)}${sec('현장에서 바꾼 점',r.changed)}${sec('다음엔 이렇게',r.next)}
+    <div class="rv-acts">${r.plan?`<button type="button" class="rv-go" onclick="rvUsePlan()">이 배치 열어보기</button>`:''}
+      <button type="button" class="rv-like" onclick="rvLike(this)">♥ <b>${r.likes}</b></button>
+      <button type="button" class="rv-link" onclick="rvShare()">링크 복사</button>
+      ${rvOwn(r.id)?`<button type="button" class="rv-del" onclick="rvDel(this)">내 후기 지우기</button>`:`<button type="button" class="rv-rep" onclick="rvReport(this)">신고</button>`}</div>
+    <div class="rv-cm"><h3>이야기 <small>${cm.length}</small></h3>
+      <ul>${cm.map(c=>`<li><b>${aiEsc(c.nick)}</b><span>${aiEsc(c.text)}</span><small>${rvDate(c.at)}</small></li>`).join('')||'<li class="rv-none">첫 이야기를 남겨 보세요.</li>'}</ul>
+      <form onsubmit="event.preventDefault();rvComment()"><input id="rvCN" maxlength="16" placeholder="닉네임" value="${aiEsc(rvNick())}" aria-label="닉네임">
+        <input id="rvCT" maxlength="300" placeholder="궁금한 점이나 응원 한마디" aria-label="댓글" required><button type="submit" class="rv-go">남기기</button></form>
+      <p class="rv-msg" id="rvCMsg" role="status"></p></div></div>`;}
+function rvDialog(){let dl=document.getElementById('rvDlg');if(!dl){dl=document.createElement('dialog');dl.id='rvDlg';dl.className='rv-dlg';dl.setAttribute('aria-labelledby','rvT');document.body.appendChild(dl);
+  dl.addEventListener('close',()=>{if(location.hash.startsWith('#review/'))history.replaceState(null,'','#review');});
+  dl.addEventListener('click',e=>{if(e.target===dl)dl.close();});}return dl;}
+function rvShow(dl){if(!dl.open){try{dl.showModal();}catch(e){dl.setAttribute('open','');}}}
+function rvClose(){const d=document.getElementById('rvDlg');if(d&&d.open)d.close();}
+async function rvUsePlan(){const r=RV.open.item;rvClose();go('plan');if(typeof loadPlanCode==='function')await loadPlanCode(r.plan,r.title);}
+async function rvLike(b){b.disabled=true;const d=await rvCall({op:'like',id:RV.open.item.id});if(d.ok){b.querySelector('b').textContent=d.likes;b.classList.add('on');RV.open.item.likes=d.likes;const it=(RV.items||[]).find(x=>x.id===RV.open.item.id);if(it){it.likes=d.likes;rvRender();}}}
+async function rvComment(){const nick=document.getElementById('rvCN').value.trim(),text=document.getElementById('rvCT').value.trim(),m=document.getElementById('rvCMsg');if(!text)return;
+  rvNick(nick);m.textContent='남기는 중…';const d=await rvCall({op:'comment',id:RV.open.item.id,nick,text});
+  if(d.fail){m.textContent=d.fail==='quota'?'오늘은 이야기를 많이 남겼어요. 내일 다시 남겨 주세요.':'남기지 못했어요. 잠시 뒤 다시 해 주세요.';return;}
+  RV.open.comments=d.comments;const it=(RV.items||[]).find(x=>x.id===RV.open.item.id);if(it){it.nc=d.comments.length;rvRender();}rvDetail();}
+async function rvReport(b){if(!confirm('이 후기를 신고할까요? 여러 명이 신고하면 관리자가 확인할 때까지 숨겨져요.'))return;b.disabled=true;await rvCall({op:'report',id:RV.open.item.id});b.textContent='신고했어요';}
+async function rvDel(b){if(!confirm('내 후기를 지울까요? 사진과 댓글도 함께 지워져요.'))return;b.disabled=true;const id=RV.open.item.id;
+  const d=await rvCall({op:'del',id,own:rvOwn(id)});if(d.ok){rvClose();RV.items=(RV.items||[]).filter(x=>x.id!==id);rvRender();}else{b.disabled=false;alert('지우지 못했어요.');}}
+async function rvShare(){const u=location.origin+location.pathname+'#review/'+RV.open.item.id;try{await navigator.clipboard.writeText(u);}catch(e){prompt('링크를 복사해 주세요',u);return;}
+  const b=document.querySelector('#rvDlg .rv-link');if(b){b.textContent='복사했어요';setTimeout(()=>b.textContent='링크 복사',1800);}}
+
+// ----- 후기 쓰기 -----
+function rvWrite(){const dl=rvDialog(),T=TENTS[tent.id],hasPlan=state.pieces.length>0||!!T.outer;RV.photos=[];
+  dl.innerHTML=`<form class="rv-in rv-form" onsubmit="event.preventDefault();rvSend()">
+    <div class="rv-top"><h2 id="rvT">캠핑 후기 쓰기</h2><button type="button" class="rv-x" aria-label="닫기" onclick="rvClose()">×</button></div>
+    <label>제목<input id="rvTitle" maxlength="40" required placeholder="예: 가평 B-12, 랜드록 첫 가을 캠핑"></label>
+    <div class="rv-row"><label>캠핑장·사이트<input id="rvSite" maxlength="40" placeholder="예: 자라섬 오토캠핑장 A-3"></label><label>다녀온 날<input id="rvDate" type="date"></label></div>
+    <div class="rv-row"><label>닉네임<input id="rvNick" maxlength="16" placeholder="캠퍼" value="${aiEsc(rvNick())}"></label>
+      <fieldset class="rv-rate"><legend>별점</legend>${[1,2,3,4,5].map(n=>`<label><input type="radio" name="rvRate" value="${n}"${n===5?' checked':''}><span>★</span></label>`).join('')}</fieldset></div>
+    <label class="rv-chk"><input type="checkbox" id="rvPlan"${hasPlan?' checked':''}${hasPlan?'':' disabled'}> <span><b>지금 내부 구성 배치</b>를 같이 올리기<small>${hasPlan?aiEsc((T.outer?T.name:'')+(state.pieces.length?` · 장비 ${state.pieces.filter(p=>p.parent==null).length}세트`:'')):'내부 구성에서 배치를 먼저 만들어 주세요'} — 다른 사람이 ‘이 배치 열어보기’로 그대로 열 수 있어요</small></span></label>
+    <div class="rv-up"><label class="rv-pick">📷 실제 사진 고르기 (최대 4장)<input type="file" id="rvPics" accept="image/*" multiple hidden onchange="rvPicked(this)"></label><div class="rv-prev" id="rvPrev"></div></div>
+    <p class="rv-note">사진은 줄여서 올리고 위치 정보는 지워요. 얼굴·차 번호판이 크게 나온 사진은 피해 주세요.</p>
+    <label>좋았던 점<textarea id="rvGood" maxlength="600" rows="2" placeholder="예: IGT를 입구 쪽에 두니 연기가 잘 빠졌어요"></textarea></label>
+    <label>현장에서 바꾼 점<textarea id="rvChanged" maxlength="600" rows="2" placeholder="예: 사이트가 좁아서 타프를 옆으로 돌렸어요"></textarea></label>
+    <label>다음엔 이렇게<textarea id="rvNext" maxlength="600" rows="2" placeholder="예: 의자는 4개 대신 3개"></textarea></label>
+    <p class="rv-msg" id="rvMsg" role="status"></p>
+    <div class="rv-acts"><button type="submit" class="rv-go" id="rvGo">후기 올리기</button><button type="button" class="rv-no" onclick="rvClose()">취소</button></div></form>`;
+  rvShow(dl);setTimeout(()=>document.getElementById('rvTitle').focus(),50);}
+// 사진을 긴 변 1600px JPEG로 줄임 (캔버스로 다시 그려 위치 정보(EXIF)도 빠짐)
+function rvShrink(src,max,q){return new Promise((ok,no)=>{const i=new Image();i.onload=()=>{const k=Math.min(1,max/Math.max(i.naturalWidth,i.naturalHeight)),c=document.createElement('canvas');c.width=Math.round(i.naturalWidth*k);c.height=Math.round(i.naturalHeight*k);
+  c.getContext('2d').drawImage(i,0,0,c.width,c.height);let d=c.toDataURL('image/jpeg',q);if(d.length>440000)d=c.toDataURL('image/jpeg',.62);ok(d);};i.onerror=no;i.src=src;});}
+async function rvPicked(inp){const fs=[...(inp.files||[])].slice(0,4-RV.photos.length);inp.value='';
+  for(const f of fs){const u=URL.createObjectURL(f);try{RV.photos.push(await rvShrink(u,1600,.8));}catch(e){}URL.revokeObjectURL(u);}rvPrevRender();}
+function rvPrevRender(){const p=document.getElementById('rvPrev');if(p)p.innerHTML=RV.photos.map((d,k)=>`<span><img src="${d}" alt="고른 사진 ${k+1}"><button type="button" aria-label="사진 ${k+1} 빼기" onclick="RV.photos.splice(${k},1);rvPrevRender()">×</button></span>`).join('');}
+async function rvSend(){const m=document.getElementById('rvMsg'),b=document.getElementById('rvGo'),v=id=>document.getElementById(id).value.trim();
+  const usePlan=document.getElementById('rvPlan').checked;
+  if(!usePlan&&!RV.photos.length){m.textContent='배치나 실제 사진 중 하나는 있어야 해요.';return;}
+  b.disabled=true;m.textContent='올리는 중… (사진이 많으면 몇 초 걸려요)';
+  let plan='',planImg='',gear=[];
+  if(usePlan){try{plan=await encodePlan(planObj());const blob=await exportCard(true);if(blob){const u=URL.createObjectURL(blob);planImg=(await rvShrink(u,1200,.82)).split(',')[1];URL.revokeObjectURL(u);}
+    gear=[...new Set(state.pieces.map(p=>CATALOG[p.type].name))].slice(0,12);}catch(e){}}
+  const T=TENTS[tent.id];rvNick(v('rvNick'));
+  const d=await rvCall({op:'add',title:v('rvTitle'),site:v('rvSite'),date:v('rvDate'),nick:v('rvNick'),rating:+(document.querySelector('input[name=rvRate]:checked')||{}).value||0,
+    tent:usePlan&&T.outer?T.name:'',good:v('rvGood'),changed:v('rvChanged'),next:v('rvNext'),plan,planImg,gear,photos:RV.photos.map(x=>x.split(',')[1])});
+  if(d.fail){b.disabled=false;m.textContent=d.fail==='quota'?'오늘은 후기를 많이 올렸어요. 내일 다시 올려 주세요.':d.fail==='image'?'사진이 너무 커요. 다른 사진으로 해 주세요.':d.fail==='empty'?'제목을 적어 주세요.':'올리지 못했어요. 잠시 뒤 다시 해 주세요.';return;}
+  rvOwn(d.id,d.own);if(typeof camEv==='function')camEv('review-add','후기 올리기');RV.items=null;await rvLoad();rvOpen(d.id);}
 
 </script>
 <script data-goatcounter="https://camterior.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
