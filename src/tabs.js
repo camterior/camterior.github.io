@@ -167,9 +167,27 @@ function ssMineTake(){const box=document.getElementById('ssMine'),l=box._list||[
   if(n){mineSave();if(typeof mineRender==='function')mineRender();if(document.getElementById('minePick')&&typeof minePickUI==='function')minePickUI();}
   box.innerHTML=`<p class="ss-mine-ok">${n?`내 장비에 ${n}가지 넣었어요.`:'추가하지 않았어요.'}</p>`;}
 function ssMineSkip(){const b=document.getElementById('ssMine');b.hidden=true;b.innerHTML='';}
-const _saveMine=saveMine;saveMine=async function(...a){await _saveMine(...a);if(!IN_CLAUDE)ssMineOffer();};
+/* 저장한 세팅을 내 코드(서버)에도 보관: 같은 코드면 휴대폰·PC 어디서든 같은 목록 */
+const PLAN_K='campPlanner.saved';
+const planLocal=()=>localSaved(),planSetLocal=L=>LS.set(PLAN_K,JSON.stringify(L.slice(0,40)));
+async function planPush(r){const c=await acctEnsure();if(!c)return false;const d=await acctCall({op:'plan_add',code:c,plan:r});
+  if(!d.plans)return false;const L=planLocal().map(x=>x.id===r.id?{...x,sync:1}:x);planSetLocal(L);return true;}
+let PLAN_SYNCING=null;
+function planSync(){if(IN_CLAUDE||mineInDb||typeof acctCode!=='function')return Promise.resolve();if(PLAN_SYNCING)return PLAN_SYNCING;
+  PLAN_SYNCING=(async()=>{try{const loc=planLocal();let c=acctCode();if(!c){if(!loc.length)return;c=await acctEnsure();if(!c)return;}
+    const d=await acctCall({op:'plans',code:c});if(!d.plans)return;let srv=d.plans;const ids=new Set(srv.map(x=>x.id));
+    for(const r of loc.filter(r=>!r.sync&&!ids.has(r.id)).reverse()){const x=await acctCall({op:'plan_add',code:c,plan:r});if(x.plans)srv=x.plans;}
+    planSetLocal(srv.map(x=>({...x,sync:1})).sort((a,b)=>b.savedAt-a.savedAt));renderMine();}finally{PLAN_SYNCING=null;}})();return PLAN_SYNCING;}
+const _saveMine=saveMine;saveMine=async function(...a){const before=new Set(planLocal().map(r=>r.id));await _saveMine(...a);
+  if(!IN_CLAUDE&&!mineInDb){const r=planLocal().find(x=>!before.has(x.id));if(r){planPush(r).then(ok=>{if(ok)setStatus(`'${r.name}' 저장했어요. 같은 내 코드면 휴대폰·PC 어디서든 불러올 수 있어요.`);});}ssMineOffer();}};
+const _delMine=delMine;delMine=async function(id,btn){const armed=btn&&btn.dataset.armed==='1';await _delMine(id,btn);
+  if(armed&&!IN_CLAUDE&&!mineInDb&&typeof acctCode==='function'&&acctCode())acctCall({op:'plan_del',code:acctCode(),id});};
+const _openLoad=openLoad;openLoad=function(){_openLoad();const w=document.getElementById('loadWhere');
+  if(!IN_CLAUDE&&!mineInDb){if(w&&!planLocal().length)w.textContent='불러오는 중…';planSync().then(()=>{renderLoad();const w2=document.getElementById('loadWhere');if(w2&&planLocal().length)w2.textContent=`저장한 세팅 ${planLocal().length}개 · 내 코드에 보관돼서 휴대폰·PC 어디서든 열려요.`;else if(w2)w2.textContent='';});}};
+if(!IN_CLAUDE&&typeof acctLoad==='function'){const _acctLoad=acctLoad;acctLoad=async function(...a){const r=await _acctLoad(...a);if(r&&r.ok)planSync();return r;};}
+setTimeout(()=>{if(!IN_CLAUDE&&typeof acctCode==='function'&&acctCode())planSync();},2500);
 const _openSave=openSave;openSave=function(){_openSave();ssMineSkip();};
-const _renderMine=renderMine;renderMine=function(){_renderMine();const e=document.querySelector('#myList .empty');if(e)e.textContent='아직 없어요. 위의 저장하기를 눌러보세요.';};
+const _renderMine=renderMine;renderMine=function(){_renderMine();if(!IN_CLAUDE&&!mineInDb){const sw=document.getElementById('saveWhere');if(sw)sw.textContent='내 코드에 같이 보관돼서, 같은 내 코드를 쓰는 휴대폰·PC 어디서든 📂 불러오기로 열려요.';}const e=document.querySelector('#myList .empty');if(e)e.textContent='아직 없어요. 위의 저장하기를 눌러보세요.';};
 
 /* 텐트 브랜드 정리: 스노우피크 먼저, 나머지는 텐트 많은 순. 3종 이하 브랜드는 '그 외 브랜드' 하나로 묶음 */
 const T_MINOR=3,T_ETC='그 외 브랜드';

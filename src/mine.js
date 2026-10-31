@@ -122,7 +122,9 @@ const acctSet=v=>{try{v?localStorage.setItem(ACCT_KEY,v):localStorage.removeItem
 let ACCT_VIP=false,ACCT_ADMIN=false,ACCT_OFF=false,acctTimer=null;
 async function acctCall(a){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({acct:a})});const d=await r.json().catch(()=>({}));
   if(!r.ok){if(!d.error||d.error==='acct-off'||d.error==='empty'||d.error==='bad')ACCT_OFF=true;return {fail:d.error||'error'};}ACCT_OFF=false;return d;}catch(e){ACCT_OFF=true;return {fail:'network'};}}
-async function acctEnsure(){if(acctCode())return acctCode();const d=await acctCall({op:'new'});if(d.code){acctSet(d.code);ACCT_VIP=false;acctUI();return d.code;}return '';}
+let ACCT_NEW=null;
+function acctEnsure(){if(acctCode())return Promise.resolve(acctCode());if(ACCT_NEW)return ACCT_NEW;
+  ACCT_NEW=(async()=>{try{const d=await acctCall({op:'new'});if(d.code){acctSet(d.code);ACCT_VIP=false;acctUI();return d.code;}return '';}finally{ACCT_NEW=null;}})();return ACCT_NEW;}
 // 장비가 바뀌면 1.5초 뒤 한 번에 서버에 저장 (무료 저장 횟수 아끼기)
 function acctQueue(){clearTimeout(acctTimer);acctTimer=setTimeout(async()=>{const c=await acctEnsure();if(!c)return;const d=await acctCall({op:'save',code:c,gear:MYG});if(d.ok){ACCT_VIP=!!d.vip;ACCT_ADMIN=!!d.admin;acctUI();}},1500);}
 async function acctPull(){const c=acctCode();if(!c){acctUI();return;}const d=await acctCall({op:'get',code:c});
