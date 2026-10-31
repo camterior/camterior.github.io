@@ -883,6 +883,20 @@
   @media (max-width:640px){.instacard{flex-wrap:wrap;padding:20px;margin-top:-40px}.instacard .ic-ico{width:52px;height:52px}.instacard .go{width:100%;text-align:center}}
   .foot-ig{display:inline-flex;align-items:center;gap:5px;color:inherit;font-weight:700;text-decoration:none;border-bottom:1px solid currentColor}
   .foot-ig .ig{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2}
+
+  /* PC: 머리 사진·분류 사진을 통째로 잘라 쓰지 않고 액자처럼 오른쪽에 (넓은 화면에서 사진이 너무 확대돼 알아볼 수 없던 문제) */
+  @media (min-width:900px){
+    .vhero{min-height:300px;align-items:center}
+    .vhero>img{inset:auto;top:50%;right:max(32px,calc(50% - 512px));width:auto;height:236px;aspect-ratio:4/3;transform:translateY(-50%);border-radius:20px;opacity:1;animation:none;object-fit:cover;box-shadow:0 18px 44px rgba(0,0,0,.4)}
+    .vhero::after{display:none}
+    .vh-in{padding-block:44px}
+    .vh-in h1,.vh-in p,.vh-in .eyebrow{max-width:calc(100% - 400px)}
+    .ghead{height:auto;background:var(--night);display:grid;grid-template-columns:minmax(0,1fr) 240px;align-items:end}
+    .ghead img{position:static;width:240px;height:180px;object-fit:cover;grid-column:2;grid-row:1}
+    .ghead::after{display:none}
+    .ghead .gtt{position:static;grid-column:1;grid-row:1;padding:0 0 20px 24px}
+    .ghead .gtt h2{font-size:28px}
+  }
 </style>
 
 <style>
