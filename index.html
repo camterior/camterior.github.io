@@ -1129,6 +1129,23 @@
 .rv-go:disabled{opacity:.55}
 .rv-no{border:1px solid #d9dcd5;background:#fff;border-radius:999px;padding:10px 18px;font:inherit;font-size:15px;cursor:pointer;min-height:44px}
 .rv-form input,.rv-form textarea,.rv-cm input{font-weight:400}
+
+/* 요청 목록: 상태별 접기 */
+.reqb .rq-list li.rq-grp{display:block;border:0;padding:0;background:none}
+.rq-grp>details{border:1px solid var(--line);border-radius:16px;background:var(--paper-2,#F6F3EC)}
+.rq-grp>details>summary,.mn-sec>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;min-height:48px;box-sizing:border-box}
+.rq-grp>details>summary::-webkit-details-marker,.mn-sec>summary::-webkit-details-marker{display:none}
+.rq-grp>details>summary span{margin-left:auto;font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
+.rq-grp>details>summary::after,.mn-sec>summary::after{content:"";flex:none;width:8px;height:8px;border-right:2px solid var(--ink-3);border-bottom:2px solid var(--ink-3);transform:rotate(45deg);margin:-4px 2px 0 4px;transition:transform .2s}
+.rq-grp>details[open]>summary::after,.mn-sec[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.rq-sub{list-style:none;margin:0;padding:0 10px 10px;display:grid;gap:8px}
+/* 내 장비: 파트별 접기 */
+.mn-sec{margin-top:10px;border:1px solid var(--line);border-radius:14px;background:var(--surface,#fff)}
+.mn-sec>summary b{font-size:15px;flex:none}
+.mn-sec>summary small{color:var(--ink-3);font-family:var(--mono);flex:none}
+.mn-sec>summary .mn-peek{flex:1;min-width:0;font-size:12.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mn-sec[open]>summary .mn-peek{visibility:hidden}
+.mn-sec>ul{margin:0;padding:0 10px 10px}
 </style>
 
 </head>
@@ -5242,6 +5259,7 @@ async function aiRun(){
   const b=document.getElementById('board');if(b&&b.scrollIntoView&&innerWidth<900)setTimeout(()=>b.scrollIntoView({behavior:'smooth',block:'start'}),400);}
 
 /* --- 게시판: 공지사항 · 장비 요청 · 개발 요청 (워커 KV에 저장, 매주 일요일 확인 후 반영) --- */
+const RQ_GRP=[['new','새 요청 · 확인 중'],['sun','일요일 추가 예정'],['ok','확인됨'],['done','완료'],['no','어려움']],RQ_OPEN=new Set(),RQ_SHUT=new Set();
 const RQ_ST={gear:{new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정',done:'추가됨',no:'추가 어려움'},dev:{new:'확인 중',ok:'확인됨',sun:'일요일 반영 예정',done:'반영됨',no:'반영 어려움'}};
 let RQ=null,NT=null,BD_TAB='notice',RQ_MINE=new Set();try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
 const rqSave=()=>{try{localStorage.setItem('rqMine',JSON.stringify([...RQ_MINE].slice(-200)));}catch(e){}};
@@ -5257,9 +5275,12 @@ function reqRender(){
     if(!RQ){ul.innerHTML=RQ===false?'<li class="rq-empty">게시판을 준비하고 있어요. 곧 공지와 요청을 볼 수 있어요.</li>':'';return;}
     const L=RQ.filter(r=>(r.kind||'gear')===kind);
     if(!L.length){ul.innerHTML='<li class="rq-empty">아직 요청이 없어요. 첫 요청을 남겨주세요.</li>';return;}
-    ul.innerHTML=L.slice(0,80).map(r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(rqDate(r.at))}</small>${r.note?`<p>${aiEsc(r.note)}</p>`:''}${r.reply?`<p class="rq-re">↳ ${aiEsc(r.reply)}</p>`:''}</div>
+    const one=r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(rqDate(r.at))}</small>${r.note?`<p>${aiEsc(r.note)}</p>`:''}${r.reply?`<p class="rq-re">↳ ${aiEsc(r.reply)}</p>`:''}</div>
       <span class="rq-badge s-${aiEsc(r.st)}">${RQ_ST[kind][r.st]||'확인 중'}</span>
-      <button type="button" class="rq-plus" ${RQ_MINE.has(r.id)||r.st==='done'||r.st==='no'?'disabled':''} onclick="reqPlus('${aiEsc(r.id)}')" aria-label="${aiEsc(r.name)} 나도 필요해">나도 필요해 ${r.n||1}</button></li>`).join('');});}
+      <button type="button" class="rq-plus" ${RQ_MINE.has(r.id)||r.st==='done'||r.st==='no'?'disabled':''} onclick="reqPlus('${aiEsc(r.id)}')" aria-label="${aiEsc(r.name)} 나도 필요해">나도 필요해 ${r.n||1}</button></li>`;
+    ul.innerHTML=RQ_GRP.map(([st,t])=>{const G=L.filter(r=>(RQ_ST[kind][r.st]?r.st:'new')===st);if(!G.length)return '';const k=kind+'|'+st,open=RQ_OPEN.has(k)||(!RQ_SHUT.has(k)&&st!=='done'&&st!=='no');
+      return `<li class="rq-grp"><details data-k="${k}"${open?' open':''}><summary><b>${t}</b><span>${G.length}</span></summary><ul class="rq-sub">${G.slice(0,120).map(one).join('')}</ul></details></li>`;}).join('');
+    ul.querySelectorAll('details[data-k]').forEach(d=>d.addEventListener('toggle',()=>{const k=d.dataset.k;if(d.open){RQ_OPEN.add(k);RQ_SHUT.delete(k);}else{RQ_SHUT.add(k);RQ_OPEN.delete(k);}}));});}
 async function reqLoad(force){if(RQ&&NT&&!force){reqRender();return;}
   const d=await rqCall({op:'list'});if(d.fail){RQ=false;reqRender();return;}
   RQ=d.items||[];NT=d.notices||[];reqRender();}
@@ -5306,8 +5327,13 @@ function mineRender(){const box=document.getElementById('mineList');if(!box)retu
   document.getElementById('mineUse').disabled=!keys.length;
   if(!keys.length){box.innerHTML='<p class="mn-empty">아직 등록한 장비가 없어요. 사진을 올리거나 이름으로 찾아서 넣어 보세요.</p>';return;}
   const by={};keys.forEach(k=>{const it=mineByKey(k);(by[it.sec]=by[it.sec]||[]).push(it);});
-  box.innerHTML=mineSecs().filter(s=>by[s.t]).map(s=>`<section class="mn-sec"><h3>${aiEsc(s.t)} <small>${by[s.t].length}</small></h3><ul>${by[s.t].map(it=>`<li>${mineThumb(it)}<span class="mn-n"><b>${aiEsc(it.name)}</b>${it.model?`<small>${aiEsc(it.model)}</small>`:''}</span>
-    <span class="mn-q"><button type="button" aria-label="${aiEsc(it.name)} 하나 빼기" onclick="mineAdd('${it.key}',-1)">−</button><b>${MYG[it.key]}</b><button type="button" aria-label="${aiEsc(it.name)} 하나 더" onclick="mineAdd('${it.key}',1)">+</button></span></li>`).join('')}</ul></section>`).join('');}
+  const many=keys.length>6;
+  box.innerHTML=mineSecs().filter(s=>by[s.t]).map(s=>`<details class="mn-sec" data-k="${s.k}"${mineFoldOpen(s.k,!many)?' open':''}><summary><b>${aiEsc(s.t)}</b><small>${by[s.t].reduce((n,it)=>n+(MYG[it.key]||0),0)}개</small><span class="mn-peek">${aiEsc(by[s.t].map(it=>it.name).join(', '))}</span></summary><ul>${by[s.t].map(it=>`<li>${mineThumb(it)}<span class="mn-n"><b>${aiEsc(it.name)}</b>${it.model?`<small>${aiEsc(it.model)}</small>`:''}</span>
+    <span class="mn-q"><button type="button" aria-label="${aiEsc(it.name)} 하나 빼기" onclick="mineAdd('${it.key}',-1)">−</button><b>${MYG[it.key]}</b><button type="button" aria-label="${aiEsc(it.name)} 하나 더" onclick="mineAdd('${it.key}',1)">+</button></span></li>`).join('')}</ul></details>`).join('');
+  box.querySelectorAll('details.mn-sec').forEach(d=>d.addEventListener('toggle',()=>mineFoldSet(d.dataset.k,d.open)));}
+let MINE_FOLD={};try{MINE_FOLD=JSON.parse(localStorage.getItem('camMineFold')||'{}')||{};}catch(e){}
+const mineFoldOpen=(k,def)=>k in MINE_FOLD?!!MINE_FOLD[k]:def;
+function mineFoldSet(k,o){MINE_FOLD[k]=o?1:0;try{localStorage.setItem('camMineFold',JSON.stringify(MINE_FOLD));}catch(e){}}
 // 이름으로 찾기
 function mineSearch(){const q=aiNorm(document.getElementById('mineQ').value||''),out=document.getElementById('mineFind');
   if(q.length<2){out.innerHTML='';return;}

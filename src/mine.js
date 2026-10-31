@@ -29,8 +29,13 @@ function mineRender(){const box=document.getElementById('mineList');if(!box)retu
   document.getElementById('mineUse').disabled=!keys.length;
   if(!keys.length){box.innerHTML='<p class="mn-empty">아직 등록한 장비가 없어요. 사진을 올리거나 이름으로 찾아서 넣어 보세요.</p>';return;}
   const by={};keys.forEach(k=>{const it=mineByKey(k);(by[it.sec]=by[it.sec]||[]).push(it);});
-  box.innerHTML=mineSecs().filter(s=>by[s.t]).map(s=>`<section class="mn-sec"><h3>${aiEsc(s.t)} <small>${by[s.t].length}</small></h3><ul>${by[s.t].map(it=>`<li>${mineThumb(it)}<span class="mn-n"><b>${aiEsc(it.name)}</b>${it.model?`<small>${aiEsc(it.model)}</small>`:''}</span>
-    <span class="mn-q"><button type="button" aria-label="${aiEsc(it.name)} 하나 빼기" onclick="mineAdd('${it.key}',-1)">−</button><b>${MYG[it.key]}</b><button type="button" aria-label="${aiEsc(it.name)} 하나 더" onclick="mineAdd('${it.key}',1)">+</button></span></li>`).join('')}</ul></section>`).join('');}
+  const many=keys.length>6;
+  box.innerHTML=mineSecs().filter(s=>by[s.t]).map(s=>`<details class="mn-sec" data-k="${s.k}"${mineFoldOpen(s.k,!many)?' open':''}><summary><b>${aiEsc(s.t)}</b><small>${by[s.t].reduce((n,it)=>n+(MYG[it.key]||0),0)}개</small><span class="mn-peek">${aiEsc(by[s.t].map(it=>it.name).join(', '))}</span></summary><ul>${by[s.t].map(it=>`<li>${mineThumb(it)}<span class="mn-n"><b>${aiEsc(it.name)}</b>${it.model?`<small>${aiEsc(it.model)}</small>`:''}</span>
+    <span class="mn-q"><button type="button" aria-label="${aiEsc(it.name)} 하나 빼기" onclick="mineAdd('${it.key}',-1)">−</button><b>${MYG[it.key]}</b><button type="button" aria-label="${aiEsc(it.name)} 하나 더" onclick="mineAdd('${it.key}',1)">+</button></span></li>`).join('')}</ul></details>`).join('');
+  box.querySelectorAll('details.mn-sec').forEach(d=>d.addEventListener('toggle',()=>mineFoldSet(d.dataset.k,d.open)));}
+let MINE_FOLD={};try{MINE_FOLD=JSON.parse(localStorage.getItem('camMineFold')||'{}')||{};}catch(e){}
+const mineFoldOpen=(k,def)=>k in MINE_FOLD?!!MINE_FOLD[k]:def;
+function mineFoldSet(k,o){MINE_FOLD[k]=o?1:0;try{localStorage.setItem('camMineFold',JSON.stringify(MINE_FOLD));}catch(e){}}
 // 이름으로 찾기
 function mineSearch(){const q=aiNorm(document.getElementById('mineQ').value||''),out=document.getElementById('mineFind');
   if(q.length<2){out.innerHTML='';return;}

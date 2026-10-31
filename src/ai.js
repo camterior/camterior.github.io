@@ -413,6 +413,7 @@ async function aiRun(){
   const b=document.getElementById('board');if(b&&b.scrollIntoView&&innerWidth<900)setTimeout(()=>b.scrollIntoView({behavior:'smooth',block:'start'}),400);}
 
 /* --- 게시판: 공지사항 · 장비 요청 · 개발 요청 (워커 KV에 저장, 매주 일요일 확인 후 반영) --- */
+const RQ_GRP=[['new','새 요청 · 확인 중'],['sun','일요일 추가 예정'],['ok','확인됨'],['done','완료'],['no','어려움']],RQ_OPEN=new Set(),RQ_SHUT=new Set();
 const RQ_ST={gear:{new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정',done:'추가됨',no:'추가 어려움'},dev:{new:'확인 중',ok:'확인됨',sun:'일요일 반영 예정',done:'반영됨',no:'반영 어려움'}};
 let RQ=null,NT=null,BD_TAB='notice',RQ_MINE=new Set();try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
 const rqSave=()=>{try{localStorage.setItem('rqMine',JSON.stringify([...RQ_MINE].slice(-200)));}catch(e){}};
@@ -428,9 +429,12 @@ function reqRender(){
     if(!RQ){ul.innerHTML=RQ===false?'<li class="rq-empty">게시판을 준비하고 있어요. 곧 공지와 요청을 볼 수 있어요.</li>':'';return;}
     const L=RQ.filter(r=>(r.kind||'gear')===kind);
     if(!L.length){ul.innerHTML='<li class="rq-empty">아직 요청이 없어요. 첫 요청을 남겨주세요.</li>';return;}
-    ul.innerHTML=L.slice(0,80).map(r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(rqDate(r.at))}</small>${r.note?`<p>${aiEsc(r.note)}</p>`:''}${r.reply?`<p class="rq-re">↳ ${aiEsc(r.reply)}</p>`:''}</div>
+    const one=r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(rqDate(r.at))}</small>${r.note?`<p>${aiEsc(r.note)}</p>`:''}${r.reply?`<p class="rq-re">↳ ${aiEsc(r.reply)}</p>`:''}</div>
       <span class="rq-badge s-${aiEsc(r.st)}">${RQ_ST[kind][r.st]||'확인 중'}</span>
-      <button type="button" class="rq-plus" ${RQ_MINE.has(r.id)||r.st==='done'||r.st==='no'?'disabled':''} onclick="reqPlus('${aiEsc(r.id)}')" aria-label="${aiEsc(r.name)} 나도 필요해">나도 필요해 ${r.n||1}</button></li>`).join('');});}
+      <button type="button" class="rq-plus" ${RQ_MINE.has(r.id)||r.st==='done'||r.st==='no'?'disabled':''} onclick="reqPlus('${aiEsc(r.id)}')" aria-label="${aiEsc(r.name)} 나도 필요해">나도 필요해 ${r.n||1}</button></li>`;
+    ul.innerHTML=RQ_GRP.map(([st,t])=>{const G=L.filter(r=>(RQ_ST[kind][r.st]?r.st:'new')===st);if(!G.length)return '';const k=kind+'|'+st,open=RQ_OPEN.has(k)||(!RQ_SHUT.has(k)&&st!=='done'&&st!=='no');
+      return `<li class="rq-grp"><details data-k="${k}"${open?' open':''}><summary><b>${t}</b><span>${G.length}</span></summary><ul class="rq-sub">${G.slice(0,120).map(one).join('')}</ul></details></li>`;}).join('');
+    ul.querySelectorAll('details[data-k]').forEach(d=>d.addEventListener('toggle',()=>{const k=d.dataset.k;if(d.open){RQ_OPEN.add(k);RQ_SHUT.delete(k);}else{RQ_SHUT.add(k);RQ_OPEN.delete(k);}}));});}
 async function reqLoad(force){if(RQ&&NT&&!force){reqRender();return;}
   const d=await rqCall({op:'list'});if(d.fail){RQ=false;reqRender();return;}
   RQ=d.items||[];NT=d.notices||[];reqRender();}
