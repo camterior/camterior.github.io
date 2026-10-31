@@ -1,0 +1,10 @@
+binding secret_text ADMIN_KEY
+binding secret_text GEMINI_API_KEY
+binding secret_text INVITE_CODE
+binding kv_namespace RL
+compat 2026-10-26 flags [] usage standard observability True
+schedules []
+OK
+before 29
+dryrun OK
+ref refs/heads/work/worker-ci sha 38410e7e86a3573d31c35892d980b5eaee68ff48 run 41174367054
