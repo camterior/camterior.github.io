@@ -50,7 +50,7 @@ function rvDetail(){const {item:r,comments:cm}=RV.open,dl=document.getElementByI
         <input id="rvCT" maxlength="300" placeholder="궁금한 점이나 응원 한마디" aria-label="댓글" required><button type="submit" class="rv-go">남기기</button></form>
       <p class="rv-msg" id="rvCMsg" role="status"></p></div></div>`;}
 function rvDialog(){let dl=document.getElementById('rvDlg');if(!dl){dl=document.createElement('dialog');dl.id='rvDlg';dl.className='rv-dlg';dl.setAttribute('aria-labelledby','rvT');document.body.appendChild(dl);
-  dl.addEventListener('close',()=>{if(location.hash.startsWith('#review/'))history.replaceState(null,'','#review');});
+  dl.addEventListener('close',()=>{if(location.hash.startsWith('#review/'))history.replaceState(null,'','#board');});
   dl.addEventListener('click',e=>{if(e.target===dl)dl.close();});}return dl;}
 function rvShow(dl){if(!dl.open){try{dl.showModal();}catch(e){dl.setAttribute('open','');}}}
 function rvClose(){const d=document.getElementById('rvDlg');if(d&&d.open)d.close();}

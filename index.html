@@ -667,7 +667,7 @@
   .tabbar{display:none}
   @media (max-width:860px){
     .appbar .nav,.appbar .pill{display:none}
-    .tabbar{display:grid;grid-template-columns:repeat(7,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:rgba(255,255,255,.94);backdrop-filter:saturate(160%) blur(16px);-webkit-backdrop-filter:saturate(160%) blur(16px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+    .tabbar{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:rgba(255,255,255,.94);backdrop-filter:saturate(160%) blur(16px);-webkit-backdrop-filter:saturate(160%) blur(16px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
     .tabbar a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;color:var(--ink-3);text-decoration:none;font-size:11px;letter-spacing:-.02em;white-space:nowrap;font-weight:700;border-radius:12px;min-height:48px}
     .tabbar svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
     .tabbar a[aria-current="page"]{color:var(--accent)}
@@ -1133,7 +1133,6 @@
     <a href="#mine" data-go="mine" data-tab="mine">내 장비</a>
     <a href="#gear" data-go="gear" data-tab="gear">장비 제원</a>
     <a href="#board" data-go="board" data-tab="board">게시판</a>
-    <a href="#review" data-go="review" data-tab="review">후기</a>
     <a href="#hub" data-go="hub" data-tab="hub">캠핑 허브</a>
   </nav>
   <a class="pill ink" href="#plan" data-go="plan">배치 시작</a>
@@ -1327,16 +1326,21 @@
     <div class="wrap vh-in">
       <p class="eyebrow">Board</p>
       <h1 id="boardTitle">게시판</h1>
-      <p>공지사항을 보고, 필요한 장비나 기능을 요청해 주세요. 매주 일요일에 확인해서 반영해요.</p>
+      <p>공지사항을 보고, 캠핑 후기를 나누고, 필요한 장비나 기능을 요청해 주세요. 요청은 매주 일요일에 확인해서 반영해요.</p>
     </div>
   </header>
   <div class="wrap bdwrap">
     <div class="bd-tabs" role="tablist" aria-label="게시판 종류">
       <button type="button" role="tab" id="bdt-notice" aria-selected="true" onclick="bdShow('notice')">공지사항</button>
+      <button type="button" role="tab" id="bdt-review" aria-selected="false" onclick="bdShow('review')">캠핑 후기</button>
       <button type="button" role="tab" id="bdt-gear" aria-selected="false" onclick="bdShow('gear')">장비 요청</button>
       <button type="button" role="tab" id="bdt-dev" aria-selected="false" onclick="bdShow('dev')">개발 요청</button>
     </div>
     <section class="bd-pane" id="bd-notice" role="tabpanel" aria-labelledby="bdt-notice"><ul class="nt-list" id="ntList"><li class="rq-empty">불러오는 중…</li></ul></section>
+    <section class="bd-pane" id="bd-review" role="tabpanel" aria-labelledby="bdt-review" hidden>
+      <div class="rv-head"><p>캠테리어로 짠 배치와 실제로 펼친 모습을 나란히 올려 주세요. 궁금한 건 댓글로 물어보고, 마음에 드는 배치는 그대로 불러와요.</p><button type="button" class="rv-go" onclick="rvWrite()">＋ 후기 쓰기</button></div>
+      <div class="rv-grid" id="rvList"></div>
+    </section>
     <section class="bd-pane reqb" id="bd-gear" role="tabpanel" aria-labelledby="bdt-gear" hidden>
       <div class="rq-head"><h2>찾는 장비가 없나요?</h2><p>장비 제원에 없는 장비를 알려주세요. 모아서 확인한 뒤 <b>매주 일요일</b>에 한 번에 넣어요.</p></div>
       <form class="rq-form" onsubmit="event.preventDefault();reqSend('gear')">
@@ -1358,22 +1362,6 @@
       <ul class="rq-list" id="rqList-dev"></ul>
     </section>
     <p class="bd-foot">개인정보(전화번호·주소 등)는 적지 마세요. 공개 게시판이라 누구나 볼 수 있어요.</p>
-  </div>
-</div>
-
-<!-- ============ 후기 ============ -->
-<div class="view" id="v-review" data-view="review" hidden>
-  <header class="vhero" aria-labelledby="rvHeroTitle">
-    <picture><source media="(min-width:900px)" srcset="img/wide/night.webp"><img src="img/night.webp" alt="" aria-hidden="true"></picture>
-    <div class="wrap vh-in">
-      <p class="eyebrow">Reviews</p>
-      <h1 id="rvHeroTitle">캠핑 후기</h1>
-      <p>캠테리어로 짠 배치와 실제로 펼친 모습을 나란히 올려 주세요. 궁금한 건 댓글로 서로 물어봐요.</p>
-    </div>
-  </header>
-  <div class="wrap rvwrap">
-    <div class="rv-head"><p>계획한 배치 · 실제 사진 · 바꾼 점까지 한 번에</p><button type="button" class="rv-go" onclick="rvWrite()">＋ 후기 쓰기</button></div>
-    <div class="rv-grid" id="rvList"></div>
   </div>
 </div>
 
@@ -1446,7 +1434,6 @@
   <a href="#mine" data-go="mine" data-tab="mine"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5h16v11H4z"/><path d="M9 8.5V6a3 3 0 0 1 6 0v2.5"/><path d="M4 12.5h16"/></svg><span>내 장비</span></a>
   <a href="#gear" data-go="gear" data-tab="gear"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="11" rx="2"/><path d="M7.5 7v11M12 7v11M16.5 7v11M3 12.5h18"/></svg><span>장비 제원</span></a>
   <a href="#board" data-go="board" data-tab="board"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v10H9l-5 4v-14Z"/><path d="M8 9.5h8M8 12.5h5"/></svg><span>게시판</span></a>
-  <a href="#review" data-go="review" data-tab="review"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m4 17 5-4.5 4 3.5 3-2.5 4 3.5"/></svg><span>후기</span></a>
   <a href="#hub" data-go="hub" data-tab="hub"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11 15.7 7M8.3 13l7.4 4"/></svg><span>캠핑 허브</span></a>
 </nav>
 
@@ -4391,23 +4378,23 @@ async function exportCard(ret){
 /* =====================================================================
    CAMTERIOR — app tabs, gear spec catalog, share links
    ===================================================================== */
-const VIEWS=['intro','plan','mine','gear','board','review','hub'];
+const VIEWS=['intro','plan','mine','gear','board','hub'];
 const LEGACY={top:'intro',features:'intro',how:'intro',lineup:'gear',journal:'hub',commons:'hub'};
 let CUR='intro',planFitted=false;
 const IN_CLAUDE=!!window.claude||!!document.querySelector('[data-art]');
 const appbar=document.getElementById('appbar');
 function updBar(){const h=document.getElementById('top');appbar.classList.toggle('solid',CUR!=='intro'||window.scrollY>(h?h.offsetHeight-80:0));}
 addEventListener('scroll',updBar,{passive:true});
-function go(v,opts){opts=opts||{};v=LEGACY[v]||v;if(/^review\//.test(v||''))v='review';if(!VIEWS.includes(v))v='intro';
+function go(v,opts){opts=opts||{};v=LEGACY[v]||v;let rv=false;if(v==='review'||/^review\//.test(v||'')){v='board';rv=true;}if(!VIEWS.includes(v))v='intro';
   const changed=v!==CUR;CUR=v;document.body.dataset.view=v;
   VIEWS.forEach(k=>{document.getElementById('v-'+k).hidden=k!==v;});
   if(v==='board'&&typeof reqLoad==='function')reqLoad();
-  if(v==='review'&&typeof rvLoad==='function')rvLoad();
+  if(rv&&typeof bdShow==='function')bdShow('review');
   if(v==='mine'&&typeof mineInit==='function')mineInit();
   if(v==='plan'&&typeof aiCheckLeft==='function'&&!go._left){go._left=1;aiCheckLeft();}
   if(v==='plan'&&typeof tourMaybe==='function')tourMaybe();
   document.querySelectorAll('[data-tab]').forEach(a=>{if(a.dataset.tab===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
-  if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v&&!(v==='review'&&location.hash.startsWith('#review/')))history.pushState(null,'','#'+v);
+  if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v&&!(rv&&location.hash.startsWith('#review')))history.pushState(null,'','#'+v);
   if(changed&&!opts.keepScroll)window.scrollTo(0,0);
   if(v==='plan')requestAnimationFrame(()=>{if(!planFitted){fitView();planFitted=true;}render();});
   if(v==='gear')renderGear();
@@ -5079,7 +5066,7 @@ const RQ_ST={gear:{new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정'
 let RQ=null,NT=null,BD_TAB='notice',RQ_MINE=new Set();try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
 const rqSave=()=>{try{localStorage.setItem('rqMine',JSON.stringify([...RQ_MINE].slice(-200)));}catch(e){}};
 async function rqCall(b){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})});const d=await r.json().catch(()=>({}));return r.ok?d:{fail:d.error||'error'};}catch(e){return {fail:'error'};}}
-function bdShow(k){BD_TAB=k;['notice','gear','dev'].forEach(x=>{const t=document.getElementById('bdt-'+x),p=document.getElementById('bd-'+x);if(t)t.setAttribute('aria-selected',x===k);if(p)p.hidden=x!==k;});reqRender();}
+function bdShow(k){BD_TAB=k;if(k==='review'&&typeof rvLoad==='function'&&!document.querySelector('#rvList .rv-card'))rvLoad();['notice','review','gear','dev'].forEach(x=>{const t=document.getElementById('bdt-'+x),p=document.getElementById('bd-'+x);if(t)t.setAttribute('aria-selected',x===k);if(p)p.hidden=x!==k;});reqRender();}
 function bdOpen(k){go('board');bdShow(k);}
 const rqDate=s=>String(s||'').slice(5).replace('-','.');
 function reqRender(){
@@ -5388,7 +5375,7 @@ function rvDetail(){const {item:r,comments:cm}=RV.open,dl=document.getElementByI
         <input id="rvCT" maxlength="300" placeholder="궁금한 점이나 응원 한마디" aria-label="댓글" required><button type="submit" class="rv-go">남기기</button></form>
       <p class="rv-msg" id="rvCMsg" role="status"></p></div></div>`;}
 function rvDialog(){let dl=document.getElementById('rvDlg');if(!dl){dl=document.createElement('dialog');dl.id='rvDlg';dl.className='rv-dlg';dl.setAttribute('aria-labelledby','rvT');document.body.appendChild(dl);
-  dl.addEventListener('close',()=>{if(location.hash.startsWith('#review/'))history.replaceState(null,'','#review');});
+  dl.addEventListener('close',()=>{if(location.hash.startsWith('#review/'))history.replaceState(null,'','#board');});
   dl.addEventListener('click',e=>{if(e.target===dl)dl.close();});}return dl;}
 function rvShow(dl){if(!dl.open){try{dl.showModal();}catch(e){dl.setAttribute('open','');}}}
 function rvClose(){const d=document.getElementById('rvDlg');if(d&&d.open)d.close();}

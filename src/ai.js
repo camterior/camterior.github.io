@@ -410,7 +410,7 @@ const RQ_ST={gear:{new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정'
 let RQ=null,NT=null,BD_TAB='notice',RQ_MINE=new Set();try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
 const rqSave=()=>{try{localStorage.setItem('rqMine',JSON.stringify([...RQ_MINE].slice(-200)));}catch(e){}};
 async function rqCall(b){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})});const d=await r.json().catch(()=>({}));return r.ok?d:{fail:d.error||'error'};}catch(e){return {fail:'error'};}}
-function bdShow(k){BD_TAB=k;['notice','gear','dev'].forEach(x=>{const t=document.getElementById('bdt-'+x),p=document.getElementById('bd-'+x);if(t)t.setAttribute('aria-selected',x===k);if(p)p.hidden=x!==k;});reqRender();}
+function bdShow(k){BD_TAB=k;if(k==='review'&&typeof rvLoad==='function'&&!document.querySelector('#rvList .rv-card'))rvLoad();['notice','review','gear','dev'].forEach(x=>{const t=document.getElementById('bdt-'+x),p=document.getElementById('bd-'+x);if(t)t.setAttribute('aria-selected',x===k);if(p)p.hidden=x!==k;});reqRender();}
 function bdOpen(k){go('board');bdShow(k);}
 const rqDate=s=>String(s||'').slice(5).replace('-','.');
 function reqRender(){
