@@ -7,7 +7,7 @@
 const MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 앞에서부터 시도
 const MODELS_IMAGE = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 사진도 lite 먼저 (flash는 긴 장비 목록+사진에 20초 넘게 걸려서 실사용 불가, 2026-10-30 측정)
 const ALLOWED_ORIGINS = ["https://camterior.github.io"];
-const LIMIT_FREE = 10, LIMIT_CODE = 50, LIMIT_ADMIN = 100000; // 하루 횟수 (한국 시간 기준). 관리자 계정은 사실상 제한 없음
+const LIMIT_FREE = 5, LIMIT_CODE = 50, LIMIT_ADMIN = 100000; // 하루 횟수 (한국 시간 기준). 관리자 계정은 사실상 제한 없음
 const MAX_INPUT_CHARS = 8000;
 const MAX_SYSTEM_CHARS = 40000; // 사진 인식은 장비 목록 전체를 보내서 길어요
 const MAX_IMAGE_CHARS = 3000000; // base64 약 2.2MB
@@ -59,6 +59,24 @@ async function acct(a, env, request, origin) {
     o.gear = out; o.up = day;
     await env.RL.put("acct:" + code, JSON.stringify(o));
     return json({ ok: true, vip: !!o.vip, admin: !!o.admin }, 200, origin);
+  }
+  // 저장한 세팅(배치) 목록: 같은 코드면 휴대폰·PC 어디서든 같은 목록
+  if (a.op === "plans" || a.op === "plan_add" || a.op === "plan_del") {
+    const pk = "plans:" + code;
+    let L = []; try { L = JSON.parse(await env.RL.get(pk) || "[]"); if (!Array.isArray(L)) L = []; } catch (e) { L = []; }
+    if (a.op === "plan_add") {
+      if (!(await bump(`pa:${day}:${ip}`, 80))) return json({ error: "quota" }, 429, origin);
+      const r = a.plan || {}, c = String(r.code || "");
+      if (!/^CAMP-[A-Za-z0-9_\-]{8,8000}$/.test(c)) return json({ error: "plan" }, 400, origin);
+      const id = /^[a-z0-9]{2,20}$/.test(String(r.id || "")) ? String(r.id) : "p" + Date.now().toString(36);
+      L = L.filter(x => x.id !== id);
+      L.unshift({ id, name: String(r.name || "배치").slice(0, 40), summary: String(r.summary || "").slice(0, 120), code: c, savedAt: Math.min(Date.now(), +r.savedAt || Date.now()) });
+      L = L.slice(0, 40);
+      while (JSON.stringify(L).length > 220000 && L.length > 1) L.pop();
+      await env.RL.put(pk, JSON.stringify(L));
+    }
+    if (a.op === "plan_del") { L = L.filter(x => x.id !== String(a.id || "")); await env.RL.put(pk, JSON.stringify(L)); }
+    return json({ ok: true, plans: L }, 200, origin);
   }
   if (a.op === "invite") {
     // 관리 키(ADMIN_KEY)를 초대 코드 칸에 넣으면 이 코드가 관리자 계정(AI 제한 없음)이 됨
@@ -134,10 +152,101 @@ async function board(b, env, request, origin) {
   return json({ error: "op" }, 400, origin);
 }
 
+
+// ===== 캠핑 후기: 배치 사진 + 실제 사진 + 댓글 (같은 KV) =====
+// rv:<id> 글, rvc:<id> 댓글, rimg:<id>:<k> 사진(JPEG 바이트), rvidx 목록(최신순 id 배열)
+const RV_MAX_IMG = 450000; // base64 글자 수(약 330KB) — 사이트에서 1600px JPEG로 줄여 보냄
+const rid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const b64bytes = b => Uint8Array.from(atob(b), c => c.charCodeAt(0));
+async function bump(env, k, max) { const n = parseInt(await env.RL.get(k)) || 0; if (n >= max) return false; await env.RL.put(k, String(n + 1), { expirationTtl: 172800 }); return true; }
+function rvPub(r, full) {
+  const o = { id: r.id, title: r.title, site: r.site, date: r.date, rating: r.rating, nick: r.nick, at: r.at, tent: r.tent || "", likes: r.likes || 0, nc: r.nc || 0, plan: !!r.plan, nimg: r.nimg || 0, hasPlanImg: !!r.planImg };
+  if (full) Object.assign(o, { good: r.good || "", changed: r.changed || "", next: r.next || "", plan: r.plan || "", gear: r.gear || [] });
+  return o;
+}
+async function review(v, env, request, origin) {
+  if (!env.RL) return json({ error: "off" }, 503, origin);
+  const ip = request.headers.get("CF-Connecting-IP") || "0", day = today();
+  const isAdmin = env.ADMIN_KEY && v.key === env.ADMIN_KEY;
+  const idx = JSON.parse((await env.RL.get("rvidx")) || "[]");
+  const getR = async id => { const t = await env.RL.get("rv:" + String(id || "").slice(0, 20)); return t ? JSON.parse(t) : null; };
+  if (v.op === "list") {
+    const page = Math.max(0, parseInt(v.page) || 0), ids = idx.slice(page * 24, page * 24 + 24);
+    const rows = (await Promise.all(ids.map(getR))).filter(r => r && (!r.hide || isAdmin)).map(r => Object.assign(rvPub(r), isAdmin ? { hide: !!r.hide, rep: r.rep || 0 } : {}));
+    return json({ items: rows, more: idx.length > page * 24 + 24, total: idx.length }, 200, origin);
+  }
+  if (v.op === "get") {
+    const r = await getR(v.id); if (!r || (r.hide && !isAdmin)) return json({ error: "none" }, 404, origin);
+    const cm = JSON.parse((await env.RL.get("rvc:" + r.id)) || "[]").filter(c => !c.hide || isAdmin).map(({ id, nick, text, at }) => ({ id, nick, text, at }));
+    return json({ item: rvPub(r, true), comments: cm }, 200, origin);
+  }
+  if (v.op === "add") {
+    if (!(await bump(env, `rva:${day}:${ip}`, 3))) return json({ error: "quota" }, 429, origin);
+    const title = clip(v.title, 40), nick = clip(v.nick, 16) || "캠퍼";
+    if (title.length < 2) return json({ error: "empty" }, 400, origin);
+    const imgs = (Array.isArray(v.photos) ? v.photos : []).slice(0, 4).map(x => String(x || ""));
+    const planImg = String(v.planImg || "");
+    for (const b of imgs.concat(planImg ? [planImg] : [])) if (b.length > RV_MAX_IMG || /[^A-Za-z0-9+/=]/.test(b)) return json({ error: "image" }, 400, origin);
+    if (!imgs.length && !planImg) return json({ error: "photo" }, 400, origin);
+    const id = rid(), own = crypto.randomUUID();
+    const r = { id, own, title, nick, site: clip(v.site, 40), date: /^\d{4}-\d{2}-\d{2}$/.test(v.date || "") ? v.date : "", rating: Math.min(5, Math.max(0, Math.round(+v.rating || 0))),
+      tent: clip(v.tent, 40), good: clip(v.good, 600), changed: clip(v.changed, 600), next: clip(v.next, 600),
+      plan: /^CAMP-[A-Za-z0-9_\-]{10,6000}$/.test(v.plan || "") ? v.plan : "", gear: (Array.isArray(v.gear) ? v.gear : []).slice(0, 12).map(g => clip(g, 30)).filter(Boolean),
+      nimg: imgs.length, planImg: !!planImg, likes: 0, nc: 0, rep: 0, at: Date.now(), ip };
+    if (planImg) await env.RL.put(`rimg:${id}:p`, b64bytes(planImg));
+    for (let k = 0; k < imgs.length; k++) await env.RL.put(`rimg:${id}:${k}`, b64bytes(imgs[k]));
+    await env.RL.put("rv:" + id, JSON.stringify(r));
+    idx.unshift(id); await env.RL.put("rvidx", JSON.stringify(idx.slice(0, 2000)));
+    return json({ ok: true, id, own }, 200, origin);
+  }
+  const r = await getR(v.id);
+  if (!r) return json({ error: "none" }, 404, origin);
+  if (v.op === "comment") {
+    if (r.hide) return json({ error: "none" }, 404, origin);
+    if (!(await bump(env, `rvm:${day}:${ip}`, 30))) return json({ error: "quota" }, 429, origin);
+    const text = clip(v.text, 300); if (text.length < 1) return json({ error: "empty" }, 400, origin);
+    const cm = JSON.parse((await env.RL.get("rvc:" + r.id)) || "[]");
+    if (cm.length >= 300) return json({ error: "full" }, 507, origin);
+    cm.push({ id: rid(), nick: clip(v.nick, 16) || "캠퍼", text, at: Date.now(), ip });
+    await env.RL.put("rvc:" + r.id, JSON.stringify(cm)); r.nc = cm.filter(c => !c.hide).length; await env.RL.put("rv:" + r.id, JSON.stringify(r));
+    return json({ ok: true, comments: cm.filter(c => !c.hide).map(({ id, nick, text, at }) => ({ id, nick, text, at })) }, 200, origin);
+  }
+  if (v.op === "like") {
+    const lk = `rvl:${r.id}:${ip}`; if (await env.RL.get(lk)) return json({ ok: true, likes: r.likes || 0, already: true }, 200, origin);
+    await env.RL.put(lk, "1", { expirationTtl: 31536000 }); r.likes = (r.likes || 0) + 1; await env.RL.put("rv:" + r.id, JSON.stringify(r));
+    return json({ ok: true, likes: r.likes }, 200, origin);
+  }
+  if (v.op === "report") {
+    const rk = `rvr:${r.id}:${ip}`; if (!(await env.RL.get(rk))) { await env.RL.put(rk, "1", { expirationTtl: 2592000 }); r.rep = (r.rep || 0) + 1; if (r.rep >= 3) r.hide = true; await env.RL.put("rv:" + r.id, JSON.stringify(r)); }
+    return json({ ok: true }, 200, origin);
+  }
+  if (v.op === "del") { // 쓴 사람(own 토큰) 또는 관리자
+    if (!isAdmin && (!v.own || v.own !== r.own)) return json({ error: "key" }, 403, origin);
+    for (const k of ["p", 0, 1, 2, 3]) await env.RL.delete(`rimg:${r.id}:${k}`);
+    await env.RL.delete("rv:" + r.id); await env.RL.delete("rvc:" + r.id);
+    await env.RL.put("rvidx", JSON.stringify(idx.filter(x => x !== r.id)));
+    return json({ ok: true }, 200, origin);
+  }
+  if (!isAdmin) return json({ error: "key" }, 403, origin);
+  if (v.op === "hide") { r.hide = !!v.hide; if (!r.hide) r.rep = 0; await env.RL.put("rv:" + r.id, JSON.stringify(r)); return json({ ok: true }, 200, origin); }
+  if (v.op === "cdel") { const cm = JSON.parse((await env.RL.get("rvc:" + r.id)) || "[]").filter(c => c.id !== v.cid); await env.RL.put("rvc:" + r.id, JSON.stringify(cm)); r.nc = cm.length; await env.RL.put("rv:" + r.id, JSON.stringify(r)); return json({ ok: true }, 200, origin); }
+  return json({ error: "op" }, 400, origin);
+}
+// 후기 사진: GET /img/<id>/<k> (k = p | 0..3)
+async function reviewImg(url, env) {
+  const m = url.pathname.match(/^\/img\/([a-z0-9]{6,20})\/(p|[0-3])$/);
+  if (!m || !env.RL) return new Response("", { status: 404 });
+  const r = await env.RL.get("rv:" + m[1]); if (!r || JSON.parse(r).hide) return new Response("", { status: 404 });
+  const b = await env.RL.get(`rimg:${m[1]}:${m[2]}`, "arrayBuffer");
+  if (!b) return new Response("", { status: 404 });
+  return new Response(b, { headers: { "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=604800", "Access-Control-Allow-Origin": "*", "Cross-Origin-Resource-Policy": "cross-origin" } });
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
     if (request.method === "OPTIONS") return new Response(null, { headers: cors(origin) });
+    if (request.method === "GET") return reviewImg(new URL(request.url), env);
     if (request.method !== "POST") return json({ error: "method" }, 405, origin);
     if (!ALLOWED_ORIGINS.includes(origin)) return json({ error: "origin" }, 403, origin);
     if (!env.GEMINI_API_KEY) return json({ error: "key" }, 500, origin);
@@ -146,6 +255,7 @@ export default {
     try { body = await request.json(); } catch { return json({ error: "bad" }, 400, origin); }
 
     if (body.board) return board(body.board, env, request, origin);
+    if (body.review) return review(body.review, env, request, origin);
     if (body.acct && typeof body.acct === "object") return acct(body.acct, env, request, origin);
 
     // 하루 횟수
