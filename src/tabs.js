@@ -14,6 +14,7 @@ function go(v,opts){opts=opts||{};v=LEGACY[v]||v;if(!VIEWS.includes(v))v='intro'
   if(v==='board'&&typeof reqLoad==='function')reqLoad();
   if(v==='mine'&&typeof mineInit==='function')mineInit();
   if(v==='plan'&&typeof aiCheckLeft==='function'&&!go._left){go._left=1;aiCheckLeft();}
+  if(v==='plan'&&typeof tourMaybe==='function')tourMaybe();
   document.querySelectorAll('[data-tab]').forEach(a=>{if(a.dataset.tab===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v)history.pushState(null,'','#'+v);
   if(changed&&!opts.keepScroll)window.scrollTo(0,0);

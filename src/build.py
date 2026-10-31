@@ -48,9 +48,18 @@ head = re.sub(r'url\(data:font/woff2;base64,[^)]+\)', 'url(assets/pretendard.wof
 assert 'base64' not in head, 'leftover base64 in head'
 META = '''<meta name="description" content="캠테리어(CAMTERIOR) — 텐트 바닥 도면 위에 IGT·선반·난로를 실제 크기로 배치해보는 캠핑 인테리어 플래너">
 <meta name="theme-color" content="#0C1813">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="캠테리어 CAMTERIOR">
+<meta property="og:url" content="https://camterior.github.io/">
 <meta property="og:title" content="캠테리어 · 캠핑 인테리어 플래너">
-<meta property="og:description" content="텐트 도면 위에 장비를 mm 단위로 먼저 놓아보고 떠나세요.">
-<meta property="og:image" content="img/intro.webp">
+<meta property="og:description" content="텐트 도면 위에 내 장비를 실제 크기로 놓아보고 떠나세요. 장비 이름만 적으면 AI가 자동 배치, 무료·로그인 없이.">
+<meta property="og:image" content="https://camterior.github.io/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="캠테리어 — 캠핑장 위에, 나만의 인테리어">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://camterior.github.io/img/og.jpg">
 <link rel="icon" href="assets/icon-64.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">

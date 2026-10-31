@@ -5,9 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="캠테리어(CAMTERIOR) — 텐트 바닥 도면 위에 IGT·선반·난로를 실제 크기로 배치해보는 캠핑 인테리어 플래너">
 <meta name="theme-color" content="#0C1813">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="캠테리어 CAMTERIOR">
+<meta property="og:url" content="https://camterior.github.io/">
 <meta property="og:title" content="캠테리어 · 캠핑 인테리어 플래너">
-<meta property="og:description" content="텐트 도면 위에 장비를 mm 단위로 먼저 놓아보고 떠나세요.">
-<meta property="og:image" content="img/intro.webp">
+<meta property="og:description" content="텐트 도면 위에 내 장비를 실제 크기로 놓아보고 떠나세요. 장비 이름만 적으면 AI가 자동 배치, 무료·로그인 없이.">
+<meta property="og:image" content="https://camterior.github.io/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="캠테리어 — 캠핑장 위에, 나만의 인테리어">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://camterior.github.io/img/og.jpg">
 <link rel="icon" href="assets/icon-64.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1016,6 +1025,20 @@
 .ca-dm{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:#FFF4EE;border:1px solid #F6D3C2;color:var(--ink,#16190f);text-decoration:none;font-size:13.5px;line-height:1.5}
 .ca-dm b{font-weight:700}.ca-dm-ic{flex:none;width:30px;height:30px;border-radius:9px;background:linear-gradient(45deg,#F58529,#DD2A7B 55%,#8134AF);position:relative}
 .ca-dm-ic::before{content:'';position:absolute;inset:7px;border:2px solid #fff;border-radius:6px}.ca-dm-ic::after{content:'';position:absolute;left:12px;top:12px;width:6px;height:6px;border:2px solid #fff;border-radius:50%}
+.tour{position:fixed;inset:0;z-index:2000}
+.tour-hole{position:fixed;border-radius:16px;box-shadow:0 0 0 200vmax rgba(10,14,11,.62);outline:3px solid #FF5A1F;outline-offset:2px;transition:all .25s ease;pointer-events:none}
+.tour-card{position:fixed;left:50%;transform:translateX(-50%);width:min(92vw,380px);background:#fff;color:#16190f;border-radius:18px;padding:16px 18px 14px;box-shadow:0 18px 50px rgba(0,0,0,.3);transition:top .25s ease}
+.tour-n{margin:0 0 4px;font-size:12px;font-weight:700;color:#FF5A1F;letter-spacing:.04em}
+.tour-card h3{margin:0 0 6px;font-size:19px;font-weight:800}
+.tour-d{margin:0 0 14px;font-size:15px;line-height:1.55;color:#3c423c}
+.tour-btns{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tour-btns span{display:flex;gap:8px}
+.tour-btns button{border:0;border-radius:999px;padding:10px 16px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;min-height:42px}
+.tour-skip{background:transparent;color:#7a807a}
+.tour-prev{background:#EEF0EC;color:#16190f}
+.tour-next{background:#16190f;color:#fff}
+.tour-again{border:0;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.tour-hole,.tour-card{transition:none}}
 </style>
 
 </head>
@@ -1139,7 +1162,7 @@
       <div class="dock" id="dock" role="toolbar" aria-label="배치 도구"></div>
       <div class="hintbubble" id="hint">텐트와 타프를 고른 뒤 테이블이나 선반·난로를 추가해 보세요</div>
     </div>
-    <div class="stagefoot">끌어서 이동 · 두 손가락으로 확대 · ⟳ 돌리기</div>
+    <div class="stagefoot">끌어서 이동 · 두 손가락으로 확대 · ⟳ 돌리기 · <button type="button" class="tour-again" onclick="tourOpen(0)">사용법 보기</button></div>
   </section>
 
   <aside class="pane right" aria-label="선택한 장비와 점검">
@@ -1347,7 +1370,7 @@
       <button class="btn" onclick="view3('orbit')">둘러보기</button>
       <button class="btn" onclick="view3('eye')">앉은 눈높이</button>
       <button class="btn" onclick="view3('top')">위에서</button>
-      <button class="btn" onclick="save3DPNG()">이미지 저장</button>
+      <button class="btn" onclick="save3DPNG()">사진 카드 저장</button>
       <button class="btn primary" onclick="close3D()">닫기</button>
     </div>
   </div>
@@ -4026,6 +4049,10 @@ function reviewsOfPost(i){const g=GALLERY[i];if(!g)return;const rv=reviewsFor(g.
 
 /* files */
 async function offerFile(filename,data){
+  // 휴대폰: 사진은 공유 창(인스타·카카오톡·사진 저장)으로 바로. 안 되면 아래 다운로드로
+  if(!DL&&!window.claude&&data instanceof Blob&&/^image\//.test(data.type)&&matchMedia('(pointer:coarse)').matches&&navigator.canShare){
+    try{const f=new File([data],filename,{type:data.type});if(navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'캠테리어 배치',text:'캠테리어에서 만든 내 캠핑 배치 · camterior.github.io'});setStatus('공유 창을 열었어요.');return;}}
+    catch(e){if(e&&e.name==='AbortError'){setStatus('공유를 취소했어요.');return;}}}
   if(DL){try{await DL.save({filename,data});setStatus(`${filename} 저장했어요.`);}
     catch(e){setStatus(e&&e.code==='declined'?'저장을 취소했어요.':(e&&e.code==='rate_limited'?'저장 창이 이미 열려 있어요. 잠시 뒤 다시 해주세요.':'이 화면에서는 파일을 저장할 수 없어요. 공유 코드를 써주세요.'));}return;}
   if(window.claude){setStatus('이 화면에서는 파일을 저장할 수 없어요. 공유 코드를 써주세요.');return;}
@@ -4059,8 +4086,35 @@ async function exportPNG(){
     const blob=await new Promise(r=>cv.toBlob(r,'image/png'));await offerFile(`camp-layout-${stamp()}.png`,blob);}
   catch(e){console.error(e);setStatus('이미지를 만들지 못했어요.');}
   finally{URL.revokeObjectURL(url);render();}}
-async function save3DPNG(){if(!V3.renderer)return;V3.renderer.render(V3.scene,V3.camera);
-  const blob=await new Promise(r=>V3.renderer.domElement.toBlob(r,'image/png'));if(blob)await offerFile(`camp-3d-${stamp()}.png`,blob);}
+// 입체 화면을 캠테리어 로고·제목·장비 이름이 들어간 세로 카드(1080×1350, 인스타 4:5)로 저장
+async function save3DPNG(){if(!V3.renderer)return;
+  try{await document.fonts.load('800 60px Pretendard');}catch(e){}
+  const W=1080,H=1350,PX=60,PY=300,PW=W-PX*2,PH=860,R=V3.renderer,cam=V3.camera;
+  // 카드 칸 비율(960×860)로 잠깐 다시 그려서 휴대폰 세로 화면에서도 잘리지 않게
+  const ow=R.domElement.clientWidth,oh=R.domElement.clientHeight,oa=cam.aspect,pr=R.getPixelRatio();
+  R.setPixelRatio(1);R.setSize(PW,PH,false);cam.aspect=PW/PH;cam.updateProjectionMatrix();R.render(V3.scene,cam);
+  const src=document.createElement('canvas');src.width=PW;src.height=PH;src.getContext('2d').drawImage(R.domElement,0,0);
+  R.setPixelRatio(pr);R.setSize(ow,oh,false);cam.aspect=oa;cam.updateProjectionMatrix();R.render(V3.scene,cam);
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');cardHead(g,W,PX);
+  g.save();g.beginPath();g.roundRect(PX,PY,PW,PH,28);g.clip();
+  const r=Math.max(PW/src.width,PH/src.height),dw=src.width*r,dh=src.height*r;g.drawImage(src,PX+(PW-dw)/2,PY+(PH-dh)/2,dw,dh);g.restore();
+  cardFoot(g,W,H,PX,PY+PH+76);
+  const blob=await new Promise(r=>cv.toBlob(r,'image/png'));if(blob)await offerFile(`camterior-3d-${stamp()}.png`,blob);}
+// 사진 카드 공통: 위쪽 로고·제목·사이트 크기 / 아래쪽 장비 이름·출처
+function cardHead(g,W,PX){const F=(w,s)=>`${w} ${s}px Pretendard, "Apple SD Gothic Neo", sans-serif`;
+  g.fillStyle='#0C1813';g.fillRect(0,0,W,1350);
+  g.fillStyle='#FF5A1F';g.beginPath();g.roundRect(PX,64,48,48,13);g.fill();
+  g.strokeStyle='#fff';g.lineWidth=4;g.lineJoin='round';g.beginPath();g.moveTo(PX+10,PX+44);g.lineTo(PX+24,74);g.lineTo(PX+38,PX+44);g.closePath();g.stroke();g.beginPath();g.moveTo(PX+24,74);g.lineTo(PX+24,PX+44);g.stroke();
+  g.fillStyle='#fff';g.font=F(800,30);g.textAlign='left';g.fillText('CAMTERIOR',PX+64,98);
+  g.fillStyle='#7FD1A4';g.font=F(600,22);g.textAlign='right';g.fillText('@hj_ironcamp',W-PX,98);g.textAlign='left';
+  const T=TENTS[tent.id],t=TARPS[tarp.id],sb=sceneBox(true);
+  const title=(document.getElementById('saveName').value||'').trim()||[T.outer?(typeof twinDx==='function'&&twinDx(T)?T.twin.name:T.name):null,t?t.name:null].filter(Boolean).join(' + ')||'내 캠핑 배치';
+  g.fillStyle='#fff';g.font=F(800,58);g.fillText(title.length>18?title.slice(0,18)+'…':title,PX,200);
+  g.fillStyle='#A9B6AE';g.font=F(500,26);g.fillText(`필요한 사이트 ${((sb[1][0]-sb[0][0])/1000).toFixed(1)} × ${((sb[1][1]-sb[0][1])/1000).toFixed(1)} m  ·  장비 ${new Set(state.pieces.filter(p=>p.parent==null).map(p=>p.uid)).size}세트`,PX,252);}
+function cardFoot(g,W,H,PX,y0){const F=(w,s)=>`${w} ${s}px Pretendard, "Apple SD Gothic Neo", sans-serif`;
+  const gear=[...new Map(state.pieces.map(p=>[CATALOG[p.type].name,0])).keys()].slice(0,8);let x=PX,y=y0;g.font=F(700,24);
+  gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-80)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
+  g.fillStyle='#5F6E66';g.font=F(500,20);g.textAlign='left';g.fillText('camterior.github.io · 규격: 판매처·제조사 공개 치수, 일부 추정',PX,H-34);}
 
 async function initShare(){
   renderMine();renderGallery();renderJournal();
@@ -4229,8 +4283,8 @@ async function exportCard(){
     const gear=[...new Map(state.pieces.map(p=>[CATALOG[p.type].name,0])).keys()].slice(0,8);
     let x=PX,y=PY+PH+92;g.font=F(700,24);
     gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-70)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
-    g.fillStyle='#5F6E66';g.font=F(500,20);g.fillText('규격: 판매처·제조사 공개 치수 기준, 일부 추정',PX,H-34);
-    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));await offerFile('camp-layout-card.png',blob);}
+    g.fillStyle='#5F6E66';g.font=F(500,20);g.fillText('camterior.github.io · 규격: 판매처·제조사 공개 치수, 일부 추정',PX,H-34);
+    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));await offerFile(`camterior-card-${stamp()}.png`,blob);}
   finally{URL.revokeObjectURL(url);}}
 
 (function v17boot(){renderPresets();HIST.last=JSON.stringify(planObj());updUndo();})();
@@ -4252,6 +4306,7 @@ function go(v,opts){opts=opts||{};v=LEGACY[v]||v;if(!VIEWS.includes(v))v='intro'
   if(v==='board'&&typeof reqLoad==='function')reqLoad();
   if(v==='mine'&&typeof mineInit==='function')mineInit();
   if(v==='plan'&&typeof aiCheckLeft==='function'&&!go._left){go._left=1;aiCheckLeft();}
+  if(v==='plan'&&typeof tourMaybe==='function')tourMaybe();
   document.querySelectorAll('[data-tab]').forEach(a=>{if(a.dataset.tab===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(!opts.noHash&&!IN_CLAUDE&&location.hash!=='#'+v)history.pushState(null,'','#'+v);
   if(changed&&!opts.keepScroll)window.scrollTo(0,0);
@@ -5129,6 +5184,40 @@ async function codeAskGo(ev){ev.preventDefault();const m=document.getElementById
   if(r.ok){codeAskDone();setTimeout(()=>{const d=document.getElementById('codeAsk');if(d&&d.open)d.close();},1400);}return false;}
 function codeAskMaybe(){try{if(IN_CLAUDE||acctCode()||localStorage.getItem(ASK_KEY))return;}catch(e){return;}setTimeout(codeAskOpen,700);}
 codeAskMaybe();
+// ===== 처음 온 사람용 30초 안내: 실제 화면 위치를 하나씩 비춰 줘요 =====
+const TOUR_KEY='camTour1';
+const TOUR=[
+  ['#aiset','✨ 장비만 적으면 끝','가진 텐트와 장비 이름을 적고 <b>AI로 세팅하기</b>를 누르면 실제 크기로 알아서 놓아줘요.'],
+  ['.pane.left .tabs','직접 고르기','<b>텐트 → 타프 → 장비</b> 순서로 눌러서 하나씩 넣을 수도 있어요.'],
+  ['#board','끌어서 옮기기','장비를 손가락으로 끌어서 옮겨요. 누르면 <b>90° 돌리기·삭제</b> 버튼이 나와요. 두 손가락으로 확대해요.'],
+  ['.stagebar .mode','입체로 보기','<b>입체</b>를 누르면 텐트 안이 얼마나 찰지 3D로 돌려 볼 수 있어요.'],
+  ['.stagebar .savepill','저장·공유','<b>저장</b>에서 링크나 <b>사진 카드</b>로 친구·인스타에 바로 공유해요.']];
+let TOUR_I=0;
+function tourSeen(){try{return !!localStorage.getItem(TOUR_KEY);}catch(e){return true;}}
+function tourDone(){try{localStorage.setItem(TOUR_KEY,'1');}catch(e){}const o=document.getElementById('tour');if(o)o.remove();removeEventListener('resize',tourPlace);}
+function tourMaybe(){if(IN_CLAUDE||tourSeen()||document.getElementById('tour'))return;
+  const ca=document.getElementById('codeAsk');
+  if(ca&&ca.open){ca.addEventListener('close',()=>setTimeout(()=>{if(CUR==='plan')tourOpen(0);},400),{once:true});return;}
+  // 코드 팝업이 곧 뜰 예정이면 그 뒤에
+  let asked=true;try{asked=!!localStorage.getItem(ASK_KEY)||!!acctCode();}catch(e){}
+  setTimeout(()=>{const c=document.getElementById('codeAsk');if(c&&c.open)return tourMaybe();if(CUR==='plan'&&!tourSeen())tourOpen(0);},asked?600:1500);}
+function tourOpen(i){TOUR_I=i||0;let o=document.getElementById('tour');
+  if(!o){o=document.createElement('div');o.id='tour';o.className='tour';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-labelledby','tourT');
+    o.innerHTML='<div class="tour-hole"></div><div class="tour-card"><p class="tour-n" id="tourN"></p><h3 id="tourT"></h3><p class="tour-d" id="tourD"></p><div class="tour-btns"><button type="button" class="tour-skip" onclick="tourDone()">건너뛰기</button><span><button type="button" class="tour-prev" onclick="tourStep(-1)">이전</button><button type="button" class="tour-next" onclick="tourStep(1)">다음</button></span></div></div>';
+    document.body.appendChild(o);addEventListener('resize',tourPlace);
+    o.addEventListener('keydown',e=>{if(e.key==='Escape')tourDone();});}
+  tourShow();}
+function tourStep(d){TOUR_I+=d;if(TOUR_I>=TOUR.length)return tourDone();if(TOUR_I<0)TOUR_I=0;tourShow();}
+function tourShow(){const [sel,t,d]=TOUR[TOUR_I],el=document.querySelector(sel);
+  document.getElementById('tourN').textContent=`${TOUR_I+1} / ${TOUR.length}`;document.getElementById('tourT').textContent=t;document.getElementById('tourD').innerHTML=d;
+  document.querySelector('#tour .tour-prev').hidden=TOUR_I===0;const nx=document.querySelector('#tour .tour-next');nx.textContent=TOUR_I===TOUR.length-1?'시작하기':'다음';
+  if(el){const r=el.getBoundingClientRect(),top=r.top+scrollY-Math.max(80,(innerHeight-Math.min(r.height,innerHeight*.5))/2-120);scrollTo({top:Math.max(0,top),behavior:'instant'});}
+  requestAnimationFrame(()=>{tourPlace();nx.focus();});}
+function tourPlace(){const o=document.getElementById('tour');if(!o)return;const el=document.querySelector(TOUR[TOUR_I][0]),h=o.querySelector('.tour-hole'),c=o.querySelector('.tour-card');
+  if(!el){h.style.cssText='display:none';c.style.top='30%';return;}
+  const r=el.getBoundingClientRect(),p=8,vh=innerHeight,top=Math.max(4,r.top-p),hh=Math.min(r.bottom+p,vh-4)-top;
+  h.style.cssText=`display:block;left:${Math.max(4,r.left-p)}px;top:${top}px;width:${Math.min(r.width+2*p,innerWidth-8)}px;height:${Math.max(40,hh)}px`;
+  const ch=c.offsetHeight||170,below=top+hh+12;c.style.top=(below+ch<vh-8?below:Math.max(8,top-ch-12))+'px';}
 // ===== 장비 제원에서 고르기 =====
 let PICK_SEC=null;
 function minePickUI(){const el=document.getElementById('minePick');if(!el)return;const secs=mineSecs();if(!PICK_SEC)PICK_SEC=secs[0].k;

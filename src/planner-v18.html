@@ -742,7 +742,7 @@
       <div class="dock" id="dock" role="toolbar" aria-label="배치 도구"></div>
       <div class="hintbubble" id="hint">텐트와 타프를 고른 뒤 테이블이나 선반·난로를 추가해 보세요</div>
     </div>
-    <div class="stagefoot">끌어서 이동 · 두 손가락으로 확대 · ⟳ 돌리기</div>
+    <div class="stagefoot">끌어서 이동 · 두 손가락으로 확대 · ⟳ 돌리기 · <button type="button" class="tour-again" onclick="tourOpen(0)">사용법 보기</button></div>
   </section>
 
   <aside class="pane right" aria-label="선택한 장비와 점검">
@@ -817,7 +817,7 @@
       <button class="btn" onclick="view3('orbit')">둘러보기</button>
       <button class="btn" onclick="view3('eye')">앉은 눈높이</button>
       <button class="btn" onclick="view3('top')">위에서</button>
-      <button class="btn" onclick="save3DPNG()">이미지 저장</button>
+      <button class="btn" onclick="save3DPNG()">사진 카드 저장</button>
       <button class="btn primary" onclick="close3D()">닫기</button>
     </div>
   </div>
@@ -3511,6 +3511,10 @@ function reviewsOfPost(i){const g=GALLERY[i];if(!g)return;const rv=reviewsFor(g.
 
 /* files */
 async function offerFile(filename,data){
+  // 휴대폰: 사진은 공유 창(인스타·카카오톡·사진 저장)으로 바로. 안 되면 아래 다운로드로
+  if(!DL&&!window.claude&&data instanceof Blob&&/^image\//.test(data.type)&&matchMedia('(pointer:coarse)').matches&&navigator.canShare){
+    try{const f=new File([data],filename,{type:data.type});if(navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'캠테리어 배치',text:'캠테리어에서 만든 내 캠핑 배치 · camterior.github.io'});setStatus('공유 창을 열었어요.');return;}}
+    catch(e){if(e&&e.name==='AbortError'){setStatus('공유를 취소했어요.');return;}}}
   if(DL){try{await DL.save({filename,data});setStatus(`${filename} 저장했어요.`);}
     catch(e){setStatus(e&&e.code==='declined'?'저장을 취소했어요.':(e&&e.code==='rate_limited'?'저장 창이 이미 열려 있어요. 잠시 뒤 다시 해주세요.':'이 화면에서는 파일을 저장할 수 없어요. 공유 코드를 써주세요.'));}return;}
   if(window.claude){setStatus('이 화면에서는 파일을 저장할 수 없어요. 공유 코드를 써주세요.');return;}
@@ -3544,8 +3548,35 @@ async function exportPNG(){
     const blob=await new Promise(r=>cv.toBlob(r,'image/png'));await offerFile(`camp-layout-${stamp()}.png`,blob);}
   catch(e){console.error(e);setStatus('이미지를 만들지 못했어요.');}
   finally{URL.revokeObjectURL(url);render();}}
-async function save3DPNG(){if(!V3.renderer)return;V3.renderer.render(V3.scene,V3.camera);
-  const blob=await new Promise(r=>V3.renderer.domElement.toBlob(r,'image/png'));if(blob)await offerFile(`camp-3d-${stamp()}.png`,blob);}
+// 입체 화면을 캠테리어 로고·제목·장비 이름이 들어간 세로 카드(1080×1350, 인스타 4:5)로 저장
+async function save3DPNG(){if(!V3.renderer)return;
+  try{await document.fonts.load('800 60px Pretendard');}catch(e){}
+  const W=1080,H=1350,PX=60,PY=300,PW=W-PX*2,PH=860,R=V3.renderer,cam=V3.camera;
+  // 카드 칸 비율(960×860)로 잠깐 다시 그려서 휴대폰 세로 화면에서도 잘리지 않게
+  const ow=R.domElement.clientWidth,oh=R.domElement.clientHeight,oa=cam.aspect,pr=R.getPixelRatio();
+  R.setPixelRatio(1);R.setSize(PW,PH,false);cam.aspect=PW/PH;cam.updateProjectionMatrix();R.render(V3.scene,cam);
+  const src=document.createElement('canvas');src.width=PW;src.height=PH;src.getContext('2d').drawImage(R.domElement,0,0);
+  R.setPixelRatio(pr);R.setSize(ow,oh,false);cam.aspect=oa;cam.updateProjectionMatrix();R.render(V3.scene,cam);
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');cardHead(g,W,PX);
+  g.save();g.beginPath();g.roundRect(PX,PY,PW,PH,28);g.clip();
+  const r=Math.max(PW/src.width,PH/src.height),dw=src.width*r,dh=src.height*r;g.drawImage(src,PX+(PW-dw)/2,PY+(PH-dh)/2,dw,dh);g.restore();
+  cardFoot(g,W,H,PX,PY+PH+76);
+  const blob=await new Promise(r=>cv.toBlob(r,'image/png'));if(blob)await offerFile(`camterior-3d-${stamp()}.png`,blob);}
+// 사진 카드 공통: 위쪽 로고·제목·사이트 크기 / 아래쪽 장비 이름·출처
+function cardHead(g,W,PX){const F=(w,s)=>`${w} ${s}px Pretendard, "Apple SD Gothic Neo", sans-serif`;
+  g.fillStyle='#0C1813';g.fillRect(0,0,W,1350);
+  g.fillStyle='#FF5A1F';g.beginPath();g.roundRect(PX,64,48,48,13);g.fill();
+  g.strokeStyle='#fff';g.lineWidth=4;g.lineJoin='round';g.beginPath();g.moveTo(PX+10,PX+44);g.lineTo(PX+24,74);g.lineTo(PX+38,PX+44);g.closePath();g.stroke();g.beginPath();g.moveTo(PX+24,74);g.lineTo(PX+24,PX+44);g.stroke();
+  g.fillStyle='#fff';g.font=F(800,30);g.textAlign='left';g.fillText('CAMTERIOR',PX+64,98);
+  g.fillStyle='#7FD1A4';g.font=F(600,22);g.textAlign='right';g.fillText('@hj_ironcamp',W-PX,98);g.textAlign='left';
+  const T=TENTS[tent.id],t=TARPS[tarp.id],sb=sceneBox(true);
+  const title=(document.getElementById('saveName').value||'').trim()||[T.outer?(typeof twinDx==='function'&&twinDx(T)?T.twin.name:T.name):null,t?t.name:null].filter(Boolean).join(' + ')||'내 캠핑 배치';
+  g.fillStyle='#fff';g.font=F(800,58);g.fillText(title.length>18?title.slice(0,18)+'…':title,PX,200);
+  g.fillStyle='#A9B6AE';g.font=F(500,26);g.fillText(`필요한 사이트 ${((sb[1][0]-sb[0][0])/1000).toFixed(1)} × ${((sb[1][1]-sb[0][1])/1000).toFixed(1)} m  ·  장비 ${new Set(state.pieces.filter(p=>p.parent==null).map(p=>p.uid)).size}세트`,PX,252);}
+function cardFoot(g,W,H,PX,y0){const F=(w,s)=>`${w} ${s}px Pretendard, "Apple SD Gothic Neo", sans-serif`;
+  const gear=[...new Map(state.pieces.map(p=>[CATALOG[p.type].name,0])).keys()].slice(0,8);let x=PX,y=y0;g.font=F(700,24);
+  gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-80)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
+  g.fillStyle='#5F6E66';g.font=F(500,20);g.textAlign='left';g.fillText('camterior.github.io · 규격: 판매처·제조사 공개 치수, 일부 추정',PX,H-34);}
 
 async function initShare(){
   renderMine();renderGallery();renderJournal();
@@ -3714,8 +3745,8 @@ async function exportCard(){
     const gear=[...new Map(state.pieces.map(p=>[CATALOG[p.type].name,0])).keys()].slice(0,8);
     let x=PX,y=PY+PH+92;g.font=F(700,24);
     gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-70)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
-    g.fillStyle='#5F6E66';g.font=F(500,20);g.fillText('규격: 판매처·제조사 공개 치수 기준, 일부 추정',PX,H-34);
-    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));await offerFile('camp-layout-card.png',blob);}
+    g.fillStyle='#5F6E66';g.font=F(500,20);g.fillText('camterior.github.io · 규격: 판매처·제조사 공개 치수, 일부 추정',PX,H-34);
+    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));await offerFile(`camterior-card-${stamp()}.png`,blob);}
   finally{URL.revokeObjectURL(url);}}
 
 (function v17boot(){renderPresets();HIST.last=JSON.stringify(planObj());updUndo();})();

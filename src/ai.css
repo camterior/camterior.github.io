@@ -138,4 +138,18 @@
 .ca-dm{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:#FFF4EE;border:1px solid #F6D3C2;color:var(--ink,#16190f);text-decoration:none;font-size:13.5px;line-height:1.5}
 .ca-dm b{font-weight:700}.ca-dm-ic{flex:none;width:30px;height:30px;border-radius:9px;background:linear-gradient(45deg,#F58529,#DD2A7B 55%,#8134AF);position:relative}
 .ca-dm-ic::before{content:'';position:absolute;inset:7px;border:2px solid #fff;border-radius:6px}.ca-dm-ic::after{content:'';position:absolute;left:12px;top:12px;width:6px;height:6px;border:2px solid #fff;border-radius:50%}
+.tour{position:fixed;inset:0;z-index:2000}
+.tour-hole{position:fixed;border-radius:16px;box-shadow:0 0 0 200vmax rgba(10,14,11,.62);outline:3px solid #FF5A1F;outline-offset:2px;transition:all .25s ease;pointer-events:none}
+.tour-card{position:fixed;left:50%;transform:translateX(-50%);width:min(92vw,380px);background:#fff;color:#16190f;border-radius:18px;padding:16px 18px 14px;box-shadow:0 18px 50px rgba(0,0,0,.3);transition:top .25s ease}
+.tour-n{margin:0 0 4px;font-size:12px;font-weight:700;color:#FF5A1F;letter-spacing:.04em}
+.tour-card h3{margin:0 0 6px;font-size:19px;font-weight:800}
+.tour-d{margin:0 0 14px;font-size:15px;line-height:1.55;color:#3c423c}
+.tour-btns{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tour-btns span{display:flex;gap:8px}
+.tour-btns button{border:0;border-radius:999px;padding:10px 16px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;min-height:42px}
+.tour-skip{background:transparent;color:#7a807a}
+.tour-prev{background:#EEF0EC;color:#16190f}
+.tour-next{background:#16190f;color:#fff}
+.tour-again{border:0;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.tour-hole,.tour-card{transition:none}}
 </style>

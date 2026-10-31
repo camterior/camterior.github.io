@@ -173,6 +173,40 @@ async function codeAskGo(ev){ev.preventDefault();const m=document.getElementById
   if(r.ok){codeAskDone();setTimeout(()=>{const d=document.getElementById('codeAsk');if(d&&d.open)d.close();},1400);}return false;}
 function codeAskMaybe(){try{if(IN_CLAUDE||acctCode()||localStorage.getItem(ASK_KEY))return;}catch(e){return;}setTimeout(codeAskOpen,700);}
 codeAskMaybe();
+// ===== 처음 온 사람용 30초 안내: 실제 화면 위치를 하나씩 비춰 줘요 =====
+const TOUR_KEY='camTour1';
+const TOUR=[
+  ['#aiset','✨ 장비만 적으면 끝','가진 텐트와 장비 이름을 적고 <b>AI로 세팅하기</b>를 누르면 실제 크기로 알아서 놓아줘요.'],
+  ['.pane.left .tabs','직접 고르기','<b>텐트 → 타프 → 장비</b> 순서로 눌러서 하나씩 넣을 수도 있어요.'],
+  ['#board','끌어서 옮기기','장비를 손가락으로 끌어서 옮겨요. 누르면 <b>90° 돌리기·삭제</b> 버튼이 나와요. 두 손가락으로 확대해요.'],
+  ['.stagebar .mode','입체로 보기','<b>입체</b>를 누르면 텐트 안이 얼마나 찰지 3D로 돌려 볼 수 있어요.'],
+  ['.stagebar .savepill','저장·공유','<b>저장</b>에서 링크나 <b>사진 카드</b>로 친구·인스타에 바로 공유해요.']];
+let TOUR_I=0;
+function tourSeen(){try{return !!localStorage.getItem(TOUR_KEY);}catch(e){return true;}}
+function tourDone(){try{localStorage.setItem(TOUR_KEY,'1');}catch(e){}const o=document.getElementById('tour');if(o)o.remove();removeEventListener('resize',tourPlace);}
+function tourMaybe(){if(IN_CLAUDE||tourSeen()||document.getElementById('tour'))return;
+  const ca=document.getElementById('codeAsk');
+  if(ca&&ca.open){ca.addEventListener('close',()=>setTimeout(()=>{if(CUR==='plan')tourOpen(0);},400),{once:true});return;}
+  // 코드 팝업이 곧 뜰 예정이면 그 뒤에
+  let asked=true;try{asked=!!localStorage.getItem(ASK_KEY)||!!acctCode();}catch(e){}
+  setTimeout(()=>{const c=document.getElementById('codeAsk');if(c&&c.open)return tourMaybe();if(CUR==='plan'&&!tourSeen())tourOpen(0);},asked?600:1500);}
+function tourOpen(i){TOUR_I=i||0;let o=document.getElementById('tour');
+  if(!o){o=document.createElement('div');o.id='tour';o.className='tour';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-labelledby','tourT');
+    o.innerHTML='<div class="tour-hole"></div><div class="tour-card"><p class="tour-n" id="tourN"></p><h3 id="tourT"></h3><p class="tour-d" id="tourD"></p><div class="tour-btns"><button type="button" class="tour-skip" onclick="tourDone()">건너뛰기</button><span><button type="button" class="tour-prev" onclick="tourStep(-1)">이전</button><button type="button" class="tour-next" onclick="tourStep(1)">다음</button></span></div></div>';
+    document.body.appendChild(o);addEventListener('resize',tourPlace);
+    o.addEventListener('keydown',e=>{if(e.key==='Escape')tourDone();});}
+  tourShow();}
+function tourStep(d){TOUR_I+=d;if(TOUR_I>=TOUR.length)return tourDone();if(TOUR_I<0)TOUR_I=0;tourShow();}
+function tourShow(){const [sel,t,d]=TOUR[TOUR_I],el=document.querySelector(sel);
+  document.getElementById('tourN').textContent=`${TOUR_I+1} / ${TOUR.length}`;document.getElementById('tourT').textContent=t;document.getElementById('tourD').innerHTML=d;
+  document.querySelector('#tour .tour-prev').hidden=TOUR_I===0;const nx=document.querySelector('#tour .tour-next');nx.textContent=TOUR_I===TOUR.length-1?'시작하기':'다음';
+  if(el){const r=el.getBoundingClientRect(),top=r.top+scrollY-Math.max(80,(innerHeight-Math.min(r.height,innerHeight*.5))/2-120);scrollTo({top:Math.max(0,top),behavior:'instant'});}
+  requestAnimationFrame(()=>{tourPlace();nx.focus();});}
+function tourPlace(){const o=document.getElementById('tour');if(!o)return;const el=document.querySelector(TOUR[TOUR_I][0]),h=o.querySelector('.tour-hole'),c=o.querySelector('.tour-card');
+  if(!el){h.style.cssText='display:none';c.style.top='30%';return;}
+  const r=el.getBoundingClientRect(),p=8,vh=innerHeight,top=Math.max(4,r.top-p),hh=Math.min(r.bottom+p,vh-4)-top;
+  h.style.cssText=`display:block;left:${Math.max(4,r.left-p)}px;top:${top}px;width:${Math.min(r.width+2*p,innerWidth-8)}px;height:${Math.max(40,hh)}px`;
+  const ch=c.offsetHeight||170,below=top+hh+12;c.style.top=(below+ch<vh-8?below:Math.max(8,top-ch-12))+'px';}
 // ===== 장비 제원에서 고르기 =====
 let PICK_SEC=null;
 function minePickUI(){const el=document.getElementById('minePick');if(!el)return;const secs=mineSecs();if(!PICK_SEC)PICK_SEC=secs[0].k;
