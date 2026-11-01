@@ -1506,6 +1506,13 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
    inners:{std:{label:'이너',model:'',size:'436×240',poly:T2.rect(1800,70,4200,W-70),posEst:true,h:2000}},
    doors:[{a:[0,1450],b:[0,W-1450],label:'전면 도어',zone:true},{a:[L,1450],b:[L,W-1450],label:'후면 도어',zone:true}],windows:[{a:[2150,0],b:[3850,0],label:'측면 패널'},{a:[2150,W],b:[3850,W],label:'측면 패널'}],living:[900,2250],color:'#5E6150',prof:T2.PROF.tunnel});}}
 
+ /* 노르텐트 (2026-11-01, 판매처 제원) */
+ {const D=4320,o=T2.poly(10,D,D/2,D/2);
+ IN('nt_gamme8',{brand:'노르텐트',name:'걈8',model:'Gamme 8',size:[432,432,216],weight:'13kg (나일론) / 15.4kg (PC)',cap:'8명 (이너 쓰면 6명)',href:'https://ultralightoutdoorgear.co.uk/gamme-8-tent-floor/',srcName:'판매처 제원',drawn:true,
+  est:'판매처 제원(지름 432cm, 높이 216cm, 바닥 14.5㎡, 폴 5개 지오데식 돔, 출입구 2개)을 10각형으로 그렸어요. 출입구는 앞뒤 마주 보게 놓았어요. 난로를 쓰는 걸 전제로 만든 텐트예요.',
+  outer:o,innerNote:'이너텐트(별매, 6인)는 크기가 공개되지 않았어요. 직접 입력으로 넣어보세요.',
+  doors:[T2.door(o,'front','출입문',true),T2.door(o,'rear','출입문',true)],living:[D/2,D/2],color:'#3E4A3C',prof:T2.PROF.dome});}
+
  /* 도쿄크래프트 */
  {const o=[[0,1750],[1300,0],[4200,0],[5500,1750],[4200,3500],[1300,3500]];
   IN('tc_epica',{brand:'도쿄크래프트',name:'에피카 쉘터',model:'Epica (KTM CAMP)',size:[550,350,210],weight:'8.4kg',cap:'판매처 미표기',href:OLM+'36836',srcName:OLMN,
@@ -1988,7 +1995,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
 }
 TENT_ORDER.splice(0,TENT_ORDER.length,'landlock','landlock_x','living_shell','living_shell_long_pro','merak_pro','hb_atlas','hb_keron4gt','hx_nona','hx_vtarp','hp_backdoor','hp_cave','hp_mavericks',...T2.ids,'none');
 TENTS.none.brand='';
-const BRANDS=['스노우피크','힐레베르그','텐티피','브런스카일','텐터','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸','미니멀웍스','제인아츠','콜맨','텐트마크디자인','제이크라','그라운드커버','헬스포츠','몽벨','도메틱','위너웰','트로이','스프링바','노르디스크','라디트','하이퍼라이트마운틴기어','TFS','고파미르'];
+const BRANDS=['스노우피크','힐레베르그','텐티피','브런스카일','텐터','노르텐트','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸','미니멀웍스','제인아츠','콜맨','텐트마크디자인','제이크라','그라운드커버','헬스포츠','몽벨','도메틱','위너웰','트로이','스프링바','노르디스크','라디트','하이퍼라이트마운틴기어','TFS','고파미르'];
 
 let tent={id:'landlock',inner:'std',canopy:false,custom:{w:200,d:210}};
 

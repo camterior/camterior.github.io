@@ -2170,6 +2170,13 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
    inners:{std:{label:'이너',model:'',size:'436×240',poly:T2.rect(1800,70,4200,W-70),posEst:true,h:2000}},
    doors:[{a:[0,1450],b:[0,W-1450],label:'전면 도어',zone:true},{a:[L,1450],b:[L,W-1450],label:'후면 도어',zone:true}],windows:[{a:[2150,0],b:[3850,0],label:'측면 패널'},{a:[2150,W],b:[3850,W],label:'측면 패널'}],living:[900,2250],color:'#5E6150',prof:T2.PROF.tunnel});}}
 
+ /* 노르텐트 (2026-11-01, 판매처 제원) */
+ {const D=4320,o=T2.poly(10,D,D/2,D/2);
+ IN('nt_gamme8',{brand:'노르텐트',name:'걈8',model:'Gamme 8',size:[432,432,216],weight:'13kg (나일론) / 15.4kg (PC)',cap:'8명 (이너 쓰면 6명)',href:'https://ultralightoutdoorgear.co.uk/gamme-8-tent-floor/',srcName:'판매처 제원',drawn:true,
+  est:'판매처 제원(지름 432cm, 높이 216cm, 바닥 14.5㎡, 폴 5개 지오데식 돔, 출입구 2개)을 10각형으로 그렸어요. 출입구는 앞뒤 마주 보게 놓았어요. 난로를 쓰는 걸 전제로 만든 텐트예요.',
+  outer:o,innerNote:'이너텐트(별매, 6인)는 크기가 공개되지 않았어요. 직접 입력으로 넣어보세요.',
+  doors:[T2.door(o,'front','출입문',true),T2.door(o,'rear','출입문',true)],living:[D/2,D/2],color:'#3E4A3C',prof:T2.PROF.dome});}
+
  /* 도쿄크래프트 */
  {const o=[[0,1750],[1300,0],[4200,0],[5500,1750],[4200,3500],[1300,3500]];
   IN('tc_epica',{brand:'도쿄크래프트',name:'에피카 쉘터',model:'Epica (KTM CAMP)',size:[550,350,210],weight:'8.4kg',cap:'판매처 미표기',href:OLM+'36836',srcName:OLMN,
@@ -2652,7 +2659,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
 }
 TENT_ORDER.splice(0,TENT_ORDER.length,'landlock','landlock_x','living_shell','living_shell_long_pro','merak_pro','hb_atlas','hb_keron4gt','hx_nona','hx_vtarp','hp_backdoor','hp_cave','hp_mavericks',...T2.ids,'none');
 TENTS.none.brand='';
-const BRANDS=['스노우피크','힐레베르그','텐티피','브런스카일','텐터','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸','미니멀웍스','제인아츠','콜맨','텐트마크디자인','제이크라','그라운드커버','헬스포츠','몽벨','도메틱','위너웰','트로이','스프링바','노르디스크','라디트','하이퍼라이트마운틴기어','TFS','고파미르'];
+const BRANDS=['스노우피크','힐레베르그','텐티피','브런스카일','텐터','노르텐트','헬리녹스','하임플래닛','쿠디','스노우라인','어반사이드','코베아','노스피크','도쿄크래프트','반고','몬테라','캠핑칸','미니멀웍스','제인아츠','콜맨','텐트마크디자인','제이크라','그라운드커버','헬스포츠','몽벨','도메틱','위너웰','트로이','스프링바','노르디스크','라디트','하이퍼라이트마운틴기어','TFS','고파미르'];
 
 let tent={id:'landlock',inner:'std',canopy:false,custom:{w:200,d:210}};
 
@@ -4951,6 +4958,7 @@ const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유�
   ck_oakdome_mini:['오크돔 미니','오크돔미니'],ck_oakdome_m:['오크돔 M','오크돔m'],ck_makadome:['마카돔'],ck_makaplus:['마카플러스','마카 플러스'],ck_oakbell:['오크벨'],ck_ruby_double:['루비 더블','루비더블'],ck_alpberg:['알페르그','알페르그쉘터'],ck_custom_s:['커스텀쉘터 S','커스텀쉘터s'],
   mt_monte:['몽뜨','몽뜨 쉘터','몬테라 몽뜨'],bs_1360:['브런스카일','1360 텐트','브런스카일 1360'],ttp_zirkon15:['지르콘','지르콘 15','텐티피'],hb_altai:['알타이','알타이 UL','알타이ul'],sp_kayad_m:['카야드','카야드 M','카야드m'],
   tt_horizon:['선셋 호라이즌','선셋호라이즌','썬셋 호라이즌','텐터 호라이즌'],tt_little_sunset:['리틀선셋','리틀 선셋','리틀썬셋'],tt_ortus_s_mk2:['오르투스 S','오르투스S','오르투스 마크2','오르투스S 마크2','S마크2','오르투스 레이싱'],tt_ortus_v:['오르투스 V','오르투스V'],tt_ortus_x:['오르투스 X','오르투스X','오르투스 엑스'],
+  nt_gamme8:['걈8','갬8','걈 8','감8','gamme 8','gamme8','노르텐트'],
   merak_pro:['메락'],landlock:['랜드락'],living_shell_long_pro:['리빙쉘 롱 프로','리빙쉘롱'],living_shell:['리빙쉘']};
 const AI_INNER_AL={shell_duo:['쉘이너','쉘이너 듀오','쉘 이너'],geoair2:['지오에어','지오 에어','지오에어2','지오 에어2'],godong:['고동','고동텐트','고동 텐트','고동 이너','고동이너텐트']};
 const aiTentName=id=>{const T=TENTS[id];return ((T.brand?T.brand+' ':'')+T.name).trim();};
