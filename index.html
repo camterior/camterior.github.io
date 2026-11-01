@@ -2152,22 +2152,23 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
   IN('tt_horizon',{brand:'텐터',name:'선셋 호라이즌',model:'SUNSET HORIZON',size:[300,400,220],weight:'약 10kg',cap:'판매처 미표기',href:TT+'4368294d-0c8b-4f75-8fe8-6ecf87cf426f',srcName:TTN,drawn:true,
    est:'판매처 상세 SPECS & SPACE(W400×D300×H220cm 팔각 바닥, 긴 쪽 앞뒤 아치 도어)로 그렸어요. 양 끝에 싱글 침대 두 개가 들어가는 크기예요.',outer:T2.tun(3000,4000,600,3100,600,3100),innerNote:NOINNER,
    doors:[T2.front(4000,2400,'전면 아치 도어'),T2.rear(3000,4000,2400,'후면 아치 도어',true)],windows:[{a:[1100,0],b:[1900,0],label:'원형 창'},{a:[1100,4000],b:[1900,4000],label:'원형 창'}],color:'#E8E1CF',prof:T2.PROF.dome});
-  IN('tt_little_sunset',{brand:'텐터',name:'리틀 선셋 3P',model:'LITTLE SUNSET 3P',size:[175,280,135],weight:'판매처 미표기',cap:'2–3명',href:TT+'ba1bea96-d784-4338-8e2c-f4f89aef186e',srcName:TTN,drawn:true,
-   est:'제원(W280(220)×D175×H135(110)cm)으로 그렸어요. 괄호 값은 본체 폭·옆 높이로 봤어요.',outer:T2.box(1750,2800,450),innerNote:'바닥 일체형 소형 텐트예요.',
-   doors:[T2.front(2800,1800,'전면 도어')],color:'#E3B94A',prof:T2.PROF.dome});
-  {const L=5000,W=3400,o=[[0,W/2],[500,0],[L-500,0],[L,W/2],[L-500,W],[500,W]];
+  IN('tt_little_sunset',{brand:'텐터',name:'리틀 선셋 3P',model:'LITTLE SUNSET 3P',size:[170,280,135],weight:'4.3kg',cap:'2–3명',href:TT+'ba1bea96-d784-4338-8e2c-f4f89aef186e',srcName:'텐터 공식몰 상세',drawn:true,
+   est:'판매처 상세(W280×D170×H135cm, 4.3kg, 긴 쪽 앞 아치 도어)로 그렸어요.',outer:T2.box(1700,2800,250),innerNote:'바닥 일체형 소형 텐트예요.',
+   doors:[T2.front(2800,2300,'전면 아치 도어')],color:'#E3B94A',prof:T2.PROF.dome});
+  {const L=5000,W=3400,o=[[0,250],[L/2,0],[L,250],[L,W-250],[L/2,W],[0,W-250]];
   IN('tt_ortus_s_mk2',{brand:'텐터',name:'오르투스 S Mark2',model:'ORTUS S MARK2',size:[500,340,240],weight:'16.5kg',cap:'판매처 미표기',href:TT+'6db9f6d2-b75a-4207-bd17-77533c1004bf',srcName:'판매처 상품 상세 (오캠프)',drawn:true,
-   est:'판매처 제원(W500×D340×H240cm, 네모에 가까운 육각, 앞뒤 대형 도어)으로 그렸어요. S-MARK2 RACING도 같은 크기예요.',outer:o,innerNote:NOINNER,
-   doors:[tipDoor(o,0,'전면 도어',true),tipDoor(o,3,'후면 도어',false)],living:[2500,1700],color:'#B8A88A',prof:T2.PROF.shelter,
-   canopy:[[300,150],[-2700,-50],[-2700,W+50],[300,W-150]],canopyLabel:'오르투스 V 연결 (350×270cm, 별매)',canopyName:'오르투스 V',canopyH:1700,canopyWall:true});}
-  IN('tt_ortus_v',{brand:'텐터',name:'오르투스 V TC',model:'ORTUS V TC',size:[270,350,170],weight:'판매처 미표기',cap:'판매처 미표기',href:TT+'07643831-0998-4c60-abe6-5e0147ed44c3',srcName:TTN,drawn:true,
-   est:'제원(W350(310)×D270×H170(130)cm)으로 그렸어요. 오르투스 S에 붙이는 베스티블로도 써요(오르투스 S Mark2에서 \'오르투스 V 연결\').',outer:T2.tun(2700,3500,500,3100,0,3500),innerNote:NOFLOOR,
-   doors:[T2.front(3500,3100,'전면 개방')],color:'#8E8B6E',prof:T2.PROF.dome});
-  {const L=6000,W=4500;
-  IN('tt_ortus_x',{brand:'텐터',name:'오르투스 X',model:'ortus-X',size:[600,450,220],weight:'18–19kg',cap:'판매처 미표기',href:TT+'2ckdPdir',srcName:TTN,drawn:true,
-   est:'판매처 제원(터널 모드 600×450×220cm, 돔 모드 480×450cm, 이너 436×240×200cm)으로 그렸어요. 이너 위치는 추정이에요.',outer:T2.box(L,W,700),
-   inners:{std:{label:'이너',model:'',size:'436×240',poly:T2.rect(L-150-2400,70,L-150,W-70),posEst:true}},
-   doors:[T2.front(W,3200,'전면 도어'),T2.rear(L,W,3200,'후면 도어')],color:'#5E6150',prof:T2.PROF.tunnel});}}
+   est:'판매처 상세(500×340×240cm, 16.5kg, 네모에 가까운 육각, 앞뒤 대형 아치 도어, 양옆 사이드벤트, 화목난로 연통 구멍)로 그렸어요. S-MARK2 RACING도 같은 크기예요.',outer:o,innerNote:NOINNER,
+   doors:[T2.front(W,2700,'전면 아치 도어'),T2.rear(L,W,2700,'후면 아치 도어',true)],windows:[{a:[1600,125],b:[2200,60],label:'사이드벤트'},{a:[1600,W-125],b:[2200,W-60],label:'사이드벤트'}],living:[2500,1700],color:'#B8A88A',prof:T2.PROF.shelter,
+   canopy:[[0,0],[-2400,200],[-2400,W-200],[0,W]],canopyLabel:'오르투스 V 연결 (340×240cm, 별매)',canopyName:'오르투스 V',canopyH:1700,canopyWall:true});}
+  IN('tt_ortus_v',{brand:'텐터',name:'오르투스 V TC',model:'ORTUS V TC',size:[240,340,170],weight:'18kg',cap:'판매처 미표기',href:TT+'07643831-0998-4c60-abe6-5e0147ed44c3',srcName:'텐터 공식몰 상세',drawn:true,
+   est:'판매처 상세(W340(300)×D240×H170cm, 18kg, 바닥 사다리꼴 330·290×200cm)로 그렸어요. 오르투스 S에 붙여 쓰는 전실로도 써요(오르투스 S Mark2에서 \'오르투스 V 연결\').',outer:[[0,200],[2400,0],[2400,3400],[0,3200]],
+   inners:{std:{label:'이너 그라운드',model:'',size:'330(290)×200',poly:[[200,250],[2200,50],[2200,3350],[200,3150]],h:1450}},
+   doors:[T2.front(3400,2600,'전면 아치 도어')],color:'#8E8B6E',prof:T2.PROF.dome});
+  {const L=6000,W=4500,o=[[0,1250],[1950,0],[4050,0],[L,1250],[L,W-1250],[4050,W],[1950,W],[0,W-1250]];
+  IN('tt_ortus_x',{brand:'텐터',name:'오르투스 X',model:'ortus-X',size:[600,450,220],weight:'18–19kg',cap:'판매처 미표기',href:TT+'2ckdPdir',srcName:'텐터 공식몰 상세',drawn:true,
+   est:'판매처 상세 평면도(터널 모드 L600×W450×H220cm 팔각, 돔 모드 480×450cm, 이너 436×240×200cm)로 그렸어요. 이너는 가운데에 놓았고 위치는 추정이에요.',outer:o,
+   inners:{std:{label:'이너',model:'',size:'436×240',poly:T2.rect(1800,70,4200,W-70),posEst:true,h:2000}},
+   doors:[{a:[0,1450],b:[0,W-1450],label:'전면 도어',zone:true},{a:[L,1450],b:[L,W-1450],label:'후면 도어',zone:true}],windows:[{a:[2150,0],b:[3850,0],label:'측면 패널'},{a:[2150,W],b:[3850,W],label:'측면 패널'}],living:[900,2250],color:'#5E6150',prof:T2.PROF.tunnel});}}
 
  /* 도쿄크래프트 */
  {const o=[[0,1750],[1300,0],[4200,0],[5500,1750],[4200,3500],[1300,3500]];
