@@ -7,4 +7,4 @@ schedules []
 OK
 before 33
 dryrun OK
-ref refs/heads/work/worker-notice-img sha 0312965a43921ca805ad4880d9a95d11c65a629d run 41398374411
+ref refs/heads/work/worker-notice-img sha 37d6c6e1c2d6c62cf88eb726bf707fbab38ff0e3 run 41398978595
