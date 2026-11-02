@@ -2884,10 +2884,16 @@ const GEAR={
     note:'본체 634.6×397.7×91.9mm. 받침을 포함한 바닥 깊이는 추정이에요. 캠핑용 원목 스탠드에 올리면 높이가 달라져요',href:'https://www.lge.co.kr/',srcName:'LG전자 제품 정보'},
   pf_cot75:{gtype:'cot',sleep:true,group:'야전침대',name:'플랜포티 P-COT 피콧 야전침대 슈퍼와이드 75',model:'P-COT Super Wide 75',conf:'retailer',w:2100,d:750,h:390,kg:6.9,sw:'#5C6150',
     note:'높이 39cm(로우 모드 18cm), 내하중 350kg. 와이드 73(190×73cm)은 요청 오면 추가할게요',href:'https://m.xlite.co.kr/product/detail.html?product_no=12929',srcName:'판매처 상품 상세'},
+  gw_bucket:{gtype:'box',soft:true,group:'수납·행어',name:'그리비웍스×왓낫 원터치 버킷 GW',model:'ONE TOUCH BUCKET GW',conf:'retailer',w:360,d:250,h:320,kg:1.2,sw:'#4A4C4A',
+    note:'펼친 크기 36×25×32cm(접으면 높이 6cm), 폴리에스터 본체·스틸 프레임. 2단 랙 위나 아래 칸에 올릴 수 있어요',href:'https://www.sundaymountain.jp/c/brand/b_g/grebeworks/g64035',srcName:'판매처 상품 상세'},
+  gw_rack:{gtype:'shelf',frame:true,low:160,top:'black',group:'수납·행어',name:'그리비웍스 원터치 버킷 랙 (2단)',model:'One-Touch Bucket Rack',conf:'official',w:398,d:365,h:795,kg:2.7,sw:'#232527',
+    note:'펼친 크기 39.8×36.5×79.5cm, 철(분체도장), 내하중 위 10kg·아래 10kg. 버킷을 위·아래 2단으로 놓아요(처음엔 위 칸, 그다음은 아래 칸)',href:'https://divhorizon.base.shop/items/95809797',srcName:'그리비웍스 공식몰'},
+  mw_indian_l:{gtype:'hanger',group:'수납·행어',name:'미니멀웍스 인디언 행어 L',model:'Indian Hanger L',conf:'official',w:1010,d:750,h:1030,kg:0.84,sw:'#1E2022',
+    note:'가로바 101cm, 높이 103cm, 다리 폭 75cm, 알루미늄 840g. 옷·랜턴을 거는 A자 행어라 그 위에 장비를 올리지 않아요',href:'https://www.minimalworks.co.kr/goods/goods_view.php?goodsNo=813',srcName:'미니멀웍스 공식몰 상세'},
   alpicool_k25:{gtype:'fridge',group:'냉장고',name:'알피쿨 K25',model:'K25',conf:'retailer',w:585,d:335,h:350,kg:10.2,sw:'#3B3F44',
     note:'25L 컴프레서 냉장고',href:'https://www.alpicool.com/',srcName:'판매처 제원'},
 };
-const GEAR_GROUPS=['쉘프컨테이너','알루미늄 박스','마이테이블','테이블','폴딩쉘프','체어','매트','야전침대','난방','냉장고','버너','기타'];
+const GEAR_GROUPS=['쉘프컨테이너','알루미늄 박스','마이테이블','테이블','폴딩쉘프','수납·행어','체어','매트','야전침대','난방','냉장고','버너','기타'];
 const GEAR_ORDER=Object.keys(GEAR);
 const gLink=g=>g.href||(g.src?SRC+g.src:null),gLinkName=g=>g.srcName||'판매처 상품 상세';
 const GEAR_CAT=Object.fromEntries(Object.entries(GEAR).map(([id,g])=>[id,{kind:'gear',...g,short:g.name,
@@ -2954,8 +2960,8 @@ function segDist(p,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],L=dx*dx+dy*dy;let t=L?((
 function polyGap(A,B){let m=Infinity;[[A,B],[B,A]].forEach(([P,Q])=>P.forEach(p=>{for(let k=0;k<Q.length;k++)m=Math.min(m,segDist(p,Q[k],Q[(k+1)%Q.length]));}));return m;}
 const pieceH=p=>{const c=CATALOG[p.type];return c.kind==='gear'?c.h:(rootOf(p).leg||660);};
 /* ---------- 위에 올리기 (선반·테이블·박스 위에 장비 놓기) ---------- */
-const STACK_BASE=c=>c.kind==='frame'||c.kind==='ext'||(c.kind==='gear'&&['table','shelf','box','fridge'].includes(c.gtype));
-const STACK_TOP=c=>c.kind==='gear'&&!c.heat&&!c.sleep&&!['chair','mat','cot'].includes(c.gtype);
+const STACK_BASE=c=>!c.soft&&(c.kind==='frame'||c.kind==='ext'||(c.kind==='gear'&&['table','shelf','box','fridge'].includes(c.gtype)));
+const STACK_TOP=c=>c.kind==='gear'&&!c.heat&&!c.sleep&&!['chair','mat','cot','hanger'].includes(c.gtype);
 const STACK_FIRE=c=>c.kind==='gear'&&['burner','stove','wood'].includes(c.gtype);
 function invT(T,w){const x=w[0]-T.tx,y=w[1]-T.ty;return [T.cos*x+T.sin*y,-T.sin*x+T.cos*y];}
 function stackRoot(p){let q=p,n=0;while(q&&q.on!=null&&n++<40){const b=byId(q.on);if(!b)break;q=rootOf(b);}return rootOf(q);}
@@ -2969,6 +2975,7 @@ function stackBaseAt(p){const c=CATALOG[p.type];if(!STACK_TOP(c)||p.parent!=null
   return best&&best.q;}
 // 높은 테이블 밑에 들어가는 박스·냉장고는 '아래 수납'이 기본
 function stackPreferUnder(p,q){const c=CATALOG[p.type],cq=CATALOG[q.type];const top=pieceH(q);
+  if(cq.frame)return (c.gtype==='box'||c.gtype==='fridge')&&c.h<=top-60&&stackKids(q.uid).length>0;// 2단 랙: 위 칸이 차 있으면 아래 칸
   return (c.gtype==='box'||c.gtype==='fridge')&&(cq.kind!=='gear'||cq.gtype==='table')&&top>=500&&c.h<=top-60&&!q.on;}
 function stackSet(p,q){p.on=q.uid;p.onC=invT(q._T,centroid(p._v)).map(v=>Math.round(v));p.onR=Math.round((p.rot||0)-Math.atan2(q._T.sin,q._T.cos)*180/Math.PI);p.floor=false;}
 function stackAuto(p){if(!p||p.floor||p.parent!=null)return false;const q=stackBaseAt(p);if(!q||stackPreferUnder(p,q))return false;stackSet(p,q);return true;}
@@ -2997,6 +3004,10 @@ function computeAll(){
     const a=Math.atan2(b._T.sin,b._T.cos)*180/Math.PI,w=applyT(b._T,p.onC||[0,0]),c=centroid(CATALOG[p.type].verts);
     p.rot=(((a+(p.onR||0))%360)+360)%360;p.ox=w[0]-c[0];p.oy=w[1]-c[1];one(p);p._z=(b._z||0)+pieceH(b);return false;});
   pend.forEach(p=>{delete p.on;one(p);});
+  // 2단 랙 아래 칸: 랙 안 바닥에 놓인 장비는 아래 틀 높이(low)에 올려요
+  const racks=state.pieces.filter(q=>q.parent==null&&CATALOG[q.type].frame&&q._v);
+  if(racks.length)state.pieces.forEach(p=>{if(p.on!=null||p.parent!=null||!p._v)return;const c=CATALOG[p.type];if(c.kind!=='gear'||c.frame||!STACK_TOP(c))return;
+    const cp=centroid(p._v),r=racks.find(q=>pointInPoly(cp,q._v));if(r)p._z=(r._z||0)+(CATALOG[r.type].low||0);});
   state.pieces.filter(p=>p.parent==null).forEach(r=>{const isl=state.pieces.filter(p=>rootOf(p).uid===r.uid);
     r._isl=isl;const bb=bbox(isl.flatMap(p=>p._v));r._bbox=bb;r._foot=[Math.round(bb[1][0]-bb[0][0]),Math.round(bb[1][1]-bb[0][1])];});
   TW=tarpWorld();
@@ -3036,16 +3047,21 @@ const bbHit=(A,B)=>!(A[1][0]<=B[0][0]||B[1][0]<=A[0][0]||A[1][1]<=B[0][1]||B[1][
 const pName=p=>{const c=CATALOG[p.type];return `${c.short||c.name}(${c.model})`;};
 // 쉘터 안에 넣는 인기 이너텐트 (어느 텐트에나 뒤쪽 벽에 붙여 놓기)
 const INNER_PRESETS={
-  shell_duo:{name:'스노우피크 쉘이너 듀오',model:'SD-460',w:210,d:260,h:170,note:'2명, 2.7kg (판매처 상품 상세)'},
+  shell_duo:{name:'스노우피크 쉘이너 듀오',model:'SD-460',w:259,wb:210,d:169,h:122,note:'1–2명, 2.7kg, 사다리꼴 바닥 앞 259·뒤 210·옆 171cm, 실내 높이 122cm (스노우피크 공식)'},
   geoair2:{name:'디얼스 지오 에어2',model:'Geo-Air 2',w:160,d:200,h:140,note:'에어 이너, 바닥 200×160cm (판매처 상품 상세)'},
   godong:{name:'캠빌 고동 텐트',model:'No.201GT2',w:155,d:220,h:125,note:'고동 2.0, 5.8kg, 문은 긴 쪽 (캠빌 공식)'}};
-function customInnerPoly(w0,d0){const T=TENTS[tent.id];let w=(w0||tent.custom.w)*10,d=(d0||tent.custom.d)*10;if(tent.innerRot)[w,d]=[d,w];const b=bbox(T.outer),cy=centroid(T.outer)[1];
+function customInnerPoly(w0,d0,wb0){const r=customInnerRect(w0,d0);if(!wb0)return r;
+  // 사다리꼴 이너(쉘이너 듀오): 뒤(벽 쪽)가 좁고 앞(거실 쪽)이 넓음
+  const cx=(r[0][0]+r[2][0])/2,cy=(r[0][1]+r[2][1])/2,W=w0*10,D=d0*10,WB=wb0*10;
+  let loc=[[-D/2,-W/2],[D/2,-WB/2],[D/2,WB/2],[-D/2,W/2]];if(tent.innerRot)loc=loc.map(([x,y])=>[-y,x]);
+  return loc.map(([x,y])=>[cx+x,cy+y]);}
+function customInnerRect(w0,d0){const T=TENTS[tent.id];let w=(w0||tent.custom.w)*10,d=(d0||tent.custom.d)*10;if(tent.innerRot)[w,d]=[d,w];const b=bbox(T.outer),cy=centroid(T.outer)[1];
   for(let x1=b[1][0]-120;x1-d>=b[0][0];x1-=50){const r=[[x1-d,cy-w/2],[x1,cy-w/2],[x1,cy+w/2],[x1-d,cy+w/2]];if(r.every(v=>pointInPoly(v,T.outer)))return r;}
   const cx=(b[0][0]+b[1][0])/2;return [[cx-d/2,cy-w/2],[cx+d/2,cy-w/2],[cx+d/2,cy+w/2],[cx-d/2,cy+w/2]];}
 function tentInner(){const T=TENTS[tent.id];if(!T.outer||!tent.inner)return null;
   const mv=pl=>{const o=tent.innerOff;return o&&(o[0]||o[1])?pl.map(v=>[v[0]+o[0],v[1]+o[1]]):pl;};
   if(tent.inner==='custom')return {label:'이너',model:'',size:`${tent.custom.w}×${tent.custom.d}`,poly:mv(customInnerPoly()),custom:true};
-  if(typeof tent.inner==='string'&&tent.inner.startsWith('p:')){const P=INNER_PRESETS[tent.inner.slice(2)];if(P)return {label:P.name,model:P.model,size:`${P.w}×${P.d}`,poly:mv(customInnerPoly(P.w,P.d)),custom:true,h:P.h*10};}
+  if(typeof tent.inner==='string'&&tent.inner.startsWith('p:')){const P=INNER_PRESETS[tent.inner.slice(2)];if(P)return {label:P.name,model:P.model,size:P.wb?`앞 ${P.w}·뒤 ${P.wb}×${P.d}`:`${P.w}×${P.d}`,poly:mv(customInnerPoly(P.w,P.d,P.wb)),custom:true,h:P.h*10};}
   return T.inners[tent.inner]||null;}
 /* ---------- 단체 캠핑: 텐트 더 놓기 (추가 텐트는 옮기고 돌리기만, 옵션은 기본 이너) ---------- */
 let XT=[],XT_SEQ=1,XT_ADD=false;
@@ -3290,6 +3306,15 @@ function gearBody(p,fine){const c=CATALOG[p.type],w=c.w,d=c.d;let o='';
   if(c.gtype==='cot'){o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="24" fill="#3A3E41" stroke="#16181A" stroke-width="6"/>`;
     o+=`<rect x="40" y="30" width="${w-80}" height="${d-60}" rx="18" fill="${c.sw}"/>`;
     [0,w-28].forEach(x=>{o+=`<rect x="${x}" y="-10" width="28" height="${d+20}" rx="10" fill="#9EA3A7"/>`;});return o;}
+  if(c.frame){// 2단 랙: 열린 철 프레임 (X자 다리, 위 칸 틀)
+    o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="10" fill="rgba(35,37,39,.10)" stroke="#232527" stroke-width="16"/>`;
+    [d*.3,d*.7].forEach(y=>{o+=`<rect x="${w*.2}" y="${y-10}" width="${w*.6}" height="20" rx="8" fill="#232527" opacity=".55"/>`;});
+    o+=`<path d="M8,8L${w-8},${d-8}M${w-8},8L8,${d-8}" stroke="#232527" stroke-width="6" stroke-dasharray="18 12" opacity=".45"/>`;return o;}
+  if(c.gtype==='hanger'){// A자 행어: 가로바 + 양쪽 다리
+    o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="20" fill="rgba(30,32,34,.04)" stroke="rgba(30,32,34,.25)" stroke-width="4" stroke-dasharray="16 12"/>`;
+    [[30,0,30,d],[w-30,0,w-30,d]].forEach(([a,b,c2,e])=>{o+=`<path d="M${a},${b}L${a},${d/2}L${c2},${e}" fill="none" stroke="#1E2022" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>`;});
+    o+=`<line x1="20" y1="${d/2}" x2="${w-20}" y2="${d/2}" stroke="#1E2022" stroke-width="22" stroke-linecap="round"/>`;
+    [w*.3,w*.5,w*.7].forEach(x=>{o+=`<path d="M${x-40},${d/2+40}L${x},${d/2}L${x+40},${d/2+40}" fill="none" stroke="#9EA3A7" stroke-width="6"/>`;});return o;}
   if(c.gtype==='box'){const bf=c.alu?'#C9CDD0':'#6B6E68',bs=c.alu?'#8C9196':'#3E403C',bi=c.alu?'#DADDE0':'#7E827B';
     o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="16" fill="${bf}" stroke="${bs}" stroke-width="5"/><rect x="26" y="26" width="${w-52}" height="${d-52}" rx="10" fill="${bi}" stroke="${bs}" stroke-width="3"/>`;
     [[0,d/2],[w,d/2]].forEach(([x,y])=>{o+=`<rect x="${x-14}" y="${y-48}" width="28" height="96" rx="12" fill="#C9CDD0" stroke="#7F8489" stroke-width="3"/>`;});return o;}
@@ -3755,7 +3780,7 @@ function renderTentOpts(){const T=TENTS[tent.id];
   Object.entries(T.inners).forEach(([k,v])=>{h+=`<button aria-pressed="${tent.inner===k}" onclick="setInner('${k}')">${Object.keys(T.inners).length>1?v.label.replace('이너룸 ',''):'전용 이너'}</button>`;});
   h+=`<button aria-pressed="${tent.inner==='custom'}" onclick="setInner('custom')">직접 입력</button><button aria-pressed="${!tent.inner}" onclick="setInner(null)">없음</button></div>`;
   h+=`<div class="opt" style="margin-top:6px"><span>이너텐트 넣기</span><div class="seg">${Object.entries(INNER_PRESETS).map(([k,P])=>`<button aria-pressed="${tent.inner==='p:'+k}" onclick="setInner('p:${k}')" title="${P.w}×${P.d}cm">${P.name.replace(/^(스노우피크|디얼스|캠빌) /,'')}</button>`).join('')}</div></div>`;
-  if(tent.inner&&tent.inner.startsWith&&tent.inner.startsWith('p:')){const P=INNER_PRESETS[tent.inner.slice(2)];if(P)h+=`<p class="muted" style="margin-top:4px">${P.name} ${P.w}×${P.d}cm · ${P.note}. 뒤쪽 벽에 붙여 놓아요.</p>`;}
+  if(tent.inner&&tent.inner.startsWith&&tent.inner.startsWith('p:')){const P=INNER_PRESETS[tent.inner.slice(2)];if(P)h+=`<p class="muted" style="margin-top:4px">${P.name} ${P.wb?'앞 '+P.w+'·뒤 '+P.wb+'×'+P.d:P.w+'×'+P.d}cm · ${P.note}. 뒤쪽 벽에 붙여 놓아요.</p>`;}
   if(tent.inner==='custom'||(tent.inner&&tent.inner.startsWith&&tent.inner.startsWith('p:')))h+=`<div class="inbtns"><button type="button" class="rotin" onclick="rotInner()" aria-pressed="${!!tent.innerRot}">↻ 90° 돌리기</button><button type="button" class="rotin" onclick="lockInner()" aria-pressed="${!!tent.innerLock}">${tent.innerLock?'🔒 고정됨':'✥ 끌어서 이동 중'}</button>${tent.innerOff?`<button type="button" class="rotin" onclick="resetInner()">처음 자리로</button>`:''}</div><p class="muted" style="margin-top:4px">${tent.innerLock?'이너가 고정됐어요. 옮기려면 고정을 풀어요.':'도면에서 이너(파란 점선)를 끌어 옮기고, 다 되면 고정을 눌러요.'}</p>`;
   if(tent.inner==='custom')h+=`<div class="inrow"><label>폭 <input type="number" min="60" max="600" step="5" value="${tent.custom.w}" onchange="setCustom('w',this.value)" aria-label="이너 폭 cm"> cm</label>
     <label>깊이 <input type="number" min="60" max="600" step="5" value="${tent.custom.d}" onchange="setCustom('d',this.value)" aria-label="이너 깊이 cm"> cm</label></div>
@@ -4122,6 +4147,13 @@ function igt3(THREE){
         [x0,x1-6].forEach(xx=>grp.add(extrudePoly(THREE,[[xx,y0],[xx+6,y0],[xx+6,y1],[xx,y1]].map(X),shelves[shelves.length-1],Hh-30,M.steel)));}
     }else if(c.kind==='gear'){const h=c.h,w=c.w,d=c.d,R=(x0,y0,x1,y1)=>[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(X);
       if(c.gtype==='box'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h-8,c.alu?M.alu:M.cont));grp.add(extrudePoly(THREE,R(-6,-6,w+6,d+6),h-8,h,c.alu?M.alu:M.cont2));}
+      else if(c.frame){const fm=M.dark,rim=(y0,y1)=>[[0,0,w,24],[0,d-24,w,d],[0,0,24,d],[w-24,0,w,d]].forEach(([a,b,c2,e])=>grp.add(extrudePoly(THREE,R(a,b,c2,e),y0,y1,fm)));
+        rim(h-30,h);rim(130,160);[[w*.3,d/2],[w*.7,d/2]].forEach(([x])=>grp.add(extrudePoly(THREE,R(x-15,24,x+15,d-24),h-24,h-8,fm)));
+        [[0,0],[w,0],[0,d],[w,d]].forEach(([x,y])=>{const a=X([x,y]),b=X([w-x,y]);grp.add(lineOf(THREE,[[mm(a[0]),0,mm(a[1])],[mm(b[0]),mm(h),mm(b[1])]],'#232527',1));});}
+      else if(c.gtype==='hanger'){const a=X([20,d/2]),b=X([w-20,d/2]),col='#1E2022';
+        grp.add(lineOf(THREE,[[mm(a[0]),mm(h),mm(a[1])],[mm(b[0]),mm(h),mm(b[1])]],col,1));
+        [[30,0],[30,d],[w-30,0],[w-30,d]].forEach(([x,y])=>{const f=X([x,y]),t=X([x,d/2]);grp.add(lineOf(THREE,[[mm(f[0]),0,mm(f[1])],[mm(t[0]),mm(h),mm(t[1])]],col,1));});
+        grp.add(extrudePoly(THREE,R(20,d/2-12,w-20,d/2+12),h-24,h,M.dark));}
       else if(c.gtype==='mat'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h,new THREE.MeshStandardMaterial({color:c.sw,roughness:.95})));}
       else if(c.gtype==='cot'){grp.add(extrudePoly(THREE,R(20,0,w-20,d),h-30,h,new THREE.MeshStandardMaterial({color:c.sw,roughness:.9})));
         [[20,20],[w-20,20],[20,d-20],[w-20,d-20],[w/2,20],[w/2,d-20]].forEach(q=>grp.add(cyl(THREE,X(q),0,h-30,10,M.dark)));}
@@ -4794,16 +4826,16 @@ const GSEC=[
    items:()=>GEAR_ORDER.filter(id=>GEAR[id].gtype==='fridge').map(id=>gearCard(id))},
 ];
 function gearCard(id){const g=GEAR[id];
-  return {id,b:gearBrand(g),q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'||g.gtype==='wood'?'난로 히터 화목난로 장작':''}${g.gtype==='fridge'?'냉장고 쿨러 아이스박스':''}${g.gtype==='burner'?'버너 스토브 강염 화구 ':''}${g.gtype==='chair'?'의자 체어 '+(g.srcName||''):''}${g.sleep?'매트 침대 야전침대 코트 자충':''}${g.alu?'알루텍 알루미늄 박스 수납':''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
+  return {id,b:gearBrand(g),q:`${g.name} ${g.model} ${g.group} ${g.gtype==='stove'||g.gtype==='fan'||g.gtype==='wood'?'난로 히터 화목난로 장작':''}${g.gtype==='fridge'?'냉장고 쿨러 아이스박스':''}${g.gtype==='burner'?'버너 스토브 강염 화구 ':''}${g.gtype==='chair'?'의자 체어 '+(g.srcName||''):''}${g.sleep?'매트 침대 야전침대 코트 자충':''}${g.alu?'알루텍 알루미늄 박스 수납':''}${g.gtype==='hanger'?'행어 옷걸이 랙 ':''}${g.frame?'랙 선반 버킷 스탠드 2단 ':''}${id==='gw_bucket'?'바스켓 버킷 바구니 수납 ':''}`,html:`<div class="gpv"><span class="bt">${g.group}</span>${confBadge(g.conf)}${catPreview(id)}</div>
     <div class="gb"><div><h3>${g.name}</h3><span class="md">${g.model}</span></div>
     <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.sh?`<dt>좌면 높이</dt><dd>${fmt(g.sh)}mm</dd>`:''}${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}</dl>
     ${g.note?`<p class="nt">${g.note}</p>`:''}
     <div class="ga"><button type="button" onclick="gearUse('item','${id}')">배치에 놓기</button>${gLink(g)?`<a href="${gLink(g)}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};}
-const GBRANDS=['스노우피크','헬리녹스','커밋','헤카','카즈미','베른','LG','플랜포티','알피쿨','토요토미','파세코','신일','엑스페드','스패로우','도메틱','알루텍','코베아','제백'];
+const GBRANDS=['그리비웍스','미니멀웍스','스노우피크','헬리녹스','커밋','헤카','카즈미','베른','LG','플랜포티','알피쿨','토요토미','파세코','신일','엑스페드','스패로우','도메틱','알루텍','코베아','제백'];
 function gearBrand(g){const n=g.name||'';return GBRANDS.find(b=>n.startsWith(b))||'스노우피크';}
 let GEAR_F='all';const G_OPEN=new Set();
 /* 장비 카드 그림: 힉스필드로 만든 제품 사진풍 그림이 있으면 도형 대신 보여줌 (텐트·타프는 도면 그대로) */
-const GEAR_ART=new Set(["alpicool_k25", "heka", "hx_swivel", "kzm_castanets", "kzm_lettino", "lg_roomtv", "pf_cot75", "sp_conn", "sp_entry_igt", "sp_ext_igt", "verne_maestro", "zebec_pro240","zebec_pro260","zebec_pro280","zebec_pro300","reg3", "long4", "sep2", "sep3", "sep4", "mf_reg", "mf_long", "open_L", "open_R", "corner_L", "corner_R", "slide_h", "slide_hl", "h020", "wood_s", "wood_w", "steel1", "lid_half", "box_half", "mesh_d1", "mesh_s1", "mesh_hd", "mesh_hs", "flat", "seppou", "CK-230", "CK-220", "legs", "sc25", "sc50", "mytable", "mytable_s", "fshelf", "fshelf_l", "fshelf_m", "sp_oat", "sp_oat_l", "sp_oat_low", "sp_chabu", "sp_kitchen", "hx_t1", "hx_t1l", "hx_t0lt", "hx_cafe", "kermit_t", "noga_table", "alu48", "alu68", "alu93", "sp_jikaro", "megamat", "megamat_duo", "sparrow50", "cot_one", "sp_low30", "sp_lowshort", "sp_fd", "sp_take", "hx_one", "hx_zero", "hx_sunset", "kermit", "noga_chair", "omni230", "camp5000", "sfh1200", "sfh300", "mk_stove", "toyotomi_lcl53", "sfh_bh900", "sp_gs1000", "cfx3_35", "cfx3_45", "cfx3_55"]);
+const GEAR_ART=new Set(["gw_bucket", "gw_rack", "mw_indian_l", "alpicool_k25", "heka", "hx_swivel", "kzm_castanets", "kzm_lettino", "lg_roomtv", "pf_cot75", "sp_conn", "sp_entry_igt", "sp_ext_igt", "verne_maestro", "zebec_pro240","zebec_pro260","zebec_pro280","zebec_pro300","reg3", "long4", "sep2", "sep3", "sep4", "mf_reg", "mf_long", "open_L", "open_R", "corner_L", "corner_R", "slide_h", "slide_hl", "h020", "wood_s", "wood_w", "steel1", "lid_half", "box_half", "mesh_d1", "mesh_s1", "mesh_hd", "mesh_hs", "flat", "seppou", "CK-230", "CK-220", "legs", "sc25", "sc50", "mytable", "mytable_s", "fshelf", "fshelf_l", "fshelf_m", "sp_oat", "sp_oat_l", "sp_oat_low", "sp_chabu", "sp_kitchen", "hx_t1", "hx_t1l", "hx_t0lt", "hx_cafe", "kermit_t", "noga_table", "alu48", "alu68", "alu93", "sp_jikaro", "megamat", "megamat_duo", "sparrow50", "cot_one", "sp_low30", "sp_lowshort", "sp_fd", "sp_take", "hx_one", "hx_zero", "hx_sunset", "kermit", "noga_chair", "omni230", "camp5000", "sfh1200", "sfh300", "mk_stove", "toyotomi_lcl53", "sfh_bh900", "sp_gs1000", "cfx3_35", "cfx3_45", "cfx3_55"]);
 function gArt(it){if(!GEAR_ART.has(it.id))return it.html;
   return it.html.replace(/<svg[\s\S]*?<\/svg>/,`<img class="gart" src="img/gear/${it.id}.webp" alt="" loading="lazy"><span class="gart-ai">AI 그림</span>`);}
 function renderGear(){const nav=document.getElementById('gearNav'),body=document.getElementById('gearBody');if(!body)return;
@@ -5047,7 +5079,7 @@ const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유�
   megamat_duo:['메가매트 듀오','메가메트 듀오'],megamat:['메가매트','메가메트'],zebec_pro240:['에어리스 프로 240','제백 프로 240'],zebec_pro260:['에어리스 프로 260','제백 프로 260','제백 에어매트','에어리스 프로','제백 프로'],zebec_pro280:['에어리스 프로 280','제백 프로 280'],zebec_pro300:['에어리스 프로 300','제백 프로 300'],cot_one:['코트원'],sp_oat_low:['원액션 로우'],sp_oat:['원액션테이블'],
   heka:['헤카체어','헤카 체어','헤카'],kzm_lettino:['레티노체어','레티노 체어','레티노'],hx_swivel:['스위블체어','스위블 체어','스위블'],kzm_castanets:['캐스터네츠체어','캐스터네츠 체어','캐스터네츠'],
   sp_conn:['커넥션 테이블','커넥션테이블'],verne_maestro:['마에스트로','베른 IGT','베른igt','베른 테이블','베른igt테이블','VST 마에스트로'],sp_entry_igt:['엔트리 IGT','엔트리igt','엔트리 아이지티'],sp_ext_igt:['익스텐션 IGT','익스텐션igt'],
-  lg_roomtv:['룸앤티비','룸앤TV','룸앤 티비','룸앤 TV'],pf_cot75:['플랜포티','피콧','P-COT','플랜포티 야전침대','피콧 75'],alpicool_k25:['알피쿨','알피쿨 K25','K25'],
+  gw_bucket:['원터치 버킷','원터치버킷','왓낫 바스켓','왓낫바스켓','왓낫 버킷','그리비웍스 바스켓','그리비웍스 버킷','버킷 바스켓'],gw_rack:['버킷 랙','버킷랙','2단 랙','2단랙','그리비웍스 랙','그리비웍스 2단 랙','왓낫 랙'],mw_indian_l:['인디언 행어','인디언행어','인디언 행어 L','인디언행어 L','인디언 헹어','인디언헹어'],lg_roomtv:['룸앤티비','룸앤TV','룸앤 티비','룸앤 TV'],pf_cot75:['플랜포티','피콧','P-COT','플랜포티 야전침대','피콧 75'],alpicool_k25:['알피쿨','알피쿨 K25','K25'],
   ck_oakdome_mini:['오크돔 미니','오크돔미니'],ck_oakdome_m:['오크돔 M','오크돔m'],ck_makadome:['마카돔'],ck_makaplus:['마카플러스','마카 플러스'],ck_oakbell:['오크벨'],ck_ruby_double:['루비 더블','루비더블'],ck_alpberg:['알페르그','알페르그쉘터'],ck_custom_s:['커스텀쉘터 S','커스텀쉘터s'],
   mt_monte:['몽뜨','몽뜨 쉘터','몬테라 몽뜨'],bs_1360:['브런스카일','1360 텐트','브런스카일 1360'],ttp_zirkon15:['지르콘','지르콘 15','텐티피'],hb_altai:['알타이','알타이 UL','알타이ul'],sp_kayad_m:['카야드','카야드 M','카야드m'],
   tt_horizon:['선셋 호라이즌','선셋호라이즌','썬셋 호라이즌','텐터 호라이즌'],tt_little_sunset:['리틀선셋','리틀 선셋','리틀썬셋'],tt_ortus_s_mk2:['오르투스 S','오르투스S','오르투스 마크2','오르투스S 마크2','S마크2','오르투스 레이싱'],tt_ortus_v:['오르투스 V','오르투스V'],tt_ortus_x:['오르투스 X','오르투스X','오르투스 엑스'],
