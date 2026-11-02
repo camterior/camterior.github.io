@@ -3048,6 +3048,16 @@ function addExtraTent(id){const T=TENTS[id];if(!T||!T.outer)return;const b=scene
   const e={u:XT_SEQ++,id,x:Math.round(b[1][0]+800-ob[0][0]),y:Math.round(b[0][1]-ob[0][1]),r:0,inner:T.innerDefault||null};
   XT.push(e);sel='xt:'+e.u;XT_ADD=false;renderTentOpts();stageTitle();fitView();render();
   if(typeof showToast==='function')showToast(`${T.name}을(를) 추가했어요. 끌어서 옮겨요`);}
+// 추가 텐트를 메인으로: 그 텐트 기준으로 전체 좌표를 옮기고, 원래 메인은 추가 텐트로 (모든 옵션은 메인에서)
+function xtMakeMain(u){const e=xtByU(u);if(!e)return;const M=TENTS[tent.id],X=xtT(e),th=(e.r||0);
+  const inv={cos:X.cos,sin:-X.sin,tx:-(X.cos*X.tx+X.sin*X.ty),ty:(X.sin*X.tx-X.cos*X.ty)},f=v=>applyT(inv,v);
+  state.pieces.filter(p=>p.parent==null).forEach(p=>{if(p.on!=null)return;const c=centroid(CATALOG[p.type].verts),w=applyT(p._T,c),n=f(w);p.rot=((((p.rot||0)-th)%360)+360)%360;p.ox=Math.round(n[0]-c[0]);p.oy=Math.round(n[1]-c[1]);});
+  if(tarp.id){const n=f([tarp.x,tarp.y]);tarp.x=Math.round(n[0]);tarp.y=Math.round(n[1]);tarp.rot=(((tarp.rot-th)%360)+360)%360;}
+  XT.forEach(o=>{if(o===e)return;const c=xtC(o),w=applyT(xtT(o),c),n=f(w);o.r=((((o.r||0)-th)%360)+360)%360;o.x=Math.round(n[0]-c[0]);o.y=Math.round(n[1]-c[1]);});
+  if(M&&M.outer){const c=xtC({id:tent.id}),n=f(c),oldInner=typeof tent.inner==='string'&&M.inners&&M.inners[tent.inner]?tent.inner:null;
+    XT.push({u:XT_SEQ++,id:tent.id,x:Math.round(n[0]-c[0]),y:Math.round(n[1]-c[1]),r:(((-th)%360)+360)%360,inner:oldInner});}
+  const T=TENTS[e.id];tent={id:e.id,inner:e.inner,canopy:false,canopy2:false,custom:tent.custom};XT=XT.filter(o=>o!==e);sel=null;
+  renderTentList();renderTentOpts();stageTitle();fitView();render();if(typeof showToast==='function')showToast(`${T.name}을(를) 메인으로 바꿨어요. 이제 모든 옵션을 쓸 수 있어요`);}
 function xtRot(u,d){const e=xtByU(u);if(!e)return;e.r=(((e.r||0)+d)%360+360)%360;render();}
 function xtDel(u){XT=XT.filter(e=>e.u!==u);if(sel==='xt:'+u)sel=null;renderTentOpts();stageTitle();render();}
 function xtInner(u,v){const e=xtByU(u);if(!e)return;e.inner=v||null;render();}
@@ -3415,7 +3425,7 @@ let dockRaf=0;function renderDockSoon(){if(!dockRaf)dockRaf=requestAnimationFram
 function renderDock(){document.querySelectorAll('.xt-row').forEach(r=>r.classList.toggle('on',sel==='xt:'+r.dataset.u));const el=document.getElementById('dock');if(!el)return;let h='';
   if(sel==='tarp'&&TARPS[tarp.id]){h=`<span class="nm">${TARPS[tarp.id].name}</span><button onclick="rotTarp(-15)" aria-label="왼쪽으로 15도">⟲</button><button onclick="rotTarp(15)" aria-label="오른쪽으로 15도">⟳</button><button onclick="rotTarp(90)">90°</button><button class="del" onclick="pickTarp(null)">빼기</button><button onclick="sel=null;render()" aria-label="선택 해제">✕</button>`;}
   else if(typeof sel==='string'&&sel.startsWith('xt:')&&xtByU(+sel.slice(3))){const e=xtByU(+sel.slice(3)),T=TENTS[e.id];
-    h=`<span class="nm">${esc(T.name)}</span><button onclick="xtRot(${e.u},-15)" aria-label="왼쪽으로 15도">⟲</button><button onclick="xtRot(${e.u},15)" aria-label="오른쪽으로 15도">⟳</button><button onclick="xtRot(${e.u},90)">90°</button><button class="del" onclick="xtDel(${e.u})">빼기</button><button onclick="sel=null;render()" aria-label="선택 해제">✕</button>`;}
+    h=`<span class="nm">${esc(T.name)}</span><button onclick="xtRot(${e.u},-15)" aria-label="왼쪽으로 15도">⟲</button><button onclick="xtRot(${e.u},15)" aria-label="오른쪽으로 15도">⟳</button><button onclick="xtRot(${e.u},90)">90°</button><button class="pri" onclick="xtMakeMain(${e.u})">메인으로</button><button class="del" onclick="xtDel(${e.u})">빼기</button><button onclick="sel=null;render()" aria-label="선택 해제">✕</button>`;}
   else if(typeof sel==='number'&&byId(sel)){const r=byId(sel),c=CATALOG[r.type];
     const hasParts=c.kind!=='gear';
     h=`<span class="nm${hasParts?' hm':''}">${c.kind==='gear'?c.name:c.name+' 세트'}</span>${hasParts?`<button class="pri" onclick="openParts(${r.uid})">파츠·붙이기</button>`:''}<button onclick="zoomToRoot(${r.uid},true)" aria-label="이 장비로 확대">🔍</button><button class="hm" onclick="onRotate(${r.uid},-15)" aria-label="왼쪽으로 15도">⟲</button><button onclick="onRotate(${r.uid},15)" aria-label="오른쪽으로 15도">⟳</button><button onclick="onRotate(${r.uid},90)">90°</button>${c.kind==='gear'?stackBtn(r,''):''}<button class="del" onclick="killSet(${r.uid});render()">삭제</button><button onclick="sel=null;render()" aria-label="선택 해제">✕</button>`;}
@@ -3745,7 +3755,7 @@ function renderTentOpts(){const T=TENTS[tent.id];
   h+=xtOptsHtml();
   document.getElementById('tentOpts').innerHTML=h;renderTentSpec();}
 function xtOptsHtml(){let h=`<div class="xt-box"><div class="fold-h">단체 캠핑 · 텐트 더 놓기</div>`;
-  xtOk().forEach((e,i)=>{const T=TENTS[e.id];h+=`<div class="xt-row${sel==='xt:'+e.u?' on':''}" data-u="${e.u}"><button type="button" class="xt-n" onclick="sel='xt:${e.u}';render()"><b>${i+2}</b> ${esc((T.brand?T.brand+' ':'')+T.name)}</button><button type="button" class="btn small danger" onclick="xtDel(${e.u})">빼기</button></div>`;});
+  xtOk().forEach((e,i)=>{const T=TENTS[e.id];h+=`<div class="xt-row${sel==='xt:'+e.u?' on':''}" data-u="${e.u}"><button type="button" class="xt-n" onclick="sel='xt:${e.u}';render()"><b>${i+2}</b> ${esc((T.brand?T.brand+' ':'')+T.name)}</button><button type="button" class="btn small" onclick="xtMakeMain(${e.u})">메인으로</button><button type="button" class="btn small danger" onclick="xtDel(${e.u})">빼기</button></div>`;});
   h+=XT_ADD?`<p class="xt-hint">아래 텐트 목록에서 더 놓을 텐트를 눌러요. <button type="button" class="btn small" onclick="xtAddMode(false)">취소</button></p>`:`<button type="button" class="btn small xt-add" onclick="xtAddMode(true)">＋ 텐트 추가</button>`;
   return h+`</div>`;}
 function stageTitle(){const T=TENTS[tent.id],t=TARPS[tarp.id];const names=[T.outer?(twinDx(T)?twinName(T):T.name):null,xtOk().length?`텐트 ${xtOk().length}동 더`:null,t?t.name:null].filter(Boolean);
@@ -3768,7 +3778,7 @@ function stackBtn(r,cls){const c=CATALOG[r.type];if(!STACK_TOP(c))return '';if(r
 function renderSel(){const el=document.getElementById('selPanel');
   if(typeof sel==='string'&&sel.startsWith('xt:')){const e=xtByU(+sel.slice(3));if(e){const T=TENTS[e.id],ins=Object.entries(T.inners||{});
     el.innerHTML=`<div class="selbox"><h3>${esc(T.name)}</h3><p>추가한 텐트예요. 끌어서 옮기고, 아래 버튼으로 돌려요. 방향 ${Math.round(e.r||0)}°.</p>
-    <div class="btnrow"><button class="btn small" onclick="xtRot(${e.u},-15)">⟲ 15°</button><button class="btn small" onclick="xtRot(${e.u},15)">⟳ 15°</button><button class="btn small" onclick="xtRot(${e.u},90)">90° 돌리기</button><button class="btn small danger" onclick="xtDel(${e.u})">텐트 빼기</button></div>
+    <div class="btnrow"><button class="btn small" onclick="xtRot(${e.u},-15)">⟲ 15°</button><button class="btn small" onclick="xtRot(${e.u},15)">⟳ 15°</button><button class="btn small" onclick="xtRot(${e.u},90)">90° 돌리기</button><button class="btn small primary" onclick="xtMakeMain(${e.u})">이 텐트를 메인으로</button><button class="btn small danger" onclick="xtDel(${e.u})">텐트 빼기</button></div><p class="muted" style="margin-top:6px">메인으로 바꾸면 캐노피·베스티블, 이너 돌리기·옮기기 같은 옵션을 이 텐트에 쓸 수 있어요. 지금 메인 텐트는 추가 텐트로 바뀌어요.</p>
     ${ins.length?`<div class="opt" style="margin-top:8px"><span>이너룸</span><div class="seg">${ins.map(([k,v])=>`<button aria-pressed="${e.inner===k}" onclick="xtInner(${e.u},'${k}')">${esc(v.label.replace('이너 ',''))}</button>`).join('')}<button aria-pressed="${!e.inner}" onclick="xtInner(${e.u},null)">없음</button></div></div>`:''}</div>`;return;}}
   if(sel==='tarp'&&TARPS[tarp.id]){const t=TARPS[tarp.id];
     el.innerHTML=`<div class="selbox"><h3>${t.name}</h3><p>타프를 끌어서 옮기고, 아래 버튼으로 돌려요. 방향 ${Math.round(tarp.rot)}°.</p>
