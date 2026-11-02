@@ -6,5 +6,6 @@ compat 2026-10-26 flags [] usage standard observability True
 schedules []
 OK
 before 33
-dryrun OK
-ref refs/heads/work/worker-notice-img sha 37d6c6e1c2d6c62cf88eb726bf707fbab38ff0e3 run 41398978595
+deploy OK
+after 33 (before 33)
+ref refs/heads/main sha 093c6653ff2d08bbf936a8f66f83d2b9557f3131 run 41399910797
