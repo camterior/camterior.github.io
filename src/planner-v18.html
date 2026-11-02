@@ -2202,10 +2202,16 @@ const GEAR={
     note:'본체 634.6×397.7×91.9mm. 받침을 포함한 바닥 깊이는 추정이에요. 캠핑용 원목 스탠드에 올리면 높이가 달라져요',href:'https://www.lge.co.kr/',srcName:'LG전자 제품 정보'},
   pf_cot75:{gtype:'cot',sleep:true,group:'야전침대',name:'플랜포티 P-COT 피콧 야전침대 슈퍼와이드 75',model:'P-COT Super Wide 75',conf:'retailer',w:2100,d:750,h:390,kg:6.9,sw:'#5C6150',
     note:'높이 39cm(로우 모드 18cm), 내하중 350kg. 와이드 73(190×73cm)은 요청 오면 추가할게요',href:'https://m.xlite.co.kr/product/detail.html?product_no=12929',srcName:'판매처 상품 상세'},
+  gw_bucket:{gtype:'box',soft:true,group:'수납·행어',name:'그리비웍스×왓낫 원터치 버킷 GW',model:'ONE TOUCH BUCKET GW',conf:'retailer',w:360,d:250,h:320,kg:1.2,sw:'#4A4C4A',
+    note:'펼친 크기 36×25×32cm(접으면 높이 6cm), 폴리에스터 본체·스틸 프레임. 2단 랙 위나 아래 칸에 올릴 수 있어요',href:'https://www.sundaymountain.jp/c/brand/b_g/grebeworks/g64035',srcName:'판매처 상품 상세'},
+  gw_rack:{gtype:'shelf',frame:true,top:'black',group:'수납·행어',name:'그리비웍스 원터치 버킷 랙 (2단)',model:'One-Touch Bucket Rack',conf:'official',w:398,d:365,h:795,kg:2.7,sw:'#232527',
+    note:'펼친 크기 39.8×36.5×79.5cm, 철(분체도장), 내하중 위 10kg·아래 10kg. 버킷을 위·아래 2단으로 놓아요(처음엔 위 칸, 그다음은 아래 칸)',href:'https://divhorizon.base.shop/items/95809797',srcName:'그리비웍스 공식몰'},
+  mw_indian_l:{gtype:'hanger',group:'수납·행어',name:'미니멀웍스 인디언 행어 L',model:'Indian Hanger L',conf:'official',w:1010,d:750,h:1030,kg:0.84,sw:'#1E2022',
+    note:'가로바 101cm, 높이 103cm, 다리 폭 75cm, 알루미늄 840g. 옷·랜턴을 거는 A자 행어라 그 위에 장비를 올리지 않아요',href:'https://www.minimalworks.co.kr/goods/goods_view.php?goodsNo=813',srcName:'미니멀웍스 공식몰 상세'},
   alpicool_k25:{gtype:'fridge',group:'냉장고',name:'알피쿨 K25',model:'K25',conf:'retailer',w:585,d:335,h:350,kg:10.2,sw:'#3B3F44',
     note:'25L 컴프레서 냉장고',href:'https://www.alpicool.com/',srcName:'판매처 제원'},
 };
-const GEAR_GROUPS=['쉘프컨테이너','알루미늄 박스','마이테이블','테이블','폴딩쉘프','체어','매트','야전침대','난방','냉장고','버너','기타'];
+const GEAR_GROUPS=['쉘프컨테이너','알루미늄 박스','마이테이블','테이블','폴딩쉘프','수납·행어','체어','매트','야전침대','난방','냉장고','버너','기타'];
 const GEAR_ORDER=Object.keys(GEAR);
 const gLink=g=>g.href||(g.src?SRC+g.src:null),gLinkName=g=>g.srcName||'판매처 상품 상세';
 const GEAR_CAT=Object.fromEntries(Object.entries(GEAR).map(([id,g])=>[id,{kind:'gear',...g,short:g.name,
@@ -2272,8 +2278,8 @@ function segDist(p,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],L=dx*dx+dy*dy;let t=L?((
 function polyGap(A,B){let m=Infinity;[[A,B],[B,A]].forEach(([P,Q])=>P.forEach(p=>{for(let k=0;k<Q.length;k++)m=Math.min(m,segDist(p,Q[k],Q[(k+1)%Q.length]));}));return m;}
 const pieceH=p=>{const c=CATALOG[p.type];return c.kind==='gear'?c.h:(rootOf(p).leg||660);};
 /* ---------- 위에 올리기 (선반·테이블·박스 위에 장비 놓기) ---------- */
-const STACK_BASE=c=>c.kind==='frame'||c.kind==='ext'||(c.kind==='gear'&&['table','shelf','box','fridge'].includes(c.gtype));
-const STACK_TOP=c=>c.kind==='gear'&&!c.heat&&!c.sleep&&!['chair','mat','cot'].includes(c.gtype);
+const STACK_BASE=c=>!c.soft&&(c.kind==='frame'||c.kind==='ext'||(c.kind==='gear'&&['table','shelf','box','fridge'].includes(c.gtype)));
+const STACK_TOP=c=>c.kind==='gear'&&!c.heat&&!c.sleep&&!['chair','mat','cot','hanger'].includes(c.gtype);
 const STACK_FIRE=c=>c.kind==='gear'&&['burner','stove','wood'].includes(c.gtype);
 function invT(T,w){const x=w[0]-T.tx,y=w[1]-T.ty;return [T.cos*x+T.sin*y,-T.sin*x+T.cos*y];}
 function stackRoot(p){let q=p,n=0;while(q&&q.on!=null&&n++<40){const b=byId(q.on);if(!b)break;q=rootOf(b);}return rootOf(q);}
@@ -2287,6 +2293,7 @@ function stackBaseAt(p){const c=CATALOG[p.type];if(!STACK_TOP(c)||p.parent!=null
   return best&&best.q;}
 // 높은 테이블 밑에 들어가는 박스·냉장고는 '아래 수납'이 기본
 function stackPreferUnder(p,q){const c=CATALOG[p.type],cq=CATALOG[q.type];const top=pieceH(q);
+  if(cq.frame)return (c.gtype==='box'||c.gtype==='fridge')&&c.h<=top-60&&stackKids(q.uid).length>0;// 2단 랙: 위 칸이 차 있으면 아래 칸
   return (c.gtype==='box'||c.gtype==='fridge')&&(cq.kind!=='gear'||cq.gtype==='table')&&top>=500&&c.h<=top-60&&!q.on;}
 function stackSet(p,q){p.on=q.uid;p.onC=invT(q._T,centroid(p._v)).map(v=>Math.round(v));p.onR=Math.round((p.rot||0)-Math.atan2(q._T.sin,q._T.cos)*180/Math.PI);p.floor=false;}
 function stackAuto(p){if(!p||p.floor||p.parent!=null)return false;const q=stackBaseAt(p);if(!q||stackPreferUnder(p,q))return false;stackSet(p,q);return true;}
@@ -2624,6 +2631,15 @@ function gearBody(p,fine){const c=CATALOG[p.type],w=c.w,d=c.d;let o='';
   if(c.gtype==='cot'){o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="24" fill="#3A3E41" stroke="#16181A" stroke-width="6"/>`;
     o+=`<rect x="40" y="30" width="${w-80}" height="${d-60}" rx="18" fill="${c.sw}"/>`;
     [0,w-28].forEach(x=>{o+=`<rect x="${x}" y="-10" width="28" height="${d+20}" rx="10" fill="#9EA3A7"/>`;});return o;}
+  if(c.frame){// 2단 랙: 열린 철 프레임 (X자 다리, 위 칸 틀)
+    o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="10" fill="rgba(35,37,39,.10)" stroke="#232527" stroke-width="16"/>`;
+    [d*.3,d*.7].forEach(y=>{o+=`<rect x="${w*.2}" y="${y-10}" width="${w*.6}" height="20" rx="8" fill="#232527" opacity=".55"/>`;});
+    o+=`<path d="M8,8L${w-8},${d-8}M${w-8},8L8,${d-8}" stroke="#232527" stroke-width="6" stroke-dasharray="18 12" opacity=".45"/>`;return o;}
+  if(c.gtype==='hanger'){// A자 행어: 가로바 + 양쪽 다리
+    o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="20" fill="rgba(30,32,34,.04)" stroke="rgba(30,32,34,.25)" stroke-width="4" stroke-dasharray="16 12"/>`;
+    [[30,0,30,d],[w-30,0,w-30,d]].forEach(([a,b,c2,e])=>{o+=`<path d="M${a},${b}L${a},${d/2}L${c2},${e}" fill="none" stroke="#1E2022" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>`;});
+    o+=`<line x1="20" y1="${d/2}" x2="${w-20}" y2="${d/2}" stroke="#1E2022" stroke-width="22" stroke-linecap="round"/>`;
+    [w*.3,w*.5,w*.7].forEach(x=>{o+=`<path d="M${x-40},${d/2+40}L${x},${d/2}L${x+40},${d/2+40}" fill="none" stroke="#9EA3A7" stroke-width="6"/>`;});return o;}
   if(c.gtype==='box'){const bf=c.alu?'#C9CDD0':'#6B6E68',bs=c.alu?'#8C9196':'#3E403C',bi=c.alu?'#DADDE0':'#7E827B';
     o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="16" fill="${bf}" stroke="${bs}" stroke-width="5"/><rect x="26" y="26" width="${w-52}" height="${d-52}" rx="10" fill="${bi}" stroke="${bs}" stroke-width="3"/>`;
     [[0,d/2],[w,d/2]].forEach(([x,y])=>{o+=`<rect x="${x-14}" y="${y-48}" width="28" height="96" rx="12" fill="#C9CDD0" stroke="#7F8489" stroke-width="3"/>`;});return o;}
@@ -3460,6 +3476,13 @@ function igt3(THREE){
         [x0,x1-6].forEach(xx=>grp.add(extrudePoly(THREE,[[xx,y0],[xx+6,y0],[xx+6,y1],[xx,y1]].map(X),shelves[shelves.length-1],Hh-30,M.steel)));}
     }else if(c.kind==='gear'){const h=c.h,w=c.w,d=c.d,R=(x0,y0,x1,y1)=>[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(X);
       if(c.gtype==='box'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h-8,c.alu?M.alu:M.cont));grp.add(extrudePoly(THREE,R(-6,-6,w+6,d+6),h-8,h,c.alu?M.alu:M.cont2));}
+      else if(c.frame){const fm=M.dark,rim=(y0,y1)=>[[0,0,w,24],[0,d-24,w,d],[0,0,24,d],[w-24,0,w,d]].forEach(([a,b,c2,e])=>grp.add(extrudePoly(THREE,R(a,b,c2,e),y0,y1,fm)));
+        rim(h-30,h);rim(130,160);[[w*.3,d/2],[w*.7,d/2]].forEach(([x])=>grp.add(extrudePoly(THREE,R(x-15,24,x+15,d-24),h-24,h-8,fm)));
+        [[0,0],[w,0],[0,d],[w,d]].forEach(([x,y])=>{const a=X([x,y]),b=X([w-x,y]);grp.add(lineOf(THREE,[[mm(a[0]),0,mm(a[1])],[mm(b[0]),mm(h),mm(b[1])]],'#232527',1));});}
+      else if(c.gtype==='hanger'){const a=X([20,d/2]),b=X([w-20,d/2]),col='#1E2022';
+        grp.add(lineOf(THREE,[[mm(a[0]),mm(h),mm(a[1])],[mm(b[0]),mm(h),mm(b[1])]],col,1));
+        [[30,0],[30,d],[w-30,0],[w-30,d]].forEach(([x,y])=>{const f=X([x,y]),t=X([x,d/2]);grp.add(lineOf(THREE,[[mm(f[0]),0,mm(f[1])],[mm(t[0]),mm(h),mm(t[1])]],col,1));});
+        grp.add(extrudePoly(THREE,R(20,d/2-12,w-20,d/2+12),h-24,h,M.dark));}
       else if(c.gtype==='mat'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h,new THREE.MeshStandardMaterial({color:c.sw,roughness:.95})));}
       else if(c.gtype==='cot'){grp.add(extrudePoly(THREE,R(20,0,w-20,d),h-30,h,new THREE.MeshStandardMaterial({color:c.sw,roughness:.9})));
         [[20,20],[w-20,20],[20,d-20],[w-20,d-20],[w/2,20],[w/2,d-20]].forEach(q=>grp.add(cyl(THREE,X(q),0,h-30,10,M.dark)));}
