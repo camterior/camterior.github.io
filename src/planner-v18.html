@@ -1086,13 +1086,13 @@ function cdyBox(id,name,model,Lc,Wc,Hc,kg,cap,no,extra){const L=Lc*10,W=Wc*10,o=
   T2.add(id,Object.assign({brand:'쿠디',name,model,size:[Lc,Wc,Hc],weight:kg,cap,href:CDY+no,srcName:CDYN,est:CDYE(`${Lc}×${Wc}×${Hc}cm`),outer:o,
     innerNote:'바닥 일체형 에어텐트예요. 잠자리는 직접 입력으로 표시해보세요.',
     doors:[T2.front(W,W-500,'전면 도어'),T2.rear(L,W,W-500,'후면 도어')],color:'#DCCFB6',prof:T2.PROF.cabin},extra||{}));}
-cdyBox('cd_familia','파밀리아 17.2','Familia 17.2',480,360,220,'66kg','4–6명',98,{est:CDYE('480×360×220cm, 바닥 17.2㎡')});
+cdyBox('cd_familia','파밀리아 17.2','Familia 17.2',480,360,220,'66kg','2–10명 (제조사 표기)',98,{est:CDYE('480×360×220cm, 바닥 17.2㎡')});
 cdyBox('cd_familia_pro','파밀리아 프로','Familia PRO',480,360,230,'72kg (포장 76kg)','최대 10명 (제조사 표기)',261);
-cdyBox('cd_136','13.6','Familia 13.6',380,360,220,'60kg','4명',97);
-cdyBox('cd_100','10.0','Coody 10.0',340,340,220,'40kg','3–4명',96);
-cdyBox('cd_100_pro','10.0 프로','10.0 PRO',280,360,230,'32kg','2–4명',289);
-cdyBox('cd_80','8.0','Coody 8.0',320,250,204,'35kg','2–3명',100);
-cdyBox('cd_80_pro','8.0 프로','8.0 PRO',380,320,270,'판매처 미표기','2–3명',343);
+cdyBox('cd_136','13.6','Familia 13.6',380,360,220,'60kg','2–8명 (제조사 표기)',97);
+cdyBox('cd_100','10.0','Coody 10.0',340,340,220,'40kg','2–4명 (제조사 표기)',96);
+cdyBox('cd_100_pro','10.0 프로','10.0 PRO',280,360,230,'32kg','1–4명 (제조사 표기)',289);
+cdyBox('cd_80','8.0','Coody 8.0',320,250,204,'35kg','1–4명 (제조사 표기)',100);
+cdyBox('cd_80_pro','8.0 프로','8.0 PRO',320,250,230,'판매처 미표기','판매처 미표기',343,{est:CDYE('320×250×230cm, 벽 높이 190cm')});
 cdyBox('cd_wave','웨이브','Wave',280,250,200,'25kg','2명',99);
 cdyBox('cd_roomy','루미','Roomy',400,320,230,'40kg','3–4명',104);
 cdyBox('cd_hub','허브쉘터','Hub Shelter',360,360,259,'60kg (포장 66kg)','최대 6명 (제조사 표기)',101,{est:CDYE('바깥 360×360cm, 높이 259cm'),
@@ -1340,10 +1340,10 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
     za(id,name,model,L,4000,H,kg,no,o,{est:est+' 출입문 위치는 사진으로 추정했어요.',innerNote:NOFLOOR,doors:[tipDoor(o,0,'출입문',true)],living:[L/2,2000],prof:T2.PROF.ridge});};
   gigi('za_gigi1','기기1','GIGI-1',5000,2500,220,'4.5kg','1114','판매처 평면도(500×400cm 육각, 긴 평변 250cm)로 그렸어요.');
   gigi('za_gigi2','기기2','GIGI-2',7500,5000,220,'7.5kg','1088','판매처 평면도(750×400cm 육각, 긴 평변 500cm)로 그렸어요.');
-  {const D=2800,W=3950,o=[[0,600],[1400,0],[D,600],[D,W-600],[1400,W],[0,W-600]];
-   za('za_okitoma2','오키토마2','OKITOMA-2',D,W,140,'7.5kg','1090',o,{est:'판매처 평면도(395×280cm, 이너 220×130cm)로 그렸어요. 긴 면이 출입구예요.',
-     inners:{std:{label:'이너텐트',model:'',size:'220×130',poly:[[1450,875],[2700,1175],[2700,2775],[1450,3075]]}},
-     doors:[{a:[0,900],b:[0,W-900],label:'출입구',zone:true}],living:[700,W/2],prof:T2.PROF.dome});}
+  {const D=2800,W=3950,o=[[0,1185],[590,185],[1050,0],[1750,0],[2210,185],[D,1185],[D,2765],[2210,3765],[1750,W],[1050,W],[590,3765],[0,2765]];
+   za('za_okitoma2','오키토마2','OKITOMA-2',D,W,140,'7.5kg (이너 1.55kg 포함)','1090',o,{est:'공식 SPEC 도면(바닥 395×280cm, 높이 140cm, 이너 육각형 뒤 160·가운데 350·앞 220cm, 깊이 130cm)으로 그렸어요. 긴 면이 출입구예요.',
+     inners:{std:{label:'이너텐트',model:'',size:'350×130 (육각)',poly:[[1360,875],[2120,225],[2660,1175],[2660,2775],[2120,3725],[1360,3075]]}},
+     doors:[{a:[0,1185],b:[0,2765],label:'출입구',zone:true}],living:[700,W/2],prof:T2.PROF.dome});}
 }
 
 /* ===== A그룹 추가 (2026-10-28, 판매처 상품 상세 도면) ===== */
@@ -1370,7 +1370,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  const lb=(id,name,model,L,W,H,v,ef,inner,kg,href,est)=>{const o=T2.tun(L,W,v,ef,100,W-200);
   IN(id,{brand:'스노우피크',name,model,size:[L/10,W/10,H],weight:kg,cap:'판매처 미표기',href:IL+href,srcName:ILN,est,outer:o,
    inners:{std:{label:'이너',model:'',size:inner[0],poly:T2.rect(...inner[1])}},doors:[T2.front(W,ef,'전실 출입')],living:[Math.round(v*.5),W/2],color:'#B9A98E',prof:T2.PROF.dome});};
- lb('sp_landbreeze_duo','랜드브리즈 Pro.air DUO','FES-652',3150,2700,145,1150,1200,['250×200',[1150,100,3100,2600]],'4.7kg','6871','판매처 제원(270×315×145cm, 이너 250×200cm)으로 그렸어요. 전실 모양은 사진 비율이에요.');
+ lb('sp_landbreeze_duo','랜드브리즈 Pro.air DUO','FES-652',3150,2700,145,1150,1200,['250×200',[1150,100,3100,2600]],'4.3kg (부속 제외, 공식 설명서)','6871','판매처 제원(270×315×145cm, 이너 250×200cm)으로 그렸어요. 전실 모양은 사진 비율이에요.');
  lb('sp_landbreeze1','랜드브리즈 Pro.1','SD-641',2650,2400,140,1000,1000,['225×165',[1000,75,2600,2325]],'판매처 미표기','4997','판매처 제원(플라이 240×265×140cm, 이너 225×165cm)으로 그렸어요.');
  lb('sp_landbreeze3','랜드브리즈 Pro.3','SD-643',4300,2600,155,1800,1200,['240×240',[1850,100,4200,2500]],'판매처 미표기','4996','판매처 제원(플라이 430×260×155cm, 이너 240×240cm)으로 그렸어요.');
  lb('sp_landbreeze4','랜드브리즈 Pro.4','SD-644',5100,3250,175,2000,1500,['310×300',[2000,75,5000,3175]],'판매처 미표기','4995','판매처 제원(플라이 510×325×175cm, 이너 310×300cm)으로 그렸어요.');
@@ -1474,8 +1474,8 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
   const vest=(id,W,VW,VD,H)=>{const T=TENTS[id],cy=W/2;Object.assign(T,{canopy:[[200,cy-W*.42],[-VD,cy-VW/2],[-VD,cy+VW/2],[200,cy+W*.42]],canopyLabel:`베스티블 달기 (${VW/10}×${VD/10}cm, 별매)`,canopyName:'베스티블',canopyH:H,canopyWall:true});};
   vest('ck_oakdome_l',3300,3600,3000,2000);vest('ck_oakdome_m',3300,3600,3000,2000);vest('ck_oakdome_s',2600,3000,3000,1800);vest('ck_makadome',2800,2800,1650,1450);}
  /* 몬테라 · 브런스카일 · 텐티피 · 힐레베르그 · 스노우피크 카야드 (게시판 요청, 2026-10-31) */
- IN('mt_monte',{brand:'몬테라',name:'몽뜨 쉘터',model:'Monte Shelter',size:[440,420,230],weight:'판매처 미표기',cap:'판매처 미표기',href:'https://outdoorlandmark.co.kr/',srcName:'판매처 상품 상세 SPEC',drawn:true,
-  est:'판매처 제원(440×420×230cm 터널)으로 그렸어요.',outer:T2.tun(4400,4200,500,3200,500,3200),innerNote:'델타 터널 쉘터용 이너텐트 M이 따로 있어요. 직접 입력으로 넣어보세요.',
+ IN('mt_monte',{brand:'몬테라',name:'몽뜨 델타 터널 쉘터',model:'Mont Delta Tunnel Shelter',size:[440,420,227],weight:'약 25kg',cap:'7–8명',href:'https://www.kolonmall.com/Brands/monterra/Product/K1766379884811083BK01',srcName:'몬테라 공식(코오롱몰) 상품 상세',drawn:true,
+  est:'공식 제원(420×440×227cm, 루프플라이 360×448cm)으로 그렸어요.',outer:T2.tun(4400,4200,500,3200,500,3200),innerNote:'델타 터널 쉘터용 이너텐트 M이 따로 있어요. 직접 입력으로 넣어보세요.',
   doors:[T2.front(4200,3200,'전면 도어'),T2.rear(4400,4200,3200,'후면 도어'),...sideD(4400,4200,1300,3100,'측면 도어')],color:'#6B6A5E',prof:T2.PROF.tunnel});
  IN('bs_1360',{brand:'브런스카일',name:'1360 텐트',model:'1360',size:[400,340,205],weight:'10.5kg + 폴 4.8kg',cap:'판매처 미표기',href:'https://brunskyle.com/',srcName:'브런스카일 공식몰',drawn:true,
   est:'판매처 제원(400×340×205cm, 2P 이너 340×160×190cm)으로 그렸어요. 이너 위치는 추정이에요.',outer:T2.box(4000,3400,350),
@@ -1549,17 +1549,17 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  {const o=[[0,500],[1760,0],[3830,0],[3830,2570],[1760,2570],[0,2070]];
   np('np_narcissus_plus','나르시스 돔+','Narcissus Dome+',3830,2570,150,'10kg','4명','34550',o,['207×250',[1760,35,3800,2535]],[{a:[0,700],b:[0,1870],label:'전실 출입',zone:true}],'판매처 도면(383×257×150cm, 이너 207×250cm)으로 그렸어요.',{prof:T2.PROF.dome});}
  {const D=4400,o=T2.poly(12,D,D/2,D/2);
-  np('np_hub_tipi','허브 티피','Hub Tepee',D,D,280,'11.3kg','판매처 미표기','34544',o,null,[T2.door(o,'front','출입문',true)],'판매처 도면(440×440cm 12각, 높이 280cm)으로 그렸어요.',{living:[D/2,D/2],prof:T2.PROF.tipi});}
+  np('np_hub_tipi','허브 티피','Hub Tepee',D,D,280,'11.3kg (그라운드시트 3.5kg · 폴 2.6kg 별도)','판매처 미표기','34544',o,null,[T2.door(o,'front','출입문',true)],'판매처 도면(440×440cm 12각, 높이 280cm)으로 그렸어요.',{living:[D/2,D/2],prof:T2.PROF.tipi});}
  {const L=5900,W=3100,o=T2.tun(L,W,300,2700,300,2500);
   np('np_atlantic2','아틀란틱 오션 2.0','Atlantic Ocean 2.0',L,W,195,'20.4kg','4명','34532',o,['215×285',[3600,125,5750,2975]],[T2.front(W,2700,'전면 도어'),...sideD(L,W,1200,2200)],'판매처 도면(590×310cm, 뒤 290cm, 이너 215×285cm)으로 그렸어요.');}
- {const L=5700,W=3400,o=T2.tun(L,W,350,1800,450,2500);
-  np('np_cleveland','클리브랜드','Cleveland',L,W,200,'22kg','4명','34540',o,['225×250',[3000,450,5250,2950]],[T2.front(W,1800,'전면 도어'),...sideD(L,W,700,1700,'측면 창')],'판매처 도면(570cm, 이너 225cm, 거실 120·145cm)으로 그렸어요.');}
+ {const L=5700,W=3800,o=[[0,1000],[350,450],[1800,0],[3000,50],[5250,700],[5700,1900],[5250,3100],[3000,3750],[1800,3800],[350,3350],[0,2800]];
+  np('np_cleveland','클리브랜드','Cleveland',L,W,225,'22kg','4명','34540',o,['225×340 (뒤 215)',[[3000,200],[5200,775],[5200,3025],[3000,3600]]],[T2.front(W,1800,'전면 도어'),{a:[700,341],b:[1500,93],label:'측면 창',zone:true},{a:[700,3459],b:[1500,3707],label:'측면 창',zone:true}],'공식 도면(570×380cm, 뒤쪽 최대 370cm, 높이 225cm, 이너 225cm·앞 340/뒤 215cm 사다리꼴)으로 그렸어요.');}
  {const L=5700,W=3800,o=T2.tun(L,W,1200,2630,1200,2630);
   np('np_yellowstone_ex3','옐로우스톤 EX 3.0','Yellowstone EX 3.0',L,W,210,'27kg','5명','34536',o,['210×345',[[3400,175],[4500,175],[5550,900],[5550,2900],[4500,3625],[3400,3625]]],[T2.front(W,2630,'전면 도어'),...sideD(L,W,1300,2300)],'판매처 도면(570×380cm, 120·115·100·115·120cm 구간, 이너 210×345cm)으로 그렸어요.');}
  const pac=(id,name,model,kg,no,inn)=>{const L=6300,W=4200,o=T2.rect(0,0,L,W);
   np(id,name,model,L,W,215,kg,'6명',no,o,[inn,[4050,250,6200,3950]],[{a:[0,700],b:[0,3500],label:'전면 도어',zone:true},...sideD(L,W,1300,2700)],`판매처 도면(630×420×215cm, 이너 ${inn}cm)으로 그렸어요.`,{prof:T2.PROF.cabin});};
  pac('np_pacific4','퍼시픽 오션 4.0','Pacific Ocean 4.0','25kg (폴 14kg 별도)','34528','370×215');
- pac('np_pacific_exp','퍼시픽 오션 EX+','Pacific Ocean EX+','24kg (폴 15.6kg 별도)','34526','378×215');
+ pac('np_pacific_exp','퍼시픽 오션 EX+','Pacific Ocean EX+','24kg (폴 15.6kg 별도)','34526','370×215');
  {const o=[[0,600],[1050,0],[3050,0],[3050,500],[3750,500],[3750,3150],[3050,3150],[3050,3650],[1050,3650],[0,3050]];
   np('np_air_docking','에어 도킹 쉘터','Air Docking Shelter',3750,3650,210,'19.6kg','8명','34522',o,null,[{a:[0,800],b:[0,2850],label:'전면 출입',zone:true},{a:[3750,700],b:[3750,2950],label:'차량 도킹',zone:false}],'판매처 도면(본체 305×365cm, 도킹 플랩 70cm)으로 그렸어요.',{prof:T2.PROF.cabin});}
 }
@@ -1569,8 +1569,8 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  const sideD=(L,W,x0,x1,lab)=>[T2.side(x0,x1,0,lab||'측면 도어'),T2.side(x0,x1,W,lab||'측면 도어')];
  const np=(id,name,model,L,W,H,kg,cap,no,o,inner,doors,est,extra)=>IN(id,Object.assign({brand:'노스피크',name,model,size:[L/10,W/10,H],weight:kg,cap,href:OLM+no,srcName:OLMN,drawn:true,est,outer:o,
    inners:inner?{std:{label:'이너텐트',model:'',size:inner[0],poly:Array.isArray(inner[1][0])?inner[1]:T2.rect(...inner[1])}}:{},innerNote:inner?undefined:NOFLOOR,doors,color:'#CFC3A6',prof:T2.PROF.tunnel},extra||{}));
- const a7=(id,name,model,no)=>{const L=6100,W=3880,o=T2.tun(L,W,950,3100,950,3100);
-  np(id,name,model,L,W,215,'32.2kg','5–6명',no,o,['220×310',[3900,385,6100-300,3495]],[T2.front(W,3100,'전면 도어'),...sideD(L,W,1300,2500)],'판매처 도면(610×388cm, 끝 310cm, 95·140·145·135·95cm 구간, 이너 220×310cm)으로 그렸어요.');};
+ const a7=(id,name,model,no)=>{const L=6100,W=3800,o=T2.tun(L,W,950,3100,950,3100);
+  np(id,name,model,L,W,215,'32.2kg','5–6명',no,o,['220×320',[[3850,300],[5150,300],[6050,400],[6050,3400],[5150,3500],[3850,3500]]],[T2.front(W,3100,'전면 도어'),...sideD(L,W,1300,2500)],'공식 도면(610×380cm, 끝 310cm, 95·140·145·135·95cm 구간, 이너 220×320cm)으로 그렸어요. 가운데 에어빔 부분은 조금 볼록해요.');};
  a7('np_a7_60','A7 6.0','A7 6.0','34521');a7('np_a7_exp','A7 EX+','A7 EX+','34518');
  {const L=7900,W=4700,o=[[0,375],[L,0],[L,W],[0,W-375]];
   np('np_a9','A9','A9',L,W,215,'32kg (플라이)','6–7명','34515',o,['220×415',[5600,275,7800,4425]],[{a:[0,700],b:[0,W-700],label:'전면 도어',zone:true},...sideD(L,W,1800,3200)],'판매처 도면(790cm, 앞 395cm, 뒤 470cm, 이너 220×415cm)으로 그렸어요.',{prof:T2.PROF.cabin});}
@@ -1583,7 +1583,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  {const L=6500,W=4000,o=T2.tun(L,W,600,3300,600,3100);
   np('np_acadia','아케디아 맥스+','Acadia Max+',L,W,220,'34.2kg','5–6명','34502',o,['220×350',[4100,250,6300,3750]],[T2.front(W,3300,'전면 도어'),...sideD(L,W,1500,2900)],'판매처 도면(650×400cm, 끝 330·310cm, 이너 220×350cm)으로 그렸어요.');}
  {const L=6400,W=4000,o=T2.tun(L,W,1500,3100,1500,3100);
-  np('np_yellowstone_hb','옐로우스톤 하이브리드','Yellowstone Hybrid',L,W,220,'29.7kg','5명','34499',o,['220×345',[[4000,275],[4950,275],[6250,800],[6250,3200],[4950,3725],[4000,3725]]],[T2.front(W,3100,'전면 도어'),...sideD(L,W,1600,2600)],'판매처 도면(640×400cm, 150·105·130·105·150cm 구간, 이너 220×345cm)으로 그렸어요.');}
+  np('np_yellowstone_hb','옐로우스톤 하이브리드','Yellowstone Hybrid',L,W,220,'29.7kg','5명','34499',o,['220×365 (뒤 280)',[[4050,175],[4950,175],[6250,600],[6250,3400],[4950,3825],[4050,3825]]],[T2.front(W,3100,'전면 도어'),...sideD(L,W,1600,2600)],'판매처 도면(640×400cm, 150·105·130·105·150cm 구간, 이너 220×365cm·뒤 280cm)으로 그렸어요.');}
  {const L=5050,W=3150,o=T2.tun(L,W,300,2900,300,2750);
   np('np_a5rs','A5 RS','A5 RS',L,W,205,'23kg','4명','34493',o,['220×265',[2700,300,4900,2850]],[T2.front(W,2900,'전면 도어'),...sideD(L,W,1100,2300)],'판매처 도면(505cm, 앞 315cm, 뒤 275cm, 이너 220×265cm)으로 그렸어요.');}
 
