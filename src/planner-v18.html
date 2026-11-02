@@ -2075,6 +2075,7 @@ const h020Shape=()=>shape(rect(340,161),[{name:'top',label:'바 끝',a:[0,0],b:[
 const CATALOG={
   reg3 :{kind:'frame',style:'classic',group:'IGT 프레임',name:'IGT 프레임',short:'IGT 프레임',model:'CK-149',units:3,conf:'official',spec:'846×496mm, 3유닛',...frameShape(3)},
   long4:{kind:'frame',style:'classic',group:'IGT 프레임',name:'IGT 프레임 롱',short:'IGT 프레임 롱',model:'CK-150',units:4,conf:'official',spec:'1096×496mm, 4유닛',...frameShape(4)},
+  short2:{kind:'frame',style:'classic',group:'IGT 프레임',name:'IGT 쇼트 (단종)',short:'IGT 쇼트',model:'CK-166',units:2,conf:'retailer',spec:'596×496×30mm, 2유닛, 3.4kg · 단종 (2022 설봉제 블랙 FES-153 재판매)',note:'단종 제품이라 공식 페이지가 없어 중고·리뷰 자료 기준이에요. 400 다리 4개 세트로 나왔어요',...frameShape(2)},
   sep2 :{kind:'frame',style:'separate',group:'세퍼레이트 IGT',name:'세퍼레이트 IGT 2유닛',short:'세퍼레이트 2U',model:'CK-902',units:2,conf:'official',spec:'596×496mm, 2유닛, 2.9kg',href:'https://ec.snowpeak.co.jp/item/SNP0124A0296',srcName:'스노우피크 재팬',...frameShape(2)},
   sep3 :{kind:'frame',style:'separate',group:'세퍼레이트 IGT',name:'세퍼레이트 IGT 3유닛',short:'세퍼레이트 3U',model:'CK-903',units:3,conf:'official',spec:'846×496mm, 3유닛, 3.5kg',href:'https://ec.snowpeak.co.jp/item/SNP0124A0298',srcName:'스노우피크 재팬',...frameShape(3)},
   sep4 :{kind:'frame',style:'separate',group:'세퍼레이트 IGT',name:'세퍼레이트 IGT 4유닛',short:'세퍼레이트 4U',model:'CK-904',units:4,conf:'official',spec:'1096×496mm, 4유닛, 4.1kg',href:'https://ec.snowpeak.co.jp/item/SNP0124A0300',srcName:'스노우피크 재팬',...frameShape(4)},
@@ -2227,7 +2228,7 @@ const gLink=g=>g.href||(g.src?SRC+g.src:null),gLinkName=g=>g.srcName||'판매처
 const GEAR_CAT=Object.fromEntries(Object.entries(GEAR).map(([id,g])=>[id,{kind:'gear',...g,short:g.name,
   spec:`${g.w}×${g.d}×${g.h}mm${g.sh?', 좌면 '+g.sh+'mm':''}${g.kg?', '+g.kg+'kg':''}`,...(g.gtype==='stove'||g.round?shape(circPoly(g.w/2,28),[]):g.oct?shape(octPoly(g.w,g.d,g.w*.22),[]):gearShape(g.w,g.d))}]));
 const GROUPS=['IGT 프레임','세퍼레이트 IGT','멀티펑션','오픈멀티펑션','코너테이블','슬라이드 트레이','행거'];
-const ORDER=['reg3','long4','sep2','sep3','sep4','mf_reg','mf_long','open_L','open_R','corner_L','corner_R','slide_h','slide_hl','h020'];
+const ORDER=['reg3','long4','short2','sep2','sep3','sep4','mf_reg','mf_long','open_L','open_R','corner_L','corner_R','slide_h','slide_hl','h020'];
 Object.assign(CATALOG,GEAR_CAT);
 const SEP_CYCLE={sep2:'sep3',sep3:'sep4',sep4:'sep2'};
 const SLOT_ITEMS=[
@@ -3948,7 +3949,7 @@ function showTab(name){if(!TABS[name])name='tent';
   LS.set('campPlanner.tab',name);render();}
 document.querySelector('.tabs').addEventListener('keydown',e=>{const ks=Object.keys(TABS),cur=ks.findIndex(k=>document.getElementById('tab-'+k).getAttribute('aria-selected')==='true');
   const d={ArrowRight:1,ArrowLeft:-1}[e.key];if(!d)return;e.preventDefault();const n=ks[(cur+d+ks.length)%ks.length];showTab(n);document.getElementById('tab-'+n).focus();});
-const CAT_GROUPS=[['IGT 프레임',['reg3','long4','sep2','sep3','sep4']],['IGT 테이블',['mf_reg','mf_long','open_L','open_R','corner_L','corner_R']]]
+const CAT_GROUPS=[['IGT 프레임',['reg3','long4','short2','sep2','sep3','sep4']],['IGT 테이블',['mf_reg','mf_long','open_L','open_R','corner_L','corner_R']]]
   .concat(GEAR_GROUPS.map(g=>[g,GEAR_ORDER.filter(t=>CATALOG[t].group===g)]));
 let CAT_F='all';
 function catPreview(t){if(['chair','mat','cot','wood','fridge'].includes(CATALOG[t].gtype)||CATALOG[t].alu){const c=CATALOG[t],p=Math.max(c.w,c.d)*.06;return `<svg viewBox="${-p} ${-p} ${c.w+p*2} ${c.d+p*2}" aria-hidden="true">${gearBody({type:t},false)}</svg>`;}

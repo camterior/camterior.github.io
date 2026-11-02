@@ -5,14 +5,14 @@
    - AI가 막히면(무료 한도 등) 이름 맞추기로 바로 배치
    ===================================================================== */
 const AI_URL='https://camterior-ai.ghdwnd2.workers.dev';
-const AI_ROOTS=['reg3','long4','sep2','sep3','sep4'];
+const AI_ROOTS=['reg3','long4','short2','sep2','sep3','sep4'];
 const AI_EXTS=['mf_reg','mf_long','open_L','open_R','corner_L','corner_R','slide_h','slide_hl'];
 const AI_SLOTS=SLOT_ITEMS.map(t=>t.id);
 const aiSlotName=id=>getItem(id).name;
 const AI_ZONES=['wall','center','inner','left','right','top','bottom'];
 const AI_MAX_EACH=6,AI_MAX_TOTAL=24;
 // 사람들이 흔히 부르는 이름 (AI 안내 + 이름 맞추기 둘 다 씀)
-const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유닛','IGT 레귤러','아이지티 레귤러','IGT 프레임 레귤러'],long4:['IGT 롱','IGT 4유닛','IGT 프레임 롱'],
+const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유닛','IGT 레귤러','아이지티 레귤러','IGT 프레임 레귤러'],long4:['IGT 롱','IGT 4유닛','IGT 프레임 롱'],short2:['IGT 쇼트','IGT 숏','IGT 2유닛','아이지티 쇼트','IGT 프레임 쇼트'],
   sep2:['세퍼레이트 2유닛','세퍼레이트 하프'],sep3:['세퍼레이트 3유닛','세퍼레이트 레귤러','세퍼레이트 IGT'],sep4:['세퍼레이트 4유닛','세퍼레이트 롱'],
   mf_reg:['멀티펑션','멀티펑션 테이블'],slide_h:['하프슬라이드','슬라이드하프','슬라이드 트레이'],slide_hl:['하프슬라이드 롱','슬라이드하프롱'],
   mytable_s:['스텐 마이테이블','스탠 마이테이블','스텐마이테이블','스탠마이테이블','스테인리스 마이테이블'],
