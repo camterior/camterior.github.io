@@ -3049,7 +3049,7 @@ function addExtraTent(id){const T=TENTS[id];if(!T||!T.outer)return;const b=scene
   XT.push(e);sel='xt:'+e.u;XT_ADD=false;renderTentOpts();stageTitle();fitView();render();
   if(typeof showToast==='function')showToast(`${T.name}을(를) 추가했어요. 끌어서 옮겨요`);}
 // 추가 텐트를 메인으로: 그 텐트 기준으로 전체 좌표를 옮기고, 원래 메인은 추가 텐트로 (모든 옵션은 메인에서)
-function xtMakeMain(u){const e=xtByU(u);if(!e)return;const M=TENTS[tent.id],X=xtT(e),th=(e.r||0);
+function xtMakeMain(u,quiet){const e=xtByU(u);if(!e)return;const M=TENTS[tent.id],X=xtT(e),th=(e.r||0);
   const inv={cos:X.cos,sin:-X.sin,tx:-(X.cos*X.tx+X.sin*X.ty),ty:(X.sin*X.tx-X.cos*X.ty)},f=v=>applyT(inv,v);
   state.pieces.filter(p=>p.parent==null).forEach(p=>{if(p.on!=null)return;const c=centroid(CATALOG[p.type].verts),w=applyT(p._T,c),n=f(w);p.rot=((((p.rot||0)-th)%360)+360)%360;p.ox=Math.round(n[0]-c[0]);p.oy=Math.round(n[1]-c[1]);});
   if(tarp.id){const n=f([tarp.x,tarp.y]);tarp.x=Math.round(n[0]);tarp.y=Math.round(n[1]);tarp.rot=(((tarp.rot-th)%360)+360)%360;}
@@ -3057,7 +3057,7 @@ function xtMakeMain(u){const e=xtByU(u);if(!e)return;const M=TENTS[tent.id],X=xt
   if(M&&M.outer){const c=xtC({id:tent.id}),n=f(c),oldInner=typeof tent.inner==='string'&&M.inners&&M.inners[tent.inner]?tent.inner:null;
     XT.push({u:XT_SEQ++,id:tent.id,x:Math.round(n[0]-c[0]),y:Math.round(n[1]-c[1]),r:(((-th)%360)+360)%360,inner:oldInner});}
   const T=TENTS[e.id];tent={id:e.id,inner:e.inner,canopy:false,canopy2:false,custom:tent.custom};XT=XT.filter(o=>o!==e);sel=null;
-  renderTentList();renderTentOpts();stageTitle();fitView();render();if(typeof showToast==='function')showToast(`${T.name}을(를) 메인으로 바꿨어요. 이제 모든 옵션을 쓸 수 있어요`);}
+  renderTentList();renderTentOpts();stageTitle();fitView();render();if(!quiet&&typeof showToast==='function')showToast(`${T.name}을(를) 메인으로 바꿨어요. 이제 모든 옵션을 쓸 수 있어요`);}
 function xtRot(u,d){const e=xtByU(u);if(!e)return;e.r=(((e.r||0)+d)%360+360)%360;render();}
 function xtDel(u){XT=XT.filter(e=>e.u!==u);if(sel==='xt:'+u)sel=null;renderTentOpts();stageTitle();render();}
 function xtInner(u,v){const e=xtByU(u);if(!e)return;e.inner=v||null;render();}
@@ -5067,18 +5067,35 @@ function aiTentCands(text){const t=aiNorm(text),sc={};
     (AI_ALIAS[id]||[]).map(aiNorm).forEach(a=>{if(a.length>=2&&t.includes(a))v+=a.length*3;});
     const m=aiNorm(T.model||'');if(m.length>=4&&t.includes(m))v+=m.length*2;
     if(v&&br)v+=2;if(v)sc[id]=v;});
-  return Object.entries(sc).sort((a,b)=>b[1]-a[1]).slice(0,8).map(x=>x[0]);}
+  const top=Object.entries(sc).sort((a,b)=>b[1]-a[1]).slice(0,8).map(x=>x[0]);
+  aiPlaced().forEach(p=>{if(!top.includes(p.id))top.push(p.id);});return top;}
 // 홍중 말투 대본(긴 구어체·오타·높이·이너·고치기) 50개 중 일부. 전체 100개는 scripts/ai-scripts100.json
 const AI_EXAMPLES2=[["메락에 고동 이너텐트 쓰고 제백 에어매트 깔거야. 세퍼레이트 레귤러에 멀티펑션 롱 T자로 붙이고 하프슬라이드 2개, 다리는 660으로 해줘 플랫버너랑 원유닛 트레이 2개 넣고 FD체어 2개",{"tent":"merak_pro","items":[{"type":"zebec_pro260","zone":"inner"},{"type":"sep3","zone":"wall","attach":[{"type":"mf_long","shape":"T"},{"type":"slide_h","shape":"line"},{"type":"slide_h","shape":"line"}],"slots":[{"id":"flat","count":1},{"id":"steel1","count":2}],"leg":660},{"type":"sp_fd","count":2,"zone":"center","at":"sep3"}],"unknown":[],"tip":"고동 안에 제백 매트, 주방 IGT는 벽쪽에 두고 멀티펑션 양옆에 FD체어를 앉혔어요.","inner":"godong"}],["쉘터gm에 세퍼레이트 레귤러 두고 멀티펑션 롱 일자로 붙여줘 노가체어 2개 앉고 파세코 5000은 벽쪽 도메틱 45도 벽쪽에 둘게",{"tent":"mw_shelter_gm","items":[{"type":"sep3","zone":"wall","attach":[{"type":"mf_long","shape":"line"}]},{"type":"noga_chair","count":2,"zone":"center","at":"sep3"},{"type":"camp5000","zone":"wall"},{"type":"cfx3_45","zone":"wall"}],"unknown":[],"tip":""}],["랜드록 쓸건데 igt 롱 벽쪽에 놓고 코너테이블 양쪽 다 붙여줘 칸은 설봉원 플랫버너 우드테이블 w 들어가고 가운데 원액션 롱 놓고 테이크체어 4개",{"tent":"landlock","items":[{"type":"long4","zone":"wall","attach":[{"type":"corner_L","shape":"line"},{"type":"corner_R","shape":"line"}],"slots":[{"id":"seppou","count":1},{"id":"flat","count":1},{"id":"wood_w","count":1}]},{"type":"sp_oat_l","zone":"center"},{"type":"sp_take","count":4,"zone":"center"}],"unknown":[],"tip":""}],["리빙쉘롱프로에 쉘이너 듀오 넣고 메가매트 듀오 깔아줘 거실엔 로우테이블이랑 로우체어 30 두개",{"tent":"living_shell_long_pro","items":[{"type":"megamat_duo","zone":"inner"},{"type":"sp_oat_low","zone":"center"},{"type":"sp_low30","count":2,"zone":"center"}],"unknown":[],"tip":"","inner":"shell_duo"}],["오늘은 쉘터gm 쓰고 이너는 지오에어2 넣을게 메가매트 하나만 깔고 igt는 세퍼레이트 2유닛에 플랫버너 하나 노가테이블 노가체어2",{"tent":"mw_shelter_gm","items":[{"type":"megamat","zone":"inner"},{"type":"sep2","zone":"wall","slots":[{"id":"flat","count":1}]},{"type":"noga_table","zone":"center"},{"type":"noga_chair","count":2,"zone":"center"}],"unknown":[],"tip":"","inner":"geoair2"}],["메락 프로에 세퍼레이트 레귤러 860높이로 하고 플랫버너 설봉원 넣어줘 멀티펑션 롱은 앞에 t자 FD체어 3개",{"tent":"merak_pro","items":[{"type":"sep3","zone":"wall","attach":[{"type":"mf_long","shape":"T"}],"slots":[{"id":"flat","count":1},{"id":"seppou","count":1}],"leg":830},{"type":"sp_fd","count":3,"zone":"center","at":"sep3"}],"unknown":[],"tip":""}],["주방은 텐트 입구쪽에 두고 식탁은 안쪽으로 해줘 쉘터gm, 세퍼레이트 레귤러 설봉원, 원액션테이블 롱 FD체어 4개",{"tent":"mw_shelter_gm","items":[{"type":"sep3","zone":"bottom","slots":[{"id":"seppou","count":1}]},{"type":"sp_oat_l","zone":"top"},{"type":"sp_fd","count":4,"zone":"top"}],"unknown":[],"tip":"요리는 입구 쪽, 식탁은 안쪽이라 연기가 밖으로 빠져요."}],["메락에 고동 이너, 제백 프로 280 깔고 세퍼레이트 4유닛 하프슬라이드 롱 하나 붙여 플랫버너 메쉬트레이 2개 넣고 커밋체어 2개 커밋테이블",{"tent":"merak_pro","items":[{"type":"zebec_pro280","zone":"inner"},{"type":"sep4","zone":"wall","attach":[{"type":"slide_hl","shape":"line"}],"slots":[{"id":"flat","count":1},{"id":"mesh_s1","count":2}]},{"type":"kermit_t","zone":"center"},{"type":"kermit","count":2,"zone":"center"}],"unknown":[],"tip":"","inner":"godong"}],["겨울이라 파세코 5000이랑 신일 900 두대 쓸거야 텐트는 리빙쉘 원액션테이블 하이에 FD체어 2개",{"tent":"living_shell","items":[{"type":"camp5000","zone":"wall"},{"type":"sfh_bh900","zone":"wall"},{"type":"sp_oat","zone":"center"},{"type":"sp_fd","count":2,"zone":"center"}],"unknown":[],"tip":""}],["비바돔플러스에 마운틴리버 야전침대 2개 놓고 노가체어 2개 스텐마이테이블",{"tent":null,"items":[{"type":"noga_chair","count":2,"zone":"center"},{"type":"mytable_s","zone":"center"}],"unknown":["비바돔플러스","마운틴리버 야전침대"],"tip":"비바돔 플러스와 마운틴리버 야전침대는 아직 제원에 없어서 뺐어요."}],["igt 레귤러 다리 830 서서 요리할거고 플랫버너 두개 넣어 원유닛트레이 하나 멀티펑션 일자로 붙여",{"tent":null,"items":[{"type":"reg3","zone":"wall","attach":[{"type":"mf_reg","shape":"line"}],"slots":[{"id":"flat","count":2},{"id":"steel1","count":1}],"leg":830}],"unknown":[],"tip":""}],["노스피크 a9에 세퍼레이트 레귤러 + 멀티펑션 롱 T자 + 하프슬라이드 2개, 칸은 설봉원 플랫버너 원유닛 트레이 하나 다리 660 체어는 테이크체어 4개 원액션 롱 하나",{"tent":"np_a9","items":[{"type":"sep3","zone":"wall","attach":[{"type":"mf_long","shape":"T"},{"type":"slide_h","shape":"line"},{"type":"slide_h","shape":"line"}],"slots":[{"id":"seppou","count":1},{"id":"flat","count":1},{"id":"steel1","count":1}],"leg":660},{"type":"sp_oat_l","zone":"center"},{"type":"sp_take","count":4,"zone":"center"}],"unknown":[],"tip":""}],["메락에 오른쪽엔 침실 고동 이너 메가매트 듀오 왼쪽은 주방 세퍼레이트 레귤러 플랫버너 하프슬라이드 2개 가운데 원액션 로우 로우체어30 두개",{"tent":"merak_pro","items":[{"type":"megamat_duo","zone":"inner"},{"type":"sep3","zone":"left","attach":[{"type":"slide_h","shape":"line"},{"type":"slide_h","shape":"line"}],"slots":[{"id":"flat","count":1}]},{"type":"sp_oat_low","zone":"center"},{"type":"sp_low30","count":2,"zone":"center","at":"sp_oat_low"}],"unknown":[],"tip":"","inner":"godong"}],["도메틱 55 냉장고 오른쪽 끝에 두고 igt 롱은 왼쪽 벽 쉘터gm",{"tent":"mw_shelter_gm","items":[{"type":"cfx3_55","zone":"right"},{"type":"long4","zone":"left"}],"unknown":[],"tip":""}],["쉘터gm 에 큐브 쉘프 2개랑 사이드 테이블 노가체어 2",{"tent":"mw_shelter_gm","items":[{"type":"noga_chair","count":2,"zone":"center"}],"unknown":["큐브 쉘프","사이드 테이블"],"tip":"큐브 쉘프·사이드 테이블은 어떤 제품인지 목록에서 못 찾았어요."}],["파세코 팬히터 식탁 쪽 보게 해줘 쉘터gm 원액션테이블 fd체어2",{"tent":"mw_shelter_gm","items":[{"type":"camp5000","zone":"wall"},{"type":"sp_oat","zone":"center"},{"type":"sp_fd","count":2,"zone":"center"}],"unknown":[],"tip":"팬히터 바람이 식탁 쪽으로 가게 돌렸어요."}],["세퍼레이트 2유닛 두개 놓을게 하나는 플랫버너 하나는 원유닛트레이 체어는 헬리녹스 체어제로 2개",{"tent":null,"items":[{"type":"sep2","zone":"wall","slots":[{"id":"flat","count":1}]},{"type":"sep2","zone":"wall","slots":[{"id":"steel1","count":1}]},{"type":"hx_zero","count":2,"zone":"center"}],"unknown":[],"tip":""}],["그냥 의자 4개랑 테이블 하나",{"tent":null,"items":[],"unknown":["의자 4개","테이블"],"tip":"어떤 제품인지 이름을 알려주시면 정확히 놓을게요."}],["쉘터gm 앞쪽 입구엔 아무것도 두지 말고 뒤쪽에 세퍼레이트 레귤러 플랫버너 노가체어 2",{"tent":"mw_shelter_gm","items":[{"type":"sep3","zone":"top","slots":[{"id":"flat","count":1}]},{"type":"noga_chair","count":2,"zone":"center","at":"sep3"}],"unknown":[],"tip":"입구 쪽은 비웠어요."}]];
 const AI_FIX_PREV={"tent":"merak_pro","inner":"godong","items":[{"type":"megamat","zone":"inner"},{"type":"sep3","zone":"center","attach":[{"type":"mf_long","shape":"line"},{"type":"slide_h","shape":"line"},{"type":"slide_h","shape":"line"}],"slots":[{"id":"seppou","count":1},{"id":"flat","count":1}],"leg":830},{"type":"camp5000","zone":"wall"},{"type":"sp_fd","count":2,"zone":"center","at":"sep3"}],"unknown":[]};
 const AI_FIX_EXAMPLES=[["테이블을 T자모양으로 수정해줘",{"tent":"merak_pro","items":[{"type":"megamat","zone":"inner"},{"type":"sep3","zone":"center","attach":[{"type":"mf_long","shape":"T"},{"type":"slide_h","shape":"line"},{"type":"slide_h","shape":"line"}],"slots":[{"id":"seppou","count":1},{"id":"flat","count":1}],"leg":830},{"type":"camp5000","zone":"wall"},{"type":"sp_fd","count":2,"zone":"center","at":"sep3"}],"unknown":[],"tip":"멀티펑션 롱을 T자로 붙였어요.","inner":"godong"}],["팬히터는 좌측 벽에서 식탁쪽 방향을 바라보자",{"tent":"merak_pro","items":[{"type":"megamat","zone":"inner"},{"type":"sep3","zone":"center","attach":[{"type":"mf_long","shape":"line"},{"type":"slide_h","shape":"line"},{"type":"slide_h","shape":"line"}],"slots":[{"id":"seppou","count":1},{"id":"flat","count":1}],"leg":830},{"type":"camp5000","zone":"left"},{"type":"sp_fd","count":2,"zone":"center","at":"sep3"}],"unknown":[],"tip":"팬히터를 왼쪽 벽으로 옮기고 식탁 쪽을 보게 했어요.","inner":"godong"}],["fd체어 하나 더 추가해줘",{"tent":"merak_pro","items":[{"type":"megamat","zone":"inner"},{"type":"sep3","zone":"center","attach":[{"type":"mf_long","shape":"line"},{"type":"slide_h","shape":"line"},{"type":"slide_h","shape":"line"}],"slots":[{"id":"seppou","count":1},{"id":"flat","count":1}],"leg":830},{"type":"camp5000","zone":"wall"},{"type":"sp_fd","count":3,"zone":"center","at":"sep3"}],"unknown":[],"tip":"FD체어를 3개로 늘렸어요.","inner":"godong"}],["이너를 쉘이너 듀오로 바꿔",{"tent":"merak_pro","items":[{"type":"megamat","zone":"inner"},{"type":"sep3","zone":"center","attach":[{"type":"mf_long","shape":"line"},{"type":"slide_h","shape":"line"},{"type":"slide_h","shape":"line"}],"slots":[{"id":"seppou","count":1},{"id":"flat","count":1}],"leg":830},{"type":"camp5000","zone":"wall"},{"type":"sp_fd","count":2,"zone":"center","at":"sep3"}],"unknown":[],"tip":"이너를 쉘이너 듀오로 바꿨어요.","inner":"shell_duo"}]];
+/* --- 단체 캠핑: 놓인 텐트 (1번=메인, 2번부터 추가 텐트 순서) --- */
+function aiPlaced(){const P=[{id:tent.id,u:null}];if(typeof xtOk==='function')xtOk().forEach(e=>P.push({id:e.id,u:e.u}));return P.filter(p=>TENTS[p.id]&&p.id!=='none');}
+const AI_KN={첫:1,한:1,두:2,세:3,네:4,다섯:5,'1':1,'2':2,'3':3,'4':4,'5':5};
+// "2번 텐트에", "두번째 텐트엔" → 몇 번 텐트인지
+function aiNoOf(text){const m=String(text).match(/(첫|두|세|네|다섯|[1-5])\s*(번째|번|째)\s*(텐트|동|쉘터)/);return m?AI_KN[m[1]]:null;}
+const AI_ADD_RE=/(하나|한\s*동|1\s*동|한개)\s*더|추가로|추가해|더\s*(놓|치|설치|붙)|옆에\s*(하나|한\s*동)|같이\s*(치|놓)/;
 function aiSystem(text='',fix=false){
   const tents=aiTentCands(text).map(id=>`${id}|${aiTentName(id)}${aiAl(id)}`).join('\n')||'(글에서 찾은 텐트 없음)';
   const gear=aiIds().map(id=>`${id}|${CATALOG[id].name}${aiAl(id)}`).join('\n');
   const ext=AI_EXTS.map(id=>`${id}|${CATALOG[id].name}${aiAl(id)}`).join('\n');
   const slots=SLOT_ITEMS.map(t=>`${t.id}|${t.name}|${t.halves/2}유닛${aiAl(t.id)}`).join('\n');
+  const P=aiPlaced(),multi=P.length>1;
+  const placed=multi?`[지금 놓인 텐트] (단체 캠핑. 번호는 화면 순서, 1번이 메인)
+${P.map((p,i)=>`${i+1}번|${p.id}|${aiTentName(p.id)}${aiAl(p.id)}`).join('\n')}
+[여러 텐트 규칙]
+- 사용자가 놓인 텐트를 이름이나 번호로 말하면(예: '${aiTentName(P[1].id)}에', '2번 텐트엔') 그 텐트 안을 세팅하는 거야. 그 텐트의 번호를 no에, id를 tent에 넣어. 텐트를 바꾸는 게 아니야.
+- 텐트를 말하지 않으면 no 1(메인).
+- 놓이지 않은 새 텐트를 '하나 더/추가로/옆에 한 동' 처럼 더 놓겠다고 하면 tent에 그 id, add true. 그냥 텐트 이름만 말하면 add 없이(1번 텐트를 그 텐트로 바꿈).
+- 한 글에서 여러 텐트를 각각 세팅하면 tents 배열로 텐트마다 따로 나눠: {"tents":[{"no":1,"tent":"id","inner":null,"items":[...]},{"no":2,...}],"unknown":[],"tip":""}. 장비는 사용자가 그 텐트에 둔다고 한 곳에만 넣어.
+- 예: '${aiTentName(P[1].id)}엔 FD체어 2개, 메인엔 원액션테이블 롱' → {"tents":[{"no":2,"tent":"${P[1].id}","items":[{"type":"sp_fd","count":2,"zone":"center"}]},{"no":1,"tent":"${P[0].id}","items":[{"type":"sp_oat_l","zone":"center"}]}],"unknown":[],"tip":""}
+`:'';
   const head=`너는 캠핑 텐트 안 배치 도우미야. 사용자 글에서 장비와 원하는 위치를 읽고 아래 목록의 id로만 바꿔.
-JSON만 출력: {"tent":"텐트 id 또는 null","inner":"[이너텐트] id 또는 null","tarp":"[타프] id 또는 none(타프 빼기) 또는 null","items":[{"type":"장비 id","count":1,"zone":"wall|center|inner|left|right|top|bottom","attach":[{"type":"결합 id","shape":"T|line"}],"slots":[{"id":"칸 파츠 id","count":1}],"leg":660,"at":"(체어만) 앉을 테이블·IGT id"}],"unknown":["목록에 없는 장비"],"tip":"배치 팁 한두 문장(한국어, 존댓말)"}
+JSON만 출력: {"tent":"텐트 id 또는 null",${multi?'"no":"(여러 텐트일 때) 세팅할 텐트 번호","add":"(새 텐트를 하나 더 놓을 때만) true",':''}"inner":"[이너텐트] id 또는 null","tarp":"[타프] id 또는 none(타프 빼기) 또는 null","items":[{"type":"장비 id","count":1,"zone":"wall|center|inner|left|right|top|bottom","attach":[{"type":"결합 id","shape":"T|line"}],"slots":[{"id":"칸 파츠 id","count":1}],"leg":660,"at":"(체어만) 앉을 테이블·IGT id"}],"unknown":["목록에 없는 장비"],"tip":"배치 팁 한두 문장(한국어, 존댓말)"}
 규칙:
 - 사용자 글에 없는 장비는 절대 추가하지 마. 띄어쓰기·오타가 있어도 (=별칭)을 보고 맞춰 (예: 스탠마이테이블=mytable_s).
 - '테이블','의자','버너'처럼 브랜드·모델 없는 일반 이름은 아무 제품으로 바꾸지 말고 unknown에.
@@ -5097,7 +5114,7 @@ JSON만 출력: {"tent":"텐트 id 또는 null","inner":"[이너텐트] id 또�
 - [고치기] '지금 배치(JSON)'와 '고칠 점'이 오면 고칠 점만 반영하고 나머지는 그대로 둔 전체 JSON을 다시 출력해. tip에는 무엇을 바꿨는지 한 문장.
 - [타프] 헥사타프·렉타타프를 말하면 tarp에 id(크기 없으면 M). '타프 없이/빼줘'면 none. 말 없으면 null. 타프는 items에 넣지 마.
 - 텐트를 말하지 않으면 null. [텐트] 후보에 없는 텐트면 비슷한 모델로 바꾸지 말고 null + unknown에 이름.
-[텐트 후보]
+${placed}[텐트 후보]
 ${tents}
 [타프]
 ${TARP_ORDER.map(id=>`${id}|스노우피크 ${TARPS[id].name}`).join('\n')}
@@ -5172,6 +5189,7 @@ function aiClean(o){const ids=new Set(aiIds()),exts=new Set(AI_EXTS),out={tent:n
   if(o&&typeof o.tent==='string'&&TENTS[o.tent]&&o.tent!=='none')out.tent=o.tent;
   if(o&&typeof o.inner==='string'){const k=o.inner.replace(/^p:/,'');if(INNER_PRESETS[k])out.inner=k;}
   if(o&&typeof o.tarp==='string'&&(TARPS[o.tarp]||o.tarp==='none'))out.tarp=o.tarp;
+  if(o&&+o.no>=1&&+o.no<=9)out.no=Math.round(+o.no);if(o&&(o.add===true||o.add==='true'))out.add=true;
   const items=[],loose=[],looseS=[];
   // AI가 장비를 칸(slots)이나 inner 자리에 잘못 넣으면 장비로 옮기기
   if(o&&Array.isArray(o.items)){const more=[];o.items.forEach(it=>{if(it&&Array.isArray(it.slots))it.slots.forEach(a=>{const id=a&&(a.id||a.type);if(ids.has(id)&&!exts.has(id)&&!AI_SLOTS.includes(id)&&!AI_ROOTS.includes(id))more.push({type:id,count:a.count||1,zone:'wall'});});});
@@ -5307,8 +5325,12 @@ function aiPlace(list){
 
 function aiApply(res){
   // 단체 캠핑: 이미 놓인 추가 텐트를 말하면 그 텐트를 메인으로 바꿔서 그 안에 세팅 (다른 텐트와 그 안 장비는 그대로)
-  const xtHit=res.tent&&res.tent!==tent.id&&typeof xtOk==='function'?xtOk().find(e=>e.id===res.tent):null;
-  if(xtHit){xtMakeMain(xtHit.u);computeAll();}
+  // 세팅할 텐트를 잠깐 메인으로 바꿔서 세팅하고, 끝나면 원래 메인·번호 순서로 되돌림
+  const P=aiPlaced(),origMain=tent.id;let tgt=null,back=false,k=-1;
+  if(res.add&&res.tent&&TENTS[res.tent]&&TENTS[res.tent].outer&&TENTS[tent.id]&&TENTS[tent.id].outer&&typeof addExtraTent==='function'){
+    addExtraTent(res.tent);const e=XT[XT.length-1];tgt={id:res.tent,u:e.u};}
+  else if(P.length>1){if(res.no>=1&&res.no<=P.length)tgt=P[res.no-1];else if(res.tent)tgt=P.find(p=>p.id===res.tent)||null;}
+  if(tgt){if(tgt.u!=null){k=XT.indexOf(xtByU(tgt.u));xtMakeMain(tgt.u,true);computeAll();back=true;}res.tent=tent.id;delete res.add;}
   if(res.tent&&res.tent!==tent.id){const T=TENTS[res.tent];tent={id:res.tent,inner:T.innerDefault,canopy:false,custom:tent.custom};
     if(T.tarpJoin!=null&&!tarp.id)tarp.id='hexa_m';if(tarp.id)placeTarpDefault();renderTentList();renderTentOpts();}
   if(res.inner&&INNER_PRESETS[res.inner]){tent.inner='p:'+res.inner;tent.innerOff=null;renderTentOpts();}
@@ -5342,6 +5364,9 @@ function aiApply(res){
         q.ox=P[0]+co*lx-si*ly-cp[0];q.oy=P[1]+si*lx+co*ly-cp[1];q.rot=((p.rot||0)+rot)%360;q.z=++Z_TOP;}
       if(p.slots)q.slots=p.slots.map(x=>x&&{...x});
       map[p.uid]=q.uid;state.pieces.push(q);});});
+  if(back){computeAll();const e=[...xtOk()].reverse().find(x=>x.id===origMain);if(e){const cur=tent.id;xtMakeMain(e.u,true);
+    const j=XT.length-1;if(k>=0&&XT[j]&&XT[j].id===cur){const m=XT.splice(j,1)[0];XT.splice(Math.min(k,XT.length),0,m);}renderTentOpts();stageTitle();}}
+  if(tgt)res.no=back&&k>=0?k+2:1;
   fitView();render();return miss;}
 
 /* --- 화면 --- */
@@ -5396,7 +5421,7 @@ async function aiRun(){
   const inp=document.getElementById('aiIn'),btn=document.getElementById('aiGo'),st=document.getElementById('aiSt'),box=document.getElementById('aiOut');
   const text=(inp.value||'').trim().slice(0,600),fix=!!AI_CHAT.last;
   if(text.length<2){st.textContent=fix?'고칠 점을 적어주세요':'가진 장비를 먼저 적어주세요';inp.focus();return;}
-  if(!fix&&state.pieces.length&&!confirm('지금 놓인 장비를 지우고 AI 세팅으로 바꿀까요? 되돌리기(↶)로 돌아갈 수 있어요.'))return;
+  if(!fix&&state.pieces.length&&!confirm(aiPlaced().length>1?'세팅할 텐트 안의 장비를 AI 세팅으로 바꿀까요? 다른 텐트와 그 안 장비는 그대로예요. 되돌리기(↶)로 돌아갈 수 있어요.':'지금 놓인 장비를 지우고 AI 세팅으로 바꿀까요? 되돌리기(↶)로 돌아갈 수 있어요.'))return;
   btn.disabled=true;st.textContent=fix?'AI가 고치는 중…':'AI가 장비를 찾는 중…';
   AI_CHAT.log.push({who:'me',t:text});aiChatUI();
   const ask=fix?`지금 배치(JSON): ${JSON.stringify(aiCompact(AI_CHAT.last))}\n고칠 점: ${text}`:text;
@@ -5404,25 +5429,31 @@ async function aiRun(){
   if(r.fail==='quota'){btn.disabled=false;st.textContent='';AI_CHAT.log.push({who:'ai',t:'오늘 쓸 수 있는 AI 횟수를 다 썼어요. 지금 배치는 그대로 두었어요. 내일 다시 쓰거나, 내 장비 탭의 내 코드에 초대 코드를 넣어 주세요.'});aiChatUI();return;}
   if(fix&&!r.ok){btn.disabled=false;st.textContent='';AI_CHAT.log.push({who:'ai',t:r.fail==='busy'?'지금 AI를 쓰는 사람이 많아서 고치지 못했어요. 30초쯤 뒤에 다시 눌러 주세요. 그동안 끌어서 직접 다듬을 수도 있어요.':'AI 연결이 안 돼서 고치지 못했어요. 잠시 뒤 다시 해보세요.'});aiChatUI();return;}
   inp.value='';
-  if(r.ok){res=aiClean(r.ok);
+  if(r.ok&&!fix&&Array.isArray(r.ok.tents)&&r.ok.tents.length&&aiPlaced().length>1){// 여러 텐트를 한 번에
+    const subs=r.ok.tents.slice(0,6).map(aiClean).filter(x=>x.items.length||x.inner||x.tent);
+    r.ok={items:[],unknown:(r.ok.unknown||[]).concat(...subs.map(x=>x.unknown)),tip:r.ok.tip||''};r.subs=subs;}
+  if(r.ok){res=aiClean(r.ok);if(r.subs&&r.subs.length){res.subs=r.subs;res.items=r.subs.flatMap(x=>x.items);}
     // AI가 모른다고 한 이름도 별칭으로 한 번 더 찾아보기
     res.unknown=res.unknown.filter(u=>{const l=aiLocal(u);if(l.inner&&!l.items.length){res.inner=res.inner||l.inner;return false;}if(l.tent&&!l.items.length){res.tent=res.tent||l.tent;return false;}if(!l.items.length)return true;
       l.items.forEach(x=>{if(x.slots&&x.slots.length||x.attach&&x.attach.length){let f=res.items.find(i=>AI_ROOTS.includes(i.type));if(f){f.slots=(f.slots||[]).concat(x.slots||[]);f.attach=(f.attach||[]).concat(x.attach||[]);return;}}
         if(x.type==='reg3'&&(x.slots||x.attach))return;const same=res.items.find(i=>i.type===x.type);if(same)return;res.items.push({type:x.type,count:x.count,zone:null});});return false;});if(!res.items.length&&!res.tent){const l=aiLocal(text);if(l.items.length){res=l;via='local';}}}
   else{res=aiLocal(text);via=r.fail==='busy'?'busy':'local';}
-  if(via==='ai')aiTidy(res,AI_CHAT.said+' '+text,fix?AI_CHAT.last:null,text);
+  if(via==='ai'&&!res.subs)aiTidy(res,AI_CHAT.said+' '+text,fix?AI_CHAT.last:null,text);
+  if(!res.subs&&aiPlaced().length>1){const no=aiNoOf(text);if(no&&!res.no)res.no=no;}
+  if(fix&&!res.subs&&AI_CHAT.last&&AI_CHAT.last.no&&!res.no&&(!res.tent||res.tent===AI_CHAT.last.tent))res.no=AI_CHAT.last.no;
+  if(!res.subs&&!fix&&res.tent&&AI_ADD_RE.test(text)&&!aiPlaced().some(p=>p.id===res.tent))res.add=true;
   btn.disabled=false;
-  if(!res.items.length&&!res.tent){st.textContent='';box.hidden=false;
+  if(!res.items.length&&!res.tent&&!res.no&&!res.subs){st.textContent='';box.hidden=false;
     box.innerHTML=`<p class="ai-warn">목록에서 맞는 장비를 못 찾았어요. ‘장비 제원’ 탭의 이름으로 적어보세요 (예: 폴딩쉘프, IGT 롱, 체어원).</p>`;return;}
   if(typeof camEv==='function'){camEv(fix?'ai-fix':via==='ai'?'ai-run':'ai-local',fix?'AI 고치기':via==='ai'?'AI 세팅':'AI 대신 이름 맞추기');
     res.unknown.slice(0,5).forEach(u=>{const n=String(u).replace(/[\n\r/]/g,' ').trim().slice(0,30);if(n)camEv('ai-unknown/'+encodeURIComponent(n),n);});}
-  const miss=aiApply(res);AI_CHAT.last=res;AI_CHAT.said=(AI_CHAT.said+' '+text).slice(-1200);
+  const miss=res.subs?res.subs.flatMap(sb=>aiApply(sb)):aiApply(res);AI_CHAT.last=res.subs?res.subs[res.subs.length-1]:res;AI_CHAT.said=(AI_CHAT.said+' '+text).slice(-1200);
   AI_CHAT.log.push({who:'ai',t:(res.tip||(fix?'고쳤어요.':'세팅했어요.'))+(res.added&&res.added.length?` (${res.added.join(', ')}은 목록에 있어서 IGT 칸에 넣었어요.)`:'')});aiChatUI();
   st.textContent=via==='ai'?'세팅했어요. 끌어서 다듬어 보세요':'기본 자동 배치로 세팅했어요';
   const nm=id=>aiEsc(CATALOG[id].name),ZN={center:'가운데',wall:'벽쪽',inner:'이너룸',left:'왼쪽',right:'오른쪽',top:'위쪽',bottom:'아래쪽'};
   let h='';
   if(via!=='ai')h+=`<p class="ai-note">${via==='busy'?'지금 AI를 쓰는 사람이 많아서':'AI 연결이 안 돼서'} 이름이 같은 장비만 찾아 놓았어요.${via==='busy'?' 30초쯤 뒤에 ‘새로 하기’로 다시 해보면 AI가 배치해 줘요.':''}</p>`;
-  h+=`<ul class="ai-got">${res.tent?`<li class="ai-tent">⛺ ${aiEsc(aiTentName(res.tent))}</li>`:''}${res.inner?`<li class="ai-tent">⛺ 이너: ${aiEsc(INNER_PRESETS[res.inner].name)}</li>`:''}${res.items.map(it=>`<li>${nm(it.type)}${it.attach&&it.attach.length?' + '+Object.entries(it.attach.reduce((m,a)=>{const k=nm(a.type)+(a.shape==='T'?' (T자)':'');m[k]=(m[k]||0)+1;return m;},{})).map(([k,n])=>k+(n>1?' ×'+n:'')).join(' + '):''}${it.count>1?` <b>×${it.count}</b>`:''}${it.slots&&it.slots.length?' · 칸: '+it.slots.map(sl=>aiEsc(aiSlotName(sl.id))+(sl.count>1?' ×'+sl.count:'')).join(', '):''}${it.leg?` · ${it.leg}다리`:''}${it.zone&&it.zone!==aiZone(it.type)?` · ${ZN[it.zone]}`:''}</li>`).join('')}</ul>`;
+  h+=`<ul class="ai-got">${(res.subs||[]).map((x,i)=>`<li class="ai-tent">⛺ ${x.no?x.no+'번 · ':''}${aiEsc(aiTentName(x.tent))}${x.inner?' · 이너 '+aiEsc(INNER_PRESETS[x.inner].name):''}</li>`).join('')}${res.tent&&!res.subs?`<li class="ai-tent">⛺ ${res.no>1?res.no+'번 · ':''}${aiEsc(aiTentName(res.tent))}</li>`:''}${res.inner?`<li class="ai-tent">⛺ 이너: ${aiEsc(INNER_PRESETS[res.inner].name)}</li>`:''}${res.items.map(it=>`<li>${nm(it.type)}${it.attach&&it.attach.length?' + '+Object.entries(it.attach.reduce((m,a)=>{const k=nm(a.type)+(a.shape==='T'?' (T자)':'');m[k]=(m[k]||0)+1;return m;},{})).map(([k,n])=>k+(n>1?' ×'+n:'')).join(' + '):''}${it.count>1?` <b>×${it.count}</b>`:''}${it.slots&&it.slots.length?' · 칸: '+it.slots.map(sl=>aiEsc(aiSlotName(sl.id))+(sl.count>1?' ×'+sl.count:'')).join(', '):''}${it.leg?` · ${it.leg}다리`:''}${it.zone&&it.zone!==aiZone(it.type)?` · ${ZN[it.zone]}`:''}</li>`).join('')}</ul>`;
   if(aiApply.over&&aiApply.over.length)h+=`<p class="ai-warn">자리가 모자라 IGT에 못 붙인 파츠: ${[...new Set(aiApply.over)].map(id=>aiEsc(CATALOG[id]?CATALOG[id].name:aiSlotName(id))).join(', ')}</p>`;
   if(miss.length)h+=`<p class="ai-warn">자리가 모자라 텐트 밖 오른쪽에 둔 장비: ${[...new Set(miss)].map(nm).join(', ')}</p>`;
   if(res.unknown.length)h+=`<div class="ai-unk"><p class="ai-warn">장비 제원에 아직 없어서 빼둔 장비예요. 비슷한 장비로 바꾸지 않았어요.</p><p>${res.unknown.map(u=>`<button type="button" class="rq-ask" data-n="${aiEsc(u)}" onclick="reqAsk(this)">${aiEsc(u)} · 추가 요청</button>`).join('')}</p></div>`;
