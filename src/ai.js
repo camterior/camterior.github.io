@@ -462,7 +462,7 @@ const rqDate=s=>String(s||'').slice(5).replace('-','.');
 function reqRender(){
   const nt=document.getElementById('ntList');
   if(nt){nt.innerHTML=NT==null?(RQ===false?'<li class="rq-empty">게시판을 준비하고 있어요. 곧 공지와 요청을 볼 수 있어요.</li>':'<li class="rq-empty">불러오는 중…</li>'):!NT.length?'<li class="rq-empty">아직 공지사항이 없어요.</li>':
-    NT.map(n=>`<li class="${n.pin?'pin':''}"><details${n.pin?' open':''}><summary>${n.pin?'<span class="nt-pin">고정</span>':''}<b>${aiEsc(n.title)}</b><small>${aiEsc(rqDate(n.at))}</small></summary><p>${aiEsc(n.body||'').replace(/\n/g,'<br>')}</p></details></li>`).join('');}
+    NT.map(n=>`<li class="${n.pin?'pin':''}"><details${n.pin?' open':''}><summary>${n.pin?'<span class="nt-pin">고정</span>':''}<b>${aiEsc(n.title)}</b><small>${aiEsc(rqDate(n.at))}</small></summary><p>${aiEsc(n.body||'').replace(/\n/g,'<br>')}</p>${n.ni?`<div class="nt-imgs">${Array.from({length:Math.min(4,n.ni)},(_,k)=>`<a href="${AI_URL}/nimg/${encodeURIComponent(n.id)}/${k}" target="_blank" rel="noopener"><img src="${AI_URL}/nimg/${encodeURIComponent(n.id)}/${k}" alt="${aiEsc(n.title)} 사진 ${k+1}" loading="lazy"></a>`).join('')}</div>`:''}</details></li>`).join('');}
   ['gear','dev'].forEach(kind=>{const ul=document.getElementById('rqList-'+kind);if(!ul)return;
     if(!RQ){ul.innerHTML=RQ===false?'<li class="rq-empty">게시판을 준비하고 있어요. 곧 공지와 요청을 볼 수 있어요.</li>':'';return;}
     const L=RQ.filter(r=>(r.kind||'gear')===kind);

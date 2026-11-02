@@ -68,7 +68,7 @@ h2 small{font-weight:500;color:var(--muted);font-size:12.5px;margin-left:6px}
 .list{display:grid;gap:7px;margin:0;padding:0;list-style:none}
 .list li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;font-size:13.5px;align-items:center}
 .rq li{grid-template-columns:minmax(0,1fr) auto auto;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.06)}
-.rq li small{display:block;color:#888;font-size:12px}.rq select{font:inherit;padding:5px 6px;border-radius:8px}.rq-hint{font-size:13px;color:#777;margin:6px 0}.rq-h{font-size:14px;margin:18px 0 6px}.nt-form{display:grid;gap:6px;margin-bottom:8px}.nt-form input,.nt-form textarea{font:inherit;padding:9px 10px;border:1px solid #ddd;border-radius:10px}.rq .rp{font:inherit;font-size:12.5px;padding:5px 8px;border:1px solid #ddd;border-radius:8px;width:100%;margin-top:4px;box-sizing:border-box}.rq button.x{font:inherit;font-size:12px;padding:4px 8px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
+.rq li small{display:block;color:#888;font-size:12px}.rq select{font:inherit;padding:5px 6px;border-radius:8px}.rq-hint{font-size:13px;color:#777;margin:6px 0}.rq-h{font-size:14px;margin:18px 0 6px}.nt-form{display:grid;gap:6px;margin-bottom:8px}.nt-form input,.nt-form textarea{font:inherit;padding:9px 10px;border:1px solid #ddd;border-radius:10px}.rq .rp{font:inherit;font-size:12.5px;padding:5px 8px;border:1px solid #ddd;border-radius:8px;width:100%;margin-top:4px;box-sizing:border-box}.rq button.x,.rq label.x{font:inherit;font-size:12px;padding:4px 8px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
 .list li .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .list li .ct{font-variant-numeric:tabular-nums;font-weight:600}
 .list li .mini{grid-column:1/-1;height:4px;background:var(--sunk);border-radius:2px;overflow:hidden;margin-top:-3px}
@@ -157,7 +157,7 @@ label.chk{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:cen
         <p class="rq-hint" id="rqMsg"></p>
         <div id="rqBody" hidden>
           <h3 class="rq-h">공지 쓰기</h3>
-          <form id="ntForm" class="nt-form"><input id="ntTitle" maxlength="60" placeholder="제목" required><textarea id="ntBody" maxlength="2000" rows="3" placeholder="내용"></textarea><label class="chk"><input type="checkbox" id="ntPin"> 맨 위 고정</label><button type="submit">공지 올리기</button></form>
+          <form id="ntForm" class="nt-form"><input id="ntTitle" maxlength="60" placeholder="제목" required><textarea id="ntBody" maxlength="2000" rows="3" placeholder="내용"></textarea><label class="chk">사진 (최대 4장) <input type="file" id="ntImg" accept="image/*" multiple></label><label class="chk"><input type="checkbox" id="ntPin"> 맨 위 고정</label><button type="submit">공지 올리기</button></form>
           <ul class="list rq" id="ntAdmList"></ul>
           <h3 class="rq-h">장비 요청</h3><ul class="list rq" id="rqAdm-gear"></ul>
           <h3 class="rq-h">개발 요청</h3><ul class="list rq" id="rqAdm-dev"></ul>
@@ -388,17 +388,22 @@ setPeriod(period); view();
   function draw(d){var items=d.items||[],nts=d.notices||[];$i('rqBody').hidden=false;
     var sun=items.filter(function(r){return r.st==='sun'}).length,nw=items.filter(function(r){return r.st==='new'}).length;
     $i('rqMsg').textContent='요청 '+items.length+'개 · 새 요청 '+nw+'개 · 일요일 반영 예정 '+sun+'개';
-    $i('ntAdmList').innerHTML=nts.length?nts.map(function(n){return '<li><span class="nm">'+(n.pin?'📌 ':'')+'<b>'+esc(n.title)+'</b><small>'+esc(n.at)+'</small></span><button class="x" data-pin="'+esc(n.id)+'">'+(n.pin?'고정 풀기':'고정')+'</button><button class="x" data-del="'+esc(n.id)+'">지우기</button></li>'}).join(''):'<li class="empty">공지가 없어요</li>';
+    $i('ntAdmList').innerHTML=nts.length?nts.map(function(n){return '<li><span class="nm">'+(n.pin?'📌 ':'')+'<b>'+esc(n.title)+'</b><small>'+esc(n.at)+'</small>'+(n.ni?'<small>사진 '+n.ni+'장</small>':'')+'</span><label class="x">사진 더하기<input type="file" accept="image/*" multiple hidden data-add="'+esc(n.id)+'"></label>'+(n.ni?'<button class="x" data-imgdel="'+esc(n.id)+'">사진 빼기</button>':'')+'<button class="x" data-pin="'+esc(n.id)+'">'+(n.pin?'고정 풀기':'고정')+'</button><button class="x" data-del="'+esc(n.id)+'">지우기</button></li>'}).join(''):'<li class="empty">공지가 없어요</li>';
     ['gear','dev'].forEach(function(kind){var L=items.filter(function(r){return (r.kind||'gear')===kind});
       $i('rqAdm-'+kind).innerHTML=L.length?L.map(function(r){return '<li><span class="nm"><b>'+esc(r.name)+'</b>'+(r.link?' · <a href="'+esc(r.link)+'" target="_blank" rel="noopener">링크</a>':'')+'<small>'+esc(r.at||'')+' · '+(r.from==='ai'?'AI에서':'게시판')+(r.note?' · '+esc(r.note):'')+'</small><input class="rp" data-rp="'+esc(r.id)+'" maxlength="200" placeholder="답글 (엔터로 저장)" value="'+esc(r.reply||'')+'"></span><span>+'+(r.n||1)+'</span><select data-id="'+esc(r.id)+'">'+Object.keys(ST).map(function(s){return '<option value="'+s+'"'+(s===r.st?' selected':'')+'>'+ST[s]+'</option>'}).join('')+'</select></li>'}).join(''):'<li class="empty">요청이 없어요</li>';});}
   function run(b){if(!k()){$i('rqMsg').textContent='관리 키를 넣어주세요.';return;}
     call(b).then(function(d){if(d.fail){$i('rqMsg').textContent=d.fail==='key'?'관리 키가 맞지 않아요.':d.fail==='board-off'?'워커에 KV(RL)가 아직 연결되지 않았어요.':'게시판 서버에 연결하지 못했어요 ('+d.fail+').';return;}draw(d)});}
   $i('rqKeyDel').addEventListener('click',function(){try{localStorage.removeItem(KS)}catch(x){}$i('rqMsg').textContent='관리 키를 지웠어요. 맞는 키를 다시 넣어 주세요.';});
   $i('rqKeyForm').addEventListener('submit',function(e){e.preventDefault();var v=$i('rqKey').value.trim();try{localStorage.setItem(KS,v)}catch(x){}$i('rqKey').value='';run({op:'admin'});});
-  $i('ntForm').addEventListener('submit',function(e){e.preventDefault();run({op:'notice',act:'add',title:$i('ntTitle').value,body:$i('ntBody').value,pin:$i('ntPin').checked});$i('ntTitle').value='';$i('ntBody').value='';$i('ntPin').checked=false;});
+  // 공지 사진: 1600px JPEG로 줄여서 보냄
+  function shrink(f){return new Promise(function(ok,no){var u=URL.createObjectURL(f),i=new Image();i.onload=function(){var s=Math.min(1,1600/Math.max(i.naturalWidth,i.naturalHeight)),c=document.createElement('canvas');c.width=Math.round(i.naturalWidth*s);c.height=Math.round(i.naturalHeight*s);c.getContext('2d').drawImage(i,0,0,c.width,c.height);URL.revokeObjectURL(u);var d=c.toDataURL('image/jpeg',.85);if(d.length>440000)d=c.toDataURL('image/jpeg',.68);if(d.length>440000)d=c.toDataURL('image/jpeg',.5);ok(d.split(',')[1]);};i.onerror=no;i.src=u;});}
+  function shrinkAll(fs){return Promise.all(Array.prototype.slice.call(fs||[],0,4).map(shrink));}
+  $i('ntForm').addEventListener('submit',function(e){e.preventDefault();var t=$i('ntTitle').value,b=$i('ntBody').value,p=$i('ntPin').checked;$i('rqMsg').textContent='올리는 중…';
+    shrinkAll($i('ntImg').files).then(function(imgs){run({op:'notice',act:'add',title:t,body:b,pin:p,imgs:imgs});$i('ntTitle').value='';$i('ntBody').value='';$i('ntPin').checked=false;$i('ntImg').value='';});});
+  $i('ntAdmList').addEventListener('change',function(e){var t=e.target;if(t.dataset&&t.dataset.add&&t.files&&t.files.length){$i('rqMsg').textContent='사진 올리는 중…';shrinkAll(t.files).then(function(imgs){run({op:'notice',act:'img',id:t.dataset.add,imgs:imgs});});}});
   $i('reqAdm').addEventListener('change',function(e){var t=e.target;if(t.tagName==='SELECT'&&t.dataset.id)run({op:'admin',id:t.dataset.id,st:t.value});});
   $i('reqAdm').addEventListener('keydown',function(e){var t=e.target;if(e.key==='Enter'&&t.dataset&&t.dataset.rp){e.preventDefault();run({op:'admin',id:t.dataset.rp,reply:t.value});}});
-  $i('reqAdm').addEventListener('click',function(e){var t=e.target;if(t.dataset&&t.dataset.del){if(confirm('이 공지를 지울까요?'))run({op:'notice',act:'del',id:t.dataset.del});}else if(t.dataset&&t.dataset.pin)run({op:'notice',act:'pin',id:t.dataset.pin});});
+  $i('reqAdm').addEventListener('click',function(e){var t=e.target;if(t.dataset&&t.dataset.del){if(confirm('이 공지를 지울까요?'))run({op:'notice',act:'del',id:t.dataset.del});}else if(t.dataset&&t.dataset.pin)run({op:'notice',act:'pin',id:t.dataset.pin});else if(t.dataset&&t.dataset.imgdel){if(confirm('이 공지의 사진을 모두 뺄까요?'))run({op:'notice',act:'imgdel',id:t.dataset.imgdel});}});
   if(k())run({op:'admin'});
 })();
 /* 캠핑 후기 관리 */

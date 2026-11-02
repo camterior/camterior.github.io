@@ -234,4 +234,6 @@
 .mn-sec>summary .mn-peek{flex:1;min-width:0;font-size:12.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mn-sec[open]>summary .mn-peek{visibility:hidden}
 .mn-sec>ul{margin:0;padding:0 10px 10px}
+.nt-list .nt-imgs{display:grid;gap:8px;padding:0 16px 16px}
+.nt-list .nt-imgs img{display:block;width:100%;max-width:560px;height:auto;border-radius:12px;border:1px solid var(--line)}
 </style>
