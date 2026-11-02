@@ -983,22 +983,22 @@ TENTS.hx_vtarp={brand:'헬리녹스',name:'브이타프 4.0',model:'V Tarp 4.0',
   doors:[{a:[0,1100],b:[0,2900],label:'앞문',zone:true},{a:[4000,1100],b:[4000,2900],label:'뒷문',zone:true}],
   living:[2000,2000],h3d:2200,inH3:1900,color:'#2B2C29',prof:[[1,1,0],[.93,.97,.5],[.78,.72,.84],[.55,.18,1]]};
 const BD=[[0,1450],[650,370],[1100,110],[2200,0],[3200,110],[3700,470],[4300,1450],[3700,2430],[3200,2790],[2200,2900],[1100,2790],[650,2530]];
-TENTS.hp_backdoor={brand:'하임플래닛',name:'백도어',model:'Backdoor',size:[430,290,150],weight:'6.1kg',cap:'4명',href:OC+'17634',srcName:'판매처 상품 상세',drawn:true,
+TENTS.hp_backdoor={brand:'하임플래닛',name:'백도어',model:'Backdoor',size:[430,290,150],weight:'6.1kg',cap:'4명',href:'https://en.heimplanet.com/products/zelte-backdoor-classic-castlerock',srcName:'하임플래닛 공식 제품 페이지',drawn:true,
   est:'하임플래닛 공식 평면도(430×290cm, 앞 전실 115cm, 이너 240cm 길이·폭 240→180cm, 뒤 전실 75cm)로 그렸어요. 모서리 각도는 도면 비율이에요.',
   outer:BD,frames:[],
   inners:{std:{label:'이너',model:'',size:'240×240 / 180',poly:[[1150,250],[3550,550],[3550,2350],[1150,2650]]}},innerDefault:'std',
   doors:[{a:L2(BD[0],BD[1],.2),b:L2(BD[0],BD[1],.85),label:'앞 출입',zone:true},{a:L2(BD[11],BD[0],.15),b:L2(BD[11],BD[0],.8),label:'앞 출입',zone:false},{a:L2(BD[5],BD[6],.2),b:L2(BD[5],BD[6],.8),label:'뒤 출입',zone:false}],
   living:[580,1450],h3d:1500,inH3:1250,color:'#B9BCB4',prof:[[1,1,0],[.96,.92,.5],[.85,.62,.86],[.66,.22,1]]};
 const CAVE=ngon(10,1320,0,1320,1255),CAVE_IN=clipY(inset(CAVE,70),520);
-TENTS.hp_cave={brand:'하임플래닛',name:'더 케이브',model:'The Cave',size:[264,251,125],weight:'4.8kg',cap:'2–3명',href:'https://en.heimplanet.com/products/zelte-the-cave-3-season-black-grey',srcName:'하임플래닛 공식 제품 페이지',drawn:true,
-  est:'하임플래닛 공식 평면도(폭 248cm, 이너 길이 189cm, 입구 76cm)를 십각형으로 옮겼어요.',
+TENTS.hp_cave={brand:'하임플래닛',name:'더 케이브',model:'The Cave',size:[264,251,127],weight:'4.8kg',cap:'2–3명',href:'https://en.heimplanet.com/products/zelte-the-cave-3-season-black-grey',srcName:'하임플래닛 공식 제품 페이지',drawn:true,
+  est:'하임플래닛 공식 도면(바닥 폭 248cm·에어프레임 바깥 약 263cm, 높이 127cm, 이너 길이 189cm, 입구 76cm, 바닥 4.8㎡)을 십각형으로 옮겼어요. 위쪽 프레임은 바닥보다 바깥으로 나와 옆에서 보면 최대 284cm예요.',
   outer:CAVE,frames:[],
   inners:{std:{label:'이너',model:'',size:'3.7㎡',poly:CAVE_IN}},innerDefault:'std',
-  doors:[{a:L2(CAVE[7],CAVE[8],.1),b:L2(CAVE[7],CAVE[8],.9),label:'출입',zone:true}],
-  living:[1320,300],h3d:1250,inH3:1000,color:'#3A3D3A',prof:[[1,1,0],[.95,.93,.5],[.8,.7,.85],[.45,.3,1]]};
+  doors:[{a:L2(CAVE[7],CAVE[8],.03),b:L2(CAVE[7],CAVE[8],.97),label:'출입',zone:true}],
+  living:[1320,300],h3d:1270,inH3:1000,color:'#3A3D3A',prof:[[1,1,0],[.95,.93,.5],[.8,.7,.85],[.45,.3,1]]};
 const MAV=ngon(10,2050,-Math.PI/2,1950,2050),lerp2=L2;
-TENTS.hp_mavericks={brand:'하임플래닛',name:'매버릭',model:'Mavericks',size:[390,410,234],weight:'25kg',cap:'최대 10명',href:OC+'19536',srcName:'판매처 상품 상세',drawn:true,
-  est:'하임플래닛 공식 평면도(390×410cm 십각형, 변 127cm)로 그렸어요. 출입문은 도면에 표시된 왼쪽 두 곳이에요.',
+TENTS.hp_mavericks={brand:'하임플래닛',name:'매버릭',model:'Mavericks',size:[390,410,234],weight:'25kg',cap:'최대 10명',href:'https://en.heimplanet.com/products/zelte-mavericks-white',srcName:'하임플래닛 공식 제품 페이지',drawn:true,
+  est:'하임플래닛 공식 도면(390×410cm 십각형, 옆 평변 127cm, 높이 234cm·옆 200cm, 출입문 99×116cm, 바닥 13.2㎡)으로 그렸어요. 위쪽 프레임은 바닥보다 바깥으로 나와 옆에서 보면 최대 440cm예요. 출입문은 도면에 표시된 왼쪽 두 곳이에요.',
   outer:MAV,frames:[],inners:{},innerDefault:null,innerNote:'이너 없이 쓰는 대형 에어 돔이에요.',
   doors:[{a:lerp2(MAV[8],MAV[9],.15),b:lerp2(MAV[8],MAV[9],.85),label:'출입문',zone:true},{a:lerp2(MAV[6],MAV[7],.15),b:lerp2(MAV[6],MAV[7],.85),label:'출입문',zone:false}],
   living:[1950,2050],h3d:2340,inH3:2000,color:'#E6E3DC',prof:[[1,1,0],[.96,.96,.45],[.75,.75,.84],[.32,.32,1]]};
@@ -1614,10 +1614,11 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  {const L=4700,W=2300,o=T2.tun(L,W,700,1500,700,1500);
   IN('hx_hshack',{brand:'헬리녹스',name:'에이치쉑 3.5p',model:'H-Shack 3.5P',size:[470,230,155],weight:'5.52kg',cap:'3명',href:OC+'16559',srcName:OCN,drawn:true,
    est:'판매처 도면(470×230×155cm 터널)으로 그렸어요.',outer:o,innerNote:NOINNER,doors:[T2.front(W,1500,'전면 출입'),T2.rear(L,W,1500,'후면 출입',true)],color:'#2C2E30'});}
- {const o=T2.poly(7,4500,2250,2350);
-  IN('hp_cloudbreak',{brand:'하임플래닛',name:'클라우드브레이크 쉘터',model:'Cloudbreak Shelter',size:[470,450,232],weight:'15.44kg',cap:'판매처 미표기',href:OC+'19538',srcName:OCN,drawn:true,
-   est:'판매처 도면(470×450cm 칠각형, 바닥 14.5㎡, 높이 232cm)으로 그렸어요. 출입문 3곳 중 2곳을 표시했어요.',outer:o,innerNote:NOFLOOR,
-   doors:[T2.door(o,'front','출입문',true),T2.door(o,'rear','출입문',false)],living:[2300,2250],color:'#4A4E52',prof:T2.PROF.dome});}
+ {const o=[[2340,0],[3570,350],[4370,1150],[4700,2440],[3440,4410],[2340,4670],[1260,4410],[0,2440],[310,1150],[1110,350]];
+  IN('hp_cloudbreak',{brand:'하임플래닛',name:'클라우드브레이크 쉘터',model:'Cloudbreak',size:[470,467,232],weight:'17.2kg (공식몰) · 국내 판매처 15.44kg',cap:'이너 4명 (공식 도면)',href:'https://en.heimplanet.com/products/zelte-cloudbreak-classic',srcName:'하임플래닛 공식 제품 페이지',drawn:true,
+   est:'하임플래닛 공식 도면(470×467cm, 이너 깊이 232cm·입구선 폭 453cm, 높이 232cm·옆 205cm, 출입문 230×152cm, 바닥 14.5㎡ / 이너 7.6㎡)으로 그렸어요. 출입문 3곳 중 2곳을 표시했어요. 무게는 공식몰 17.2kg, 국내 판매처 15.44kg으로 출처가 엇갈려요.',outer:o,
+   inners:{std:{label:'이너텐트',model:'',size:'약 7.6㎡ (깊이 약 230)',poly:[[2340,120],[3500,450],[4240,1220],[4510,2400],[170,2400],[440,1220],[1180,450]]}},innerDefault:'std',
+   doors:[{a:L2(o[7],o[6],.12),b:L2(o[7],o[6],.88),label:'출입문',zone:true},{a:L2(o[3],o[4],.12),b:L2(o[3],o[4],.88),label:'출입문',zone:false}],living:[2350,3500],color:'#4A4E52',prof:T2.PROF.dome});}
 
  /* 스노우라인 · 쿠디 */
  IN('sl_endurance2',{brand:'스노우라인',name:'인듀어런스 2.0',model:'SNJ5ULT011',size:[600,360,220],weight:'24.8kg',cap:'판매처 미표기',href:OLM+'36170',srcName:OLMN,drawn:true,
