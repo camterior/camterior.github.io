@@ -164,7 +164,7 @@ async function board(b, env, request, origin) {
 
 // ===== 캠핑 후기: 배치 사진 + 실제 사진 + 댓글 (같은 KV) =====
 // rv:<id> 글, rvc:<id> 댓글, rimg:<id>:<k> 사진(JPEG 바이트), rvidx 목록(최신순 id 배열)
-const RV_MAX_IMG = 450000; // base64 글자 수(약 330KB) — 사이트에서 1600px JPEG로 줄여 보냄
+const RV_MAX_IMG = 900000; // base64 글자 수(약 650KB) — 사이트에서 1600px JPEG로 한도 안까지 줄여 보냄
 const rid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 const b64bytes = b => Uint8Array.from(atob(b), c => c.charCodeAt(0));
 async function bump(env, k, max) { const n = parseInt(await env.RL.get(k)) || 0; if (n >= max) return false; await env.RL.put(k, String(n + 1), { expirationTtl: 172800 }); return true; }
