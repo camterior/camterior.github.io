@@ -2886,7 +2886,7 @@ const GEAR={
     note:'높이 39cm(로우 모드 18cm), 내하중 350kg. 와이드 73(190×73cm)은 요청 오면 추가할게요',href:'https://m.xlite.co.kr/product/detail.html?product_no=12929',srcName:'판매처 상품 상세'},
   gw_bucket:{gtype:'box',soft:true,group:'수납·행어',name:'그리비웍스×왓낫 원터치 버킷 GW',model:'ONE TOUCH BUCKET GW',conf:'retailer',w:360,d:250,h:320,kg:1.2,sw:'#4A4C4A',
     note:'펼친 크기 36×25×32cm(접으면 높이 6cm), 폴리에스터 본체·스틸 프레임. 2단 랙 위나 아래 칸에 올릴 수 있어요',href:'https://www.sundaymountain.jp/c/brand/b_g/grebeworks/g64035',srcName:'판매처 상품 상세'},
-  gw_rack:{gtype:'shelf',frame:true,top:'black',group:'수납·행어',name:'그리비웍스 원터치 버킷 랙 (2단)',model:'One-Touch Bucket Rack',conf:'official',w:398,d:365,h:795,kg:2.7,sw:'#232527',
+  gw_rack:{gtype:'shelf',frame:true,low:160,top:'black',group:'수납·행어',name:'그리비웍스 원터치 버킷 랙 (2단)',model:'One-Touch Bucket Rack',conf:'official',w:398,d:365,h:795,kg:2.7,sw:'#232527',
     note:'펼친 크기 39.8×36.5×79.5cm, 철(분체도장), 내하중 위 10kg·아래 10kg. 버킷을 위·아래 2단으로 놓아요(처음엔 위 칸, 그다음은 아래 칸)',href:'https://divhorizon.base.shop/items/95809797',srcName:'그리비웍스 공식몰'},
   mw_indian_l:{gtype:'hanger',group:'수납·행어',name:'미니멀웍스 인디언 행어 L',model:'Indian Hanger L',conf:'official',w:1010,d:750,h:1030,kg:0.84,sw:'#1E2022',
     note:'가로바 101cm, 높이 103cm, 다리 폭 75cm, 알루미늄 840g. 옷·랜턴을 거는 A자 행어라 그 위에 장비를 올리지 않아요',href:'https://www.minimalworks.co.kr/goods/goods_view.php?goodsNo=813',srcName:'미니멀웍스 공식몰 상세'},
@@ -3004,6 +3004,10 @@ function computeAll(){
     const a=Math.atan2(b._T.sin,b._T.cos)*180/Math.PI,w=applyT(b._T,p.onC||[0,0]),c=centroid(CATALOG[p.type].verts);
     p.rot=(((a+(p.onR||0))%360)+360)%360;p.ox=w[0]-c[0];p.oy=w[1]-c[1];one(p);p._z=(b._z||0)+pieceH(b);return false;});
   pend.forEach(p=>{delete p.on;one(p);});
+  // 2단 랙 아래 칸: 랙 안 바닥에 놓인 장비는 아래 틀 높이(low)에 올려요
+  const racks=state.pieces.filter(q=>q.parent==null&&CATALOG[q.type].frame&&q._v);
+  if(racks.length)state.pieces.forEach(p=>{if(p.on!=null||p.parent!=null||!p._v)return;const c=CATALOG[p.type];if(c.kind!=='gear'||c.frame||!STACK_TOP(c))return;
+    const cp=centroid(p._v),r=racks.find(q=>pointInPoly(cp,q._v));if(r)p._z=(r._z||0)+(CATALOG[r.type].low||0);});
   state.pieces.filter(p=>p.parent==null).forEach(r=>{const isl=state.pieces.filter(p=>rootOf(p).uid===r.uid);
     r._isl=isl;const bb=bbox(isl.flatMap(p=>p._v));r._bbox=bb;r._foot=[Math.round(bb[1][0]-bb[0][0]),Math.round(bb[1][1]-bb[0][1])];});
   TW=tarpWorld();
