@@ -142,6 +142,13 @@
   .stagebar .t{font-family:var(--serif);font-size:18px;font-weight:700}
   .stagebar .s{font-size:12.5px;color:var(--ink-2);margin-left:10px;font-family:var(--sans);font-weight:400}
   .zoom{display:flex;align-items:center;gap:6px}
+  .rst-wrap{position:relative;display:inline-block}
+  .rst-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:40;min-width:240px;background:var(--surface,#fff);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 30px rgba(20,24,20,.16);padding:6px;display:grid;gap:4px}
+  .rst-menu[hidden]{display:none}
+  @media (max-width:760px){.rst-menu{left:0;right:auto;min-width:min(280px,calc(100vw - 48px))}}
+  .rst-menu button{display:block;text-align:left;width:100%;border:0;background:none;padding:10px 12px;border-radius:10px;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
+  .rst-menu button:hover{background:rgba(0,0,0,.05)}
+  .rst-menu small{display:block;font-weight:400;color:var(--ink-3);font-size:12.5px;margin-top:2px}
   .zoom button{width:32px;height:32px;border:1px solid var(--line);background:var(--paper);border-radius:3px;cursor:pointer;font-size:16px;line-height:1}
   .zoom button.fit{width:auto;padding:0 10px;font-size:12.5px}
   .zoom button:hover{border-color:var(--ink-3)}
@@ -1272,7 +1279,7 @@
       <div class="t" id="stageTitle">랜드록</div>
       <div class="acts">
         <div class="ur" role="group" aria-label="실행 취소"><button type="button" id="undoB" onclick="undo()" aria-label="되돌리기" title="되돌리기 (⌘Z / Ctrl+Z)" disabled>↶</button><button type="button" id="redoB" onclick="redo()" aria-label="다시 하기" title="다시 하기 (⇧⌘Z / Ctrl+Y)" disabled>↷</button></div>
-        <button type="button" class="savepill" onclick="openSave()">💾 저장</button><button type="button" class="savepill" onclick="openLoad()">📂 불러오기</button>
+        <button type="button" class="savepill" onclick="openSave()">💾 저장</button><button type="button" class="savepill" onclick="openLoad()">📂 불러오기</button><span class="rst-wrap"><button type="button" class="savepill" id="rstB" onclick="resetMenu(event)" aria-haspopup="true" aria-expanded="false">↺ 초기화</button><div class="rst-menu" id="rstMenu" hidden role="menu"><button type="button" role="menuitem" onclick="clearGear()">🧹 장비만 비우기<small>텐트·타프는 그대로 두고 놓은 장비만 지워요</small></button><button type="button" role="menuitem" onclick="resetMenu();startFresh()">↺ 처음부터 다시<small>텐트·타프·장비를 모두 처음 상태로</small></button></div></span>
         <div class="mode" role="group" aria-label="보기 방식"><button type="button" aria-pressed="true">평면</button><button type="button" aria-pressed="false" onclick="open3D()">입체</button></div>
         <div class="zoom">
           <button onclick="zoomBy(1/1.25)" aria-label="축소">−</button>
@@ -1632,7 +1639,7 @@ TENTS.hb_atlas={brand:'힐레베르그',name:'아틀라스',model:'Atlas',size:[
   twin:{gaps:[500,800,1200],gap:800,inner:'i6',door:[1350,2850],label:'아틀라스 더 연결하기 (커넥터, 별매 · 2~3동)',name:'아틀라스 2동 연결'},
   doors:[{a:[0,1350],b:[0,2850],label:'출입문',zone:true,est:true},{a:[4350,1350],b:[4350,2850],label:'출입문',zone:false,est:true}],
   living:[640,2100],h3d:2000,inH3:1750,color:'#E7E4DC',prof:[[1,1,0],[.97,.97,.38],[.8,.8,.76],[.4,.4,1]]};
-TENTS.hb_keron4gt={brand:'힐레베르그',name:'케론 4 GT',model:'Keron 4 GT',size:[508,230,120],weight:'6.4kg (수납)',cap:'4명',href:OC+'18216',srcName:'판매처 상품 상세',
+TENTS.hb_keron4gt={brand:'힐레베르그',name:'케론 4 GT',model:'Keron 4 GT',size:[508,230,120],weight:'5.5kg (수납)',cap:'4명',href:OC+'18216',srcName:'판매처 상품 상세',
   est:'길이·폭은 해외 판매처 표기, 전실 끝 모양은 전실 면적(3.3㎡ + 1.6㎡)으로 맞춘 추정이에요.',
   outer:[[0,775],[1050,0],[4030,0],[5080,775],[5080,1525],[4030,2300],[1050,2300],[0,1525]],
   frames:[{a:[1050,0],b:[1050,2300],label:'폴'},{a:[2150,0],b:[2150,2300],label:''},{a:[3250,0],b:[3250,2300],label:''},{a:[4030,0],b:[4030,2300],label:'GT 폴'}],
@@ -1725,7 +1732,7 @@ T2.add('sp_riegel',{brand:'스노우피크',name:'리겔 Pro.',model:'TP-950',si
   inners:{std:{label:'이너룸',model:'',size:'210×315',poly:T2.rect(4600,675,6700,3825)}},
   doors:[T2.front(W,2600,'전면 도어'),T2.side(2500,4200,0,'측면 패널 도어'),T2.side(2500,4200,W,'측면 패널 도어'),T2.rear(L,W,3150,'후면 도어')],living:[2200,2250],h3d:2250,inH3:1800});}
 {const L=5200,W=3800,o=T2.tun(L,W,700,1800,700,1800);
-T2.add('sp_cumulus',{brand:'스노우피크',name:'에어로 큐뮬러스쉘',model:'TP-480',size:[520,380,200],weight:'약 24kg',cap:'판매처 미표기',src:7906,
+T2.add('sp_cumulus',{brand:'스노우피크',name:'에어로 큐뮬러스쉘',model:'TP-480',size:[520,380,200],weight:'약 24kg',cap:'4명',src:7906,
   drawn:true,est:'판매처 평면도(520×380cm, 실내 높이 180cm)로 그렸어요. 끝 모서리는 도면 비율이에요.',outer:o,innerNote:NOINNER,
   doors:[T2.front(W,1800,'전면 도어'),T2.rear(L,W,1800,'후면 도어',true),T2.side(1900,3300,0,'측면 도어'),T2.side(1900,3300,W,'측면 도어')],color:'#D9D4C7',prof:T2.PROF.cabin});}
 {const o=[[0,1100],[1900,0],[4750,0],[4900,150],[4900,3100],[4750,3250],[1900,3250],[0,2150]];
@@ -1750,7 +1757,7 @@ T2.add('sp_landnest',{brand:'스노우피크',name:'랜드네스트 쉘터',mode
   inners:{std:{label:'안쪽 공간',model:'',size:'220×338',poly:T2.rect(3800,110,5980,3490)}},
   doors:[T2.front(W,2400,'전면 도어'),T2.side(1300,2300,0),T2.side(1300,2300,W),T2.rear(L,W,3000)],color:'#8C7B66'});}
 {const L=5800,W=3600,o=T2.tun(L,W,500,2400,300,3100);
-T2.add('sp_tortue',{brand:'스노우피크',name:'토르튜 Pro. 2026',model:'FES-770',size:[580,360,210],weight:'23kg',cap:'3명',href:A247+'758',srcName:'판매처 상품 상세',drawn:true,
+T2.add('sp_tortue',{brand:'스노우피크',name:'토르튜 Pro. 2026',model:'FES-770',size:[580,360,210],weight:'22kg',cap:'3–4명',href:A247+'758',srcName:'판매처 상품 상세',drawn:true,
   est:'판매처 평면도(580×360cm, 이너 220×310cm, 이너 높이 160cm)로 그렸어요. 끝 모서리는 도면 비율이에요.',outer:o,
   inners:{std:{label:'이너룸',model:'',size:'220×310',poly:T2.rect(3480,250,5700,3350)}},
   doors:[T2.front(W,2400,'전면 도어'),T2.side(1300,2300,0),T2.side(1300,2300,W),T2.rear(L,W,3100)],color:'#6F5E4C'});}
@@ -1762,7 +1769,7 @@ function cdyBox(id,name,model,Lc,Wc,Hc,kg,cap,no,extra){const L=Lc*10,W=Wc*10,o=
     innerNote:'바닥 일체형 에어텐트예요. 잠자리는 직접 입력으로 표시해보세요.',
     doors:[T2.front(W,W-500,'전면 도어'),T2.rear(L,W,W-500,'후면 도어')],color:'#DCCFB6',prof:T2.PROF.cabin},extra||{}));}
 cdyBox('cd_familia','파밀리아 17.2','Familia 17.2',480,360,220,'66kg','4–6명',98,{est:CDYE('480×360×220cm, 바닥 17.2㎡')});
-cdyBox('cd_familia_pro','파밀리아 프로','Familia PRO',480,360,230,'55kg','4–6명',261);
+cdyBox('cd_familia_pro','파밀리아 프로','Familia PRO',480,360,230,'72kg (포장 76kg)','최대 10명 (제조사 표기)',261);
 cdyBox('cd_136','13.6','Familia 13.6',380,360,220,'60kg','4명',97);
 cdyBox('cd_100','10.0','Coody 10.0',340,340,220,'40kg','3–4명',96);
 cdyBox('cd_100_pro','10.0 프로','10.0 PRO',280,360,230,'32kg','2–4명',289);
@@ -1770,21 +1777,21 @@ cdyBox('cd_80','8.0','Coody 8.0',320,250,204,'35kg','2–3명',100);
 cdyBox('cd_80_pro','8.0 프로','8.0 PRO',380,320,270,'판매처 미표기','2–3명',343);
 cdyBox('cd_wave','웨이브','Wave',280,250,200,'25kg','2명',99);
 cdyBox('cd_roomy','루미','Roomy',400,320,230,'40kg','3–4명',104);
-cdyBox('cd_hub','허브쉘터','Hub Shelter',360,360,259,'판매처 미표기','4–6명',101,{est:CDYE('바깥 360×360cm, 높이 259cm'),
+cdyBox('cd_hub','허브쉘터','Hub Shelter',360,360,259,'60kg (포장 66kg)','최대 6명 (제조사 표기)',101,{est:CDYE('바깥 360×360cm, 높이 259cm'),
   doors:[T2.front(3600,3100),T2.rear(3600,3600,3100,'출입문',true),T2.side(800,2800,0,'출입문'),T2.side(800,2800,3600,'출입문')],innerNote:'바닥 없는 쉘터형이에요. 이너는 직접 입력으로 넣어보세요.'});
-cdyBox('cd_hub_pro','허브쉘터 프로','Hub Shelter PRO',360,380,270,'47kg','4–6명',262,{innerNote:'바닥 없는 쉘터형이에요. 이너는 직접 입력으로 넣어보세요.'});
+cdyBox('cd_hub_pro','허브쉘터 프로','Hub Shelter PRO',360,380,270,'59kg (포장 65kg)','최대 6명 (제조사 표기)',262,{innerNote:'바닥 없는 쉘터형이에요. 이너는 직접 입력으로 넣어보세요.'});
 cdyBox('cd_90dock','9.0 도킹 쉘터','9.0 Car Docking',250,360,220,'27kg','2–4명',105,{doors:[T2.side(500,2000,0,'측면 도어'),{a:[2500,400],b:[2500,3200],label:'차량 연결부',zone:false}],
   innerNote:'차량 뒤에 붙이는 도킹 쉘터예요.'});
 {const D=4600,o=T2.poly(8,D,2300,2300);
-T2.add('cd_aurora',{brand:'쿠디',name:'오로라 돔 5M',model:'Aurora Dome',size:[500,500,250],weight:'71kg (포장)',cap:'6–8명',href:CDY+'102',srcName:CDYN,
+T2.add('cd_aurora',{brand:'쿠디',name:'오로라 돔 5M',model:'Aurora Dome',size:[500,500,250],weight:'71kg (포장 77.3kg)',cap:'2–4명 (제조사 표기)',href:CDY+'102',srcName:CDYN,
   est:'쿠디 공식 제원(모서리 500cm, 벽-벽 460cm 팔각형, 높이 250cm)으로 그렸어요. 출입문 3곳 중 2곳만 표시했어요.',outer:o,innerNote:'바닥 일체형 에어 돔이에요.',
   doors:[T2.door(o,'front','출입문',true),T2.door(o,'rear','출입문',false)],living:[2300,2300],color:'#E3D9C4',prof:T2.PROF.dome});}
 {const D=3800,o=T2.poly(8,D,1900,1900);
-T2.add('cd_bestona',{brand:'쿠디',name:'베스토나',model:'Bestona',size:[380,380,255],weight:'55kg (포장)',cap:'4–6명',href:CDY+'204',srcName:CDYN,
+T2.add('cd_bestona',{brand:'쿠디',name:'베스토나',model:'Bestona',size:[380,380,270],weight:'55kg (포장 61kg)',cap:'2–4명 (제조사 표기)',href:CDY+'204',srcName:CDYN,
   est:'쿠디 공식 제원(380×380cm 팔각 돔, 높이 255cm)으로 그렸어요.',outer:o,innerNote:'바닥 일체형 에어 돔이에요.',
   doors:[T2.door(o,'front','출입문',true)],living:[1900,1900],color:'#E3D9C4',prof:T2.PROF.dome});}
 {const D=3000,o=T2.poly(8,D,1500,1500);
-T2.add('cd_havena',{brand:'쿠디',name:'하베나',model:'Havena',size:[300,300,235],weight:'30.5kg',cap:'2–3명',href:CDY+'205',srcName:CDYN,
+T2.add('cd_havena',{brand:'쿠디',name:'하베나',model:'Havena',size:[300,300,235],weight:'약 28kg (본체 23kg + 타프 5kg)',cap:'4명 취침 (제조사 표기)',href:CDY+'205',srcName:CDYN,
   est:'쿠디 공식 제원(본체 300×300cm, 높이 235cm)으로 그렸어요. 일체형 타프(약 7m)는 평면에 넣지 않았어요.',outer:o,innerNote:'바닥 일체형이에요. 앞쪽 일체형 타프 아래가 리빙이에요.',
   doors:[T2.door(o,'front','출입문',true)],living:[1500,1500],color:'#D3C6AA',prof:T2.PROF.dome});}
 
@@ -1915,7 +1922,7 @@ T2.add('mw_bigball',{brand:'미니멀웍스',name:'빅볼R',model:'Big Ball R',s
   sp('mw_superpos','슈퍼포지션','Superposition T/C',5600,4100,235,1550,'17kg','1558','#B49A72',{drawn:true,est:'판매처 바닥 도면(155+250+155cm, 폭 410cm, 양쪽 삼각 도어)으로 그렸어요.'});
   sp('mw_superpos_p','슈퍼포지션 P','Superposition P',5600,4100,235,1550,'11kg','1566',MWC,{drawn:true,est:'판매처 바닥 도면(155+250+155cm, 폭 410cm)으로 그렸어요. 폴리 버전이에요.'});
   sp('mw_superpos_solo','슈퍼포지션 솔로','Superposition Solo',5000,2800,195,1400,'10kg','1539','#B49A72',{est:'판매처 크기(500×280×195cm)에 슈퍼포지션 평면 비율을 맞췄어요.'});
-  sp('mw_superpos_solop','슈퍼포지션 솔로 P','Superposition Solo P',5000,2800,195,1400,'판매처 미표기','1574',MWC,{est:'판매처 크기(솔로와 같은 500×280cm)에 슈퍼포지션 평면 비율을 맞췄어요.'});
+  sp('mw_superpos_solop','슈퍼포지션 솔로 P','Superposition Solo P',5000,2800,195,1400,'약 7kg (스킨 2.55kg·도어 0.9kg×2·폴 2.82kg)','1574',MWC,{est:'판매처 상세 도면(500×280×195cm, 양 끝 160cm·가운데 180cm)으로 그렸어요.'});
   sp('mw_mgx600','슈퍼포지션 MGX-600','MGX-600',6000,4300,230,1650,'14.6kg','1628',MWC,{est:'판매처 제원(600×430×230cm 에어 A형)과 항공 사진으로 평면 비율을 맞췄어요.'});}
 {const L=6500,W=3400,o=T2.tun(L,W,1100,2700,600,2700);
 T2.add('mw_albergue',{brand:'미니멀웍스',name:'올어라운드 알베르게',model:'All-round Albergue',size:[650,340,210],weight:'17kg',cap:'판매처 미표기',href:JD+'1541',srcName:JDN,drawn:true,
@@ -1928,14 +1935,14 @@ T2.add('mw_tutti',{brand:'미니멀웍스',name:'투띠',model:'Tutti',size:[760
   inners:{std:{label:'이너텐트',model:'',size:'356×195',poly:T2.rect(5000,220,6950,3780),posEst:true}},
   doors:[tipDoor(o,0,'전면 입구',true),T2.side(2820,4120,0,'메쉬 도어'),T2.side(2820,4120,W,'메쉬 도어')],color:MWC});}
 {const L=5000,W=3000,o=T2.tun(L,W,800,2600,600,2000);
-T2.add('mw_boniato',{brand:'미니멀웍스',name:'보니아또',model:'Boniato',size:[500,300,160],weight:'5.6kg',cap:'최대 4명',href:JD+'1257',srcName:JDN,
+T2.add('mw_boniato',{brand:'미니멀웍스',name:'보니아또',model:'Boniato',size:[500,300,160],weight:'5.6kg',cap:'2–3명',href:JD+'1257',srcName:JDN,
   est:'판매처 제원(500×300×160cm, 입구 260cm, 이너 230×260cm)에 맞춘 터널 평면이에요.',outer:o,
-  inners:{std:{label:'이너텐트',model:'',size:'230×260',poly:T2.rect(2550,200,4850,2800),posEst:true}},
+  inners:{std:{label:'이너텐트',model:'',size:'230×260',poly:T2.rect(2325,200,4625,2800),posEst:true}},
   doors:[T2.front(W,2600,'전면 입구')],color:'#7C5A86',prof:T2.PROF.tunnel});}
 {const mk=(id,name,model,L,W,H,kg,no,extra)=>{const o=T2.rect(0,0,L,W);T2.add(id,Object.assign({brand:'미니멀웍스',name,model,size:[L/10,W/10,H],weight:kg,cap:'2명',href:JD+no,srcName:JDN,outer:o,
     innerNote:'바닥 일체형 텐트예요.',doors:[{a:[0,W*.25],b:[0,W*.75],label:'출입문',zone:true}],living:[L/2,W/2],color:'#D9823F',prof:T2.PROF.dome},extra));};
   mk('mw_paprika','파프리카','Paprika',1400,2300,120,'2.2kg','1254',{drawn:true,est:'판매처 바닥면 도면(230×140cm)으로 그렸어요. 긴 변 쪽이 출입문이에요.'});
-  mk('mw_paprika_mg','파프리카 매그넘','Paprika Magnum',1800,2300,130,'2.5kg','971',{drawn:true,est:'판매처 바닥면 도면(230×180cm)으로 그렸어요.'});
+  mk('mw_paprika_mg','파프리카 매그넘','Paprika Magnum',1800,2300,130,'2.5kg','971',{drawn:true,cap:'3명',est:'판매처 바닥면 도면(230×180cm)으로 그렸어요.'});
   mk('mw_turtle','로맨틱터틀','Romantic Turtle',1300,2200,105,'1.96kg','108',{est:'판매처 제원(220×130×105cm)으로 그렸어요.',color:'#C8423B'});
   mk('mw_tangerine','탠저린','Tangerine',960,2330,95,'982g','326',{cap:'1명',est:'판매처 제원(233×96×95cm)으로 그렸어요.'});}
 {const o=[[0,0],[2350,150],[2350,2150],[0,2300]];
@@ -1949,7 +1956,7 @@ T2.add('mw_mango_ex',{brand:'미니멀웍스',name:'망고 EX',model:'Mango EX',
   // tipDoor는 꼭짓점 기준이라 백패킹형은 끝 평변 전체를 문으로
   const endDoors=(o,D)=>[{a:o[0],b:o[7],label:'전실 출입',zone:true},{a:o[3],b:o[4],label:'전실 출입',zone:true}];
   bp('mw_dp2','디피2','DP2',2600,2250,650,190,117,'1.99kg','2명','1441',['220×130',[650,15,1950,2235]],'판매처 바닥 도면(225×260cm, 양쪽 전실 68cm, 이너 220×130cm)으로 그렸어요.');
-  bp('mw_dp15','디피1.5','DP1.5',2000,2250,500,190,105,'1.72kg','1–2명','1437',['220×100',[500,25,1500,2225]],'판매처 바닥 도면(225×200cm, 양쪽 전실 50cm, 이너 220×100cm)으로 그렸어요.');
+  bp('mw_dp15','디피1.5','DP1.5',2000,2250,500,190,105,'1.72kg','1명','1437',['220×100',[500,25,1500,2225]],'판매처 바닥 도면(225×200cm, 양쪽 전실 50cm, 이너 220×100cm)으로 그렸어요.');
   bp('mw_guava3','구아바3','Guava 3',4000,2700,930,450,137,'3.7kg','3명','1025',['213×260',[935,50,3065,2650]],'판매처 바닥 도면(400×270cm, 이너 213×260cm 가운데)으로 그렸어요.','#D9823F');
   bp('mw_pomme','폼므','Pomme',3070,2300,800,650,129,'2.9kg','2명','1081',['220×147',[800,50,2270,2250]],'판매처 바닥 도면(307×230cm, 양쪽 전실 80cm, 이너 220×147cm)으로 그렸어요.',MWC);
   bp('mw_mangosteen','망고스틴','Mangosteen',3200,2350,800,1000,140,'3.5kg','2–3명','234',['145×210',[875,125,2325,2225]],'판매처 바닥 도면(320×235cm, 양쪽 전실 80cm, 이너 145×210cm)으로 그렸어요.','#4CAF50');
@@ -1963,20 +1970,20 @@ T2.add('mw_goldkiwi',{brand:'미니멀웍스',name:'골드키위',model:'Gold Ki
 T2.add('mw_watermelon',{brand:'미니멀웍스',name:'워터멜론',model:'Watermelon',size:[375,375,190],weight:'4kg',cap:'4명',href:JD+'125',srcName:JDN,drawn:true,
   est:'판매처 바닥 그림(375×375cm 팔각)으로 그렸어요.',outer:o,innerNote:'바닥 일체형 돔이에요.',doors:[T2.door(o,'front','출입문',true)],living:[D/2,D/2],color:'#C8423B',prof:T2.PROF.dome});}
 {const o=[[0,1350],[650,0],[1850,0],[1850,2200],[650,2200]];
-T2.add('mw_el16',{brand:'미니멀웍스',name:'EL 1.6',model:'EL 1.6',size:[220,185,112],weight:'1.13kg',cap:'1–2명',href:JD+'1718',srcName:JDN,drawn:true,
+T2.add('mw_el16',{brand:'미니멀웍스',name:'EL 1.6',model:'EL 1.6',size:[220,185,112],weight:'1.13kg',cap:'1명',href:JD+'1718',srcName:JDN,drawn:true,
   est:'판매처 도면(바깥 220×185cm, 이너 218×118cm, 앞 삼각 전실 65cm)으로 그렸어요.',outer:o,
   inners:{std:{label:'이너텐트',model:'',size:'218×118',poly:T2.rect(670,10,1850,2190)}},
   doors:[tipDoor(o,0,'전실 출입',true)],living:[1250,1100],color:'#AFC0C4',prof:T2.PROF.dome});}
 {const jack=(id,name,model,D,W,H,kg,no)=>{const o=T2.rect(0,0,D,W);T2.add(id,{brand:'미니멀웍스',name,model,size:[D/10,W/10,H],weight:kg,cap:'판매처 미표기',href:JD+no,srcName:JDN,drawn:true,
     est:`판매처 바닥면 도면(${W/10}×${D/10}cm, 아치 입구 한 면)으로 그렸어요.`,outer:o,innerNote:NOFLOOR,doors:[{a:[0,W*.08],b:[0,W*.92],label:'아치 입구',zone:true}],living:[D/2,W/2],color:'#B49A72',prof:T2.PROF.cabin});};
-  jack('mw_jack_plus','잭 쉘터 플러스','Jack Shelter Plus',2350,3000,190,'2.9kg','931');
+  jack('mw_jack_plus','잭 쉘터 플러스','Jack Shelter Plus',3000,3000,190,'2.9kg','931');
   jack('mw_jack_mini','잭 쉘터 미니','Jack Shelter Mini',2200,2200,165,'1.7kg','934');}
 {const o=[[0,1125],[2250,0],[4500,1125],[4500,3375],[2250,4500],[0,3375]];
 T2.add('mw_mangostation',{brand:'미니멀웍스',name:'망고스테이션 플러스',model:'Mango Station Plus',size:[450,450,220],weight:'9.75kg',cap:'판매처 미표기',href:JD+'429',srcName:JDN,drawn:true,
   est:'판매처 바닥면 도면(450×450cm 육각)으로 그렸어요. 출입문 위치는 사진으로 추정했어요.',outer:o,innerNote:NOFLOOR,
   doors:[{a:[0,1400],b:[0,3100],label:'출입문',zone:true}],living:[2250,2250],color:'#D9823F',prof:T2.PROF.dome});}
 {const W=3000,D=2300,o=[[0,0]];for(let k=1;k<12;k++){const a=Math.PI*k/12;o.push([Math.round(D*Math.sin(a)),Math.round(W/2-W/2*Math.cos(a))]);}o.push([0,W]);
-T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glamour Shelter',size:[300,230,150],weight:'2.3kg',cap:'판매처 미표기',href:JD+'102',srcName:JDN,
+T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glamour Shelter',size:[300,230,150],weight:'2.3kg',cap:'4명',href:JD+'102',srcName:JDN,
   est:'판매처 제원(로우 모드 300×230×150cm 반돔)으로 그렸어요. 앞면 전체가 열려요.',outer:o,innerNote:NOFLOOR,
   doors:[{a:[0,150],b:[0,2850],label:'개방면',zone:true}],living:[900,1500],color:'#C4B49C',prof:T2.PROF.dome});}
 {const vh=(id,name,L,H,kg,cap,no,color)=>{const D=3050,o=[[0,600],[1525,0],[D,600],[D,L-600],[1525,L],[0,L-600]];
@@ -2035,7 +2042,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
    inners:{std:{label:'이너',model:'',size:inner[0],poly:T2.rect(...inner[1]),posEst:true}},
    doors:[{a:[0,c+150],b:[0,W-c-150],label:'전실 출입',zone:true},{a:[L,W*.35],b:[L,W*.65],label:'후면 출입',zone:false}],living:[Math.round(v*.5),W/2],h3d:H*10,inH3:H*10-150,color:'#C9C2B2',prof:T2.PROF.dome},extra||{}));};
  amen('sp_amenity2','어메니티돔 2','SD-020',3900,2400,130,'5.9kg','2명',IL+'7627',ILN,1800,['160×220',[2200,100,3800,2300]],'판매처 제원(390×240×130cm, 이너 160×220cm)으로 어메니티돔 평면을 맞췄어요.');
- amen('sp_amenity3','어메니티돔 3','SD-030',5150,2800,165,'9kg','3명',IL+'7626',ILN,1900,['265×265',[2200,75,4850,2725]],'판매처 제원(515×280×165cm, 이너 265×265cm)으로 어메니티돔 평면을 맞췄어요.');
+ amen('sp_amenity3','어메니티돔 3','SD-030',5150,2800,165,'9kg','3–4명',IL+'7626',ILN,1900,['265×265',[2200,75,4850,2725]],'판매처 제원(515×280×165cm, 이너 265×265cm)으로 어메니티돔 평면을 맞췄어요.');
  amen('sp_amenity_s','어메니티돔 S','SDE-002',3550,2300,120,'5kg','2–3명','https://www.snowpeak.co.uk/products/amenity-dome-s','스노우피크 UK 제원',1600,['150×210 (추정)',[1900,100,3450,2200]],'스노우피크 제원(355×230×120cm)이에요. 이너 크기는 공개되지 않아 비율로 넣었어요.');
  {const o=[[0,1900],[1100,900],[1000,0],[2350,500],[3700,0],[3600,900],[4700,1900],[3600,2900],[3700,3800],[2350,3300],[1000,3800],[1100,2900]];
   IN('sp_wingel2',{brand:'스노우피크',name:'윈젤2',model:'SD-828',size:[470,380,150],weight:'5.1kg',cap:'2명',href:IL+'7307',srcName:ILN,drawn:true,
@@ -2102,7 +2109,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
   inners:{std:{label:'이너',model:'',size:'250×115',poly:T2.rect(1450,100,2600,2600)}},doors:[{a:[0,500],b:[0,2200],label:'출입문',zone:true}],living:[700,1350],color:'#C8B48F',prof:T2.PROF.tipi});
 
  /* 캠핑칸 */
- IN('ck_oakdome_s',{brand:'캠핑칸',name:'오크돔 S',model:'Oak Dome S',size:[354,260,180],weight:'11kg (스킨)',cap:'2–3명',href:A247+'697',srcName:A247N,drawn:true,
+ IN('ck_oakdome_s',{brand:'캠핑칸',name:'오크돔 S',model:'Oak Dome S',size:[354,260,180],weight:'11kg (스킨)',cap:'4명 (판매처 표기)',href:A247+'697',srcName:A247N,drawn:true,
   est:'판매처 도면(260×220×180cm, 앞뒤 67cm 확장)으로 그렸어요.',outer:[[0,600],[670,0],[2870,0],[3540,600],[3540,2000],[2870,2600],[670,2600],[0,2000]],innerNote:NOINNER,
   doors:[{a:[0,800],b:[0,1800],label:'전면 도어',zone:true},{a:[3540,800],b:[3540,1800],label:'후면 도어',zone:false}],windows:[{a:[1100,0],b:[2400,0],label:'아치 창'},{a:[1100,2600],b:[2400,2600],label:'아치 창'}],color:'#9C8B6E',prof:T2.PROF.tunnel});
  const ckOct=(id,name,D,c,H,kg,cap,no,est)=>{const o=T2.box(D,D,c);IN(id,{brand:'캠핑칸',name,model:name,size:[D/10,D/10,H],weight:kg,cap,href:A247+no,srcName:A247N,drawn:true,est,outer:o,innerNote:NOFLOOR,
@@ -2129,7 +2136,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
     doors:[{a:[0,W*.3],b:[0,W*.7],label:'전면 도어',zone:true},{a:[L,W*.3],b:[L,W*.7],label:'후면 도어',zone:false}],windows:[{a:[L*.3,0],b:[L*.7,0],label:'아치 창'},{a:[L*.3,W],b:[L*.7,W],label:'아치 창'}],color:'#9C8B6E',prof:T2.PROF.tunnel});};
   oak('ck_oakdome_mini','오크돔 Mini',2200,1500,480,140,'7kg (스킨) / 14kg','1–2명');
   oak('ck_oakdome_m','오크돔 M',3300,2600,630,190,'15kg (스킨) / 27kg','4–5명');
-  IN('ck_makadome',{brand:'캠핑칸',name:'마카돔',model:'Maka Dome',size:[260,280,175],weight:'9.5kg (스킨) / 17kg',cap:'2–3명',href:CK,srcName:CKN,drawn:true,
+  IN('ck_makadome',{brand:'캠핑칸',name:'마카돔',model:'Maka Dome',size:[260,280,175],weight:'9.5kg (스킨) / 17kg',cap:'4명',href:CK,srcName:CKN,drawn:true,
    est:'판매처 제원(280×260×175cm 돔)으로 그렸어요.',outer:T2.box(2600,2800,500),innerNote:NOINNER,doors:[T2.front(2800,1800,'전면 도어')],color:'#C7B79A',prof:T2.PROF.dome});
   IN('ck_makaplus',{brand:'캠핑칸',name:'마카플러스',model:'Maka Plus',size:[330,300,180],weight:'10.5kg (스킨) / 25kg',cap:'4–6명',href:CK,srcName:CKN,drawn:true,
    est:'판매처 제원(300×330×180cm, 돔 + 앞쪽 확장)으로 그렸어요. 앞쪽 모양은 사진 비율 추정이에요.',outer:T2.tun(3300,3000,900,1600,400,2200),innerNote:NOINNER,doors:[T2.front(3000,1600,'전면 도어')],color:'#C7B79A',prof:T2.PROF.dome});
@@ -2154,12 +2161,12 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
   doors:[T2.front(4200,3200,'전면 도어'),T2.rear(4400,4200,3200,'후면 도어'),...sideD(4400,4200,1300,3100,'측면 도어')],color:'#6B6A5E',prof:T2.PROF.tunnel});
  IN('bs_1360',{brand:'브런스카일',name:'1360 텐트',model:'1360',size:[400,340,205],weight:'10.5kg + 폴 4.8kg',cap:'판매처 미표기',href:'https://brunskyle.com/',srcName:'브런스카일 공식몰',drawn:true,
   est:'판매처 제원(400×340×205cm, 2P 이너 340×160×190cm)으로 그렸어요. 이너 위치는 추정이에요.',outer:T2.box(4000,3400,350),
-  inners:{std:{label:'2P 이너',model:'옵션',size:'340×160',poly:T2.rect(4000-150-1600,100,4000-150,3300),posEst:true}},doors:[T2.front(3400,2400,'전면 도어')],color:'#8F806C',prof:T2.PROF.tunnel});
+  inners:{std:{label:'2P 이너',model:'옵션',size:'340×160',poly:T2.rect(4000-275-1600,100,4000-275,3300),posEst:true}},doors:[T2.front(3400,2400,'전면 도어')],color:'#8F806C',prof:T2.PROF.tunnel});
  {const D=5300,o=T2.poly(12,D,D/2,D/2);
  IN('ttp_zirkon15',{brand:'텐티피',name:'지르콘 15 CP',model:'Zirkon 15 CP',size:[530,530,360],weight:'23.7kg',cap:'판매처 미표기',href:'https://www.tentipi.com/',srcName:'텐티피 공식',drawn:true,
   est:'제조사 제원(지름 530cm 원형 티피, 높이 360cm)을 12각형으로 그렸어요.',outer:o,innerNote:NOFLOOR,doors:[T2.door(o,'front','출입문',true)],living:[D/2,D/2],color:'#D8CDB8',prof:T2.PROF.tipi});}
  {const D=3550,o=T2.poly(10,D,D/2,D/2);
- IN('hb_altai',{brand:'힐레베르그',name:'알타이 UL',model:'Altai UL',size:[355,355,180],weight:'판매처 미표기',cap:'판매처 미표기',href:'https://hilleberg.com/',srcName:'힐레베르그 공식',drawn:true,
+ IN('hb_altai',{brand:'힐레베르그',name:'알타이 UL',model:'Altai UL',size:[355,355,210],weight:'4.3kg (수납)',cap:'6명 이상 (제조사 표기)',href:'https://hilleberg.com/',srcName:'힐레베르그 공식',drawn:true,
   est:'바닥 9.9㎡(지름 약 355cm)를 10각형으로 그렸어요. 가운데 기둥 하나, 높이는 근사값이에요.',outer:o,innerNote:NOFLOOR,doors:[T2.door(o,'front','출입문',true)],living:[D/2,D/2],color:'#7A7F6A',prof:T2.PROF.tipi});}
  IN('sp_kayad_m',{brand:'스노우피크',name:'카야드 M',model:'Kayad M',size:[494,405,210],weight:'판매처 미표기',cap:'판매처 미표기',href:'https://www.snowpeak.com/',srcName:'스노우피크 공식',drawn:true,
   est:'제원(약 405×494×210cm, 사방 메쉬 쉘터형 타프)으로 그렸어요.',outer:T2.box(4940,4050,600),innerNote:NOFLOOR,
@@ -2278,7 +2285,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  jsq('jk_jsquare_m','제이스퀘어돔 M',2940,2500,630,1550,147,'3.09kg','15245');
 
  /* 헬리녹스 · 하임플래닛 */
- IN('hx_field_tunnel',{brand:'헬리녹스',name:'택티컬 필드 터널 4.35',model:'Tac. Field Tunnel 4.35',size:[435,300,220],weight:'14.6kg',cap:'6명',href:OC+'16075',srcName:OCN,drawn:true,
+ IN('hx_field_tunnel',{brand:'헬리녹스',name:'택티컬 필드 터널 4.35',model:'Tac. Field Tunnel 4.35',size:[435,300,220],weight:'12.82kg (설치) / 13.5kg (패킹)',cap:'제조사 미표기',href:'https://helinox.eu/products/tactical-field-tunnel',srcName:'헬리녹스 공식',srcName:OCN,drawn:true,
   est:'판매처 제원(435×300×220cm 터널 쉘터)으로 그렸어요.',outer:T2.rect(0,0,4350,3000),innerNote:NOFLOOR,
   doors:[{a:[0,300],b:[0,2700],label:'전면 개방',zone:true},{a:[4350,300],b:[4350,2700],label:'후면 개방',zone:true},...sideD(4350,3000,1200,3100,'메쉬 패널')],living:[2175,1500],color:'#2C2E30',prof:T2.PROF.tunnel});
  {const L=3600,W=3300,o=[[0,850],[700,0],[2900,0],[3600,850],[3600,2450],[2900,3300],[700,3300],[0,2450]];
@@ -2304,7 +2311,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  IN('sl_saturn_lite',{brand:'스노우라인',name:'새턴 쉘터 라이트',model:'SNE5ULT002',size:[520,340,210],weight:'12kg',cap:'판매처 미표기',href:OC+'5041',srcName:OCN,drawn:true,
   est:'판매처 도면(520cm, 가운데 340cm, 끝 240cm)으로 그렸어요. 이너텐트는 따로 팔아요.',outer:T2.tun(5200,3400,800,2400,800,2400),innerNote:NOFLOOR,
   doors:[T2.front(3400,2400,'전면 도어'),T2.rear(5200,3400,2400,'후면 도어',true),...sideD(5200,3400,2000,3200)],color:'#8C7B66'});
- IN('cd_yustona',{brand:'쿠디',name:'유스토나',model:'Yustona',size:[260,240,200],weight:'20.7kg',cap:'판매처 미표기',href:CDY+'281',srcName:CDYN2,drawn:true,
+ IN('cd_yustona',{brand:'쿠디',name:'유스토나',model:'Yustona',size:[260,240,205],weight:'약 19kg (부속 약 6kg 별도)',cap:'1–2명',href:CDY+'281',srcName:CDYN2,drawn:true,
   est:'쿠디 공식 제원(240×260×200cm, 바닥 일체형 면텐트)으로 그렸어요.',outer:T2.box(2600,2400,200),innerNote:'바닥 일체형 에어텐트예요.',
   doors:[T2.front(2400,1900,'전면 도어'),T2.rear(2600,2400,1900,'후면 도어',true)],color:'#DCCFB6',prof:T2.PROF.cabin});
  IN('cd_58',{brand:'쿠디',name:'5.8',model:'Coody 5.8',size:[240,240,180],weight:'7kg',cap:'판매처 미표기',href:CDY+'103',srcName:CDYN2,drawn:true,
@@ -2312,7 +2319,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
   doors:[T2.front(2400,1900,'전면 도어')],color:'#DCCFB6',prof:T2.PROF.cabin});
 
  /* 기타 */
- IN('mt_cubex28',{brand:'몬테라',name:'큐벡스 2.8 에어 쉘터',model:'Cubex 2.8 Air',size:[280,280,210],weight:'16kg',cap:'판매처 미표기',href:'https://bigtentoutdoors.com/products/monterra-cubex-28-air-shelter',srcName:'판매처 제원',
+ IN('mt_cubex28',{brand:'몬테라',name:'큐벡스 2.8 에어 쉘터',model:'Cubex 2.8 Air',size:[280,280,210],weight:'16kg',cap:'4–5명',href:'https://bigtentoutdoors.com/products/monterra-cubex-28-air-shelter',srcName:'판매처 제원',
   est:'제원(280×280×210cm 큐브형 에어 쉘터)으로 그렸어요. 문 위치는 사진 기준이에요.',outer:T2.rect(0,0,2800,2800),innerNote:NOFLOOR,
   doors:[{a:[0,400],b:[0,2400],label:'전면 도어',zone:true}],living:[1400,1400],color:'#2E3238',prof:T2.PROF.cabin});
  IN('dm_hub',{brand:'도메틱',name:'허브',model:'HUB',size:[230,230,230],weight:'13.8kg',cap:'판매처 미표기',href:OLM+'29644',srcName:'도메틱 공식 제원',
@@ -2333,8 +2340,8 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
    est:`판매처 도면(팔각 ${D/10}cm, 앞 출입부 ${ext/10}cm, 높이 ${H}cm)으로 그렸어요.`,outer:o,
    canopy:[[ext,D/2-f/2],[0,D/2-f/2+150],[0,D/2+f/2-150],[ext,D/2+f/2]],canopyLabel:`출입부 (${ext/10}cm)`,canopyName:'출입부',
    doors:[T2.door(o,'front','출입문',true)],living:[ext+D/2,D/2],color:'#5E6B44',prof:T2.PROF.tipi});};
- var_('hs_varanger_camp8','바랑에르 캠프 8-10',4350,1150,300,'12.2kg','8–10명','3891');
- var_('hs_varanger_camp12','바랑에르 캠프 12-14',5150,1300,350,'15.1kg','12–14명','3893');
+ var_('hs_varanger_camp8','바랑에르 캠프 8-10',4350,1150,300,'약 8kg (아우터+폴, 이너 별도)','8–10명','3891');
+ var_('hs_varanger_camp12','바랑에르 캠프 12-14',5150,1300,350,'약 9.2kg (아우터+폴, 이너 별도)','12–14명','3893');
  {const D=5100,o=T2.poly(10,D,D/2,D/2);
   IN('tr_hector',{brand:'트로이',name:'헥토르 2026',model:'Hector',size:[510,510,230],weight:'16kg',cap:'12명',href:OC+'19959',srcName:OCN,
    est:'판매처 제원(지름 510cm, 실내 높이 230cm, 문 3개)으로 그렸어요. 바닥은 십각으로 그렸어요.',outer:o,innerNote:NOFLOOR,
@@ -2343,9 +2350,10 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
   IN('mb_moonlight_cabin4',{brand:'몽벨',name:'문라이트 캐빈 4',model:'Moonlight Cabin 4',size:[580,275,213],weight:'12kg',cap:'4명',href:OC+'15620',srcName:OCN,drawn:true,
    est:'판매처 도면(580cm, 앞 275cm, 뒤 250cm, 거실 300 + 이너 210 + 후실 70cm)으로 그렸어요.',outer:T2.tun(5800,2750,300,2600,300,2400),
    inners:{std:{label:'이너룸',model:'',size:'210×250',poly:T2.rect(3000,150,5100,2600)}},doors:[T2.front(2750,2600,'전면 도어')],color:'#CDBF9E'});}
- {const L=7000,W=3200,o=T2.tun(L,W,500,2600,400,2600);
-  IN('us_easycabin_pro',{brand:'어반사이드',name:'이지캐빈 프로',model:'Easy Cabin Pro',size:[700,320,230],weight:'판매처 미표기',cap:'판매처 미표기',href:OC+'18438',srcName:OCN,
-   est:'판매처 제원(700×320×230cm 에어텐트)으로 그렸어요. 도면이 없어 모서리는 비율이에요.',outer:o,innerNote:NOINNER,
+ {const L=7400,W=4400,o=T2.tun(L,W,1560,3050,1560,3050);
+  IN('us_easycabin_pro',{brand:'어반사이드',name:'이지캐빈 프로',model:'Easy Cabin Pro',size:[740,440,240],weight:'제조사 미공지',cap:'제조사 미표기',href:'https://docs.channel.io/7bc67b61/ko/articles/%EC%9D%B4%EC%A7%80%EC%BA%90%EB%B9%88-%ED%94%84%EB%A1%9C-d42d7900',srcName:'어반사이드 공식 안내',
+   est:'어반사이드 공식 안내(740×440×240cm, 이너 380×240×210cm)로 그렸어요. 모서리와 이너 위치는 도면이 없어 추정이에요.',outer:o,
+   inners:{std:{label:'이너룸',model:'',size:'380×240',poly:T2.rect(L-1560-2400,(W-3800)/2,L-1560,(W+3800)/2),posEst:true}},innerDefault:'std',
    doors:[T2.front(W,2600,'전면 도어'),...sideD(L,W,1500,2700)],color:'#6E6B55'});}
  {const L=6000,W=3400,o=T2.tun(L,W,500,2800,400,2800);
   IN('us_easytrain_pro',{brand:'어반사이드',name:'이지트레인 프로',model:'Easy Train Pro',size:[600,340,220],weight:'판매처 미표기',cap:'판매처 미표기',href:OC+'18706',srcName:OCN,
@@ -2370,7 +2378,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
   doors:[T2.front(W,2200,'전면 도어'),T2.rear(L,W,2600,'후면 도어')],
   living:[1400,1625],color:'#8C8670',prof:T2.PROF.tunnel});}
 {const L=4450,W=4350,o=T2.rect(0,0,L,W);
- T2.add('tfs_skydome',{brand:'TFS',name:'스카이돔',model:'SKYDOME (화이트라벨)',size:[445,435,205],weight:'13.6kg (70D)',cap:'5명',
+ T2.add('tfs_skydome',{brand:'TFS',name:'스카이돔',model:'SKYDOME (화이트라벨)',size:[445,435,205],weight:'13.6kg (패키지)',cap:'4–5명',
   href:'https://www.zetuenlife.com/entry/tfstents',srcName:'일본 리뷰 블로그 (스펙 인용)',drawn:true,
   est:'일본 블로그에 인용된 스펙(외부 445×435×205cm, 이너 215×435×190cm)으로 그렸어요. 공식 페이지는 확인 못 했어요. 바닥 모양은 공개되지 않아 직사각형으로 단순화했고, 이너를 뒤쪽 전체 폭에 둔 위치와 앞문 위치는 추정이에요.',outer:o,
   inners:{std:{label:'이너룸',model:'',size:'215×435',poly:T2.rect(2300,0,4450,4350),posEst:true}},
@@ -2448,7 +2456,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
   doors:[T2.front(D,1656,'출입 패널')],living:[2000,2000],color:'#C2B9A3',prof:T2.PROF.shelter});}
 /* 메쉬쉘터: 크로스 프레임 돔 + 바이저, 출입 4곳 */
 {const L=3900,W=4000,o=T2.box(L,W,300);
- T2.add('sp_meshshelter',{brand:'스노우피크',name:'메쉬쉘터',model:'TP-925',size:[390,400,220],weight:'12.5kg',cap:'4명 (제조사 표기)',
+ T2.add('sp_meshshelter',{brand:'스노우피크',name:'메쉬쉘터',model:'TP-925',size:[390,400,220],weight:'12.5kg',cap:'4–6명 (제조사 표기)',
   href:'https://uk.snowpeak.com/products/mesh-shelter-1',srcName:'제조사 공식 페이지',drawn:true,
   est:'제조사 표기 400×390×220cm(실내 215cm)와 출입 4곳으로 그렸어요. 네 면 출입은 설명서의 양쪽 도어 패널·사진 기준이고, 모서리 모양은 추정이에요. 단종 모델이에요.',outer:o,innerNote:NOFLOOR,
   doors:[T2.front(W,W-600,'도어 패널'),T2.rear(L,W,W-600,'도어 패널',true),T2.side(600,3300,0,'측면 출입'),T2.side(600,3300,W,'측면 출입')],
@@ -2470,7 +2478,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
    living:[1500,2950],h3d:2600,inH3:2200,color:'#A79F8B',prof:cone});}}
 /* 토우가(투가): 2룸 터널. 앞=출입 패널, 왼쪽(A폴 L쪽)=측면 도어, 뒤=이너룸 */
 {const L=5950,W=3800,o=T2.tun(L,W,1000,2600,400,3200);
- T2.add('sp_tuga',{brand:'스노우피크',name:'토우가',model:'TP-690',size:[595,380,215],weight:'18.3kg',cap:'2–4명 (제조사 표기)',
+ T2.add('sp_tuga',{brand:'스노우피크',name:'토우가',model:'TP-690',size:[595,380,215],weight:'18.3kg',cap:'4명 (제조사 표기)',
   href:'https://snowpeak.com/products/tuga',srcName:'제조사 공식 페이지',drawn:true,
   est:'제조사 표기 19.5′×12.5′×7.1′(595×380cm)와 설명서 크기도·매트시트 세트 숫자(이너 약 220cm 깊이, 폭 340→305cm)로 그렸어요. 앞뒤 끝 모양은 추정이에요. 측면 도어는 설명서대로 A폴(L) 쪽이에요.',outer:o,
   inners:{std:{label:'이너룸',model:'',size:'약 340(305)×220',poly:[[3700,200],[5900,375],[5900,3425],[3700,3600]],posEst:true}},
@@ -2481,7 +2489,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  T2.add('sp_amenity_l',{brand:'스노우피크',name:'어메니티돔 L',model:'SDE-003',size:[540,310,165],weight:'9.8kg',cap:'6명 (어른 4·어린이 2)',
   href:'https://www.snowpeak.com/products/amenity-dome-l',srcName:'제조사 공식 페이지',drawn:true,
   est:'일본 카탈로그 값(전체 540×310×165cm, 이너 295×295cm)으로 그렸어요(미국 페이지는 15.7′×9.8′로 전실 길이가 짧게 표기). 전실 모양은 어메니티돔 M과 같은 비율 추정이에요.',outer:o,
-  inners:{std:{label:'이너',model:'',size:'295×295',poly:T2.rect(2350,75,5300,3025)}},
+  inners:{std:{label:'이너',model:'',size:'295×295',poly:T2.rect(2150,75,5100,3025),posEst:true}},
   doors:[{a:[0,1200],b:[0,1900],label:'전실 출입',zone:true},{a:[5400,1150],b:[5400,1950],label:'후면 출입',zone:false}],
   living:[1000,1550],h3d:1650,inH3:1500,color:'#C9C2B2',prof:T2.PROF.dome});}
 /* 후비(Fubi): 2룸 쉘터. 폭(좌우)이 더 길고, 이너룸은 좌우 어느 쪽에나 */
@@ -2510,7 +2518,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  asg('nd_asgard71','아스가르드 7.1','Asgard 7.1 m²',2650,3000,200,'15.5kg','3명 (제조사 표기)','asgard-71-m2-glamping-tent-3-person-natural',
   '제조사 플라이 치수(길이 265×폭 300cm, 높이 200cm, 바닥 7.1㎡=지름 300cm 원)로 둥근 바닥을 12각형으로 그렸어요. A형 도어는 앞쪽, 창문은 바닥 높이 D형이에요. 벽 높이는 공개되지 않았어요.');
  asg('nd_asgard126','아스가르드 12.6','Asgard 12.6 m²',3750,4000,250,'16kg','6명 (제조사 표기)','asgard-126-m2-glamping-tent-6-person-natural',
-  '제조사 플라이 치수(길이 375×폭 400cm, 높이 250cm, 바닥 12.6㎡=지름 400cm 원)로 둥근 바닥을 12각형으로 그렸어요. A형 도어는 앞쪽, 양옆에 바닥 높이 D형 창이 있어요. 벽 높이는 공개되지 않았어요.');
+  '제조사 플라이 치수(길이 375cm, 높이 250cm)와 바닥 12.6㎡(=지름 400cm 원)로 폭 400cm를 잡았어요(공식 페이지 폭 375 표기는 같은 시리즈 7.1·19.6 규칙과 달라 바닥 면적 기준으로 봤어요). 둥근 바닥을 12각형으로 그렸어요. A형 도어는 앞쪽, 양옆에 바닥 높이 D형 창이 있어요. 벽 높이는 공개되지 않았어요.');
  asg('nd_asgard196','아스가르드 19.6','Asgard 19.6 m²',4700,5000,300,'20kg','8–10명 (제조사 표기)','asgard-196-m2-glamping-tent-8-10-person-natural',
   '제조사 플라이 치수(길이 470×폭 500cm, 높이 300cm, 바닥 19.6㎡=지름 500cm 원)로 둥근 바닥을 12각형으로 그렸어요. A형 도어는 앞쪽이에요. 벽 높이는 공개되지 않았어요.');
 
@@ -2542,12 +2550,13 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  van('nd_vanaheim40','바나하임 40','Vanaheim 40 m²',4950,8000,'55.2kg','20명 (제조사 표기)','vanaheim-40-m2-glamping-tent-16-person-natural',
   '제조사 플라이 치수(길이 495×폭 800cm, 높이 300cm)로 그렸어요. 출입구는 24와 같은 앞 긴 벽 가운데 더블 도어로 보고 문 폭(160cm)은 사진으로 추정했어요.');
 
- /* --- 미드가르드 20 (육각, A프레임·터틀 허브, 기둥 없는 실내, 바닥 일체형) --- */
- {const D=4920,o=T2.poly(6,D,D/2,2840);
-  T2.add('nd_midgard20',{brand:'노르디스크',name:'미드가르드 20',model:'Midgard 20 m²',size:[536,568,300],weight:'49.5kg',cap:'10명 (제조사 표기)',href:ND+'midgard-20-m2-glamping-tent-10-person-natural',srcName:NDN,drawn:true,
-   est:'제조사 높이 300cm·바닥 20㎡와 판매처(Bergzeit) 길이 536×폭 568cm로, 꼭짓점 사이 568cm인 정육각형(마주 보는 변 사이 492cm, 20.9㎡)으로 그렸어요. 536cm는 도어 처마를 포함한 값으로 봤어요. 출입 개구부 4곳 중 앞·뒤 두 곳만 표시했고 위치는 추정이에요.',
-   outer:o,innerNote:'바닥이 꿰매진 싱글월 텐트라 따로 넣는 이너가 없어요.',doors:[T2.door(o,'front','전면 도어',true),T2.door(o,'rear','후면 도어',true)],
-   living:[D/2,2840],color:NDC,prof:T2.PROF.dome});}
+ /* --- 미드가르드 20 (공식 450×450, 터틀 허브, 기둥 없는 실내, 바닥 일체형, 네 면 출입구) --- */
+ {const D=4500,o=T2.rect(0,0,D,D);
+  T2.add('nd_midgard20',{brand:'노르디스크',name:'미드가르드 20',model:'Midgard 20 m²',size:[450,450,300],weight:'49.5kg',cap:'10명 (제조사 표기)',href:ND+'midgard-20-m2-glamping-tent-10-person-natural',srcName:NDN,drawn:true,
+   est:'제조사 공식 플라이 치수(450×450cm, 높이 300cm, 바닥 20㎡)로 그렸어요. 네 면에 출입구가 있어 미드가르드 릿지 텐트를 옆에 이어 붙일 수 있어요. 출입구 폭은 추정이에요.',
+   outer:o,innerNote:'바닥이 꿰매진 싱글월 텐트라 따로 넣는 이너가 없어요.',
+   doors:[T2.front(D,1800,'전면 도어'),{a:[D,D/2-900],b:[D,D/2+900],label:'후면 도어',zone:true},T2.side(D/2-900,D/2+900,0,'측면 도어'),T2.side(D/2-900,D/2+900,D,'측면 도어')],
+   living:[D/2,D/2],color:NDC,prof:T2.PROF.dome});}
 
  /* --- 이둔 5.5 (클래식 릿지 텐트, 양 끝 출입) --- */
  {const L=2600,W=2100,o=T2.rect(0,0,L,W);
@@ -2561,7 +2570,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  {const L=6450,W=2950,o=T2.tun(L,W,600,2300,400,2500);
   T2.add('nd_reisa6',{brand:'노르디스크',name:'레이사 6 PU',model:'Reisa 6 PU',size:[645,295,210],weight:'18.9kg',cap:'6명 (제조사 표기)',href:ND+'reisa-6-pu-tent-6-person-beige',srcName:NDN,drawn:true,
    est:'제조사 치수(플라이 645×295cm·높이 210cm, 이너 230×280cm)로 그렸어요. 이너는 뒤쪽(2인+4인 분할), 앞문 1개·옆문 2개는 전실 쪽으로 봤어요. 앞뒤 끝 좁아지는 정도와 옆문 위치는 사진으로 추정했어요.',
-   outer:o,inners:{std:{label:'이너룸 (2인+4인)',model:'',size:'230×280',poly:T2.rect(L-150-2300,75,L-150,W-75),posEst:true}},
+   outer:o,inners:{std:{label:'이너룸 (2인+4인)',model:'',size:'230×280',poly:T2.rect(L-275-2300,75,L-275,W-75),posEst:true}},
    doors:[T2.front(W,2300,'전면 도어'),T2.side(1300,2700,0,'측면 도어'),T2.side(1300,2700,W,'측면 도어')],
    living:[2000,W/2],color:'#C8B89C',prof:T2.PROF.tunnel});}
 
@@ -2569,7 +2578,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  {const L=4450,W=2100,o=T2.tun(L,W,1300,1000,700,1100);
   T2.add('nd_oppland3',{brand:'노르디스크',name:'오플란드 3 PU',model:'Oppland 3 PU (3.0)',size:[445,210,120],weight:'4.5kg',cap:'3명 (제조사 표기)',href:ND+'oppland-3-pu-30-tent-onesize-dark-olive',srcName:NDN,drawn:true,
    est:'제조사 치수(플라이 445×210cm·높이 120cm, 이너 225×190cm)로 그렸어요. 이너는 뒤쪽, 앞쪽은 전실(포치)이고 앞 끝 전체가 열려요. 앞뒤 끝 모양은 사진으로 추정했어요.',
-   outer:o,inners:{std:{label:'이너룸',model:'',size:'225×190',poly:T2.rect(L-100-2250,100,L-100,W-100),posEst:true}},
+   outer:o,inners:{std:{label:'이너룸',model:'',size:'225×190',poly:T2.rect(L-575-2250,100,L-575,W-100),posEst:true}},
    doors:[T2.front(W,1000,'전면 도어')],living:[900,W/2],color:'#5E5F45',prof:T2.PROF.tunnel});}
 }
 
@@ -2779,7 +2788,7 @@ const GEAR={
   fshelf_m:{gtype:'shelf',top:'black',group:'폴딩쉘프',name:'폴딩쉘프 메탈탑',model:'FES-067-BK',conf:'retailer',w:846,d:340,h:397,kg:4.8,sw:'#2B2E31',note:'블랙 메탈 상판',src:'7933'},
   omni230:{gtype:'stove',group:'난방',name:'토요토미 옴니 230',model:'OMNI 230',conf:'official',w:440,d:440,h:583,kg:10.7,sw:'#3B3F3A',
     note:'등유 대류형 난로, 6.77kW. 크기는 제조사 카탈로그 기준',heat:{type:'round',c:1000},src:'7033'},
-  camp5000:{gtype:'fan',group:'난방',name:'파세코 캠프 5000 팬히터',model:'CAMP-5000',conf:'retailer',w:474,d:322,h:440,kg:null,sw:'#2E3134',
+  camp5000:{gtype:'fan',group:'난방',name:'파세코 캠프 5000 팬히터',model:'CAMP-5000',conf:'official',w:474,d:322,h:440,kg:null,href:'https://m.paseco.co.kr/goods/goods_view.php?goodsNo=1000000619',srcName:'파세코 공식몰',sw:'#2E3134',
     note:'등유 팬히터, 1.1~5.0kW, 연료 7L, 전기 26W 필요. 바람은 앞쪽(화살표)으로 나와요',heat:{type:'front',front:1000,side:300},src:null},
   sp_low30:{gtype:'chair',group:'체어',name:'스노우피크 로우체어 30',model:'LV-091',conf:'official',w:580,d:650,h:860,sh:300,kg:3.6,sw:'#6E6250',
     note:'좌면 높이 30cm 로우체어. 크기는 스노우피크 재팬 공식 기준',href:'https://ec.snowpeak.co.jp/item/SNP0116A0238',srcName:'스노우피크 재팬'},
@@ -4263,6 +4272,12 @@ async function loadPlanCode(code,label){const prev=CURRENT_CODE||await encodePla
   try{applyPlan(await decodePlan(code));}catch(e){setStatus(e.message);return false;}
   undoCode=prev;setStatus(`열었어요: ${label}.`,'되돌리기',async()=>{const u=undoCode;undoCode=null;if(u){applyPlan(await decodePlan(u));setStatus('되돌렸어요.');}});
   document.querySelector('.stage').scrollIntoView({behavior:'smooth',block:'start'});return true;}
+// 배치 초기화: 장비만 비우기 / 처음부터 (둘 다 되돌리기 가능)
+function resetMenu(e){const m=document.getElementById('rstMenu'),b=document.getElementById('rstB');if(!m)return;const open=m.hidden;m.hidden=!open;b.setAttribute('aria-expanded',String(open));
+  if(open){setTimeout(()=>{const off=ev=>{if(!m.contains(ev.target)&&ev.target!==b){m.hidden=true;b.setAttribute('aria-expanded','false');document.removeEventListener('click',off);}};document.addEventListener('click',off);},0);}}
+async function clearGear(){const m=document.getElementById('rstMenu');if(m)m.hidden=true;if(!state.pieces.length){setStatus('지울 장비가 없어요.');return;}
+  const prev=await encodePlan(planObj()),n=state.pieces.filter(p=>p.parent==null).length;state.pieces=[];sel=null;render();
+  setStatus(`장비 ${n}개를 비웠어요. 텐트·타프는 그대로예요.`,'되돌리기',async()=>{applyPlan(await decodePlan(prev));setStatus('되돌렸어요.');});}
 async function startFresh(){const prev=await encodePlan(planObj());XT=[];XT_ADD=false;tent={id:'landlock',inner:'std',canopy:false,custom:{w:200,d:210}};tarp={id:null,x:0,y:0,rot:0};state.pieces=[];sel=null;
   renderTentList();renderTentOpts();renderTarpList();renderTarpSpec();fitView();render();
   setStatus('새 배치로 시작했어요.','되돌리기',async()=>{applyPlan(await decodePlan(prev));setStatus('되돌렸어요.');});}
