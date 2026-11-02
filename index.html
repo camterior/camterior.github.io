@@ -142,6 +142,13 @@
   .stagebar .t{font-family:var(--serif);font-size:18px;font-weight:700}
   .stagebar .s{font-size:12.5px;color:var(--ink-2);margin-left:10px;font-family:var(--sans);font-weight:400}
   .zoom{display:flex;align-items:center;gap:6px}
+  .rst-wrap{position:relative;display:inline-block}
+  .rst-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:40;min-width:240px;background:var(--surface,#fff);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 30px rgba(20,24,20,.16);padding:6px;display:grid;gap:4px}
+  .rst-menu[hidden]{display:none}
+  @media (max-width:760px){.rst-menu{left:0;right:auto;min-width:min(280px,calc(100vw - 48px))}}
+  .rst-menu button{display:block;text-align:left;width:100%;border:0;background:none;padding:10px 12px;border-radius:10px;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
+  .rst-menu button:hover{background:rgba(0,0,0,.05)}
+  .rst-menu small{display:block;font-weight:400;color:var(--ink-3);font-size:12.5px;margin-top:2px}
   .zoom button{width:32px;height:32px;border:1px solid var(--line);background:var(--paper);border-radius:3px;cursor:pointer;font-size:16px;line-height:1}
   .zoom button.fit{width:auto;padding:0 10px;font-size:12.5px}
   .zoom button:hover{border-color:var(--ink-3)}
@@ -1272,7 +1279,7 @@
       <div class="t" id="stageTitle">랜드록</div>
       <div class="acts">
         <div class="ur" role="group" aria-label="실행 취소"><button type="button" id="undoB" onclick="undo()" aria-label="되돌리기" title="되돌리기 (⌘Z / Ctrl+Z)" disabled>↶</button><button type="button" id="redoB" onclick="redo()" aria-label="다시 하기" title="다시 하기 (⇧⌘Z / Ctrl+Y)" disabled>↷</button></div>
-        <button type="button" class="savepill" onclick="openSave()">💾 저장</button><button type="button" class="savepill" onclick="openLoad()">📂 불러오기</button>
+        <button type="button" class="savepill" onclick="openSave()">💾 저장</button><button type="button" class="savepill" onclick="openLoad()">📂 불러오기</button><span class="rst-wrap"><button type="button" class="savepill" id="rstB" onclick="resetMenu(event)" aria-haspopup="true" aria-expanded="false">↺ 초기화</button><div class="rst-menu" id="rstMenu" hidden role="menu"><button type="button" role="menuitem" onclick="clearGear()">🧹 장비만 비우기<small>텐트·타프는 그대로 두고 놓은 장비만 지워요</small></button><button type="button" role="menuitem" onclick="resetMenu();startFresh()">↺ 처음부터 다시<small>텐트·타프·장비를 모두 처음 상태로</small></button></div></span>
         <div class="mode" role="group" aria-label="보기 방식"><button type="button" aria-pressed="true">평면</button><button type="button" aria-pressed="false" onclick="open3D()">입체</button></div>
         <div class="zoom">
           <button onclick="zoomBy(1/1.25)" aria-label="축소">−</button>
@@ -4263,6 +4270,12 @@ async function loadPlanCode(code,label){const prev=CURRENT_CODE||await encodePla
   try{applyPlan(await decodePlan(code));}catch(e){setStatus(e.message);return false;}
   undoCode=prev;setStatus(`열었어요: ${label}.`,'되돌리기',async()=>{const u=undoCode;undoCode=null;if(u){applyPlan(await decodePlan(u));setStatus('되돌렸어요.');}});
   document.querySelector('.stage').scrollIntoView({behavior:'smooth',block:'start'});return true;}
+// 배치 초기화: 장비만 비우기 / 처음부터 (둘 다 되돌리기 가능)
+function resetMenu(e){const m=document.getElementById('rstMenu'),b=document.getElementById('rstB');if(!m)return;const open=m.hidden;m.hidden=!open;b.setAttribute('aria-expanded',String(open));
+  if(open){setTimeout(()=>{const off=ev=>{if(!m.contains(ev.target)&&ev.target!==b){m.hidden=true;b.setAttribute('aria-expanded','false');document.removeEventListener('click',off);}};document.addEventListener('click',off);},0);}}
+async function clearGear(){const m=document.getElementById('rstMenu');if(m)m.hidden=true;if(!state.pieces.length){setStatus('지울 장비가 없어요.');return;}
+  const prev=await encodePlan(planObj()),n=state.pieces.filter(p=>p.parent==null).length;state.pieces=[];sel=null;render();
+  setStatus(`장비 ${n}개를 비웠어요. 텐트·타프는 그대로예요.`,'되돌리기',async()=>{applyPlan(await decodePlan(prev));setStatus('되돌렸어요.');});}
 async function startFresh(){const prev=await encodePlan(planObj());XT=[];XT_ADD=false;tent={id:'landlock',inner:'std',canopy:false,custom:{w:200,d:210}};tarp={id:null,x:0,y:0,rot:0};state.pieces=[];sel=null;
   renderTentList();renderTentOpts();renderTarpList();renderTarpSpec();fitView();render();
   setStatus('새 배치로 시작했어요.','되돌리기',async()=>{applyPlan(await decodePlan(prev));setStatus('되돌렸어요.');});}
