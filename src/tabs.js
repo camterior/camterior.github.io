@@ -290,7 +290,7 @@ rotDown=function(e,uid){if(multiTouch(e))return;_rotDown(e,uid);};
 /* phones: fit to the tent and gear only (the tarp runs off-screen; drag to see it) so pieces are big enough to grab */
 const _fitView=fitView;
 fitView=function(){const [hw,hh]=hostSize();if(!hw)return;if(hw>=600)return _fitView();
-  const T=TENTS[tent.id];let pts=[];if(T.outer)pts=pts.concat(T.outer);
+  const T=TENTS[tent.id];let pts=[];if(T.outer)pts=pts.concat(T.outer);if(typeof xtOk==='function')xtOk().forEach(e=>{pts=pts.concat(xtW(e).outer);});
   state.pieces.forEach(p=>{if(p._v)pts=pts.concat(p._v);});
   if(!pts.length)return _fitView();const b=bbox(pts),m=18,bottom=64,w=b[1][0]-b[0][0],h=b[1][1]-b[0][1];
   SCALE=Math.min((hw-2*m)/w,(hh-2*m-bottom)/h);viewX=(b[0][0]+b[1][0])/2-hw/SCALE/2;viewY=(b[0][1]+b[1][1])/2-(hh-bottom)/SCALE/2;};
