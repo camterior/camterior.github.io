@@ -2,6 +2,17 @@
    캠핑 후기 — 배치 사진 + 실제 사진 + 댓글 (워커 KV에 저장)
    ===================================================================== */
 const RV_IMG=k=>AI_URL+'/img/'+k;
+// 사진 크게 보기: 누르면 화면 가득, 한 번 더 누르면 원래 크기(1600px)로 확대해서 끌어 보기, ✕나 바깥 누르면 닫기
+function camZoom(src,alt){let z=document.getElementById('camZoom');
+  if(!z){z=document.createElement('div');z.id='camZoom';z.setAttribute('role','dialog');z.setAttribute('aria-modal','true');
+    z.innerHTML='<button type="button" class="cz-x" aria-label="닫기">✕</button><div class="cz-in"><img alt=""></div><p class="cz-h">사진을 누르면 확대 · 다시 누르면 맞춤</p>';document.body.appendChild(z);
+    const close=()=>{z.hidden=true;document.documentElement.style.overflow='';};
+    z.addEventListener('click',e=>{if(e.target===z||e.target.classList.contains('cz-x')||e.target.classList.contains('cz-in'))close();});
+    z.querySelector('img').addEventListener('click',e=>{const box=z.querySelector('.cz-in'),im=e.currentTarget,on=!box.classList.contains('big');
+      const rx=e.offsetX/im.clientWidth,ry=e.offsetY/im.clientHeight;box.classList.toggle('big',on);
+      if(on)requestAnimationFrame(()=>{box.scrollLeft=im.clientWidth*rx-box.clientWidth/2;box.scrollTop=im.clientHeight*ry-box.clientHeight/2;});});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!z.hidden)close();});}
+  const im=z.querySelector('img');im.src=src;im.alt=alt||'';z.querySelector('.cz-in').classList.remove('big');z.hidden=false;document.documentElement.style.overflow='hidden';}
 let RV={items:null,page:0,more:false,open:null,photos:[]};
 const rvNick=v=>{try{if(v!==undefined)localStorage.setItem('camNick',v);return localStorage.getItem('camNick')||'';}catch(e){return '';}};
 const rvOwn=(id,v)=>{try{const o=JSON.parse(localStorage.getItem('camRvOwn')||'{}');if(v!==undefined){o[id]=v;localStorage.setItem('camRvOwn',JSON.stringify(o));}return o[id]||'';}catch(e){return '';}};
@@ -34,7 +45,7 @@ function rvDetail(){const {item:r,comments:cm}=RV.open,dl=document.getElementByI
   const sec=(t,v)=>v?`<div class="rv-sec"><h4>${t}</h4><p>${aiEsc(v)}</p></div>`:'';
   dl.innerHTML=`<div class="rv-in">
     <div class="rv-top"><button type="button" class="rv-x" aria-label="닫기" onclick="rvClose()">×</button></div>
-    <div class="rv-pics">${pics.map(([k,l])=>`<figure><img src="${RV_IMG(r.id+'/'+k)}" alt="${l}" loading="lazy"><figcaption>${l}</figcaption></figure>`).join('')}</div>
+    <div class="rv-pics">${pics.map(([k,l])=>`<figure><img src="${RV_IMG(r.id+'/'+k)}" alt="${l}" loading="lazy" onclick="camZoom(this.src,this.alt)" style="cursor:zoom-in"><figcaption>${l}</figcaption></figure>`).join('')}</div>
     <h2 id="rvT">${aiEsc(r.title)}</h2>
     <p class="rv-sub"><span class="rv-st">${rvStars(r.rating)}</span> ${aiEsc([r.site,r.date,r.tent].filter(Boolean).join(' · '))}</p>
     <p class="rv-by">${aiEsc(r.nick)} · ${rvDate(r.at)}</p>
