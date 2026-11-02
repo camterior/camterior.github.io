@@ -234,4 +234,15 @@
 .mn-sec>summary .mn-peek{flex:1;min-width:0;font-size:12.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mn-sec[open]>summary .mn-peek{visibility:hidden}
 .mn-sec>ul{margin:0;padding:0 10px 10px}
+.nt-list .nt-imgs{display:grid;gap:8px;padding:0 16px 16px}
+.nt-list .nt-imgs img{display:block;width:100%;max-width:560px;height:auto;border-radius:12px;border:1px solid var(--line)}
+#camZoom{position:fixed;inset:0;z-index:9999;background:rgba(10,12,10,.92);display:flex;flex-direction:column}
+#camZoom[hidden]{display:none}
+#camZoom .cz-in{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;-webkit-overflow-scrolling:touch}
+#camZoom .cz-in img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in;border-radius:4px}
+#camZoom .cz-in.big{display:block}
+#camZoom .cz-in.big img{max-width:none;max-height:none;cursor:zoom-out}
+#camZoom .cz-x{position:absolute;top:max(12px,env(safe-area-inset-top));right:12px;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:20px;cursor:pointer}
+#camZoom .cz-h{margin:0;padding:10px 16px max(12px,env(safe-area-inset-bottom));text-align:center;color:rgba(255,255,255,.75);font-size:13px}
+.nt-list .nt-imgs img{cursor:zoom-in}
 </style>

@@ -1153,6 +1153,17 @@
 .mn-sec>summary .mn-peek{flex:1;min-width:0;font-size:12.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mn-sec[open]>summary .mn-peek{visibility:hidden}
 .mn-sec>ul{margin:0;padding:0 10px 10px}
+.nt-list .nt-imgs{display:grid;gap:8px;padding:0 16px 16px}
+.nt-list .nt-imgs img{display:block;width:100%;max-width:560px;height:auto;border-radius:12px;border:1px solid var(--line)}
+#camZoom{position:fixed;inset:0;z-index:9999;background:rgba(10,12,10,.92);display:flex;flex-direction:column}
+#camZoom[hidden]{display:none}
+#camZoom .cz-in{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;-webkit-overflow-scrolling:touch}
+#camZoom .cz-in img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in;border-radius:4px}
+#camZoom .cz-in.big{display:block}
+#camZoom .cz-in.big img{max-width:none;max-height:none;cursor:zoom-out}
+#camZoom .cz-x{position:absolute;top:max(12px,env(safe-area-inset-top));right:12px;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:20px;cursor:pointer}
+#camZoom .cz-h{margin:0;padding:10px 16px max(12px,env(safe-area-inset-bottom));text-align:center;color:rgba(255,255,255,.75);font-size:13px}
+.nt-list .nt-imgs img{cursor:zoom-in}
 </style>
 
 </head>
@@ -5476,7 +5487,7 @@ const rqDate=s=>String(s||'').slice(5).replace('-','.');
 function reqRender(){
   const nt=document.getElementById('ntList');
   if(nt){nt.innerHTML=NT==null?(RQ===false?'<li class="rq-empty">게시판을 준비하고 있어요. 곧 공지와 요청을 볼 수 있어요.</li>':'<li class="rq-empty">불러오는 중…</li>'):!NT.length?'<li class="rq-empty">아직 공지사항이 없어요.</li>':
-    NT.map(n=>`<li class="${n.pin?'pin':''}"><details${n.pin?' open':''}><summary>${n.pin?'<span class="nt-pin">고정</span>':''}<b>${aiEsc(n.title)}</b><small>${aiEsc(rqDate(n.at))}</small></summary><p>${aiEsc(n.body||'').replace(/\n/g,'<br>')}</p></details></li>`).join('');}
+    NT.map(n=>`<li class="${n.pin?'pin':''}"><details${n.pin?' open':''}><summary>${n.pin?'<span class="nt-pin">고정</span>':''}<b>${aiEsc(n.title)}</b><small>${aiEsc(rqDate(n.at))}</small></summary><p>${aiEsc(n.body||'').replace(/\n/g,'<br>')}</p>${n.ni?`<div class="nt-imgs">${Array.from({length:Math.min(4,n.ni)},(_,k)=>`<img src="${AI_URL}/nimg/${encodeURIComponent(n.id)}/${k}" alt="${aiEsc(n.title)} 사진 ${k+1}" loading="lazy" onclick="camZoom(this.src,this.alt)">`).join('')}</div>`:''}</details></li>`).join('');}
   ['gear','dev'].forEach(kind=>{const ul=document.getElementById('rqList-'+kind);if(!ul)return;
     if(!RQ){ul.innerHTML=RQ===false?'<li class="rq-empty">게시판을 준비하고 있어요. 곧 공지와 요청을 볼 수 있어요.</li>':'';return;}
     const L=RQ.filter(r=>(r.kind||'gear')===kind);
@@ -5745,6 +5756,17 @@ function mineOnlyToggle(){if(!Object.keys(MYG).length){if(confirm('아직 등록
    캠핑 후기 — 배치 사진 + 실제 사진 + 댓글 (워커 KV에 저장)
    ===================================================================== */
 const RV_IMG=k=>AI_URL+'/img/'+k;
+// 사진 크게 보기: 누르면 화면 가득, 한 번 더 누르면 원래 크기(1600px)로 확대해서 끌어 보기, ✕나 바깥 누르면 닫기
+function camZoom(src,alt){let z=document.getElementById('camZoom');
+  if(!z){z=document.createElement('div');z.id='camZoom';z.setAttribute('role','dialog');z.setAttribute('aria-modal','true');
+    z.innerHTML='<button type="button" class="cz-x" aria-label="닫기">✕</button><div class="cz-in"><img alt=""></div><p class="cz-h">사진을 누르면 확대 · 다시 누르면 맞춤</p>';document.body.appendChild(z);
+    const close=()=>{z.hidden=true;document.documentElement.style.overflow='';};
+    z.addEventListener('click',e=>{if(e.target===z||e.target.classList.contains('cz-x')||e.target.classList.contains('cz-in'))close();});
+    z.querySelector('img').addEventListener('click',e=>{const box=z.querySelector('.cz-in'),im=e.currentTarget,on=!box.classList.contains('big');
+      const rx=e.offsetX/im.clientWidth,ry=e.offsetY/im.clientHeight;box.classList.toggle('big',on);
+      if(on)requestAnimationFrame(()=>{box.scrollLeft=im.clientWidth*rx-box.clientWidth/2;box.scrollTop=im.clientHeight*ry-box.clientHeight/2;});});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!z.hidden)close();});}
+  const im=z.querySelector('img');im.src=src;im.alt=alt||'';z.querySelector('.cz-in').classList.remove('big');z.hidden=false;document.documentElement.style.overflow='hidden';}
 let RV={items:null,page:0,more:false,open:null,photos:[]};
 const rvNick=v=>{try{if(v!==undefined)localStorage.setItem('camNick',v);return localStorage.getItem('camNick')||'';}catch(e){return '';}};
 const rvOwn=(id,v)=>{try{const o=JSON.parse(localStorage.getItem('camRvOwn')||'{}');if(v!==undefined){o[id]=v;localStorage.setItem('camRvOwn',JSON.stringify(o));}return o[id]||'';}catch(e){return '';}};
@@ -5777,7 +5799,7 @@ function rvDetail(){const {item:r,comments:cm}=RV.open,dl=document.getElementByI
   const sec=(t,v)=>v?`<div class="rv-sec"><h4>${t}</h4><p>${aiEsc(v)}</p></div>`:'';
   dl.innerHTML=`<div class="rv-in">
     <div class="rv-top"><button type="button" class="rv-x" aria-label="닫기" onclick="rvClose()">×</button></div>
-    <div class="rv-pics">${pics.map(([k,l])=>`<figure><img src="${RV_IMG(r.id+'/'+k)}" alt="${l}" loading="lazy"><figcaption>${l}</figcaption></figure>`).join('')}</div>
+    <div class="rv-pics">${pics.map(([k,l])=>`<figure><img src="${RV_IMG(r.id+'/'+k)}" alt="${l}" loading="lazy" onclick="camZoom(this.src,this.alt)" style="cursor:zoom-in"><figcaption>${l}</figcaption></figure>`).join('')}</div>
     <h2 id="rvT">${aiEsc(r.title)}</h2>
     <p class="rv-sub"><span class="rv-st">${rvStars(r.rating)}</span> ${aiEsc([r.site,r.date,r.tent].filter(Boolean).join(' · '))}</p>
     <p class="rv-by">${aiEsc(r.nick)} · ${rvDate(r.at)}</p>
@@ -5827,8 +5849,12 @@ function rvWrite(){const dl=rvDialog(),T=TENTS[tent.id],hasPlan=state.pieces.len
     <div class="rv-acts"><button type="submit" class="rv-go" id="rvGo">후기 올리기</button><button type="button" class="rv-no" onclick="rvClose()">취소</button></div></form>`;
   rvShow(dl);setTimeout(()=>document.getElementById('rvTitle').focus(),50);}
 // 사진을 긴 변 1600px JPEG로 줄임 (캔버스로 다시 그려 위치 정보(EXIF)도 빠짐)
-function rvShrink(src,max,q){return new Promise((ok,no)=>{const i=new Image();i.onload=()=>{const k=Math.min(1,max/Math.max(i.naturalWidth,i.naturalHeight)),c=document.createElement('canvas');c.width=Math.round(i.naturalWidth*k);c.height=Math.round(i.naturalHeight*k);
-  c.getContext('2d').drawImage(i,0,0,c.width,c.height);let d=c.toDataURL('image/jpeg',q);if(d.length>440000)d=c.toDataURL('image/jpeg',.62);ok(d);};i.onerror=no;i.src=src;});}
+// 서버 한도(사진 1장 base64 90만 자, 약 650KB) 안에 들어갈 때까지 화질 → 크기 순서로 줄임
+const RV_IMG_MAX=860000;
+function rvShrink(src,max,q){return new Promise((ok,no)=>{const i=new Image();i.onload=()=>{let m=max,d='';
+  for(let t=0;t<6;t++){const k=Math.min(1,m/Math.max(i.naturalWidth,i.naturalHeight)),c=document.createElement('canvas');c.width=Math.round(i.naturalWidth*k);c.height=Math.round(i.naturalHeight*k);
+    c.getContext('2d').drawImage(i,0,0,c.width,c.height);for(const qq of [q,.7,.6,.5]){if(qq>q)continue;d=c.toDataURL('image/jpeg',qq);if(d.length<=RV_IMG_MAX)return ok(d);}m=Math.round(Math.max(c.width,c.height)*.8);}
+  ok(d);};i.onerror=no;i.src=src;});}
 async function rvPicked(inp){const fs=[...(inp.files||[])].slice(0,4-RV.photos.length);inp.value='';
   for(const f of fs){const u=URL.createObjectURL(f);try{RV.photos.push(await rvShrink(u,1600,.8));}catch(e){}URL.revokeObjectURL(u);}rvPrevRender();}
 function rvPrevRender(){const p=document.getElementById('rvPrev');if(p)p.innerHTML=RV.photos.map((d,k)=>`<span><img src="${d}" alt="고른 사진 ${k+1}"><button type="button" aria-label="사진 ${k+1} 빼기" onclick="RV.photos.splice(${k},1);rvPrevRender()">×</button></span>`).join('');}

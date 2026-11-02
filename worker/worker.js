@@ -140,9 +140,18 @@ async function board(b, env, request, origin) {
     if (b.act === "add") {
       const title = clip(b.title, 60);
       if (!title) return json({ error: "empty" }, 400, origin);
-      notices.unshift({ id: Date.now().toString(36), title, body: clip(b.body, 2000), pin: !!b.pin, at: today() });
+      const n = { id: Date.now().toString(36), title, body: clip(b.body, 2000), pin: !!b.pin, at: today() };
+      const ni = await ntImgs(n, b.imgs, env); if (ni === false) return json({ error: "image" }, 400, origin);
+      notices.unshift(n);
+    } else if (b.act === "img") {
+      // 이미 올린 공지에 사진 더하기 (최대 4장)
+      const n = notices.find(n => n.id === b.id); if (!n) return json({ error: "none" }, 404, origin);
+      const ni = await ntImgs(n, b.imgs, env); if (ni === false) return json({ error: "image" }, 400, origin);
+    } else if (b.act === "imgdel") {
+      const n = notices.find(n => n.id === b.id); if (n) { for (let k = 0; k < 4; k++) await env.RL.delete(`nimg:${n.id}:${k}`); n.ni = 0; }
     } else if (b.act === "del") {
-      const k = notices.findIndex(n => n.id === b.id); if (k >= 0) notices.splice(k, 1);
+      const k = notices.findIndex(n => n.id === b.id);
+      if (k >= 0) { for (let q = 0; q < 4; q++) await env.RL.delete(`nimg:${notices[k].id}:${q}`); notices.splice(k, 1); }
     } else if (b.act === "pin") {
       const n = notices.find(n => n.id === b.id); if (n) n.pin = !n.pin;
     }
@@ -155,7 +164,7 @@ async function board(b, env, request, origin) {
 
 // ===== 캠핑 후기: 배치 사진 + 실제 사진 + 댓글 (같은 KV) =====
 // rv:<id> 글, rvc:<id> 댓글, rimg:<id>:<k> 사진(JPEG 바이트), rvidx 목록(최신순 id 배열)
-const RV_MAX_IMG = 450000; // base64 글자 수(약 330KB) — 사이트에서 1600px JPEG로 줄여 보냄
+const RV_MAX_IMG = 900000; // base64 글자 수(약 650KB) — 사이트에서 1600px JPEG로 한도 안까지 줄여 보냄
 const rid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 const b64bytes = b => Uint8Array.from(atob(b), c => c.charCodeAt(0));
 async function bump(env, k, max) { const n = parseInt(await env.RL.get(k)) || 0; if (n >= max) return false; await env.RL.put(k, String(n + 1), { expirationTtl: 172800 }); return true; }
@@ -232,8 +241,23 @@ async function review(v, env, request, origin) {
   if (v.op === "cdel") { const cm = JSON.parse((await env.RL.get("rvc:" + r.id)) || "[]").filter(c => c.id !== v.cid); await env.RL.put("rvc:" + r.id, JSON.stringify(cm)); r.nc = cm.length; await env.RL.put("rv:" + r.id, JSON.stringify(r)); return json({ ok: true }, 200, origin); }
   return json({ error: "op" }, 400, origin);
 }
+// 공지 사진: nimg:<공지 id>:<0..3> (JPEG 바이트), 공지에는 장수(ni)만
+async function ntImgs(n, imgs, env) {
+  if (!Array.isArray(imgs) || !imgs.length) return n.ni || 0;
+  const have = n.ni || 0, add = imgs.slice(0, Math.max(0, 4 - have));
+  for (const b of add) if (typeof b !== "string" || b.length > RV_MAX_IMG || /[^A-Za-z0-9+/=]/.test(b)) return false;
+  for (let k = 0; k < add.length; k++) await env.RL.put(`nimg:${n.id}:${have + k}`, b64bytes(add[k]));
+  n.ni = have + add.length; return n.ni;
+}
+async function noticeImg(m, env) {
+  const b = await env.RL.get(`nimg:${m[1]}:${m[2]}`, "arrayBuffer");
+  if (!b) return new Response("", { status: 404 });
+  return new Response(b, { headers: { "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=86400", "Access-Control-Allow-Origin": "*", "Cross-Origin-Resource-Policy": "cross-origin" } });
+}
 // 후기 사진: GET /img/<id>/<k> (k = p | 0..3)
 async function reviewImg(url, env) {
+  const nm = url.pathname.match(/^\/nimg\/([a-z0-9]{6,20})\/([0-3])$/);
+  if (nm && env.RL) return noticeImg(nm, env);
   const m = url.pathname.match(/^\/img\/([a-z0-9]{6,20})\/(p|[0-3])$/);
   if (!m || !env.RL) return new Response("", { status: 404 });
   const r = await env.RL.get("rv:" + m[1]); if (!r || JSON.parse(r).hide) return new Response("", { status: 404 });
