@@ -2369,7 +2369,10 @@ function tentInner(){const T=TENTS[tent.id];if(!T.outer||!tent.inner)return null
 let XT=[],XT_SEQ=1,XT_ADD=false;
 function xtC(e){const b=bbox(TENTS[e.id].outer);return [(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2];}
 function xtT(e){const th=(e.r||0)*Math.PI/180,cos=Math.cos(th),sin=Math.sin(th),c=xtC(e);return {cos,sin,tx:c[0]+(e.x||0)-(cos*c[0]-sin*c[1]),ty:c[1]+(e.y||0)-(sin*c[0]+cos*c[1])};}
-function xtW(e){const T=TENTS[e.id],X=xtT(e),f=v=>applyT(X,v),inn=e.inner&&T.inners&&T.inners[e.inner];
+// 추가 텐트 이너: 텐트 자체 이너 + 이너 프리셋(고동·쉘이너 등)·직접 크기도 그 텐트 기준으로
+function xtInn(e){const T=TENTS[e.id];if(!e.inner||!T||!T.outer)return null;if(T.inners&&T.inners[e.inner])return T.inners[e.inner];
+  const keep=tent;tent={id:e.id,inner:e.inner,innerOff:e.io||null,innerRot:e.ir||0,custom:e.cu||keep.custom,canopy:false,canopy2:false};try{return tentInner();}catch(x){return null;}finally{tent=keep;}}
+function xtW(e){const T=TENTS[e.id],X=xtT(e),f=v=>applyT(X,v),inn=xtInn(e);
   return {T,X,outer:T.outer.map(f),inner:inn?inn.poly.map(f):null,innerLabel:inn?inn.label:'',doors:T.doors.map(d=>({...d,a:f(d.a),b:f(d.b)}))};}
 const xtOk=()=>XT.filter(e=>TENTS[e.id]&&TENTS[e.id].outer);
 function xtByU(u){return XT.find(e=>e.u===u);}
@@ -2383,15 +2386,15 @@ function xtMakeMain(u,quiet){const e=xtByU(u);if(!e)return;const M=TENTS[tent.id
   state.pieces.filter(p=>p.parent==null).forEach(p=>{if(p.on!=null)return;const c=centroid(CATALOG[p.type].verts),w=applyT(p._T,c),n=f(w);p.rot=((((p.rot||0)-th)%360)+360)%360;p.ox=Math.round(n[0]-c[0]);p.oy=Math.round(n[1]-c[1]);});
   if(tarp.id){const n=f([tarp.x,tarp.y]);tarp.x=Math.round(n[0]);tarp.y=Math.round(n[1]);tarp.rot=(((tarp.rot-th)%360)+360)%360;}
   XT.forEach(o=>{if(o===e)return;const c=xtC(o),w=applyT(xtT(o),c),n=f(w);o.r=((((o.r||0)-th)%360)+360)%360;o.x=Math.round(n[0]-c[0]);o.y=Math.round(n[1]-c[1]);});
-  if(M&&M.outer){const c=xtC({id:tent.id}),n=f(c),oldInner=typeof tent.inner==='string'&&M.inners&&M.inners[tent.inner]?tent.inner:null;
-    XT.push({u:XT_SEQ++,id:tent.id,x:Math.round(n[0]-c[0]),y:Math.round(n[1]-c[1]),r:(((-th)%360)+360)%360,inner:oldInner});}
-  const T=TENTS[e.id];tent={id:e.id,inner:e.inner,canopy:false,canopy2:false,custom:tent.custom};XT=XT.filter(o=>o!==e);sel=null;
+  if(M&&M.outer){const c=xtC({id:tent.id}),n=f(c),oldInner=typeof tent.inner==='string'&&(M.inners&&M.inners[tent.inner]||tent.inner==='custom'||tent.inner.startsWith('p:')&&INNER_PRESETS[tent.inner.slice(2)])?tent.inner:null;
+    XT.push({u:XT_SEQ++,id:tent.id,x:Math.round(n[0]-c[0]),y:Math.round(n[1]-c[1]),r:(((-th)%360)+360)%360,inner:oldInner,io:tent.innerOff||null,ir:tent.innerRot||0,cu:tent.inner==='custom'?{...tent.custom}:null});}
+  const T=TENTS[e.id];tent={id:e.id,inner:e.inner,innerOff:e.io||null,innerRot:e.ir||0,canopy:false,canopy2:false,custom:e.cu||tent.custom};XT=XT.filter(o=>o!==e);sel=null;
   renderTentList();renderTentOpts();stageTitle();fitView();render();if(!quiet&&typeof showToast==='function')showToast(`${T.name}을(를) 메인으로 바꿨어요. 이제 모든 옵션을 쓸 수 있어요`);}
 function xtRot(u,d){const e=xtByU(u);if(!e)return;e.r=(((e.r||0)+d)%360+360)%360;render();}
 function xtDel(u){XT=XT.filter(e=>e.u!==u);if(sel==='xt:'+u)sel=null;renderTentOpts();stageTitle();render();}
 function xtInner(u,v){const e=xtByU(u);if(!e)return;e.inner=v||null;render();}
 function xtAddMode(on){XT_ADD=!!on;renderTentOpts();if(on){const el=document.getElementById('tentList')||document.querySelector('.tentlist');if(el)el.scrollIntoView({block:'nearest',behavior:'smooth'});}}
-function xtLayer(){const k=1/SCALE;let o='';xtOk().forEach((e,i)=>{const T=TENTS[e.id],on=sel==='xt:'+e.u,X=xtT(e),inn=e.inner&&T.inners&&T.inners[e.inner];
+function xtLayer(){const k=1/SCALE;let o='';xtOk().forEach((e,i)=>{const T=TENTS[e.id],on=sel==='xt:'+e.u,X=xtT(e),inn=xtInn(e);
   let g=`<polygon points="${pts(T.outer)}" fill="#E8E2D4" stroke="${on?COL.ai:COL.ink}" stroke-width="${(on?2.6:1.6)*k}" stroke-linejoin="round"/>`;
   g+=`<text x="${T.living[0]}" y="${T.living[1]+90}" text-anchor="middle" font-family="Gowun Batang,serif" font-size="280" fill="rgba(31,36,33,.1)">${i+2}</text>`;
   if(inn)g+=`<polygon points="${pts(inn.poly)}" fill="url(#hatch)" stroke="${COL.ink}" stroke-opacity=".7" stroke-width="${1.2*k}" stroke-dasharray="${6*k} ${4*k}"/>`;
@@ -3305,7 +3308,7 @@ function build3D(THREE,OrbitControls){
 
   // tent
   if(T.outer)scene.add(tent3(THREE,T));
-  xtOk().forEach(e=>{const XTt=TENTS[e.id],keep=tent,sv=V3.tentGroup,sm=V3.tentMat;tent={id:e.id,inner:e.inner,canopy:false,canopy2:false,twin:false,innerOff:null,innerRot:0,custom:keep.custom};
+  xtOk().forEach(e=>{const XTt=TENTS[e.id],keep=tent,sv=V3.tentGroup,sm=V3.tentMat;tent={id:e.id,inner:e.inner,canopy:false,canopy2:false,twin:false,innerOff:e.io||null,innerRot:e.ir||0,custom:e.cu||keep.custom};
     let g;try{g=tent3(THREE,XTt);}finally{tent=keep;V3.tentGroup=sv;V3.tentMat=sm;}const c=xtC(e),par=new THREE.Group();g.position.set(-mm(c[0]),0,-mm(c[1]));par.add(g);par.rotation.y=-(e.r||0)*Math.PI/180;par.position.set(mm(c[0]+(e.x||0)),0,mm(c[1]+(e.y||0)));scene.add(par);});
   // 2동 연결: 같은 텐트를 한 동 더 (확장·커넥터는 첫 동에서만 그림)
   if(twinDx(T)){const n=twinN(),dx=twinDx(T);for(let kk=1;kk<n;kk++){const keep=[tent.canopy,tent.canopy2,tent.twin,tent.inner],sv=V3.tentGroup,sm=V3.tentMat;tent.canopy=tent.canopy2=tent.twin=false;tent.inner=tent.twinInner||null;
@@ -3498,7 +3501,7 @@ let DB=null,UID=null,DL=null,mineInDb=false,galleryOn=false,galleryWrite=false,M
 function planObj(){return {v:1,
   tent:{id:tent.id,inner:tent.inner,ir:tent.innerRot?90:0,io:tent.innerOff||null,il:tent.innerLock?1:0,canopy:!!tent.canopy,canopy2:!!tent.canopy2,tw:tent.twin?(tent.twinGap||1):0,tn:tent.twin?twinN():0,ti2:tent.twinInner||null,custom:{w:tent.custom.w,d:tent.custom.d}},
   tarp:tarp.id?{id:tarp.id,x:Math.round(tarp.x),y:Math.round(tarp.y),r:Math.round(tarp.rot)}:null,
-  xt:xtOk().map(e=>({i:e.id,x:Math.round(e.x||0),y:Math.round(e.y||0),r:e.r||0,n:e.inner||null})),
+  xt:xtOk().map(e=>({i:e.id,x:Math.round(e.x||0),y:Math.round(e.y||0),r:e.r||0,n:e.inner&&e.inner!=='custom'?e.inner:null,o:e.io&&(e.io[0]||e.io[1])?e.io.map(Math.round):undefined,ro:e.ir||undefined})),
   pieces:state.pieces.map(p=>{const o={u:p.uid,t:p.type};
     if(p.parent!=null){o.p=p.parent;o.pe=p.pEdge;o.me=p.mEdge;if(p.slide)o.s=Math.round(p.slide);}
     else{o.x=Math.round(p.ox||0);o.y=Math.round(p.oy||0);if(p.rot)o.r=p.rot;o.z=p.z||0;if(p.leg&&p.leg!==660)o.l=p.leg;if(p.on!=null){o.on=p.on;o.oc=(p.onC||[0,0]).map(v=>Math.round(v));o.or=Math.round(p.onR||0);}if(p.floor)o.fl=1;}
@@ -3529,7 +3532,7 @@ function parsePlan(o){
       if(!ok)changed=true;return ok;});}
   // break accidental cycles
   const byU=new Map(list.map(p=>[p.uid,p]));list=list.filter(p=>{let q=p,n=0;while(q&&q.parent!=null&&n<300){q=byU.get(q.parent);n++;}return n<300&&q&&q.parent==null;});
-  const xt=(Array.isArray(o.xt)?o.xt:[]).slice(0,12).filter(q=>q&&TENTS[q.i]&&TENTS[q.i].outer).map((q,k)=>({u:k+1,id:q.i,x:num(q.x,-1e5,1e5,0),y:num(q.y,-1e5,1e5,0),r:num(q.r,0,359,0),inner:q.n&&TENTS[q.i].inners&&TENTS[q.i].inners[q.n]?q.n:null}));
+  const xt=(Array.isArray(o.xt)?o.xt:[]).slice(0,12).filter(q=>q&&TENTS[q.i]&&TENTS[q.i].outer).map((q,k)=>({u:k+1,id:q.i,x:num(q.x,-1e5,1e5,0),y:num(q.y,-1e5,1e5,0),r:num(q.r,0,359,0),inner:q.n&&(TENTS[q.i].inners&&TENTS[q.i].inners[q.n]||typeof q.n==='string'&&q.n.startsWith('p:')&&INNER_PRESETS[q.n.slice(2)])?q.n:null,io:Array.isArray(q.o)?[num(q.o[0],-2e4,2e4,0),num(q.o[1],-2e4,2e4,0)]:null,ir:q.ro?90:0}));
   return {tent:nt,tarp:nTarp,pieces:list,xt};}
 function applyPlan(o){const P=parsePlan(o);
   tent=P.tent;tarp=P.tarp;state.pieces=P.pieces;XT=P.xt||[];XT_SEQ=XT.length+1;XT_ADD=false;sel=null;const list=P.pieces;
