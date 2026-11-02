@@ -5248,7 +5248,7 @@ function aiBuild(it){
 function aiRotPolys(polys,rot,P){const th=rot*Math.PI/180,co=Math.cos(th),si=Math.sin(th);
   return polys.map(pl=>pl.map(v=>[P[0]+co*v[0]-si*v[1],P[1]+si*v[0]+co*v[1]]));}
 function aiEdgeDist(p,poly){let m=Infinity;for(let k=0;k<poly.length;k++)m=Math.min(m,segDist(p,poly[k],poly[(k+1)%poly.length]));return m;}
-function aiRegion(){const T=TENTS[tent.id];const a=allowedPolys(T);if(a.length)return {polys:a,wall:T.outer,center:T.living};
+function aiRegion(){const T=TENTS[tent.id];const a=T.outer?[T.outer].concat(extList(T).map(e=>e.q),typeof twinOuters==='function'?twinOuters(T):[]):[];if(a.length)return {polys:a,wall:T.outer,center:T.living};
   if(TW)return {polys:[TW.fabric],wall:TW.fabric,center:centroid(TW.fabric)};
   const r=[[-2000,-1500],[2000,-1500],[2000,1500],[-2000,1500]];return {polys:[r],wall:r,center:[0,0]};}
 
@@ -5306,6 +5306,9 @@ function aiPlace(list){
   return {out,miss:miss.map(m=>m.type)};}
 
 function aiApply(res){
+  // 단체 캠핑: 이미 놓인 추가 텐트를 말하면 그 텐트를 메인으로 바꿔서 그 안에 세팅 (다른 텐트와 그 안 장비는 그대로)
+  const xtHit=res.tent&&res.tent!==tent.id&&typeof xtOk==='function'?xtOk().find(e=>e.id===res.tent):null;
+  if(xtHit){xtMakeMain(xtHit.u);computeAll();}
   if(res.tent&&res.tent!==tent.id){const T=TENTS[res.tent];tent={id:res.tent,inner:T.innerDefault,canopy:false,custom:tent.custom};
     if(T.tarpJoin!=null&&!tarp.id)tarp.id='hexa_m';if(tarp.id)placeTarpDefault();renderTentList();renderTentOpts();}
   if(res.inner&&INNER_PRESETS[res.inner]){tent.inner='p:'+res.inner;tent.innerOff=null;renderTentOpts();}
@@ -5329,7 +5332,9 @@ function aiApply(res){
   const list=[];units.forEach(it=>{const b=aiBuild(it);list.push({type:it.type,zone:it.zone||aiZone(it.type),...b});
     (b.left||[]).forEach(t=>{const lb=aiBuild({type:t});list.push({type:t,zone:'center',near:true,...lb});});});
   const {out,miss}=aiPlace(list);aiApply.over=list.flatMap(x=>x.over||[]);
-  state.pieces=[];sel=null;
+  // 다른 텐트(추가 텐트) 안에 있던 장비는 남기고, 이번에 세팅하는 텐트의 장비만 새로
+  const keepIn=typeof xtOk==='function'?xtOk().map(e=>xtW(e).outer):[];
+  state.pieces=keepIn.length?state.pieces.filter(p=>{const r=rootOf(p);return r&&r._v&&keepIn.some(o=>pointInPoly(centroid(r._v),o));}):[];sel=null;
   out.forEach(({it,rot,P})=>{const root=it.pieces[0],c=centroid(CATALOG[root.type].verts),map={};
     it.pieces.forEach(p=>{const q=newPiece(p.type,{parent:p.parent==null?null:map[p.parent],pEdge:p.pEdge,mEdge:p.mEdge,slide:p.slide});
       if(p.parent==null&&p===root){q.ox=P[0]-c[0];q.oy=P[1]-c[1];q.rot=rot;q.z=++Z_TOP;if(p.leg)q.leg=p.leg;}
