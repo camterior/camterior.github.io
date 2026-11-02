@@ -1658,8 +1658,8 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
    est:`판매처 도면(팔각 ${D/10}cm, 앞 출입부 ${ext/10}cm, 높이 ${H}cm)으로 그렸어요.`,outer:o,
    canopy:[[ext,D/2-f/2],[0,D/2-f/2+150],[0,D/2+f/2-150],[ext,D/2+f/2]],canopyLabel:`출입부 (${ext/10}cm)`,canopyName:'출입부',
    doors:[T2.door(o,'front','출입문',true)],living:[ext+D/2,D/2],color:'#5E6B44',prof:T2.PROF.tipi});};
- var_('hs_varanger_camp8','바랑에르 캠프 8-10',4350,1150,300,'12.2kg','8–10명','3891');
- var_('hs_varanger_camp12','바랑에르 캠프 12-14',5150,1300,350,'15.1kg','12–14명','3893');
+ var_('hs_varanger_camp8','바랑에르 캠프 8-10',4350,1150,300,'약 8kg (아우터+폴, 이너 별도)','8–10명','3891');
+ var_('hs_varanger_camp12','바랑에르 캠프 12-14',5150,1300,350,'약 9.2kg (아우터+폴, 이너 별도)','12–14명','3893');
  {const D=5100,o=T2.poly(10,D,D/2,D/2);
   IN('tr_hector',{brand:'트로이',name:'헥토르 2026',model:'Hector',size:[510,510,230],weight:'16kg',cap:'12명',href:OC+'19959',srcName:OCN,
    est:'판매처 제원(지름 510cm, 실내 높이 230cm, 문 3개)으로 그렸어요. 바닥은 십각으로 그렸어요.',outer:o,innerNote:NOFLOOR,
@@ -1836,7 +1836,7 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  asg('nd_asgard71','아스가르드 7.1','Asgard 7.1 m²',2650,3000,200,'15.5kg','3명 (제조사 표기)','asgard-71-m2-glamping-tent-3-person-natural',
   '제조사 플라이 치수(길이 265×폭 300cm, 높이 200cm, 바닥 7.1㎡=지름 300cm 원)로 둥근 바닥을 12각형으로 그렸어요. A형 도어는 앞쪽, 창문은 바닥 높이 D형이에요. 벽 높이는 공개되지 않았어요.');
  asg('nd_asgard126','아스가르드 12.6','Asgard 12.6 m²',3750,4000,250,'16kg','6명 (제조사 표기)','asgard-126-m2-glamping-tent-6-person-natural',
-  '제조사 플라이 치수(길이 375×폭 400cm, 높이 250cm, 바닥 12.6㎡=지름 400cm 원)로 둥근 바닥을 12각형으로 그렸어요. A형 도어는 앞쪽, 양옆에 바닥 높이 D형 창이 있어요. 벽 높이는 공개되지 않았어요.');
+  '제조사 플라이 치수(길이 375cm, 높이 250cm)와 바닥 12.6㎡(=지름 400cm 원)로 폭 400cm를 잡았어요(공식 페이지 폭 375 표기는 같은 시리즈 7.1·19.6 규칙과 달라 바닥 면적 기준으로 봤어요). 지름 400cm 원로 둥근 바닥을 12각형으로 그렸어요. A형 도어는 앞쪽, 양옆에 바닥 높이 D형 창이 있어요. 벽 높이는 공개되지 않았어요.');
  asg('nd_asgard196','아스가르드 19.6','Asgard 19.6 m²',4700,5000,300,'20kg','8–10명 (제조사 표기)','asgard-196-m2-glamping-tent-8-10-person-natural',
   '제조사 플라이 치수(길이 470×폭 500cm, 높이 300cm, 바닥 19.6㎡=지름 500cm 원)로 둥근 바닥을 12각형으로 그렸어요. A형 도어는 앞쪽이에요. 벽 높이는 공개되지 않았어요.');
 
@@ -1868,12 +1868,13 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
  van('nd_vanaheim40','바나하임 40','Vanaheim 40 m²',4950,8000,'55.2kg','20명 (제조사 표기)','vanaheim-40-m2-glamping-tent-16-person-natural',
   '제조사 플라이 치수(길이 495×폭 800cm, 높이 300cm)로 그렸어요. 출입구는 24와 같은 앞 긴 벽 가운데 더블 도어로 보고 문 폭(160cm)은 사진으로 추정했어요.');
 
- /* --- 미드가르드 20 (육각, A프레임·터틀 허브, 기둥 없는 실내, 바닥 일체형) --- */
- {const D=4920,o=T2.poly(6,D,D/2,2840);
-  T2.add('nd_midgard20',{brand:'노르디스크',name:'미드가르드 20',model:'Midgard 20 m²',size:[536,568,300],weight:'49.5kg',cap:'10명 (제조사 표기)',href:ND+'midgard-20-m2-glamping-tent-10-person-natural',srcName:NDN,drawn:true,
-   est:'제조사 높이 300cm·바닥 20㎡와 판매처(Bergzeit) 길이 536×폭 568cm로, 꼭짓점 사이 568cm인 정육각형(마주 보는 변 사이 492cm, 20.9㎡)으로 그렸어요. 536cm는 도어 처마를 포함한 값으로 봤어요. 출입 개구부 4곳 중 앞·뒤 두 곳만 표시했고 위치는 추정이에요.',
-   outer:o,innerNote:'바닥이 꿰매진 싱글월 텐트라 따로 넣는 이너가 없어요.',doors:[T2.door(o,'front','전면 도어',true),T2.door(o,'rear','후면 도어',true)],
-   living:[D/2,2840],color:NDC,prof:T2.PROF.dome});}
+ /* --- 미드가르드 20 (공식 450×450, 터틀 허브, 기둥 없는 실내, 바닥 일체형, 네 면 출입구) --- */
+ {const D=4500,o=T2.rect(0,0,D,D);
+  T2.add('nd_midgard20',{brand:'노르디스크',name:'미드가르드 20',model:'Midgard 20 m²',size:[450,450,300],weight:'49.5kg',cap:'10명 (제조사 표기)',href:ND+'midgard-20-m2-glamping-tent-10-person-natural',srcName:NDN,drawn:true,
+   est:'제조사 공식 플라이 치수(450×450cm, 높이 300cm, 바닥 20㎡)로 그렸어요. 네 면에 출입구가 있어 미드가르드 릿지 텐트를 옆에 이어 붙일 수 있어요. 출입구 폭은 추정이에요.',
+   outer:o,innerNote:'바닥이 꿰매진 싱글월 텐트라 따로 넣는 이너가 없어요.',
+   doors:[T2.front(D,1800,'전면 도어'),{a:[D,D/2-900],b:[D,D/2+900],label:'후면 도어',zone:true},T2.side(D/2-900,D/2+900,0,'측면 도어'),T2.side(D/2-900,D/2+900,D,'측면 도어')],
+   living:[D/2,D/2],color:NDC,prof:T2.PROF.dome});}
 
  /* --- 이둔 5.5 (클래식 릿지 텐트, 양 끝 출입) --- */
  {const L=2600,W=2100,o=T2.rect(0,0,L,W);
