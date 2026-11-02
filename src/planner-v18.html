@@ -2378,7 +2378,7 @@ function addExtraTent(id){const T=TENTS[id];if(!T||!T.outer)return;const b=scene
   XT.push(e);sel='xt:'+e.u;XT_ADD=false;renderTentOpts();stageTitle();fitView();render();
   if(typeof showToast==='function')showToast(`${T.name}을(를) 추가했어요. 끌어서 옮겨요`);}
 // 추가 텐트를 메인으로: 그 텐트 기준으로 전체 좌표를 옮기고, 원래 메인은 추가 텐트로 (모든 옵션은 메인에서)
-function xtMakeMain(u){const e=xtByU(u);if(!e)return;const M=TENTS[tent.id],X=xtT(e),th=(e.r||0);
+function xtMakeMain(u,quiet){const e=xtByU(u);if(!e)return;const M=TENTS[tent.id],X=xtT(e),th=(e.r||0);
   const inv={cos:X.cos,sin:-X.sin,tx:-(X.cos*X.tx+X.sin*X.ty),ty:(X.sin*X.tx-X.cos*X.ty)},f=v=>applyT(inv,v);
   state.pieces.filter(p=>p.parent==null).forEach(p=>{if(p.on!=null)return;const c=centroid(CATALOG[p.type].verts),w=applyT(p._T,c),n=f(w);p.rot=((((p.rot||0)-th)%360)+360)%360;p.ox=Math.round(n[0]-c[0]);p.oy=Math.round(n[1]-c[1]);});
   if(tarp.id){const n=f([tarp.x,tarp.y]);tarp.x=Math.round(n[0]);tarp.y=Math.round(n[1]);tarp.rot=(((tarp.rot-th)%360)+360)%360;}
@@ -2386,7 +2386,7 @@ function xtMakeMain(u){const e=xtByU(u);if(!e)return;const M=TENTS[tent.id],X=xt
   if(M&&M.outer){const c=xtC({id:tent.id}),n=f(c),oldInner=typeof tent.inner==='string'&&M.inners&&M.inners[tent.inner]?tent.inner:null;
     XT.push({u:XT_SEQ++,id:tent.id,x:Math.round(n[0]-c[0]),y:Math.round(n[1]-c[1]),r:(((-th)%360)+360)%360,inner:oldInner});}
   const T=TENTS[e.id];tent={id:e.id,inner:e.inner,canopy:false,canopy2:false,custom:tent.custom};XT=XT.filter(o=>o!==e);sel=null;
-  renderTentList();renderTentOpts();stageTitle();fitView();render();if(typeof showToast==='function')showToast(`${T.name}을(를) 메인으로 바꿨어요. 이제 모든 옵션을 쓸 수 있어요`);}
+  renderTentList();renderTentOpts();stageTitle();fitView();render();if(!quiet&&typeof showToast==='function')showToast(`${T.name}을(를) 메인으로 바꿨어요. 이제 모든 옵션을 쓸 수 있어요`);}
 function xtRot(u,d){const e=xtByU(u);if(!e)return;e.r=(((e.r||0)+d)%360+360)%360;render();}
 function xtDel(u){XT=XT.filter(e=>e.u!==u);if(sel==='xt:'+u)sel=null;renderTentOpts();stageTitle();render();}
 function xtInner(u,v){const e=xtByU(u);if(!e)return;e.inner=v||null;render();}
