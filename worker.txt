@@ -5,7 +5,6 @@ binding kv_namespace RL
 compat 2026-10-26 flags [] usage standard observability True
 schedules []
 OK
-before 29
-deploy OK
-after 29 (before 29)
-ref refs/heads/main sha 0a2861bdc4a15330015eb1e55d456e532261f7f2 run 41174518289
+before 33
+dryrun OK
+ref refs/heads/work/worker-notice-img sha 0312965a43921ca805ad4880d9a95d11c65a629d run 41398374411
