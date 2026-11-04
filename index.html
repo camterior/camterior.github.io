@@ -1171,6 +1171,17 @@
 #camZoom .cz-x{position:absolute;top:max(12px,env(safe-area-inset-top));right:12px;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:20px;cursor:pointer}
 #camZoom .cz-h{margin:0;padding:10px 16px max(12px,env(safe-area-inset-bottom));text-align:center;color:rgba(255,255,255,.75);font-size:13px}
 .nt-list .nt-imgs img{cursor:zoom-in}
+.upd-pop{border:0;border-radius:22px;padding:0;width:min(92vw,380px);max-width:calc(100vw - 32px);box-shadow:0 20px 60px rgba(0,0,0,.25);color:var(--ink,#16190f)}
+.upd-pop::backdrop{background:rgba(14,16,12,.45)}
+.upd-in{padding:22px 20px 18px;display:grid;gap:12px}
+.upd-k{margin:0;font-size:12.5px;font-weight:700;letter-spacing:.04em;color:#E2531C}
+.upd-in h2{margin:-6px 0 2px;font-size:21px}
+.upd-l{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.upd-l li{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border-radius:14px;background:#F4F4EF}
+.upd-i{flex:none;width:30px;height:30px;border-radius:9px;background:#fff;display:grid;place-items:center;font-size:16px}
+.upd-l b{display:block;font-size:14.5px;line-height:1.4}.upd-l small{display:block;margin-top:2px;color:var(--ink-3,#6b6f66);font-size:12.5px;line-height:1.45}
+.upd-btns{display:flex;gap:8px;margin-top:2px}.upd-btns button{flex:1;min-height:46px;border-radius:12px;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
+.upd-more{border:1px solid var(--line,#ddd);background:#fff}.upd-ok{border:0;background:#0F120D;color:#fff}
 </style>
 
 </head>
@@ -5779,6 +5790,29 @@ function tourPlace(){const o=document.getElementById('tour');if(!o)return;const 
   const r=el.getBoundingClientRect(),p=8,vh=innerHeight,top=Math.max(4,r.top-p),hh=Math.min(r.bottom+p,vh-4)-top;
   h.style.cssText=`display:block;left:${Math.max(4,r.left-p)}px;top:${top}px;width:${Math.min(r.width+2*p,innerWidth-8)}px;height:${Math.max(40,hh)}px`;
   const ch=c.offsetHeight||170,below=top+hh+12;c.style.top=(below+ch<vh-8?below:Math.max(8,top-ch-12))+'px';}
+// ===== 업데이트 알림 팝업: 다시 온 사람에게 한 번만 =====
+// 업데이트할 때마다 UPD만 바꾸면 돼요 (v가 바뀌면 다시 떠요)
+const UPD={v:'20261108',date:'11월 8일',items:[
+  ['🧰','장비 27개가 추가되었어요','IGT 쇼트, 화로대, 랙소토, 발할 등'],
+  ['✅','게시판 요청이 반영되었어요','요청해 주신 장비 27건'],
+  ['📐','텐트 제원을 공식 도면으로 다시 맞췄어요','클리브랜드, 클라우드브레이크 등']]};
+const UPD_KEY='camUpd';
+function updSeen(){try{return localStorage.getItem(UPD_KEY)===UPD.v;}catch(e){return true;}}
+function updDone(){try{localStorage.setItem(UPD_KEY,UPD.v);}catch(e){}}
+function updOpen(){if(document.getElementById('updPop'))return;const dl=document.createElement('dialog');dl.id='updPop';dl.className='upd-pop';dl.setAttribute('aria-labelledby','updT');
+  dl.innerHTML=`<form method="dialog" class="upd-in"><p class="upd-k">업데이트 · ${UPD.date}</p><h2 id="updT" tabindex="-1" autofocus style="outline:none">새로워졌어요</h2>
+   <ul class="upd-l">${UPD.items.map(([i,t,d])=>`<li><span class="upd-i" aria-hidden="true">${i}</span><span><b>${t}</b>${d?`<small>${d}</small>`:''}</span></li>`).join('')}</ul>
+   <div class="upd-btns"><button type="button" class="upd-more" onclick="document.getElementById('updPop').close();go('board')">공지 보기</button><button type="submit" class="upd-ok">확인</button></div></form>`;
+  document.body.appendChild(dl);dl.addEventListener('close',()=>{updDone();dl.remove();});
+  dl.addEventListener('click',e=>{if(e.target===dl)dl.close();});
+  try{dl.showModal();}catch(e){dl.setAttribute('open','');}}
+function updMaybe(){if(IN_CLAUDE||updSeen())return;
+  // 처음 온 사람은 안내가 따로 있으니 이번 업데이트는 본 걸로 쳐요
+  let back=false;try{back=!!(localStorage.getItem(ASK_KEY)||localStorage.getItem(TOUR_KEY)||acctCode());}catch(e){}
+  if(!back){updDone();return;}
+  const busy=()=>{const c=document.getElementById('codeAsk');return (c&&c.open)||document.getElementById('tour');};
+  const t=()=>{if(busy())return setTimeout(t,800);updOpen();};setTimeout(t,900);}
+updMaybe();
 // ===== 장비 제원에서 고르기 =====
 let PICK_SEC=null;
 function minePickUI(){const el=document.getElementById('minePick');if(!el)return;const secs=mineSecs();if(!PICK_SEC)PICK_SEC=secs[0].k;
