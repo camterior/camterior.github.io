@@ -3375,12 +3375,6 @@ function cyl(THREE,p,y0,y1,r,mat){const me=new THREE.Mesh(new THREE.CylinderGeom
 function lineOf(THREE,pts,color,opacity){const g=new THREE.BufferGeometry().setFromPoints(pts.map(a=>new THREE.Vector3(...a)));
   return new THREE.Line(g,new THREE.LineBasicMaterial({color,transparent:opacity<1,opacity:opacity??1}));}
 // 텐트 겉면 높이: 바닥 한 점(mm) 위로 텐트 천이 몇 mm 높이에 있는지 (prof 고리를 따라 계산)
-function shellHFn(T){const outer=T.outer,H=T.h3d||2000;if(!outer||!T.prof||T.walls)return ()=>H;
-  const c=T.apex||centroid(outer),R=T.prof.slice().sort((a,b)=>a[2]-b[2]).concat([[0.001,0.001,1]]);
-  const inside=(p,sx,sy)=>pointInPoly([c[0]+(p[0]-c[0])/sx,c[1]+(p[1]-c[1])/sy],outer);
-  return p=>{if(!inside(p,R[0][0],R[0][1]))return 0;let k=0;while(k<R.length-1&&inside(p,R[k+1][0],R[k+1][1]))k++;if(k>=R.length-1)return H;
-    const A=R[k],B=R[k+1];let lo=0,hi=1;for(let i=0;i<14;i++){const m=(lo+hi)/2;inside(p,A[0]+(B[0]-A[0])*m,A[1]+(B[1]-A[1])*m)?lo=m:hi=m;}
-    return (A[2]+(B[2]-A[2])*lo)*H;};}
 function tent3(THREE,T){
   const grp=new THREE.Group(),H=T.h3d,prof=T.prof,outer=T.outer,c=T.apex||centroid(outer),n=outer.length;
   const at=(v,[sx,sy,hf])=>[c[0]+(v[0]-c[0])*sx,c[1]+(v[1]-c[1])*sy,hf*H];
@@ -3392,7 +3386,9 @@ function tent3(THREE,T){
   const tb=(lv.length-1)*n;for(let i=0;i<n;i++)idx.push(tb+i,tb+(i+1)%n,ci);
   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setIndex(idx);geo.computeVertexNormals();
   const mat=new THREE.MeshStandardMaterial({color:T.color||'#8F806C',roughness:.95,transparent:true,opacity:.3,side:THREE.DoubleSide,depthWrite:false});
-  const shell=new THREE.Group();shell.add(new THREE.Mesh(geo,mat));
+  const shell=new THREE.Group(),shellMesh=new THREE.Mesh(geo,mat);shell.add(shellMesh);
+  // 이너 높이 제한: 실제 겉면 메시를 위에서 아래로 쏴서 그 자리 천장 높이(mm)를 구해요
+  const rcS=new THREE.Raycaster(),dnS=new THREE.Vector3(0,-1,0),EHm=p=>{rcS.set(new THREE.Vector3(mm(p[0]),mm(H)+5,mm(p[1])),dnS);const h=rcS.intersectObject(shellMesh,false);return h.length?Math.max(...h.map(q=>q.point.y))*1000:0;};
   if(T.pole){const pm=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,mm(H),12),new THREE.MeshStandardMaterial({color:'#B0342C',roughness:.4,metalness:.5}));pm.position.set(mm(T.pole[0]),mm(H)/2,mm(T.pole[1]));pm.castShadow=true;grp.add(pm);}
   // seams + floor outline
   for(let i=0;i<n;i++)shell.add(lineOf(THREE,lv.map(L=>[mm(L[i][0]),mm(L[i][2]),mm(L[i][1])]),'#4B4034',.5));
@@ -3428,7 +3424,7 @@ function tent3(THREE,T){
   const inner=tentInner();
   if(inner){const im=new THREE.MeshStandardMaterial({color:'#E7DFCC',roughness:.95,transparent:true,opacity:.55,depthWrite:false});
     if(T.apex&&!inner.custom){// 가운데 기둥 텐트의 이너: 기둥 쪽은 높고 뒤로 갈수록 낮은 고깔 모양
-      const P=inner.poly,n2=P.length,ax=T.apex[0]+120,ay=T.apex[1],AH=(T.h3d||2800)*.92,ws=P.map(v=>v[0]>ax+600?(T.inH3||1100):0),ps=[];
+      const P=inner.poly,n2=P.length,ax=T.apex[0]+120,ay=T.apex[1],AH=Math.min((T.h3d||2800)*.92,EHm([ax,ay])-60),ws=P.map(v=>v[0]>ax+600?Math.max(0,Math.min(T.inH3||1100,EHm(v)-60)):0),ps=[];
       P.forEach(v=>ps.push(mm(v[0]),0,mm(v[1])));P.forEach((v,i)=>{const f=ws[i]?.05:0;ps.push(mm(v[0]+(ax-v[0])*f),mm(ws[i]),mm(v[1]+(ay-v[1])*f));});ps.push(mm(ax),mm(AH),mm(ay));
       const ix=[],top=2*n2;for(let i=0;i<n2;i++){const j=(i+1)%n2;ix.push(i,j,n2+j,i,n2+j,n2+i,n2+i,n2+j,top);}
       const g2=new THREE.BufferGeometry();g2.setAttribute('position',new THREE.Float32BufferAttribute(ps,3));g2.setIndex(ix);g2.computeVertexNormals();
@@ -3436,19 +3432,22 @@ function tent3(THREE,T){
       P.forEach((v,i)=>grp.add(lineOf(THREE,[[mm(v[0]),0,mm(v[1])],[mm(v[0]),mm(ws[i]),mm(v[1])],[mm(ax),mm(AH),mm(ay)]],'#7A6F5C',.6)));}
     else if(inner.h){// 따로 넣는 이너(쉘이너·지오에어·고동): 실제 높이의 낮은 돔 모양
       const P=inner.poly,n2=P.length,c=centroid(P),H2=inner.h,rings=[[0,0],[.55,.1],[.88,.3],[1,.5]],ps=[],ix=[];
-      const EH=shellHFn(T),hq=(x,y,h)=>Math.max(0,Math.min(h,EH([x,y])-60));rings.forEach(([hf,sh])=>P.forEach(v=>{const x=v[0]+(c[0]-v[0])*sh,y=v[1]+(c[1]-v[1])*sh;ps.push(mm(x),mm(hf?hq(x,y,H2*hf):0),mm(y));}));
+      const EH=EHm,hq=(x,y,h)=>Math.max(0,Math.min(h,EH([x,y])-60));rings.forEach(([hf,sh])=>P.forEach(v=>{const x=v[0]+(c[0]-v[0])*sh,y=v[1]+(c[1]-v[1])*sh;ps.push(mm(x),mm(hf?hq(x,y,H2*hf):0),mm(y));}));
       for(let r=0;r<rings.length-1;r++)for(let i=0;i<n2;i++){const j=(i+1)%n2,a=r*n2;ix.push(a+i,a+j,a+n2+j,a+i,a+n2+j,a+n2+i);}
       const tp=(rings.length-1)*n2;for(let i=1;i<n2-1;i++)ix.push(tp,tp+i,tp+i+1);
       const g2=new THREE.BufferGeometry();g2.setAttribute('position',new THREE.Float32BufferAttribute(ps,3));g2.setIndex(ix);g2.computeVertexNormals();
       const im2=im.clone();im2.side=THREE.DoubleSide;grp.add(new THREE.Mesh(g2,im2));
-      P.forEach(v=>grp.add(lineOf(THREE,rings.map(([hf,sh])=>[mm(v[0]+(c[0]-v[0])*sh),mm(H2*hf),mm(v[1]+(c[1]-v[1])*sh)]),'#7A6F5C',.6)));
-      grp.add(lineOf(THREE,P.concat([P[0]]).map(v=>[mm(v[0]+(c[0]-v[0])*.5),mm(H2),mm(v[1]+(c[1]-v[1])*.5)]),'#7A6F5C',.7));}
+      P.forEach(v=>grp.add(lineOf(THREE,rings.map(([hf,sh])=>{const x=v[0]+(c[0]-v[0])*sh,y=v[1]+(c[1]-v[1])*sh;return [mm(x),mm(hf?hq(x,y,H2*hf):0),mm(y)];}),'#7A6F5C',.6)));
+      grp.add(lineOf(THREE,P.concat([P[0]]).map(v=>{const x=v[0]+(c[0]-v[0])*.5,y=v[1]+(c[1]-v[1])*.5;return [mm(x),mm(hq(x,y,H2)),mm(y)];}),'#7A6F5C',.7));}
     else{// 텐트 겉면 안쪽으로만: 꼭짓점·변마다 텐트 높이를 넘지 않게 윗면을 낮춰요
-      const IH=T.inH3||1800,EH=shellHFn(T),cap=v=>Math.max(300,Math.min(IH,EH(v)-60));
-      const P=[];inner.poly.forEach((a,i)=>{const b=inner.poly[(i+1)%inner.poly.length];for(let k=0;k<8;k++){const t=k/8;P.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]);}});
+      const IH=T.inH3||1800,EH=EHm,cap=v=>Math.max(0,Math.min(IH,EH(v)-60));
+      const P=[];inner.poly.forEach((a,i)=>{const b=inner.poly[(i+1)%inner.poly.length];for(let k=0;k<24;k++){const t=k/24;P.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]);}});
       const n2=P.length,c=centroid(inner.poly),hs=P.map(cap),hc=Math.min(IH,cap(c)),ps=[],ix=[];
-      P.forEach(v=>ps.push(mm(v[0]),0,mm(v[1])));P.forEach((v,i)=>ps.push(mm(v[0]),mm(hs[i]),mm(v[1])));ps.push(mm(c[0]),mm(hc),mm(c[1]));
-      const tp=2*n2;for(let i=0;i<n2;i++){const j=(i+1)%n2;ix.push(i,j,n2+j,i,n2+j,n2+i,n2+i,n2+j,tp);}
+      // 윗면은 가장자리에서 가운데로 링을 여러 겹 두고, 점마다 천장 아래로 눌러요
+      const RS=[0,.04,.1,.2,.35,.55,.8];P.forEach(v=>ps.push(mm(v[0]),0,mm(v[1])));
+      RS.forEach((f,r)=>P.forEach((v,i)=>{const q=[v[0]+(c[0]-v[0])*f,v[1]+(c[1]-v[1])*f];ps.push(mm(q[0]),mm(r?cap(q):hs[i]),mm(q[1]));}));ps.push(mm(c[0]),mm(hc),mm(c[1]));
+      const tp=(RS.length+1)*n2;for(let i=0;i<n2;i++){const j=(i+1)%n2;ix.push(i,j,n2+j,i,n2+j,n2+i);
+        for(let r=1;r<RS.length;r++){const a0=r*n2,b0=(r+1)*n2;ix.push(a0+i,a0+j,b0+j,a0+i,b0+j,b0+i);}ix.push(RS.length*n2+i,RS.length*n2+j,tp);}
       const g2=new THREE.BufferGeometry();g2.setAttribute('position',new THREE.Float32BufferAttribute(ps,3));g2.setIndex(ix);g2.computeVertexNormals();
       const im2=im.clone();im2.side=THREE.DoubleSide;const me=new THREE.Mesh(g2,im2);me.castShadow=false;grp.add(me);
       grp.add(lineOf(THREE,P.concat([P[0]]).map((v,i)=>[mm(v[0]),mm(hs[i%n2]),mm(v[1])]),'#7A6F5C',.7));}}
