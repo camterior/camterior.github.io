@@ -20,7 +20,7 @@
 - 푸시 전 직접 검사: `node scripts/smoke.js` (playwright 필요).
 
 ## 4-1. 주간 업데이트 공지 (홍중 2026-11-09)
-- 주간 업데이트를 배포할 때마다 게시판 **공지사항**에 이번 수정사항을 글로 남깁니다. 배포 검사(deploy.yml)가 성공한 뒤에 씁니다.
+- 공지는 **일요일 예약 작업 '캠테리어 신상품 주간 확인 + 업데이트 공지'**가 올립니다. 지난 공지 이후 `main`에 반영된 수정사항과 '반영됨' 처리된 게시판 요청을 모아 공지사항에 씁니다(기준점은 `watch/products` 브랜치의 `notice.json`). 배포할 때 따로 공지를 쓰지 않아도 됩니다(중복 방지).
 - 제목: `M월 D일 업데이트` / 내용: 추가된 장비·텐트(개수와 대표 이름), 반영된 게시판 요청, 고친 제원·오류, 새 기능을 짧은 줄로. 사용자가 읽는 말투로, 내부 브랜치·파일 이름은 쓰지 않음.
 - 쓰는 방법: 크롬에서 https://camterior.github.io 탭을 열고 그 탭에서 워커(https://camterior-ai.ghdwnd2.workers.dev)로 `{board:{op:'notice',act:'add',title,body,pin:false,key:localStorage.camRqKey}}` POST (관리 화면 admin.html의 '공지 쓰기'와 같음).
 - 업데이트 팝업(`src/mine.js`의 UPD)의 '공지 보기'가 이 글로 이어지므로 팝업 날짜·내용과 맞춥니다.
