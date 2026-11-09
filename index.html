@@ -2757,9 +2757,10 @@ const h020Shape=()=>shape(rect(340,161),[{name:'top',label:'바 끝',a:[0,0],b:[
 const CATALOG={
   reg3 :{kind:'frame',style:'classic',group:'IGT 프레임',name:'IGT 프레임',short:'IGT 프레임',model:'CK-149',units:3,conf:'official',spec:'846×496mm, 3유닛',...frameShape(3)},
   long4:{kind:'frame',style:'classic',group:'IGT 프레임',name:'IGT 프레임 롱',short:'IGT 프레임 롱',model:'CK-150',units:4,conf:'official',spec:'1096×496mm, 4유닛',...frameShape(4)},
-  sep2 :{kind:'frame',style:'separate',group:'세퍼레이트 IGT',name:'세퍼레이트 IGT 2유닛',short:'세퍼레이트 2U',model:'CK-902',units:2,conf:'retailer',spec:'596×496mm',...frameShape(2)},
-  sep3 :{kind:'frame',style:'separate',group:'세퍼레이트 IGT',name:'세퍼레이트 IGT 3유닛',short:'세퍼레이트 3U',model:'CK-903',units:3,conf:'retailer',spec:'846×496mm',...frameShape(3)},
-  sep4 :{kind:'frame',style:'separate',group:'세퍼레이트 IGT',name:'세퍼레이트 IGT 4유닛',short:'세퍼레이트 4U',model:'CK-904',units:4,conf:'retailer',spec:'1096×496mm',...frameShape(4)},
+  short2:{kind:'frame',style:'classic',group:'IGT 프레임',name:'IGT 쇼트 (단종)',short:'IGT 쇼트',model:'CK-166',units:2,conf:'retailer',spec:'596×496×30mm, 2유닛, 3.4kg · 단종 (2022 설봉제 블랙 FES-153 재판매)',note:'단종 제품이라 공식 페이지가 없어 중고·리뷰 자료 기준이에요. 400 다리 4개 세트로 나왔어요',...frameShape(2)},
+  sep2 :{kind:'frame',style:'separate',group:'세퍼레이트 IGT',name:'세퍼레이트 IGT 2유닛',short:'세퍼레이트 2U',model:'CK-902',units:2,conf:'official',spec:'596×496mm, 2유닛, 2.9kg',href:'https://ec.snowpeak.co.jp/item/SNP0124A0296',srcName:'스노우피크 재팬',...frameShape(2)},
+  sep3 :{kind:'frame',style:'separate',group:'세퍼레이트 IGT',name:'세퍼레이트 IGT 3유닛',short:'세퍼레이트 3U',model:'CK-903',units:3,conf:'official',spec:'846×496mm, 3유닛, 3.5kg',href:'https://ec.snowpeak.co.jp/item/SNP0124A0298',srcName:'스노우피크 재팬',...frameShape(3)},
+  sep4 :{kind:'frame',style:'separate',group:'세퍼레이트 IGT',name:'세퍼레이트 IGT 4유닛',short:'세퍼레이트 4U',model:'CK-904',units:4,conf:'official',spec:'1096×496mm, 4유닛, 4.1kg',href:'https://ec.snowpeak.co.jp/item/SNP0124A0300',srcName:'스노우피크 재팬',...frameShape(4)},
   mf_reg :{kind:'ext',group:'멀티펑션',name:'멀티펑션 테이블',model:'CK-116TR',conf:'official',spec:'846×496mm',...mfShape(846)},
   mf_long:{kind:'ext',group:'멀티펑션',name:'멀티펑션 테이블 롱',model:'CK-117TR',conf:'official',spec:'1096×496mm',...mfShape(1096)},
   open_L :{kind:'ext',group:'오픈멀티펑션',name:'오픈멀티펑션 L',model:'CK-218',conf:'photo',spec:'1000×465mm 사다리꼴',...openShape('L')},
@@ -2909,7 +2910,7 @@ const gLink=g=>g.href||(g.src?SRC+g.src:null),gLinkName=g=>g.srcName||'판매처
 const GEAR_CAT=Object.fromEntries(Object.entries(GEAR).map(([id,g])=>[id,{kind:'gear',...g,short:g.name,
   spec:`${g.w}×${g.d}×${g.h}mm${g.sh?', 좌면 '+g.sh+'mm':''}${g.kg?', '+g.kg+'kg':''}`,...(g.gtype==='stove'||g.round?shape(circPoly(g.w/2,28),[]):g.oct?shape(octPoly(g.w,g.d,g.w*.22),[]):gearShape(g.w,g.d))}]));
 const GROUPS=['IGT 프레임','세퍼레이트 IGT','멀티펑션','오픈멀티펑션','코너테이블','슬라이드 트레이','행거'];
-const ORDER=['reg3','long4','sep2','sep3','sep4','mf_reg','mf_long','open_L','open_R','corner_L','corner_R','slide_h','slide_hl','h020'];
+const ORDER=['reg3','long4','short2','sep2','sep3','sep4','mf_reg','mf_long','open_L','open_R','corner_L','corner_R','slide_h','slide_hl','h020'];
 Object.assign(CATALOG,GEAR_CAT);
 const SEP_CYCLE={sep2:'sep3',sep3:'sep4',sep4:'sep2'};
 const SLOT_ITEMS=[
@@ -4628,7 +4629,7 @@ function showTab(name){if(!TABS[name])name='tent';
   LS.set('campPlanner.tab',name);render();}
 document.querySelector('.tabs').addEventListener('keydown',e=>{const ks=Object.keys(TABS),cur=ks.findIndex(k=>document.getElementById('tab-'+k).getAttribute('aria-selected')==='true');
   const d={ArrowRight:1,ArrowLeft:-1}[e.key];if(!d)return;e.preventDefault();const n=ks[(cur+d+ks.length)%ks.length];showTab(n);document.getElementById('tab-'+n).focus();});
-const CAT_GROUPS=[['IGT 프레임',['reg3','long4','sep2','sep3','sep4']],['IGT 테이블',['mf_reg','mf_long','open_L','open_R','corner_L','corner_R']]]
+const CAT_GROUPS=[['IGT 프레임',['reg3','long4','short2','sep2','sep3','sep4']],['IGT 테이블',['mf_reg','mf_long','open_L','open_R','corner_L','corner_R']]]
   .concat(GEAR_GROUPS.map(g=>[g,GEAR_ORDER.filter(t=>CATALOG[t].group===g)]));
 let CAT_F='all';
 function catPreview(t){if(['chair','mat','cot','wood','fridge'].includes(CATALOG[t].gtype)||CATALOG[t].alu){const c=CATALOG[t],p=Math.max(c.w,c.d)*.06;return `<svg viewBox="${-p} ${-p} ${c.w+p*2} ${c.d+p*2}" aria-hidden="true">${gearBody({type:t},false)}</svg>`;}
@@ -4864,7 +4865,7 @@ const GBRANDS=['그리비웍스','미니멀웍스','스노우피크','헬리녹�
 function gearBrand(g){const n=g.name||'';return GBRANDS.find(b=>n.startsWith(b))||'스노우피크';}
 let GEAR_F='all';const G_OPEN=new Set();
 /* 장비 카드 그림: 힉스필드로 만든 제품 사진풍 그림이 있으면 도형 대신 보여줌 (텐트·타프는 도면 그대로) */
-const GEAR_ART=new Set(["gw_bucket", "gw_rack", "mw_indian_l", "alpicool_k25", "heka", "hx_swivel", "kzm_castanets", "kzm_lettino", "lg_roomtv", "pf_cot75", "sp_conn", "sp_entry_igt", "sp_ext_igt", "verne_maestro", "zebec_pro240","zebec_pro260","zebec_pro280","zebec_pro300","reg3", "long4", "sep2", "sep3", "sep4", "mf_reg", "mf_long", "open_L", "open_R", "corner_L", "corner_R", "slide_h", "slide_hl", "h020", "wood_s", "wood_w", "steel1", "lid_half", "box_half", "mesh_d1", "mesh_s1", "mesh_hd", "mesh_hs", "flat", "seppou", "CK-230", "CK-220", "legs", "sc25", "sc50", "mytable", "mytable_s", "fshelf", "fshelf_l", "fshelf_m", "sp_oat", "sp_oat_l", "sp_oat_low", "sp_chabu", "sp_kitchen", "hx_t1", "hx_t1l", "hx_t0lt", "hx_cafe", "kermit_t", "noga_table", "alu48", "alu68", "alu93", "sp_jikaro", "megamat", "megamat_duo", "sparrow50", "cot_one", "sp_low30", "sp_lowshort", "sp_fd", "sp_take", "hx_one", "hx_zero", "hx_sunset", "kermit", "noga_chair", "omni230", "camp5000", "sfh1200", "sfh300", "mk_stove", "toyotomi_lcl53", "sfh_bh900", "sp_gs1000", "cfx3_35", "cfx3_45", "cfx3_55"]);
+const GEAR_ART=new Set(["gw_bucket", "gw_rack", "mw_indian_l", "alpicool_k25", "heka", "hx_swivel", "kzm_castanets", "kzm_lettino", "lg_roomtv", "pf_cot75", "sp_conn", "sp_entry_igt", "sp_ext_igt", "verne_maestro", "zebec_pro240","zebec_pro260","zebec_pro280","zebec_pro300","reg3", "long4", "short2", "sep2", "sep3", "sep4", "mf_reg", "mf_long", "open_L", "open_R", "corner_L", "corner_R", "slide_h", "slide_hl", "h020", "wood_s", "wood_w", "steel1", "lid_half", "box_half", "mesh_d1", "mesh_s1", "mesh_hd", "mesh_hs", "flat", "seppou", "CK-230", "CK-220", "legs", "sc25", "sc50", "mytable", "mytable_s", "fshelf", "fshelf_l", "fshelf_m", "sp_oat", "sp_oat_l", "sp_oat_low", "sp_chabu", "sp_kitchen", "hx_t1", "hx_t1l", "hx_t0lt", "hx_cafe", "kermit_t", "noga_table", "alu48", "alu68", "alu93", "sp_jikaro", "megamat", "megamat_duo", "sparrow50", "cot_one", "sp_low30", "sp_lowshort", "sp_fd", "sp_take", "hx_one", "hx_zero", "hx_sunset", "kermit", "noga_chair", "omni230", "camp5000", "sfh1200", "sfh300", "mk_stove", "toyotomi_lcl53", "sfh_bh900", "sp_gs1000", "cfx3_35", "cfx3_45", "cfx3_55"]);
 function gArt(it){if(!GEAR_ART.has(it.id))return it.html;
   return it.html.replace(/<svg[\s\S]*?<\/svg>/,`<img class="gart" src="img/gear/${it.id}.webp" alt="" loading="lazy"><span class="gart-ai">AI 그림</span>`);}
 function renderGear(){const nav=document.getElementById('gearNav'),body=document.getElementById('gearBody');if(!body)return;
@@ -5091,14 +5092,14 @@ function camEv(path,title){try{if(window.goatcounter&&goatcounter.count)goatcoun
    - AI가 막히면(무료 한도 등) 이름 맞추기로 바로 배치
    ===================================================================== */
 const AI_URL='https://camterior-ai.ghdwnd2.workers.dev';
-const AI_ROOTS=['reg3','long4','sep2','sep3','sep4'];
+const AI_ROOTS=['reg3','long4','short2','sep2','sep3','sep4'];
 const AI_EXTS=['mf_reg','mf_long','open_L','open_R','corner_L','corner_R','slide_h','slide_hl'];
 const AI_SLOTS=SLOT_ITEMS.map(t=>t.id);
 const aiSlotName=id=>getItem(id).name;
 const AI_ZONES=['wall','center','inner','left','right','top','bottom'];
 const AI_MAX_EACH=6,AI_MAX_TOTAL=24;
 // 사람들이 흔히 부르는 이름 (AI 안내 + 이름 맞추기 둘 다 씀)
-const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유닛','IGT 레귤러','아이지티 레귤러','IGT 프레임 레귤러'],long4:['IGT 롱','IGT 4유닛','IGT 프레임 롱'],
+const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유닛','IGT 레귤러','아이지티 레귤러','IGT 프레임 레귤러'],long4:['IGT 롱','IGT 4유닛','IGT 프레임 롱'],short2:['IGT 쇼트','IGT 숏','IGT 2유닛','아이지티 쇼트','IGT 프레임 쇼트'],
   sep2:['세퍼레이트 2유닛','세퍼레이트 하프'],sep3:['세퍼레이트 3유닛','세퍼레이트 레귤러','세퍼레이트 IGT'],sep4:['세퍼레이트 4유닛','세퍼레이트 롱'],
   mf_reg:['멀티펑션','멀티펑션 테이블'],slide_h:['하프슬라이드','슬라이드하프','슬라이드 트레이'],slide_hl:['하프슬라이드 롱','슬라이드하프롱'],
   mytable_s:['스텐 마이테이블','스탠 마이테이블','스텐마이테이블','스탠마이테이블','스테인리스 마이테이블'],
@@ -5651,7 +5652,7 @@ function mineSystem(){return `너는 캠핑 장비 사진을 보고 아래 [목�
 ${mineAll().map(x=>`${x.key}: ${x.name} / ${x.model} / ${x.sec}`).join('\n')}`;}
 let MINE_FOUND=[];
 // 크기·방향만 다른 형제 제품: 사진 결과에서 고를 수 있게
-const MINE_FAMS=[['igt:reg3','igt:long4','igt:sep2','igt:sep3','igt:sep4'],['igt:mf_reg','igt:mf_long','igt:slide_h','igt:slide_hl'],['igt:open_L','igt:open_R'],['igt:corner_L','igt:corner_R'],['parts:mesh_d1','parts:mesh_s1','parts:mesh_hd','parts:mesh_hs'],['parts:steel1','parts:lid_half','parts:box_half'],['parts:wood_s','parts:wood_w'],['parts:flat','parts:seppou'],['gear:sc25','gear:sc50'],['gear:fshelf','gear:fshelf_l','gear:fshelf_m'],['gear:mytable','gear:mytable_s'],['gear:sp_oat','gear:sp_oat_l','gear:sp_oat_low','gear:sp_chabu'],['gear:hx_t1','gear:hx_t1l','gear:hx_t0lt','gear:noga_table','gear:hx_cafe'],['gear:alu48','gear:alu68','gear:alu93'],['sleep:megamat','sleep:megamat_duo','sleep:sparrow50'],['sleep:zebec_pro240','sleep:zebec_pro260','sleep:zebec_pro280','sleep:zebec_pro300'],['chair:sp_fd','chair:sp_low30','chair:sp_lowshort','chair:sp_take'],['chair:hx_one','chair:hx_zero','chair:noga_chair','chair:hx_sunset'],['heat:sfh1200','heat:sfh300','heat:sfh_bh900','heat:camp5000','heat:toyotomi_lcl53'],['cool:cfx3_35','cool:cfx3_45','cool:cfx3_55'],['tarp:hexa_m','tarp:hexa_l','tarp:recta_m','tarp:recta_l']];
+const MINE_FAMS=[['igt:reg3','igt:long4','igt:short2','igt:sep2','igt:sep3','igt:sep4'],['igt:mf_reg','igt:mf_long','igt:slide_h','igt:slide_hl'],['igt:open_L','igt:open_R'],['igt:corner_L','igt:corner_R'],['parts:mesh_d1','parts:mesh_s1','parts:mesh_hd','parts:mesh_hs'],['parts:steel1','parts:lid_half','parts:box_half'],['parts:wood_s','parts:wood_w'],['parts:flat','parts:seppou'],['gear:sc25','gear:sc50'],['gear:fshelf','gear:fshelf_l','gear:fshelf_m'],['gear:mytable','gear:mytable_s'],['gear:sp_oat','gear:sp_oat_l','gear:sp_oat_low','gear:sp_chabu'],['gear:hx_t1','gear:hx_t1l','gear:hx_t0lt','gear:noga_table','gear:hx_cafe'],['gear:alu48','gear:alu68','gear:alu93'],['sleep:megamat','sleep:megamat_duo','sleep:sparrow50'],['sleep:zebec_pro240','sleep:zebec_pro260','sleep:zebec_pro280','sleep:zebec_pro300'],['chair:sp_fd','chair:sp_low30','chair:sp_lowshort','chair:sp_take'],['chair:hx_one','chair:hx_zero','chair:noga_chair','chair:hx_sunset'],['heat:sfh1200','heat:sfh300','heat:sfh_bh900','heat:camp5000','heat:toyotomi_lcl53'],['cool:cfx3_35','cool:cfx3_45','cool:cfx3_55'],['tarp:hexa_m','tarp:hexa_l','tarp:recta_m','tarp:recta_l']];
 const mineFam=k=>(MINE_FAMS.find(a=>a.includes(k))||[]).filter(x=>mineByKey(x));
 // AI가 'hx_t1'처럼 분류 없이 준 키도 받기
 const mineKeyFix=k=>{k=String(k||'').trim();if(mineByKey(k))return k;const id=k.split(':').pop(),it=mineAll().find(x=>x.id===id);return it?it.key:k;};
