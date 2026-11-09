@@ -19,6 +19,13 @@
 - `main` 푸시 → `.github/workflows/deploy.yml`이 `scripts/smoke.js`(모든 탭 열기 + 휴대폰 폭 넘침 검사)를 통과해야 배포됩니다. 실패하면 지금 사이트가 유지됩니다.
 - 푸시 전 직접 검사: `node scripts/smoke.js` (playwright 필요).
 
+## 4-1. 주간 업데이트 공지 (홍중 2026-11-09)
+- 주간 업데이트를 배포할 때마다 게시판 **공지사항**에 이번 수정사항을 글로 남깁니다. 배포 검사(deploy.yml)가 성공한 뒤에 씁니다.
+- 제목: `M월 D일 업데이트` / 내용: 추가된 장비·텐트(개수와 대표 이름), 반영된 게시판 요청, 고친 제원·오류, 새 기능을 짧은 줄로. 사용자가 읽는 말투로, 내부 브랜치·파일 이름은 쓰지 않음.
+- 쓰는 방법: 크롬에서 https://camterior.github.io 탭을 열고 그 탭에서 워커(https://camterior-ai.ghdwnd2.workers.dev)로 `{board:{op:'notice',act:'add',title,body,pin:false,key:localStorage.camRqKey}}` POST (관리 화면 admin.html의 '공지 쓰기'와 같음).
+- 업데이트 팝업(`src/mine.js`의 UPD)의 '공지 보기'가 이 글로 이어지므로 팝업 날짜·내용과 맞춥니다.
+- 급한 오류 수정만 따로 배포한 경우는 다음 주간 업데이트 공지에 함께 적습니다.
+
 ## 참고
 - 루트 `index.html`은 빌드 결과물입니다. 원본은 `src/`에 있어요: 플래너 `planner-v18.html` + 탭 껍데기 `shell.html`·`tabs.css`·`tabs.js`.
 - 빌드: `cd src && python3 build.py` → `src/site/index.html`을 루트로 복사. Claude 페이지용 `camterior.artifact.html`도 같이 나옵니다.
