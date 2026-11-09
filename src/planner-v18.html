@@ -2043,8 +2043,8 @@ const SEAT_CY=SEAT_Y0+SEAT/2;
 const frameW=u=>96+PITCH*u;
 const rect=(w,h)=>[[0,0],[w,0],[w,h],[0,h]];
 const OPP={top:'bottom',bottom:'top',left:'right',right:'left'};
-const CONF_LABEL={official:'공식',retailer:'판매처',retailer_photo:'판매처 사진',derived:'계산값',photo:'사진추정',unverified:'미확인'};
-const isWeak=c=>c==='photo'||c==='unverified';
+const CONF_LABEL={official:'공식',retailer:'판매처',retailer_photo:'판매처 사진',derived:'계산값',photo:'사진추정',unverified:'미확인',conflict:'출처 엇갈림',estimate:'추정'};
+const isWeak=c=>c==='photo'||c==='unverified'||c==='conflict'||c==='estimate';
 function signedArea(v){let s=0;for(let k=0;k<v.length;k++){const a=v[k],b=v[(k+1)%v.length];s+=a[0]*b[1]-b[0]*a[1];}return s/2;}
 const near=(a,b)=>Math.abs(a[0]-b[0])<1e-6&&Math.abs(a[1]-b[1])<1e-6;
 function shape(verts,specs){
@@ -2219,10 +2219,28 @@ const GEAR={
     note:'펼친 크기 39.8×36.5×79.5cm, 철(분체도장), 내하중 위 10kg·아래 10kg. 버킷을 위·아래 2단으로 놓아요(처음엔 위 칸, 그다음은 아래 칸)',href:'https://divhorizon.base.shop/items/95809797',srcName:'그리비웍스 공식몰'},
   mw_indian_l:{gtype:'hanger',group:'수납·행어',name:'미니멀웍스 인디언 행어 L',model:'Indian Hanger L',conf:'official',w:1010,d:750,h:1030,kg:0.84,sw:'#1E2022',
     note:'가로바 101cm, 높이 103cm, 다리 폭 75cm, 알루미늄 840g. 옷·랜턴을 거는 A자 행어라 그 위에 장비를 올리지 않아요',href:'https://www.minimalworks.co.kr/goods/goods_view.php?goodsNo=813',srcName:'미니멀웍스 공식몰 상세'},
+  sp_fire_s:{gtype:'fire',group:'화로대',name:'스노우피크 화로대 S',model:'ST-031R',conf:'conflict',w:285,d:285,h:205,kg:null,sw:'#6E7276',
+    note:'출처 엇갈림: 공식 영국몰 28.5×28.5×20.5cm(무게 표기 없음) / 판매처 27×27×21cm·1.8kg. 높이는 본체만(베이스 플레이트 별매). 위에 장비를 올리지 않아요',href:'https://uk.snowpeak.com/products/pack-and-carry-s-fire-place-st-031',srcName:'스노우피크 공식몰(영국)'},
+  sp_fire_m:{gtype:'fire',group:'화로대',name:'스노우피크 화로대 M',model:'ST-033R',conf:'official',w:350,d:350,h:248,kg:3.5,sw:'#6E7276',
+    note:'35×35×24.8cm, 스테인리스. 무게는 공식 영국몰 3.5kg·미국몰 3.6kg. 높이는 본체만(베이스 플레이트 별매)',href:'https://uk.snowpeak.com/products/pack-and-carry-m-fire-place-st-033',srcName:'스노우피크 공식몰(영국)'},
+  sp_fire_l:{gtype:'fire',group:'화로대',name:'스노우피크 화로대 L',model:'ST-032RS',conf:'conflict',w:455,d:455,h:315,kg:5.5,sw:'#6E7276',
+    note:'출처 엇갈림: 공식 45.5×45.5×31.5cm·5.5kg / 일부 판매처 45×45×30cm·5.3kg. 높이는 본체만(전용 베이스 플레이트 45×45cm·두께 0.9cm 별매)',href:'https://uk.snowpeak.com/collections/takibi-fire-grill/products/fireplace-l-starterset',srcName:'스노우피크 공식몰(영국)'},
+  sp_fire_ll:{gtype:'fire',group:'화로대',name:'스노우피크 화로대 LL',model:'ST-034',conf:'official',w:633,d:633,h:440,kg:11,sw:'#6E7276',
+    note:'63.3×63.3×44cm, 11kg(공식 설명서). 높이는 본체만',href:'https://cdn.shopify.com/s/files/1/0330/3299/4860/files/ST-034_manual.pdf',srcName:'스노우피크 공식 설명서'},
+  sp_oat_bamboo:{gtype:'table',top:'bamboo',group:'테이블',name:'스노우피크 원액션테이블 라이트 밤부',model:'LV-010TL',conf:'official',w:900,d:720,h:660,kg:6.4,sw:'#C9A66B',
+    note:'90×72×66cm(높이 조절 없음), 대나무 집성 상판·알루미늄 다리, 6.4kg',href:'https://www.snowpeak.com/products/single-action-table-light',srcName:'스노우피크 공식몰·설명서'},
+  sp_dogcot:{gtype:'cot',group:'기타',name:'스노우피크 도그코트',model:'PT-042',conf:'conflict',w:650,d:650,h:300,kg:2.3,sw:'#8A7A62',
+    note:'출처 엇갈림: 공식 영국몰 65×65×30cm·2.3kg / 공식 미국몰 61×61×12.7cm·0.7kg. 반려견 15kg까지. 쿠션은 별매',href:'https://uk.snowpeak.com/products/dog-cot',srcName:'스노우피크 공식몰(영국)'},
+  sp_piledriver:{gtype:'pole',group:'기타',name:'스노우피크 파일드라이버',model:'LT-004',conf:'official',w:120,d:120,h:2400,kg:1.6,sw:'#8C9196',
+    note:'랜턴 폴, 길이 1.1~2.4m(땅에 박는 깊이만큼 낮아져요). 바닥 원은 표시용. 무게 공식 1.6kg / 판매처 1.7kg',href:'https://snowpeak.com/collections/for-lights/products/lantern-pile-driver',srcName:'스노우피크 공식몰'},
+  sp_racksotto:{gtype:'sofa',group:'체어',name:'스노우피크 랙소토 멀티 스타터 세트 암레스트 플러스',model:'SET-220',conf:'estimate',w:1500,d:750,h:650,sh:370,back:120,arm:0,seats:3,sw:'#8B8676',
+    note:'추정 배치: 베이스 3개(각 75×50×30cm)를 나란히 놓은 바닥 150×75cm(공식 외곽 표기) + 쿠션 7cm(앉는 높이 약 37cm). 등받이 2·팔걸이 2 포함, 조립 후 등받이 높이는 공식 표기가 없어 추정. 총 17.5kg(공식)',href:'https://snowpeak.com/products/racksotto-multi-starter-set-ar',srcName:'스노우피크 공식몰'},
+  sp_softjug:{gtype:'jug',group:'기타',name:'스노우피크 소프트 워터저그 14L',model:'FP-130',conf:'official',w:270,d:270,h:520,kg:0.46,sw:'#D8D2C2',
+    note:'14L, 물 채웠을 때 지름 27×높이 52cm, 460g. 사이드 테이블 위에 올려 쓸 수 있어요',href:'https://www.snowpeak.com/products/soft-water-jug',srcName:'스노우피크 공식몰'},
   alpicool_k25:{gtype:'fridge',group:'냉장고',name:'알피쿨 K25',model:'K25',conf:'retailer',w:585,d:335,h:350,kg:10.2,sw:'#3B3F44',
     note:'25L 컴프레서 냉장고',href:'https://www.alpicool.com/',srcName:'판매처 제원'},
 };
-const GEAR_GROUPS=['쉘프컨테이너','알루미늄 박스','마이테이블','테이블','폴딩쉘프','수납·행어','체어','매트','야전침대','난방','냉장고','버너','기타'];
+const GEAR_GROUPS=['쉘프컨테이너','알루미늄 박스','마이테이블','테이블','폴딩쉘프','수납·행어','체어','매트','야전침대','난방','화로대','냉장고','버너','기타'];
 const GEAR_ORDER=Object.keys(GEAR);
 const gLink=g=>g.href||(g.src?SRC+g.src:null),gLinkName=g=>g.srcName||'판매처 상품 상세';
 const GEAR_CAT=Object.fromEntries(Object.entries(GEAR).map(([id,g])=>[id,{kind:'gear',...g,short:g.name,
