@@ -218,10 +218,10 @@ function tourPlace(){const o=document.getElementById('tour');if(!o)return;const 
   const ch=c.offsetHeight||170,below=top+hh+12;c.style.top=(below+ch<vh-8?below:Math.max(8,top-ch-12))+'px';}
 // ===== 업데이트 알림 팝업: 다시 온 사람에게 한 번만 =====
 // 업데이트할 때마다 UPD만 바꾸면 돼요 (v가 바뀌면 다시 떠요)
-const UPD={v:'20261108',date:'11월 8일',items:[
-  ['🧰','장비 27개가 추가되었어요','IGT 쇼트, 화로대, 랙소토, 발할 등'],
-  ['✅','게시판 요청이 반영되었어요','요청해 주신 장비 27건'],
-  ['📐','텐트 제원을 공식 도면으로 다시 맞췄어요','클리브랜드, 클라우드브레이크 등']]};
+const UPD={v:'20261109',date:'11월 9일',items:[
+  ['🧰','장비 20개·텐트 6종이 추가되었어요','화로대, IGT 쇼트, 랙소토, 발할, 테라코어 등'],
+  ['✅','게시판 요청이 반영되었어요','요청해 주신 장비 25건'],
+  ['📐','텐트 제원을 공식 도면으로 다시 맞췄어요','입체 보기 이너텐트 넘침도 고쳤어요']]};
 const UPD_KEY='camUpd';
 function updSeen(){try{return localStorage.getItem(UPD_KEY)===UPD.v;}catch(e){return true;}}
 function updDone(){try{localStorage.setItem(UPD_KEY,UPD.v);}catch(e){}}

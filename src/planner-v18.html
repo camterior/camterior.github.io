@@ -1564,6 +1564,44 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
   np('np_air_docking','에어 도킹 쉘터','Air Docking Shelter',3750,3650,210,'19.6kg','8명','34522',o,null,[{a:[0,800],b:[0,2850],label:'전면 출입',zone:true},{a:[3750,700],b:[3750,2950],label:'차량 도킹',zone:false}],'판매처 도면(본체 305×365cm, 도킹 플랩 70cm)으로 그렸어요.',{prof:T2.PROF.cabin});}
 }
 
+/* ===== 게시판 요청 텐트 (2026-11-09, 공식 도면·상세 확인) ===== */
+{const IN=(id,o)=>T2.add(id,o);
+ /* 힐레베르그 나마츠 3 GT — 공식 도면: 이너쪽 220 + 전실 185 = 405cm, 폭 160(뒤 끝 137), 높이 105 */
+ {const o=[[0,115],[2200,0],[4050,425],[4050,1175],[2200,1600],[0,1485]];
+  IN('hb_nammatj3gt',{brand:'힐레베르그',name:'나마츠 3 GT',model:'Nammatj 3 GT',size:[405,160,105],weight:'3.4kg (최소) · 4.1kg (패킹)',cap:'3명',href:'https://hilleberg.com/eng/products/tent/Nammatj%20GT',srcName:'힐레베르그 공식 도면',drawn:true,
+   est:'공식 도면(이너쪽 220cm + GT 전실 185cm, 폭 160cm·뒤 끝 137cm, 높이 105cm)으로 그렸어요. 전실 앞 끝 폭은 도면 비율로 맞춘 추정이고, 이너는 공식 면적 3.4㎡에 맞춰 뒤쪽 220cm에 넣었어요.',
+   outer:o,frames:[{a:[300,100],b:[300,1500],label:'폴'},{a:[2200,0],b:[2200,1600],label:''},{a:[3300,250],b:[3300,1350],label:'GT 폴'}],
+   inners:{std:{label:'이너',model:'',size:'220×137~160 (3.4㎡, 높이 105)',poly:[[40,150],[2160,45],[2160,1555],[40,1450]],posEst:true}},innerDefault:'std',
+   doors:[{a:[4050,500],b:[4050,1100],label:'GT 전실 출입',zone:true,est:true}],living:[3100,800],h3d:1050,inH3:1000,color:'#B8402F',prof:[[1,1,0],[.995,.86,.5],[.985,.55,.86],[.98,.16,1]]});}
+ /* TFS 스타3 — 판매처 2곳 일치: 아우터 295×260×120, 이너 225×175×110, 양쪽 전실 */
+ {const o=[[0,1300],[600,0],[2350,0],[2950,1300],[2350,2600],[600,2600]];
+  IN('tfs_stars3',{brand:'TFS',name:'스타3',model:'STARS 3 (The Free Spirits)',size:[295,260,120],weight:'2.77kg',cap:'2–3명',href:'https://wildcamping.store/',srcName:'판매처 상품 상세',drawn:true,
+   est:'판매처 제원(아우터 260×295×120cm, 이너 225×175×110cm, 앞뒤 전실·출입구 2개)으로 그렸어요. 두 판매처 값이 같고 이너 면적 3.94㎡로 검산했어요. 제조사 공식 페이지는 찾지 못했어요.',
+   outer:o,inners:{std:{label:'이너',model:'',size:'175×225 (높이 110)',poly:T2.rect(600,175,2350,2425)}},innerDefault:'std',
+   doors:[{a:[0,900],b:[0,1700],label:'전실 출입',zone:true},{a:[2950,900],b:[2950,1700],label:'전실 출입',zone:true}],living:[300,1300],h3d:1200,inH3:1100,color:'#6E7A5E',prof:T2.PROF.dome});}
+ /* 디얼스 테라코어 — 공식 상세: 600×390×225, 끝 폭 300 */
+ {const o=[[0,450],[1500,0],[4500,0],[6000,450],[6000,3450],[4500,3900],[1500,3900],[0,3450]];
+  IN('te_terracore',{brand:'디얼스',name:'테라코어 텐트',model:'TERRA CORE TENT',size:[600,390,225],weight:'18.2kg (패킹, 릿지폴 제외) · 19.6kg (포함)',cap:'8–10명',href:'https://the-earth.co.kr/product/terra-core-tent/912/',srcName:'디얼스 공식몰 상세',drawn:true,
+   est:'공식 상세 도면(길이 600cm, 가운데 폭 390cm·양 끝 300cm, 높이 225cm, 출입구 6개)으로 그렸어요. 이너텐트(옵션) 크기는 공식 표기가 없어 넣지 않았어요.',
+   outer:o,frames:[0,1500,3000,4500,6000].map((x,i)=>({a:[x,x===0||x===6000?450:0],b:[x,x===0||x===6000?3450:3900],label:i?'':'폴'})),
+   innerNote:'이너텐트(옵션) 크기가 공개되지 않았어요. 직접 입력으로 넣어보세요.',
+   doors:[{a:[0,900],b:[0,3000],label:'전면 도어',zone:true},{a:[6000,900],b:[6000,3000],label:'후면 도어',zone:true},T2.side(1700,2900,0,'측면 도어'),T2.side(3100,4300,0,'측면 도어'),T2.side(1700,2900,3900,'측면 도어'),T2.side(3100,4300,3900,'측면 도어')],
+   living:[3000,1950],color:'#6F6754',prof:T2.PROF.tunnel});}
+ /* 노르디스크 발할 35·60 — 공식 도면: 12각(출입 변 하나가 두 칸 길이) */
+ const valhal=(id,name,model,R,H,kg,cap,door,side,href)=>{const v=ngon(12,R,Math.PI,R,R).slice(1),mx=Math.min(...v.map(q=>q[0])),o=v.map(q=>[q[0]-mx,q[1]]),L=2*R-mx;
+  IN(id,{brand:'노르디스크',name,model,size:[Math.round(L/10),2*R/10,H],weight:kg,cap,href,srcName:'노르디스크 공식 도면',drawn:true,
+   est:`공식 도면(폭 ${2*R/10}cm, 높이 ${H}cm, 벽 높이 200cm, 12각 바닥: 옆 변 약 ${side}cm, 출입 변 약 ${door}cm)으로 그렸어요. 바닥 없는 이벤트 티피예요.`,
+   outer:o,innerNote:NOFLOOR,doors:[{a:o[o.length-1],b:o[0],label:'큰 출입구',zone:true}],living:[L/2,R],color:'#D6CCB8',prof:T2.PROF.tipi,pole:[L-R,R],apex:[L-R,R]});};
+ valhal('nd_valhal35','발할 35','Valhal 35',3500,350,'60.5kg (공식) · 62kg (전체)','20명 (테이블·침낭)',330,170,'https://nordisk.eu/products/valhal-35-tipi-event-tent-35-m2-sandshell');
+ valhal('nd_valhal60','발할 60','Valhal 60',4500,450,'80kg (공식) · 81.5kg (전체)','침낭 40명 · 테이블 50명',430,220,'https://nordisk.eu/products/valhal-60-tipi-event-tent-60-m2-sandshell');
+ /* 코베아 카바나 — 판매처 제원: 620×320×205, 이너 300(250)×220×170 */
+ {const L=6200,W=3200,o=T2.box(L,W,600);
+  IN('kv_cabana',{brand:'코베아',name:'카바나',model:'Cabana (KECX9TO-01)',size:[620,320,205],weight:'24kg',cap:'3–4명',href:'https://bigtentoutdoors.com/products/cabana',srcName:'판매처 상품 상세',drawn:true,
+   est:'판매처 제원(620×320×205cm, 이너 앞 300·뒤 250×220×170cm, 출입구 4개)으로 그렸어요. 공식 도면을 찾지 못해 바닥 모서리·이너 위치는 추정이에요.',
+   outer:o,inners:{std:{label:'이너',model:'',size:'300(뒤 250)×220 (높이 170)',poly:[[L-2800,100],[L-600,350],[L-600,W-350],[L-2800,W-100]],posEst:true}},innerDefault:'std',
+   doors:[T2.front(W,2000,'전면 도어'),T2.side(800,2600,0,'측면 도어'),T2.side(800,2600,W,'측면 도어'),T2.rear(L,W,1600,'후면 도어')],living:[1900,1600],h3d:2050,inH3:1700,color:'#7E7666',prof:T2.PROF.tunnel});}
+}
+
 /* ===== A그룹 추가 2차 (노스피크 에어, 제이크라, 헬리녹스, 하임플래닛, 스노우라인, 쿠디, 기타) ===== */
 {const IN=(id,o)=>T2.add(id,o),OCN='판매처 상품 상세',OLMN='판매처 상품 상세',CDYN2='쿠디 공식몰 상품 상세';
  const sideD=(L,W,x0,x1,lab)=>[T2.side(x0,x1,0,lab||'측면 도어'),T2.side(x0,x1,W,lab||'측면 도어')];
@@ -2087,6 +2125,7 @@ const CATALOG={
   corner_R:{kind:'ext',group:'코너테이블',name:'코너테이블 R',model:'CK-119TR',conf:'photo',spec:'반지름 496mm 부채꼴',arc:true,mirror:true,...cornerShape(true)},
   slide_h :{kind:'tray',group:'슬라이드 트레이',name:'슬라이드하프',model:'CK-153TR',conf:'retailer',spec:'423×220mm',len:423,...trayShape(423)},
   slide_hl:{kind:'tray',group:'슬라이드 트레이',name:'슬라이드하프롱',model:'CK-154TR',conf:'unverified',spec:'546×220mm',len:546,...trayShape(546)},
+  side_tray:{kind:'tray',group:'슬라이드 트레이',name:'IGT 사이드트레이 블랙',model:'FES-043-BK',conf:'estimate',spec:'500×191mm',len:500,...shape(rect(500,191),[{name:'top',label:'고리',a:[0,0],b:[500,0],types:['hook_ch']}])},
   h020:{kind:'h020',group:'행거',name:'스텐박스행거 하프유닛',model:'CK-020',conf:'retailer',spec:'340×161mm',...h020Shape()},
 };
 /* free-standing gear: no mating edges, real footprint + height */
@@ -2237,6 +2276,24 @@ const GEAR={
     note:'추정 배치: 베이스 3개(각 75×50×30cm)를 나란히 놓은 바닥 150×75cm(공식 외곽 표기) + 쿠션 7cm(앉는 높이 약 37cm). 등받이 2·팔걸이 2 포함, 조립 후 등받이 높이는 공식 표기가 없어 추정. 총 17.5kg(공식)',href:'https://snowpeak.com/products/racksotto-multi-starter-set-ar',srcName:'스노우피크 공식몰'},
   sp_softjug:{gtype:'jug',group:'기타',name:'스노우피크 소프트 워터저그 14L',model:'FP-130',conf:'official',w:270,d:270,h:520,kg:0.46,sw:'#D8D2C2',
     note:'14L, 물 채웠을 때 지름 27×높이 52cm, 460g. 사이드 테이블 위에 올려 쓸 수 있어요',href:'https://www.snowpeak.com/products/soft-water-jug',srcName:'스노우피크 공식몰'},
+  hx_chair_two:{gtype:'chair',group:'체어',name:'헬리녹스 체어투',model:'Chair Two',conf:'conflict',w:545,d:640,h:840,kg:1.12,sw:'#2B2E31',
+    note:'출처 엇갈림: 공식(헬리녹스 유럽) 54.5×64×84cm·1.12kg / 판매처 55×61×85cm. 좌면 높이는 공식 표기가 없고 판매처마다 24~34cm로 달라요. 하이백 체어',href:'https://www.helinox.eu/products/chair-two',srcName:'헬리녹스 공식(유럽)'},
+  hx_one_xl:{gtype:'chair',group:'체어',name:'헬리녹스 체어원 XL',model:'Chair One XL',conf:'official',w:695,d:590,h:890,sh:315,kg:1.5,sw:'#2B2E31',
+    note:'69.5×59×89cm, 좌면 31.5cm, 1.5kg, 내하중 145kg',href:'https://helinox.com/products/chair-one-xl',srcName:'헬리녹스 공식몰'},
+  hx_side:{gtype:'table',round:true,top:'black',group:'테이블',name:'헬리녹스 사이드 테이블',model:'Side Table',conf:'official',w:265,d:265,h:390,kg:0.25,sw:'#2B2E31',
+    note:'상판 지름 26.5cm, 높이 39cm, 내하중 2kg. 2023 스타벅스 콜라보 사이드 테이블은 이 기본형(S)이 바탕인 것으로 보여요(공식 확인 전). 워터저그를 올릴 수 있어요',href:'https://helinox.com/products/side-table',srcName:'헬리녹스 공식몰'},
+  hx_side_m:{gtype:'table',round:true,top:'black',group:'테이블',name:'헬리녹스 사이드 테이블 M',model:'Side Table M',conf:'official',w:350,d:350,h:450,kg:0.47,sw:'#2B2E31',
+    note:'상판 지름 35cm, 높이 45cm, 내하중 3kg',href:'https://www.helinox.eu/products/side-table-m',srcName:'헬리녹스 공식(유럽)'},
+  uf_kitchen3:{gtype:'shelf',top:'steel',group:'폴딩쉘프',name:'유니프레임 키친스탠드 III',model:'No.611715',conf:'official',w:1150,d:370,h:780,kg:5.8,sw:'#9EA3A7',
+    note:'115×37×78cm, 약 5.8kg, 상판 내하중 약 15kg. 공식몰에 2024년 생산 종료로 표기돼 있어요',href:'https://www.uniflame.co.jp/product/611715',srcName:'유니프레임 공식'},
+  kzm_basketbag:{gtype:'box',soft:true,group:'수납·행어',name:'카즈미 필드 멀티 바스켓 백',model:'KZM218',conf:'retailer',w:470,d:310,h:420,kg:1.7,sw:'#4A4C46',
+    note:'펼친 크기 47×31×42cm(접으면 높이 8cm), 1.7kg. 용량 표기는 없어요',href:'https://glextra.com/products/kzm-field-multi-basket-bag',srcName:'판매처 상품 상세'},
+  zebec_king:{gtype:'mat',sleep:true,group:'매트',name:'제백 에어리스 킹 더블',model:'에어리스 킹 더블 200',conf:'retailer',w:2000,d:2000,h:400,kg:null,sw:'#E6E0D0',
+    note:'200×200cm, 두께 40cm 에어리스 매트리스. 무게 표기는 없어요',href:'https://www.ssg.com/item/itemView.ssg?itemId=1000703429472',srcName:'제백 브랜드샵(SSG)'},
+  thor75:{gtype:'box',group:'알루미늄 박스',name:'토르 컨테이너 75L',model:'Large Totes With Lid 75L DC',conf:'conflict',w:708,d:434,h:384,kg:3.5,sw:'#2E3134',
+    note:'출처 엇갈림: 70.8×43.4×38.4cm·3.5kg(판매처 3곳) / 71×43.5×39cm·3.4kg(판매처 1곳). 뚜껑 포함 높이인지는 확인 못 했어요. 내하중 80kg',href:'https://www.bepal.net/archives/738505',srcName:'판매처·기사'},
+  oyster_tempo:{gtype:'box',alu:true,group:'냉장고',name:'오이스터 템포 쿨러 23L',model:'Tempo Cooler',conf:'retailer',w:512,d:300,h:320,kg:5.6,sw:'#C9CDD0',
+    note:'손잡이 포함 51.2×30×32cm(손잡이 빼면 폭 49.3cm), 5.6kg, 진공 단열 쿨러. 공식몰은 열람이 막혀 판매처 값이에요',href:'https://www.rei.com/product/C15133/oyster-tempo-cooler',srcName:'판매처 상품 상세'},
   alpicool_k25:{gtype:'fridge',group:'냉장고',name:'알피쿨 K25',model:'K25',conf:'retailer',w:585,d:335,h:350,kg:10.2,sw:'#3B3F44',
     note:'25L 컴프레서 냉장고',href:'https://www.alpicool.com/',srcName:'판매처 제원'},
 };
@@ -2494,6 +2551,8 @@ function checkRules(){
   // 위에 올린 장비: 받침보다 크면 경고, 나무 상판 위 화기는 주의
   state.pieces.forEach(p=>{if(p.on==null)return;const b=byId(p.on);if(!b)return;const cb=CATALOG[b.type],c=CATALOG[p.type];
     const isl=b.parent!=null||cb.kind!=='gear'?rootOf(b)._isl||[b]:[b],out=p._v.filter(v=>!isl.some(q=>pointInPoly(v,q._v))).length;
+    if(out&&cb.round&&(c.gtype==='jug'||c.round)){// 둥근 받침 위 둥근 장비: 지름 2cm까지 넘침은 그대로 둠 (발이 받침 안쪽에 닿음)
+      const cp=centroid(p._v),cq=centroid(b._v);if(Math.hypot(cp[0]-cq[0],cp[1]-cq[1])+c.w/2<=cb.w/2+20)return;}
     if(out){p._ov=true;W.push(`<b>올림</b> ${pName(p)}가 ${pName(b)}보다 커서 밖으로 나가요`);}
     else I.push(`올림: ${pName(p)}, ${pName(b)} 위 (바닥에서 ${Math.round((p._z||0)/10)}cm)`);
     if(STACK_FIRE(c)&&(cb.top==='bamboo'||cb.wood||cb.kind==='ext'))I.push(`${pName(p)}: 나무 상판 위 화기예요. 열판이나 스테인리스 상판 위에서 쓰세요`);});

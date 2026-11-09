@@ -94,7 +94,7 @@ function gearCard(id){const g=GEAR[id];
     <dl><dt>가로×세로</dt><dd>${fmt(g.w)}×${fmt(g.d)}mm</dd><dt>높이</dt><dd>${fmt(g.h)}mm</dd>${g.sh?`<dt>좌면 높이</dt><dd>${fmt(g.sh)}mm</dd>`:''}${g.kg?`<dt>무게</dt><dd>${g.kg}kg</dd>`:''}</dl>
     ${g.note?`<p class="nt">${g.note}</p>`:''}
     <div class="ga"><button type="button" onclick="gearUse('item','${id}')">배치에 놓기</button>${gLink(g)?`<a href="${gLink(g)}" target="_blank" rel="noopener">출처 ↗</a>`:''}</div></div>`};}
-const GBRANDS=['그리비웍스','미니멀웍스','스노우피크','헬리녹스','커밋','헤카','카즈미','베른','LG','플랜포티','알피쿨','토요토미','파세코','신일','엑스페드','스패로우','도메틱','알루텍','코베아','제백'];
+const GBRANDS=['그리비웍스','미니멀웍스','스노우피크','헬리녹스','커밋','헤카','카즈미','베른','LG','플랜포티','알피쿨','토요토미','파세코','신일','엑스페드','스패로우','도메틱','알루텍','코베아','제백','유니프레임','토르','오이스터'];
 function gearBrand(g){const n=g.name||'';return GBRANDS.find(b=>n.startsWith(b))||'스노우피크';}
 let GEAR_F='all';const G_OPEN=new Set();
 /* 장비 카드 그림: 힉스필드로 만든 제품 사진풍 그림이 있으면 도형 대신 보여줌 (텐트·타프는 도면 그대로) */
