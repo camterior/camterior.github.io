@@ -245,4 +245,15 @@
 #camZoom .cz-x{position:absolute;top:max(12px,env(safe-area-inset-top));right:12px;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:20px;cursor:pointer}
 #camZoom .cz-h{margin:0;padding:10px 16px max(12px,env(safe-area-inset-bottom));text-align:center;color:rgba(255,255,255,.75);font-size:13px}
 .nt-list .nt-imgs img{cursor:zoom-in}
+.upd-pop{border:0;border-radius:22px;padding:0;width:min(92vw,380px);max-width:calc(100vw - 32px);box-shadow:0 20px 60px rgba(0,0,0,.25);color:var(--ink,#16190f)}
+.upd-pop::backdrop{background:rgba(14,16,12,.45)}
+.upd-in{padding:22px 20px 18px;display:grid;gap:12px}
+.upd-k{margin:0;font-size:12.5px;font-weight:700;letter-spacing:.04em;color:#E2531C}
+.upd-in h2{margin:-6px 0 2px;font-size:21px}
+.upd-l{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.upd-l li{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border-radius:14px;background:#F4F4EF}
+.upd-i{flex:none;width:30px;height:30px;border-radius:9px;background:#fff;display:grid;place-items:center;font-size:16px}
+.upd-l b{display:block;font-size:14.5px;line-height:1.4}.upd-l small{display:block;margin-top:2px;color:var(--ink-3,#6b6f66);font-size:12.5px;line-height:1.45}
+.upd-btns{display:flex;gap:8px;margin-top:2px}.upd-btns button{flex:1;min-height:46px;border-radius:12px;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
+.upd-more{border:1px solid var(--line,#ddd);background:#fff}.upd-ok{border:0;background:#0F120D;color:#fff}
 </style>
