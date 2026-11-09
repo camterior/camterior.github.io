@@ -2290,7 +2290,7 @@ function polyGap(A,B){let m=Infinity;[[A,B],[B,A]].forEach(([P,Q])=>P.forEach(p=
 const pieceH=p=>{const c=CATALOG[p.type];return c.kind==='gear'?c.h:(rootOf(p).leg||660);};
 /* ---------- 위에 올리기 (선반·테이블·박스 위에 장비 놓기) ---------- */
 const STACK_BASE=c=>!c.soft&&(c.kind==='frame'||c.kind==='ext'||(c.kind==='gear'&&['table','shelf','box','fridge'].includes(c.gtype)));
-const STACK_TOP=c=>c.kind==='gear'&&!c.heat&&!c.sleep&&!['chair','mat','cot','hanger'].includes(c.gtype);
+const STACK_TOP=c=>c.kind==='gear'&&!c.heat&&!c.sleep&&!['chair','mat','cot','hanger','fire','pole','sofa'].includes(c.gtype);
 const STACK_FIRE=c=>c.kind==='gear'&&['burner','stove','wood'].includes(c.gtype);
 function invT(T,w){const x=w[0]-T.tx,y=w[1]-T.ty;return [T.cos*x+T.sin*y,-T.sin*x+T.cos*y];}
 function stackRoot(p){let q=p,n=0;while(q&&q.on!=null&&n++<40){const b=byId(q.on);if(!b)break;q=rootOf(b);}return rootOf(q);}
@@ -2655,6 +2655,17 @@ function gearBody(p,fine){const c=CATALOG[p.type],w=c.w,d=c.d;let o='';
     [[30,0,30,d],[w-30,0,w-30,d]].forEach(([a,b,c2,e])=>{o+=`<path d="M${a},${b}L${a},${d/2}L${c2},${e}" fill="none" stroke="#1E2022" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>`;});
     o+=`<line x1="20" y1="${d/2}" x2="${w-20}" y2="${d/2}" stroke="#1E2022" stroke-width="22" stroke-linecap="round"/>`;
     [w*.3,w*.5,w*.7].forEach(x=>{o+=`<path d="M${x-40},${d/2+40}L${x},${d/2}L${x+40},${d/2+40}" fill="none" stroke="#9EA3A7" stroke-width="6"/>`;});return o;}
+  if(c.gtype==='fire'){// 화로대: 위가 넓은 역피라미드 + 받침판
+    const m=Math.min(w,d);o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="8" fill="#55595D" stroke="#2A2D30" stroke-width="5"/>`;
+    o+=`<path d="M8,8L${w/2},${d/2}L${w-8},8M8,${d-8}L${w/2},${d/2}L${w-8},${d-8}" stroke="#2A2D30" stroke-width="4" fill="none"/>`;
+    o+=`<rect x="${w*.32}" y="${d*.32}" width="${w*.36}" height="${d*.36}" rx="6" fill="#3A2A22"/><circle cx="${w/2}" cy="${d/2}" r="${m*.12}" fill="#C8642E"/>`;return o;}
+  if(c.gtype==='pole'){const r=w/2;o+=`<circle cx="${r}" cy="${r}" r="${r}" fill="rgba(60,64,68,.12)" stroke="#6E7378" stroke-width="4" stroke-dasharray="10 8"/><circle cx="${r}" cy="${r}" r="${Math.max(18,r*.25)}" fill="#8C9196" stroke="#4A4E52" stroke-width="4"/>`;return o;}
+  if(c.gtype==='jug'){const r=w/2;o+=`<circle cx="${r}" cy="${r}" r="${r}" fill="${c.sw}" stroke="rgba(20,22,20,.55)" stroke-width="5"/><circle cx="${r}" cy="${r}" r="${r*.32}" fill="rgba(255,255,255,.35)" stroke="rgba(20,22,20,.35)" stroke-width="3"/>`;return o;}
+  if(c.gtype==='sofa'){const ar=c.arm||0,bk=c.back||Math.min(160,d*.25);
+    o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="18" fill="#3B3A36" stroke="#1E1D1B" stroke-width="5"/>`;
+    o+=`<rect x="${ar}" y="0" width="${w-ar*2}" height="${bk}" rx="16" fill="${c.sw}" stroke="rgba(20,22,20,.5)" stroke-width="4"/>`;
+    const n=c.seats||Math.max(1,Math.round((w-ar*2)/750)),sw=(w-ar*2)/n;for(let k=0;k<n;k++)o+=`<rect x="${ar+sw*k+6}" y="${bk+6}" width="${sw-12}" height="${d-bk-12}" rx="18" fill="${c.sw}" stroke="rgba(20,22,20,.45)" stroke-width="4"/>`;
+    if(ar)[0,w-ar].forEach(x=>{o+=`<rect x="${x}" y="0" width="${ar}" height="${d}" rx="14" fill="${c.sw}" stroke="rgba(20,22,20,.55)" stroke-width="4"/>`;});return o;}
   if(c.gtype==='box'){const bf=c.alu?'#C9CDD0':'#6B6E68',bs=c.alu?'#8C9196':'#3E403C',bi=c.alu?'#DADDE0':'#7E827B';
     o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="16" fill="${bf}" stroke="${bs}" stroke-width="5"/><rect x="26" y="26" width="${w-52}" height="${d-52}" rx="10" fill="${bi}" stroke="${bs}" stroke-width="3"/>`;
     [[0,d/2],[w,d/2]].forEach(([x,y])=>{o+=`<rect x="${x-14}" y="${y-48}" width="28" height="96" rx="12" fill="#C9CDD0" stroke="#7F8489" stroke-width="3"/>`;});return o;}
@@ -3512,6 +3523,14 @@ function igt3(THREE){
         [[30,0],[30,d],[w-30,0],[w-30,d]].forEach(([x,y])=>{const f=X([x,y]),t=X([x,d/2]);grp.add(lineOf(THREE,[[mm(f[0]),0,mm(f[1])],[mm(t[0]),mm(h),mm(t[1])]],col,1));});
         grp.add(extrudePoly(THREE,R(20,d/2-12,w-20,d/2+12),h-24,h,M.dark));}
       else if(c.gtype==='mat'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h,new THREE.MeshStandardMaterial({color:c.sw,roughness:.95})));}
+      else if(c.gtype==='fire'){const ce=X([w/2,d/2]),bowl=new THREE.Mesh(new THREE.CylinderGeometry(mm(Math.min(w,d)*.707),mm(Math.min(w,d)*.12),mm(h*.62),4,1,true),new THREE.MeshStandardMaterial({color:'#6E7276',metalness:.6,roughness:.4,side:THREE.DoubleSide}));
+        {const a0=X([0,0]),a1=X([w,0]);bowl.rotation.y=Math.PI/4-Math.atan2(a1[1]-a0[1],a1[0]-a0[0]);}bowl.position.set(mm(ce[0]),mm(h-h*.31),mm(ce[1]));bowl.castShadow=true;grp.add(bowl);
+        [[w*.2,d*.2],[w*.8,d*.2],[w*.2,d*.8],[w*.8,d*.8]].forEach(q=>grp.add(cyl(THREE,X(q),0,h*.4,8,M.leg)));grp.add(cyl(THREE,X([w/2,d/2]),h*.42,h*.5,Math.min(w,d)*.1,M.glow));}
+      else if(c.gtype==='pole'){grp.add(cyl(THREE,X([w/2,d/2]),0,h,16,M.steel));grp.add(cyl(THREE,X([w/2,d/2]),h-120,h-100,60,M.dark));}
+      else if(c.gtype==='jug'){const ce=X([w/2,w/2]),me=new THREE.Mesh(new THREE.CylinderGeometry(mm(w/2),mm(w/2),mm(h),28),new THREE.MeshStandardMaterial({color:c.sw,roughness:.7}));me.position.set(mm(ce[0]),mm(h/2),mm(ce[1]));me.castShadow=true;grp.add(me);}
+      else if(c.gtype==='sofa'){const ar=c.arm||0,bk=c.back||Math.min(160,d*.25),sh=c.sh||370,fm=new THREE.MeshStandardMaterial({color:c.sw,roughness:.95}),bm=new THREE.MeshStandardMaterial({color:'#3B3A36',roughness:.8});
+        grp.add(extrudePoly(THREE,R(ar,0,w-ar,d),0,sh-70,bm));grp.add(extrudePoly(THREE,R(ar,bk,w-ar,d),sh-70,sh,fm));grp.add(extrudePoly(THREE,R(ar,0,w-ar,bk),sh-70,h,fm));
+        if(ar)[[0,ar],[w-ar,w]].forEach(([a2,b2])=>grp.add(extrudePoly(THREE,R(a2,0,b2,d),0,c.armH||sh+200,fm)));}
       else if(c.gtype==='cot'){grp.add(extrudePoly(THREE,R(20,0,w-20,d),h-30,h,new THREE.MeshStandardMaterial({color:c.sw,roughness:.9})));
         [[20,20],[w-20,20],[20,d-20],[w-20,d-20],[w/2,20],[w/2,d-20]].forEach(q=>grp.add(cyl(THREE,X(q),0,h-30,10,M.dark)));}
       else if(c.gtype==='stove'){const ce=X([w/2,w/2]),mk=(r0,r1,y0,y1,m)=>{const me=new THREE.Mesh(new THREE.CylinderGeometry(mm(r1),mm(r0),mm(y1-y0),32),m);me.position.set(mm(ce[0]),mm((y0+y1)/2),mm(ce[1]));me.castShadow=true;return me;};
