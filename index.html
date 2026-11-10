@@ -1583,7 +1583,7 @@
    ===================================================================== */
 const SRC='https://www.ilcamp.co.kr/product/detail.html?product_no=';
 const TENTS={
-  landlock:{name:'랜드록',model:'TP-671R',size:[625,405,205],weight:'22kg',cap:'6명 (판매처 표기)',src:4006,
+  landlock:{name:'랜드록',model:'TP-671R',href:'https://www.snowpeak.co.kr/products/detail?godCd=TP-671R',srcName:'스노우피크 공식몰',size:[625,405,205],weight:'22kg',cap:'6명 (판매처 표기)',src:4006,
     outer:[[930,0],[5320,0],[6250,520],[6250,3530],[5320,4050],[930,4050],[0,3530],[0,520]],
     frames:[{a:[3125,0],b:[3125,4050],label:'센터 프레임'}],
     inners:{std:{label:'이너룸',model:'',size:'360×230 (이너매트 기준)',poly:[[3830,225],[5590,225],[6130,685],[6130,3365],[5590,3825],[3830,3825]],posEst:true}},
@@ -1608,7 +1608,7 @@ const TENTS={
     innerDefault:'std',
     doors:[{a:[660,1490],b:[660,2660],label:'전면 도어',zone:true}],
     living:[1300,2075]},
-  living_shell_long_pro:{name:'리빙쉘 롱 Pro.',model:'TP-660',size:[530,415,220],weight:'18.6kg',cap:'6명',src:3474,
+  living_shell_long_pro:{name:'리빙쉘 롱 Pro.',model:'TP-660',href:'https://www.snowpeak.co.kr/products/detail?godCd=TP-660',srcName:'스노우피크 공식몰',size:[530,415,220],weight:'18.6kg',cap:'6명',src:3474,
     outer:[[0,575],[1805,0],[2800,0],[5300,725],[5300,3425],[2800,4150],[1805,4150],[0,3575]],
     frames:[{a:[2260,0],b:[2260,4150],label:'측면 도어 중심'}],
     inners:{std:{label:'이너룸',model:'TP-660IR',size:'앞 365 / 뒤 255 × 215',poly:[[3100,250],[5250,800],[5250,3350],[3100,3900]]}},
@@ -1727,7 +1727,7 @@ const NOFLOOR='바닥이 없는 쉘터예요. 이너텐트는 직접 입력으�
 
 /* ===== 스노우피크 ===== */
 {const L=8850,W=5100,o=[[0,2550],[1500,0],[7350,0],[8850,2550],[7350,5100],[1500,5100]];
-T2.add('sp_landstation_l',{brand:'스노우피크',name:'랜드스테이션 L',model:'TP-820',size:[885,510,210],weight:'8.2kg',cap:'6명 (클로즈) · 8명 (오픈)',src:4118,
+T2.add('sp_landstation_l',{brand:'스노우피크',name:'랜드스테이션 L',model:'TP-820',href:'https://www.snowpeak.co.kr/products/detail?godCd=TP-820',srcName:'스노우피크 공식몰',size:[885,510,210],weight:'8.2kg',cap:'6명 (클로즈) · 8명 (오픈)',src:4118,
   est:'설치 크기 885×510cm에 맞춘 육각 평면이에요. 패널을 열고 닫는 타프 쉘터라 바닥이 없어요.',outer:o,innerNote:NOFLOOR,
   doors:[{a:L2(o[0],o[1],.2),b:L2(o[0],o[1],.8),label:'출입 패널',zone:true},{a:L2(o[3],o[4],.2),b:L2(o[3],o[4],.8),label:'출입 패널',zone:false}],
   living:[4425,2550],color:'#8B7F6E',prof:T2.PROF.shelter});}
@@ -1747,9 +1747,9 @@ T2.add('sp_cumulus',{brand:'스노우피크',name:'에어로 큐뮬러스쉘',mo
   drawn:true,est:'판매처 평면도(520×380cm, 실내 높이 180cm)로 그렸어요. 끝 모서리는 도면 비율이에요.',outer:o,innerNote:NOINNER,
   doors:[T2.front(W,1800,'전면 도어'),T2.rear(L,W,1800,'후면 도어',true),T2.side(1900,3300,0,'측면 도어'),T2.side(1900,3300,W,'측면 도어')],color:'#D9D4C7',prof:T2.PROF.cabin});}
 {const o=[[0,1100],[1900,0],[4750,0],[4900,150],[4900,3100],[4750,3250],[1900,3250],[0,2150]];
-T2.add('sp_dockdome6',{brand:'스노우피크',name:'도크돔 Pro.6',model:'SD-507IV',size:[490,325,180],weight:'판매처 미표기',cap:'6명',src:4011,
-  est:'전체 490×325cm(전실 포함), 이너 300×300cm는 판매처 표기예요. 전실 모양은 추정이에요.',outer:o,
-  inners:{std:{label:'이너',model:'',size:'300×300',poly:T2.rect(1950,125,4850,3125)}},
+T2.add('sp_dockdome6',{brand:'스노우피크',name:'도크돔 Pro.6',model:'SD-507IV',href:'https://www.snowpeak.co.kr/products/detail?godCd=SD-507IV',srcName:'스노우피크 공식몰',size:[490,325,180],weight:'13.5kg',cap:'6명',src:4011,
+  est:'공식몰 제원(본체 490×325×180cm, 이너 300×300×155cm, 13.5kg)으로 그렸어요. 전실 모양은 추정이에요.',outer:o,
+  inners:{std:{label:'이너',model:'',size:'300×300 (높이 155)',poly:T2.rect(1850,125,4850,3125)}},
   doors:[{a:[0,1250],b:[0,2000],label:'전실 출입',zone:true},T2.side(2200,3200,0,'측면 출입',false)],living:[900,1625],
   h3d:1800,inH3:1550,color:'#E4DFD3',prof:T2.PROF.dome});}
 {const o=[[0,1000],[1250,0],[3900,0],[4250,350],[4250,3300],[3900,3650],[1250,3650],[0,2650]];
@@ -1758,7 +1758,7 @@ T2.add('sp_elfield',{brand:'스노우피크',name:'어메니티 엘필드',model
   inners:{std:{label:'이너',model:'',size:'약 265×335 (추정)',poly:T2.rect(1300,150,3950,3500),posEst:true}},
   doors:[{a:[0,1150],b:[0,2500],label:'전실 출입',zone:true}],living:[650,1825],color:'#E1D9C6',prof:T2.PROF.dome});}
 {const o=[[0,900],[1900,0],[4700,0],[5050,350],[5050,2450],[4700,2800],[1900,2800],[0,1900]];
-T2.add('sp_amenity_m',{brand:'스노우피크',name:'어메니티돔 M',model:'SDE-001RH',size:[505,280,150],weight:'8kg',cap:'5명',src:3495,
+T2.add('sp_amenity_m',{brand:'스노우피크',name:'어메니티돔 M',model:'SDE-001RH',href:'https://www.snowpeak.co.kr/products/detail?godCd=SDE-001RH',srcName:'스노우피크 공식몰',size:[505,280,150],weight:'8kg',cap:'5명',src:3495,
   est:'전체 505×280cm(전실 포함), 이너 265×265cm는 판매처 표기예요. 전실 모양은 추정이에요.',outer:o,
   inners:{std:{label:'이너',model:'',size:'265×265',poly:T2.rect(2100,75,4750,2725)}},
   doors:[{a:[0,1050],b:[0,1750],label:'전실 출입',zone:true},{a:[5050,950],b:[5050,1850],label:'후면 출입',zone:false}],living:[950,1400],h3d:1500,inH3:1350,color:'#C9C2B2',prof:T2.PROF.dome});}
@@ -2827,17 +2827,17 @@ function circPoly(r,n){const v=[];for(let k=0;k<n;k++){const a=k/n*Math.PI*2;v.p
 const gearShape=(w,d)=>shape(rect(w,d),[]);
 const HEAT_NOTE='';
 const GEAR={
-  sc25:{gtype:'box',group:'쉘프컨테이너',name:'쉘프컨테이너 25',model:'UG-025G',conf:'retailer',w:520,d:325,h:210,kg:3.6,sw:'#6B6E68',
+  sc25:{gtype:'box',group:'쉘프컨테이너',name:'쉘프컨테이너 25',model:'UG-025G',conf:'official',href:'https://www.snowpeak.co.kr/products/detail?godCd=UG-025G',srcName:'스노우피크 공식몰',w:520,d:325,h:210,kg:3.6,sw:'#6B6E68',
     note:'안쪽 405×290×195mm. 같은 크기끼리 쌓을 수 있어요. 올리브 FES-037-OL도 같은 크기',src:'3357'},
   sc50:{gtype:'box',group:'쉘프컨테이너',name:'쉘프컨테이너 50',model:'UG-055G',conf:'retailer',w:625,d:405,h:270,kg:5.5,sw:'#6B6E68',
     note:'안쪽 500×370×255mm. 같은 크기끼리 쌓을 수 있어요. 올리브 FES-038-OL도 같은 크기',src:'3356'},
-  mytable:{gtype:'table',top:'bamboo',group:'마이테이블',name:'마이테이블',model:'LV-034TR',conf:'retailer',w:450,d:335,h:385,kg:1.8,sw:'#CFA265',
+  mytable:{gtype:'table',top:'bamboo',group:'마이테이블',name:'마이테이블',model:'LV-034TR',conf:'official',href:'https://www.snowpeak.co.kr/products/detail?godCd=LV-034TR',srcName:'스노우피크 공식몰',w:450,d:335,h:385,kg:1.8,sw:'#CFA265',
     note:'상판 450×300mm, 대나무',src:'4878'},
   mytable_s:{gtype:'table',top:'steel',group:'마이테이블',name:'스테인리스 마이테이블',model:'LV-039',conf:'retailer',w:496,d:332,h:400,kg:2.9,sw:'#B9BDC1',
     note:'스테인리스 상판이라 뜨거운 냄비를 올려도 돼요',src:'4469'},
   fshelf:{gtype:'shelf',top:'bamboo',group:'폴딩쉘프',name:'폴딩쉘프',model:'LV-065TL',conf:'retailer',w:846,d:340,h:397,kg:3.3,sw:'#CFA265',note:'라이트 대나무 상판',src:'7112'},
   fshelf_l:{gtype:'shelf',top:'bamboo',group:'폴딩쉘프',name:'폴딩쉘프 롱',model:'LV-066TL',conf:'retailer',w:1096,d:340,h:397,kg:3.6,sw:'#CFA265',note:'라이트 대나무 상판',src:'7111'},
-  fshelf_m:{gtype:'shelf',top:'black',group:'폴딩쉘프',name:'폴딩쉘프 메탈탑',model:'FES-067-BK',conf:'retailer',w:846,d:340,h:397,kg:4.8,sw:'#2B2E31',note:'블랙 메탈 상판',src:'7933'},
+  fshelf_m:{gtype:'shelf',top:'black',group:'폴딩쉘프',name:'폴딩쉘프 메탈탑',model:'FES-067-BK',conf:'official',href:'https://www.snowpeak.co.kr/products/detail?godCd=FES-067-BK',srcName:'스노우피크 공식몰',w:846,d:340,h:397,kg:4.8,sw:'#2B2E31',note:'블랙 메탈 상판',src:'7933'},
   omni230:{gtype:'stove',group:'난방',name:'토요토미 옴니 230',model:'OMNI 230',conf:'official',w:440,d:440,h:583,kg:10.7,sw:'#3B3F3A',
     note:'등유 대류형 난로, 6.77kW. 크기는 제조사 카탈로그 기준',heat:{type:'round',c:1000},src:'7033'},
   camp5000:{gtype:'fan',group:'난방',name:'파세코 캠프 5000 팬히터',model:'CAMP-5000',conf:'official',w:474,d:322,h:440,kg:null,href:'https://m.paseco.co.kr/goods/goods_view.php?goodsNo=1000000619',srcName:'파세코 공식몰',sw:'#2E3134',
@@ -2965,7 +2965,7 @@ const GEAR={
     note:'출처 엇갈림: 공식 영국몰 65×65×30cm·2.3kg / 공식 미국몰 61×61×12.7cm·0.7kg. 반려견 15kg까지. 쿠션은 별매',href:'https://uk.snowpeak.com/products/dog-cot',srcName:'스노우피크 공식몰(영국)'},
   sp_piledriver:{gtype:'pole',group:'기타',name:'스노우피크 파일드라이버',model:'LT-004',conf:'official',w:120,d:120,h:2400,kg:1.6,sw:'#8C9196',
     note:'랜턴 폴, 길이 1.1~2.4m(땅에 박는 깊이만큼 낮아져요). 바닥 원은 표시용. 무게 공식 1.6kg / 판매처 1.7kg',href:'https://snowpeak.com/collections/for-lights/products/lantern-pile-driver',srcName:'스노우피크 공식몰'},
-  sp_racksotto:{gtype:'sofa',group:'체어',name:'스노우피크 랙소토 멀티 스타터 세트 암레스트 플러스',model:'SET-220',conf:'estimate',w:1500,d:750,h:650,sh:370,back:120,arm:0,seats:3,sw:'#8B8676',
+  sp_racksotto:{gtype:'sofa',group:'체어',name:'스노우피크 랙소토 멀티 스타터 세트 암레스트 플러스',model:'SET-220',conf:'estimate',w:1500,d:750,h:650,kg:17.5,sh:370,back:120,arm:0,seats:3,sw:'#8B8676',
     note:'추정 배치: 베이스 3개(각 75×50×30cm)를 나란히 놓은 바닥 150×75cm(공식 외곽 표기) + 쿠션 7cm(앉는 높이 약 37cm). 등받이 2·팔걸이 2 포함, 조립 후 등받이 높이는 공식 표기가 없어 추정. 총 17.5kg(공식)',href:'https://snowpeak.com/products/racksotto-multi-starter-set-ar',srcName:'스노우피크 공식몰'},
   sp_softjug:{gtype:'jug',group:'기타',name:'스노우피크 소프트 워터저그 14L',model:'FP-130',conf:'official',w:270,d:270,h:520,kg:0.46,sw:'#D8D2C2',
     note:'14L, 물 채웠을 때 지름 27×높이 52cm, 460g. 사이드 테이블 위에 올려 쓸 수 있어요',href:'https://www.snowpeak.com/products/soft-water-jug',srcName:'스노우피크 공식몰'},
