@@ -460,18 +460,32 @@ async function aiRun(){
 /* --- 게시판: 공지사항 · 장비 요청 · 개발 요청 (워커 KV에 저장, 매주 일요일 확인 후 반영) --- */
 const RQ_GRP=[['new','새 요청 · 확인 중'],['sun','일요일 추가 예정'],['ok','확인됨'],['done','완료'],['no','어려움']],RQ_OPEN=new Set(),RQ_SHUT=new Set();
 const RQ_ST={gear:{new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정',done:'추가됨',no:'추가 어려움'},dev:{new:'확인 중',ok:'확인됨',sun:'일요일 반영 예정',done:'반영됨',no:'반영 어려움'}};
-let RQ=null,NT=null,BD_TAB='notice',RQ_MINE=new Set();try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
+let RQ=null,NT=null,BD_TAB='notice',RQ_MINE=new Set(),RQ_WHY='게시판을 준비하고 있어요. 곧 공지와 요청을 볼 수 있어요.';try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
 const rqSave=()=>{try{localStorage.setItem('rqMine',JSON.stringify([...RQ_MINE].slice(-200)));}catch(e){}};
-async function rqCall(b){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})});const d=await r.json().catch(()=>({}));return r.ok?d:{fail:d.error||'error'};}catch(e){return {fail:'error'};}}
+// 게시판 호출: 연결 문제는 한 번 더 시도하고, 왜 실패했는지(오프라인·다른 주소·서버)를 구분해요
+async function rqCall(b,again){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})});const d=await r.json().catch(()=>({}));return r.ok?d:{fail:d.error||'server'};}
+  catch(e){if(navigator.onLine===false)return {fail:'offline'};
+    if(!/^https:\/\/camterior\.github\.io$/.test(location.origin)&&!/^https?:\/\/(localhost|127\.0\.0\.1)/.test(location.origin))return {fail:'origin'};
+    if(!again){await new Promise(r=>setTimeout(r,1200));return rqCall(b,true);}return {fail:'net'};}}
+const RQ_FAIL={quota:'오늘은 요청을 많이 보냈어요. 내일 다시 남겨주세요.',offline:'인터넷이 끊겨 있어요. 요청은 보관해 뒀다가 다음에 열 때 자동으로 보낼게요.',net:'연결이 불안정해 보내지 못했어요. 요청은 보관해 뒀다가 다음에 열 때 자동으로 보낼게요.',origin:'이 주소에서는 요청을 보낼 수 없어요. camterior.github.io 에서 열어 주세요.',server:'서버가 잠시 응답하지 않아요. 잠시 뒤 다시 해주세요.'};
+const rqFailMsg=f=>RQ_FAIL[f]||RQ_FAIL.server;
+// 연결 문제로 못 보낸 요청은 이 기기에 보관했다가 게시판을 다시 불러올 때 보내요
+function rqQueue(){try{return JSON.parse(localStorage.getItem('rqQueue')||'[]');}catch(e){return [];}}
+function rqQueueSet(q){try{localStorage.setItem('rqQueue',JSON.stringify(q.slice(-10)));}catch(e){}}
+let RQ_FLUSHING=false;
+async function rqFlush(){const q=rqQueue();if(!q.length||RQ_FLUSHING)return 0;RQ_FLUSHING=true;let sent=0;const left=[];
+  for(const it of q){const d=await rqCall({op:'add',kind:it.kind,name:it.name,link:it.link,note:it.note,from:it.from||'retry'});
+    if(d.ok){sent++;RQ=d.items;if(d.notices)NT=d.notices;RQ_MINE.add(d.id);}else if(d.fail==='offline'||d.fail==='net')left.push(it);}
+  rqQueueSet(left);RQ_FLUSHING=false;if(sent){rqSave();reqRender();['gear','dev'].forEach(k=>{const st=document.getElementById('rqSt-'+k);if(st&&!st.textContent)st.textContent=`보관해 둔 요청 ${sent}건을 보냈어요.`;});}return sent;}
 function bdShow(k){BD_TAB=k;if(k==='review'&&typeof rvLoad==='function'&&!document.querySelector('#rvList .rv-card'))rvLoad();['notice','review','gear','dev'].forEach(x=>{const t=document.getElementById('bdt-'+x),p=document.getElementById('bd-'+x);if(t)t.setAttribute('aria-selected',x===k);if(p)p.hidden=x!==k;});reqRender();}
 function bdOpen(k){go('board');bdShow(k);}
 const rqDate=s=>String(s||'').slice(5).replace('-','.');
 function reqRender(){
   const nt=document.getElementById('ntList');
-  if(nt){nt.innerHTML=NT==null?(RQ===false?'<li class="rq-empty">게시판을 준비하고 있어요. 곧 공지와 요청을 볼 수 있어요.</li>':'<li class="rq-empty">불러오는 중…</li>'):!NT.length?'<li class="rq-empty">아직 공지사항이 없어요.</li>':
+  if(nt){nt.innerHTML=NT==null?(RQ===false?`<li class="rq-empty">${RQ_WHY}</li>`:'<li class="rq-empty">불러오는 중…</li>'):!NT.length?'<li class="rq-empty">아직 공지사항이 없어요.</li>':
     NT.map(n=>`<li class="${n.pin?'pin':''}"><details${n.pin?' open':''}><summary>${n.pin?'<span class="nt-pin">고정</span>':''}<b>${aiEsc(n.title)}</b><small>${aiEsc(rqDate(n.at))}</small></summary><p>${aiEsc(n.body||'').replace(/\n/g,'<br>')}</p>${n.ni?`<div class="nt-imgs">${Array.from({length:Math.min(4,n.ni)},(_,k)=>`<img src="${AI_URL}/nimg/${encodeURIComponent(n.id)}/${k}" alt="${aiEsc(n.title)} 사진 ${k+1}" loading="lazy" onclick="camZoom(this.src,this.alt)">`).join('')}</div>`:''}</details></li>`).join('');}
   ['gear','dev'].forEach(kind=>{const ul=document.getElementById('rqList-'+kind);if(!ul)return;
-    if(!RQ){ul.innerHTML=RQ===false?'<li class="rq-empty">게시판을 준비하고 있어요. 곧 공지와 요청을 볼 수 있어요.</li>':'';return;}
+    if(!RQ){ul.innerHTML=RQ===false?`<li class="rq-empty">${RQ_WHY}</li>`:'';return;}
     const L=RQ.filter(r=>(r.kind||'gear')===kind);
     if(!L.length){ul.innerHTML='<li class="rq-empty">아직 요청이 없어요. 첫 요청을 남겨주세요.</li>';return;}
     const one=r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(rqDate(r.at))}</small>${r.note?`<p>${aiEsc(r.note)}</p>`:''}${r.reply?`<p class="rq-re">↳ ${aiEsc(r.reply)}</p>`:''}</div>
@@ -481,16 +495,17 @@ function reqRender(){
       return `<li class="rq-grp"><details data-k="${k}"${open?' open':''}><summary><b>${t}</b><span>${G.length}</span></summary><ul class="rq-sub">${G.slice(0,120).map(one).join('')}</ul></details></li>`;}).join('');
     ul.querySelectorAll('details[data-k]').forEach(d=>d.addEventListener('toggle',()=>{const k=d.dataset.k;if(d.open){RQ_OPEN.add(k);RQ_SHUT.delete(k);}else{RQ_SHUT.add(k);RQ_OPEN.delete(k);}}));});}
 async function reqLoad(force){if(RQ&&NT&&!force){reqRender();return;}
-  const d=await rqCall({op:'list'});if(d.fail){RQ=false;reqRender();return;}
-  RQ=d.items||[];NT=d.notices||[];reqRender();}
+  const d=await rqCall({op:'list'});if(d.fail){RQ=false;RQ_WHY=d.fail==='offline'||d.fail==='net'?'게시판을 불러오지 못했어요. 인터넷 연결을 확인하고 다시 열어 주세요.':d.fail==='origin'?'이 주소에서는 게시판을 볼 수 없어요. camterior.github.io 에서 열어 주세요.':'게시판 서버가 잠시 응답하지 않아요. 잠시 뒤 다시 열어 주세요.';reqRender();return;}
+  RQ=d.items||[];NT=d.notices||[];reqRender();rqFlush();}
 async function reqAdd(kind,name,link,note,from){const d=await rqCall({op:'add',kind,name,link,note,from});
+  if(d.fail==='offline'||d.fail==='net'){const q=rqQueue();if(!q.some(x=>x.kind===kind&&x.name===name))q.push({kind,name,link,note,from});rqQueueSet(q);}
   if(d.ok){RQ=d.items;if(d.notices)NT=d.notices;RQ_MINE.add(d.id);rqSave();reqRender();if(typeof camEv==='function')camEv('req-'+kind+'/'+encodeURIComponent(String(name).slice(0,30)),kind==='dev'?'개발 요청':'장비 추가 요청');}
   return d;}
 async function reqSend(kind){const n=document.getElementById('rqName-'+kind),l=document.getElementById('rqLink-'+kind),t=document.getElementById('rqNote-'+kind),st=document.getElementById('rqSt-'+kind);
   const name=n.value.trim();if(name.length<2){st.textContent=kind==='dev'?'한 줄 요약을 적어주세요':'장비 이름을 적어주세요';n.focus();return;}
   st.textContent='보내는 중…';const d=await reqAdd(kind,name,l?l.value.trim():'',t?t.value.trim():'','form');
-  st.textContent=d.ok?'요청했어요. 일요일에 확인할게요.':d.fail==='quota'?'오늘은 요청을 많이 보냈어요. 내일 다시 남겨주세요.':'보내지 못했어요. 잠시 뒤 다시 해주세요.';
-  if(d.ok){n.value='';if(l)l.value='';if(t)t.value='';}}
+  st.textContent=d.ok?'요청했어요. 일요일에 확인할게요.':rqFailMsg(d.fail);
+  if(d.ok||d.fail==='offline'||d.fail==='net'){n.value='';if(l)l.value='';if(t)t.value='';}}
 async function reqPlus(id){if(RQ_MINE.has(id))return;const d=await rqCall({op:'plus',id});if(d.ok){RQ=d.items;RQ_MINE.add(id);rqSave();reqRender();}}
 async function reqAsk(b){b.disabled=true;const t=b.textContent;b.textContent='보내는 중…';const d=await reqAdd('gear',b.dataset.n,'','','ai');
-  b.textContent=d.ok?`${b.dataset.n} · 요청했어요 (일요일에 확인)`:d.fail==='quota'?'오늘 요청을 많이 보냈어요':'보내지 못했어요';if(!d.ok)setTimeout(()=>{b.disabled=false;b.textContent=t;},2500);}
+  const q=d.fail==='offline'||d.fail==='net';b.textContent=d.ok?`${b.dataset.n} · 요청했어요 (일요일에 확인)`:d.fail==='quota'?'오늘 요청을 많이 보냈어요':q?'연결이 불안정해요 · 다음에 자동으로 보낼게요':d.fail==='origin'?'camterior.github.io 에서 열어 주세요':'보내지 못했어요';if(!d.ok&&!q)setTimeout(()=>{b.disabled=false;b.textContent=t;},2500);}

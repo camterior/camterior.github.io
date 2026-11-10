@@ -97,6 +97,8 @@
 
   .opts{margin-top:14px;display:grid;gap:10px}
   .opt{display:grid;gap:6px}
+  .opt-h{margin:2px 0 8px;font-size:13px;color:var(--ink-2)}.opt-h b{color:var(--ink);font-weight:800}.opt-h small{font-size:11px;color:var(--ink-3);margin-left:4px}
+  #tentOpts:not(:empty){margin:10px 0 14px;padding:12px;border:1px solid var(--line,rgba(12,24,19,.12));border-radius:14px;background:rgba(255,255,255,.6)}
   .opt > span{font-size:12.5px;color:var(--ink-2)}
   .seg{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--line);border-radius:3px;overflow:hidden;width:max-content;max-width:100%}
   .seg button{border:0;border-left:1px solid var(--line);background:var(--paper);padding:6px 12px;font-size:13px;cursor:pointer}
@@ -1259,8 +1261,8 @@
     <section class="step on" id="step1" role="tabpanel" aria-labelledby="tab-tent">
       <h2>텐트</h2>
       <label class="search"><span class="sr-only">텐트 찾기</span><input id="tentQ" type="search" placeholder="텐트 찾기 (예: 랜드록, 쿠디)" oninput="renderTentList()"></label>
-      <div class="tents" id="tentList" role="group" aria-label="텐트"></div>
       <div class="opts" id="tentOpts"></div>
+      <div class="tents" id="tentList" role="group" aria-label="텐트"></div>
       <dl class="spec" id="tentSpec"></dl>
     </section>
     <section class="step" id="stepTarp" role="tabpanel" aria-labelledby="tab-tarp" hidden>
@@ -3886,7 +3888,7 @@ function setTwinInner(v){tent.twinInner=v;renderTentOpts();render();}
 function setTwinGap(v){tent.twinGap=v;renderTentOpts();fitView();render();}
 function renderTentOpts(){const T=TENTS[tent.id];
   if(!T.outer){document.getElementById('tentOpts').innerHTML='';renderTentSpec();return;}
-  let h=`<div class="opt"><span>이너룸</span><div class="seg">`;
+  let h=`<p class="opt-h"><b>${esc(T.name)}</b> 설정 <small>이너룸·옵션</small></p><div class="opt"><span>이너룸</span><div class="seg">`;
   Object.entries(T.inners).forEach(([k,v])=>{h+=`<button aria-pressed="${tent.inner===k}" onclick="setInner('${k}')">${Object.keys(T.inners).length>1?v.label.replace('이너룸 ',''):'전용 이너'}</button>`;});
   h+=`<button aria-pressed="${tent.inner==='custom'}" onclick="setInner('custom')">직접 입력</button><button aria-pressed="${!tent.inner}" onclick="setInner(null)">없음</button></div>`;
   h+=`<div class="opt" style="margin-top:6px"><span>이너텐트 넣기</span><div class="seg">${Object.entries(INNER_PRESETS).map(([k,P])=>`<button aria-pressed="${tent.inner==='p:'+k}" onclick="setInner('p:${k}')" title="${P.w}×${P.d}cm">${P.name.replace(/^(스노우피크|디얼스|캠빌) /,'')}</button>`).join('')}</div></div>`;
@@ -4664,7 +4666,7 @@ async function exportPNG(){
     g.fillStyle='#8E2F38';g.fillRect(W-48-120,40,120,4);
     let bar=1000;if(bar*scale<80)bar=2000;g.fillStyle='#1F2421';g.fillRect(48,H+HEAD+14,bar*scale,3);g.fillRect(48,H+HEAD+8,2,12);g.fillRect(48+bar*scale-2,H+HEAD+8,2,12);
     g.font='400 15px Pretendard, sans-serif';g.fillStyle='#575C57';g.fillText(`${bar/1000}m`,58+bar*scale,H+HEAD+22);
-    g.textAlign='right';g.fillText('CAMTERIOR · 인스타 @hj_ironcamp · 규격: 판매처·제조사 공개 치수, 일부 근사값',W-48,H+HEAD+22);
+    g.textAlign='right';g.fillText('camterior.github.io · 인스타 @hj_ironcamp · 규격: 판매처·제조사 공개 치수, 일부 근사값',W-48,H+HEAD+22);
     const blob=await new Promise(r=>cv.toBlob(r,'image/png'));await offerFile(`camp-layout-${stamp()}.png`,blob);}
   catch(e){console.error(e);setStatus('이미지를 만들지 못했어요.');}
   finally{URL.revokeObjectURL(url);render();}}
@@ -4695,8 +4697,12 @@ function cardHead(g,W,PX){const F=(w,s)=>`${w} ${s}px Pretendard, "Apple SD Goth
   g.fillStyle='#A9B6AE';g.font=F(500,26);g.fillText(`필요한 사이트 ${((sb[1][0]-sb[0][0])/1000).toFixed(1)} × ${((sb[1][1]-sb[0][1])/1000).toFixed(1)} m  ·  장비 ${new Set(state.pieces.filter(p=>p.parent==null).map(p=>p.uid)).size}세트`,PX,252);}
 function cardFoot(g,W,H,PX,y0){const F=(w,s)=>`${w} ${s}px Pretendard, "Apple SD Gothic Neo", sans-serif`;
   const gear=[...new Map(state.pieces.map(p=>[CATALOG[p.type].name,0])).keys()].slice(0,8);let x=PX,y=y0;g.font=F(700,24);
-  gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-80)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
-  g.fillStyle='#5F6E66';g.font=F(500,20);g.textAlign='left';g.fillText('camterior.github.io · 규격: 판매처·제조사 공개 치수, 일부 추정',PX,H-34);}
+  gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-112)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
+  // 주소를 눈에 띄게: 주황 알약 + 한 줄 안내 (공유된 사진이 곧 홍보가 되게)
+  g.font=F(800,26);g.textAlign='left';const u='camterior.github.io',uw=g.measureText(u).width+44;
+  g.fillStyle='#FF5A1F';g.beginPath();g.roundRect(PX,H-78,uw,50,25);g.fill();g.fillStyle='#fff';g.fillText(u,PX+22,H-44);
+  g.fillStyle='#A9B6AE';g.font=F(600,20);g.fillText('내 텐트로 무료로 배치해 보기',PX+uw+16,H-56);
+  g.fillStyle='#5F6E66';g.font=F(500,16);g.fillText('규격: 판매처·제조사 공개 치수, 일부 추정',PX+uw+16,H-32);}
 
 async function initShare(){
   renderMine();renderGallery();renderJournal();
@@ -4863,9 +4869,12 @@ async function exportCard(ret){
     g.fillStyle='#A9B6AE';g.font=F(500,26);g.fillText(`필요한 사이트 ${((sb[1][0]-sb[0][0])/1000).toFixed(1)} × ${((sb[1][1]-sb[0][1])/1000).toFixed(1)} m  ·  장비 ${new Set(state.pieces.filter(p=>p.parent==null).map(p=>p.uid)).size}세트`,PX,252);
     g.fillStyle='#FBFBF8';g.beginPath();g.roundRect(PX,PY-24,PW,PH+48,28);g.fill();g.drawImage(img,PX,PY,PW,PH);
     const gear=[...new Map(state.pieces.map(p=>[CATALOG[p.type].name,0])).keys()].slice(0,8);
-    let x=PX,y=PY+PH+92;g.font=F(700,24);
-    gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-70)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
-    g.fillStyle='#5F6E66';g.font=F(500,20);g.fillText('camterior.github.io · 규격: 판매처·제조사 공개 치수, 일부 추정',PX,H-34);
+    let x=PX,y=PY+PH+84;g.font=F(700,24);
+    gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-96)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
+    {g.font=F(800,26);g.textAlign='left';const u='camterior.github.io',uw=g.measureText(u).width+44;
+     g.fillStyle='#FF5A1F';g.beginPath();g.roundRect(PX,H-78,uw,50,25);g.fill();g.fillStyle='#fff';g.fillText(u,PX+22,H-44);
+     g.fillStyle='#A9B6AE';g.font=F(600,20);g.fillText('내 텐트로 무료로 배치해 보기',PX+uw+16,H-56);
+     g.fillStyle='#5F6E66';g.font=F(500,16);g.fillText('규격: 판매처·제조사 공개 치수, 일부 추정',PX+uw+16,H-32);}
     const blob=await new Promise(r=>cv.toBlob(r,'image/png'));if(ret)return blob;await offerFile(`camterior-card-${stamp()}.png`,blob);}
   finally{URL.revokeObjectURL(url);}}
 
@@ -5654,18 +5663,32 @@ async function aiRun(){
 /* --- 게시판: 공지사항 · 장비 요청 · 개발 요청 (워커 KV에 저장, 매주 일요일 확인 후 반영) --- */
 const RQ_GRP=[['new','새 요청 · 확인 중'],['sun','일요일 추가 예정'],['ok','확인됨'],['done','완료'],['no','어려움']],RQ_OPEN=new Set(),RQ_SHUT=new Set();
 const RQ_ST={gear:{new:'확인 중',ok:'확인됨',sun:'일요일 추가 예정',done:'추가됨',no:'추가 어려움'},dev:{new:'확인 중',ok:'확인됨',sun:'일요일 반영 예정',done:'반영됨',no:'반영 어려움'}};
-let RQ=null,NT=null,BD_TAB='notice',RQ_MINE=new Set();try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
+let RQ=null,NT=null,BD_TAB='notice',RQ_MINE=new Set(),RQ_WHY='게시판을 준비하고 있어요. 곧 공지와 요청을 볼 수 있어요.';try{RQ_MINE=new Set(JSON.parse(localStorage.getItem('rqMine')||'[]'));}catch(e){}
 const rqSave=()=>{try{localStorage.setItem('rqMine',JSON.stringify([...RQ_MINE].slice(-200)));}catch(e){}};
-async function rqCall(b){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})});const d=await r.json().catch(()=>({}));return r.ok?d:{fail:d.error||'error'};}catch(e){return {fail:'error'};}}
+// 게시판 호출: 연결 문제는 한 번 더 시도하고, 왜 실패했는지(오프라인·다른 주소·서버)를 구분해요
+async function rqCall(b,again){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({board:b})});const d=await r.json().catch(()=>({}));return r.ok?d:{fail:d.error||'server'};}
+  catch(e){if(navigator.onLine===false)return {fail:'offline'};
+    if(!/^https:\/\/camterior\.github\.io$/.test(location.origin)&&!/^https?:\/\/(localhost|127\.0\.0\.1)/.test(location.origin))return {fail:'origin'};
+    if(!again){await new Promise(r=>setTimeout(r,1200));return rqCall(b,true);}return {fail:'net'};}}
+const RQ_FAIL={quota:'오늘은 요청을 많이 보냈어요. 내일 다시 남겨주세요.',offline:'인터넷이 끊겨 있어요. 요청은 보관해 뒀다가 다음에 열 때 자동으로 보낼게요.',net:'연결이 불안정해 보내지 못했어요. 요청은 보관해 뒀다가 다음에 열 때 자동으로 보낼게요.',origin:'이 주소에서는 요청을 보낼 수 없어요. camterior.github.io 에서 열어 주세요.',server:'서버가 잠시 응답하지 않아요. 잠시 뒤 다시 해주세요.'};
+const rqFailMsg=f=>RQ_FAIL[f]||RQ_FAIL.server;
+// 연결 문제로 못 보낸 요청은 이 기기에 보관했다가 게시판을 다시 불러올 때 보내요
+function rqQueue(){try{return JSON.parse(localStorage.getItem('rqQueue')||'[]');}catch(e){return [];}}
+function rqQueueSet(q){try{localStorage.setItem('rqQueue',JSON.stringify(q.slice(-10)));}catch(e){}}
+let RQ_FLUSHING=false;
+async function rqFlush(){const q=rqQueue();if(!q.length||RQ_FLUSHING)return 0;RQ_FLUSHING=true;let sent=0;const left=[];
+  for(const it of q){const d=await rqCall({op:'add',kind:it.kind,name:it.name,link:it.link,note:it.note,from:it.from||'retry'});
+    if(d.ok){sent++;RQ=d.items;if(d.notices)NT=d.notices;RQ_MINE.add(d.id);}else if(d.fail==='offline'||d.fail==='net')left.push(it);}
+  rqQueueSet(left);RQ_FLUSHING=false;if(sent){rqSave();reqRender();['gear','dev'].forEach(k=>{const st=document.getElementById('rqSt-'+k);if(st&&!st.textContent)st.textContent=`보관해 둔 요청 ${sent}건을 보냈어요.`;});}return sent;}
 function bdShow(k){BD_TAB=k;if(k==='review'&&typeof rvLoad==='function'&&!document.querySelector('#rvList .rv-card'))rvLoad();['notice','review','gear','dev'].forEach(x=>{const t=document.getElementById('bdt-'+x),p=document.getElementById('bd-'+x);if(t)t.setAttribute('aria-selected',x===k);if(p)p.hidden=x!==k;});reqRender();}
 function bdOpen(k){go('board');bdShow(k);}
 const rqDate=s=>String(s||'').slice(5).replace('-','.');
 function reqRender(){
   const nt=document.getElementById('ntList');
-  if(nt){nt.innerHTML=NT==null?(RQ===false?'<li class="rq-empty">게시판을 준비하고 있어요. 곧 공지와 요청을 볼 수 있어요.</li>':'<li class="rq-empty">불러오는 중…</li>'):!NT.length?'<li class="rq-empty">아직 공지사항이 없어요.</li>':
+  if(nt){nt.innerHTML=NT==null?(RQ===false?`<li class="rq-empty">${RQ_WHY}</li>`:'<li class="rq-empty">불러오는 중…</li>'):!NT.length?'<li class="rq-empty">아직 공지사항이 없어요.</li>':
     NT.map(n=>`<li class="${n.pin?'pin':''}"><details${n.pin?' open':''}><summary>${n.pin?'<span class="nt-pin">고정</span>':''}<b>${aiEsc(n.title)}</b><small>${aiEsc(rqDate(n.at))}</small></summary><p>${aiEsc(n.body||'').replace(/\n/g,'<br>')}</p>${n.ni?`<div class="nt-imgs">${Array.from({length:Math.min(4,n.ni)},(_,k)=>`<img src="${AI_URL}/nimg/${encodeURIComponent(n.id)}/${k}" alt="${aiEsc(n.title)} 사진 ${k+1}" loading="lazy" onclick="camZoom(this.src,this.alt)">`).join('')}</div>`:''}</details></li>`).join('');}
   ['gear','dev'].forEach(kind=>{const ul=document.getElementById('rqList-'+kind);if(!ul)return;
-    if(!RQ){ul.innerHTML=RQ===false?'<li class="rq-empty">게시판을 준비하고 있어요. 곧 공지와 요청을 볼 수 있어요.</li>':'';return;}
+    if(!RQ){ul.innerHTML=RQ===false?`<li class="rq-empty">${RQ_WHY}</li>`:'';return;}
     const L=RQ.filter(r=>(r.kind||'gear')===kind);
     if(!L.length){ul.innerHTML='<li class="rq-empty">아직 요청이 없어요. 첫 요청을 남겨주세요.</li>';return;}
     const one=r=>`<li><div class="rq-n"><b>${aiEsc(r.name)}</b>${r.link?` <a href="${aiEsc(r.link)}" target="_blank" rel="noopener nofollow">링크</a>`:''}<small>${aiEsc(rqDate(r.at))}</small>${r.note?`<p>${aiEsc(r.note)}</p>`:''}${r.reply?`<p class="rq-re">↳ ${aiEsc(r.reply)}</p>`:''}</div>
@@ -5675,19 +5698,20 @@ function reqRender(){
       return `<li class="rq-grp"><details data-k="${k}"${open?' open':''}><summary><b>${t}</b><span>${G.length}</span></summary><ul class="rq-sub">${G.slice(0,120).map(one).join('')}</ul></details></li>`;}).join('');
     ul.querySelectorAll('details[data-k]').forEach(d=>d.addEventListener('toggle',()=>{const k=d.dataset.k;if(d.open){RQ_OPEN.add(k);RQ_SHUT.delete(k);}else{RQ_SHUT.add(k);RQ_OPEN.delete(k);}}));});}
 async function reqLoad(force){if(RQ&&NT&&!force){reqRender();return;}
-  const d=await rqCall({op:'list'});if(d.fail){RQ=false;reqRender();return;}
-  RQ=d.items||[];NT=d.notices||[];reqRender();}
+  const d=await rqCall({op:'list'});if(d.fail){RQ=false;RQ_WHY=d.fail==='offline'||d.fail==='net'?'게시판을 불러오지 못했어요. 인터넷 연결을 확인하고 다시 열어 주세요.':d.fail==='origin'?'이 주소에서는 게시판을 볼 수 없어요. camterior.github.io 에서 열어 주세요.':'게시판 서버가 잠시 응답하지 않아요. 잠시 뒤 다시 열어 주세요.';reqRender();return;}
+  RQ=d.items||[];NT=d.notices||[];reqRender();rqFlush();}
 async function reqAdd(kind,name,link,note,from){const d=await rqCall({op:'add',kind,name,link,note,from});
+  if(d.fail==='offline'||d.fail==='net'){const q=rqQueue();if(!q.some(x=>x.kind===kind&&x.name===name))q.push({kind,name,link,note,from});rqQueueSet(q);}
   if(d.ok){RQ=d.items;if(d.notices)NT=d.notices;RQ_MINE.add(d.id);rqSave();reqRender();if(typeof camEv==='function')camEv('req-'+kind+'/'+encodeURIComponent(String(name).slice(0,30)),kind==='dev'?'개발 요청':'장비 추가 요청');}
   return d;}
 async function reqSend(kind){const n=document.getElementById('rqName-'+kind),l=document.getElementById('rqLink-'+kind),t=document.getElementById('rqNote-'+kind),st=document.getElementById('rqSt-'+kind);
   const name=n.value.trim();if(name.length<2){st.textContent=kind==='dev'?'한 줄 요약을 적어주세요':'장비 이름을 적어주세요';n.focus();return;}
   st.textContent='보내는 중…';const d=await reqAdd(kind,name,l?l.value.trim():'',t?t.value.trim():'','form');
-  st.textContent=d.ok?'요청했어요. 일요일에 확인할게요.':d.fail==='quota'?'오늘은 요청을 많이 보냈어요. 내일 다시 남겨주세요.':'보내지 못했어요. 잠시 뒤 다시 해주세요.';
-  if(d.ok){n.value='';if(l)l.value='';if(t)t.value='';}}
+  st.textContent=d.ok?'요청했어요. 일요일에 확인할게요.':rqFailMsg(d.fail);
+  if(d.ok||d.fail==='offline'||d.fail==='net'){n.value='';if(l)l.value='';if(t)t.value='';}}
 async function reqPlus(id){if(RQ_MINE.has(id))return;const d=await rqCall({op:'plus',id});if(d.ok){RQ=d.items;RQ_MINE.add(id);rqSave();reqRender();}}
 async function reqAsk(b){b.disabled=true;const t=b.textContent;b.textContent='보내는 중…';const d=await reqAdd('gear',b.dataset.n,'','','ai');
-  b.textContent=d.ok?`${b.dataset.n} · 요청했어요 (일요일에 확인)`:d.fail==='quota'?'오늘 요청을 많이 보냈어요':'보내지 못했어요';if(!d.ok)setTimeout(()=>{b.disabled=false;b.textContent=t;},2500);}
+  const q=d.fail==='offline'||d.fail==='net';b.textContent=d.ok?`${b.dataset.n} · 요청했어요 (일요일에 확인)`:d.fail==='quota'?'오늘 요청을 많이 보냈어요':q?'연결이 불안정해요 · 다음에 자동으로 보낼게요':d.fail==='origin'?'camterior.github.io 에서 열어 주세요':'보내지 못했어요';if(!d.ok&&!q)setTimeout(()=>{b.disabled=false;b.textContent=t;},2500);}
 
 
 /* =====================================================================

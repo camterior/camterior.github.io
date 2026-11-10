@@ -78,6 +78,8 @@
 
   .opts{margin-top:14px;display:grid;gap:10px}
   .opt{display:grid;gap:6px}
+  .opt-h{margin:2px 0 8px;font-size:13px;color:var(--ink-2)}.opt-h b{color:var(--ink);font-weight:800}.opt-h small{font-size:11px;color:var(--ink-3);margin-left:4px}
+  #tentOpts:not(:empty){margin:10px 0 14px;padding:12px;border:1px solid var(--line,rgba(12,24,19,.12));border-radius:14px;background:rgba(255,255,255,.6)}
   .opt > span{font-size:12.5px;color:var(--ink-2)}
   .seg{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--line);border-radius:3px;overflow:hidden;width:max-content;max-width:100%}
   .seg button{border:0;border-left:1px solid var(--line);background:var(--paper);padding:6px 12px;font-size:13px;cursor:pointer}
@@ -703,8 +705,8 @@
     <section class="step on" id="step1" role="tabpanel" aria-labelledby="tab-tent">
       <h2>텐트</h2>
       <label class="search"><span class="sr-only">텐트 찾기</span><input id="tentQ" type="search" placeholder="텐트 찾기 (예: 랜드록, 쿠디)" oninput="renderTentList()"></label>
-      <div class="tents" id="tentList" role="group" aria-label="텐트"></div>
       <div class="opts" id="tentOpts"></div>
+      <div class="tents" id="tentList" role="group" aria-label="텐트"></div>
       <dl class="spec" id="tentSpec"></dl>
     </section>
     <section class="step" id="stepTarp" role="tabpanel" aria-labelledby="tab-tarp" hidden>
@@ -3208,7 +3210,7 @@ function setTwinInner(v){tent.twinInner=v;renderTentOpts();render();}
 function setTwinGap(v){tent.twinGap=v;renderTentOpts();fitView();render();}
 function renderTentOpts(){const T=TENTS[tent.id];
   if(!T.outer){document.getElementById('tentOpts').innerHTML='';renderTentSpec();return;}
-  let h=`<div class="opt"><span>이너룸</span><div class="seg">`;
+  let h=`<p class="opt-h"><b>${esc(T.name)}</b> 설정 <small>이너룸·옵션</small></p><div class="opt"><span>이너룸</span><div class="seg">`;
   Object.entries(T.inners).forEach(([k,v])=>{h+=`<button aria-pressed="${tent.inner===k}" onclick="setInner('${k}')">${Object.keys(T.inners).length>1?v.label.replace('이너룸 ',''):'전용 이너'}</button>`;});
   h+=`<button aria-pressed="${tent.inner==='custom'}" onclick="setInner('custom')">직접 입력</button><button aria-pressed="${!tent.inner}" onclick="setInner(null)">없음</button></div>`;
   h+=`<div class="opt" style="margin-top:6px"><span>이너텐트 넣기</span><div class="seg">${Object.entries(INNER_PRESETS).map(([k,P])=>`<button aria-pressed="${tent.inner==='p:'+k}" onclick="setInner('p:${k}')" title="${P.w}×${P.d}cm">${P.name.replace(/^(스노우피크|디얼스|캠빌) /,'')}</button>`).join('')}</div></div>`;
@@ -3986,7 +3988,7 @@ async function exportPNG(){
     g.fillStyle='#8E2F38';g.fillRect(W-48-120,40,120,4);
     let bar=1000;if(bar*scale<80)bar=2000;g.fillStyle='#1F2421';g.fillRect(48,H+HEAD+14,bar*scale,3);g.fillRect(48,H+HEAD+8,2,12);g.fillRect(48+bar*scale-2,H+HEAD+8,2,12);
     g.font='400 15px Pretendard, sans-serif';g.fillStyle='#575C57';g.fillText(`${bar/1000}m`,58+bar*scale,H+HEAD+22);
-    g.textAlign='right';g.fillText('CAMTERIOR · 인스타 @hj_ironcamp · 규격: 판매처·제조사 공개 치수, 일부 근사값',W-48,H+HEAD+22);
+    g.textAlign='right';g.fillText('camterior.github.io · 인스타 @hj_ironcamp · 규격: 판매처·제조사 공개 치수, 일부 근사값',W-48,H+HEAD+22);
     const blob=await new Promise(r=>cv.toBlob(r,'image/png'));await offerFile(`camp-layout-${stamp()}.png`,blob);}
   catch(e){console.error(e);setStatus('이미지를 만들지 못했어요.');}
   finally{URL.revokeObjectURL(url);render();}}
@@ -4017,8 +4019,12 @@ function cardHead(g,W,PX){const F=(w,s)=>`${w} ${s}px Pretendard, "Apple SD Goth
   g.fillStyle='#A9B6AE';g.font=F(500,26);g.fillText(`필요한 사이트 ${((sb[1][0]-sb[0][0])/1000).toFixed(1)} × ${((sb[1][1]-sb[0][1])/1000).toFixed(1)} m  ·  장비 ${new Set(state.pieces.filter(p=>p.parent==null).map(p=>p.uid)).size}세트`,PX,252);}
 function cardFoot(g,W,H,PX,y0){const F=(w,s)=>`${w} ${s}px Pretendard, "Apple SD Gothic Neo", sans-serif`;
   const gear=[...new Map(state.pieces.map(p=>[CATALOG[p.type].name,0])).keys()].slice(0,8);let x=PX,y=y0;g.font=F(700,24);
-  gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-80)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
-  g.fillStyle='#5F6E66';g.font=F(500,20);g.textAlign='left';g.fillText('camterior.github.io · 규격: 판매처·제조사 공개 치수, 일부 추정',PX,H-34);}
+  gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-112)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
+  // 주소를 눈에 띄게: 주황 알약 + 한 줄 안내 (공유된 사진이 곧 홍보가 되게)
+  g.font=F(800,26);g.textAlign='left';const u='camterior.github.io',uw=g.measureText(u).width+44;
+  g.fillStyle='#FF5A1F';g.beginPath();g.roundRect(PX,H-78,uw,50,25);g.fill();g.fillStyle='#fff';g.fillText(u,PX+22,H-44);
+  g.fillStyle='#A9B6AE';g.font=F(600,20);g.fillText('내 텐트로 무료로 배치해 보기',PX+uw+16,H-56);
+  g.fillStyle='#5F6E66';g.font=F(500,16);g.fillText('규격: 판매처·제조사 공개 치수, 일부 추정',PX+uw+16,H-32);}
 
 async function initShare(){
   renderMine();renderGallery();renderJournal();
@@ -4185,9 +4191,12 @@ async function exportCard(ret){
     g.fillStyle='#A9B6AE';g.font=F(500,26);g.fillText(`필요한 사이트 ${((sb[1][0]-sb[0][0])/1000).toFixed(1)} × ${((sb[1][1]-sb[0][1])/1000).toFixed(1)} m  ·  장비 ${new Set(state.pieces.filter(p=>p.parent==null).map(p=>p.uid)).size}세트`,PX,252);
     g.fillStyle='#FBFBF8';g.beginPath();g.roundRect(PX,PY-24,PW,PH+48,28);g.fill();g.drawImage(img,PX,PY,PW,PH);
     const gear=[...new Map(state.pieces.map(p=>[CATALOG[p.type].name,0])).keys()].slice(0,8);
-    let x=PX,y=PY+PH+92;g.font=F(700,24);
-    gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-70)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
-    g.fillStyle='#5F6E66';g.font=F(500,20);g.fillText('camterior.github.io · 규격: 판매처·제조사 공개 치수, 일부 추정',PX,H-34);
+    let x=PX,y=PY+PH+84;g.font=F(700,24);
+    gear.forEach(n=>{const w=g.measureText(n).width+36;if(x+w>W-PX){x=PX;y+=56;}if(y>H-96)return;g.fillStyle='#16261E';g.beginPath();g.roundRect(x,y-34,w,46,23);g.fill();g.fillStyle='#ECF1EC';g.fillText(n,x+18,y-3);x+=w+10;});
+    {g.font=F(800,26);g.textAlign='left';const u='camterior.github.io',uw=g.measureText(u).width+44;
+     g.fillStyle='#FF5A1F';g.beginPath();g.roundRect(PX,H-78,uw,50,25);g.fill();g.fillStyle='#fff';g.fillText(u,PX+22,H-44);
+     g.fillStyle='#A9B6AE';g.font=F(600,20);g.fillText('내 텐트로 무료로 배치해 보기',PX+uw+16,H-56);
+     g.fillStyle='#5F6E66';g.font=F(500,16);g.fillText('규격: 판매처·제조사 공개 치수, 일부 추정',PX+uw+16,H-32);}
     const blob=await new Promise(r=>cv.toBlob(r,'image/png'));if(ret)return blob;await offerFile(`camterior-card-${stamp()}.png`,blob);}
   finally{URL.revokeObjectURL(url);}}
 
