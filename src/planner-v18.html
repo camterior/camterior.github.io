@@ -4067,7 +4067,7 @@ document.querySelector('.tabs').addEventListener('keydown',e=>{const ks=Object.k
 const CAT_GROUPS=[['IGT 프레임',['reg3','long4','short2','sep2','sep3','sep4']],['IGT 테이블',['mf_reg','mf_long','open_L','open_R','corner_L','corner_R']]]
   .concat(GEAR_GROUPS.map(g=>[g,GEAR_ORDER.filter(t=>CATALOG[t].group===g)]));
 let CAT_F='all';
-function catPreview(t){if(['chair','mat','cot','wood','fridge'].includes(CATALOG[t].gtype)||CATALOG[t].alu){const c=CATALOG[t],p=Math.max(c.w,c.d)*.06;return `<svg viewBox="${-p} ${-p} ${c.w+p*2} ${c.d+p*2}" aria-hidden="true">${gearBody({type:t},false)}</svg>`;}
+function catPreview(t){if(['chair','mat','cot','wood','fridge','fire','jug','pole','sofa'].includes(CATALOG[t].gtype)||CATALOG[t].alu){const c=CATALOG[t],p=Math.max(c.w,c.d)*.06;return `<svg viewBox="${-p} ${-p} ${c.w+p*2} ${c.d+p*2}" aria-hidden="true">${gearBody({type:t},false)}</svg>`;}
   const c=CATALOG[t],b=bbox(c.verts),w=b[1][0]-b[0][0],d=b[1][1]-b[0][1],pad=Math.max(w,d)*.06;
   const fill=c.kind==='gear'?c.sw:c.kind==='frame'?(c.style==='classic'?'#C9CDD0':'#2B2E31'):'#CFA265';
   const stroke=c.kind==='frame'&&c.style!=='classic'?'#16181A':'rgba(26,32,28,.55)';
