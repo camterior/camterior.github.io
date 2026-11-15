@@ -218,10 +218,10 @@ function tourPlace(){const o=document.getElementById('tour');if(!o)return;const 
   const ch=c.offsetHeight||170,below=top+hh+12;c.style.top=(below+ch<vh-8?below:Math.max(8,top-ch-12))+'px';}
 // ===== 업데이트 알림 팝업: 다시 온 사람에게 한 번만 =====
 // 업데이트할 때마다 UPD만 바꾸면 돼요 (v가 바뀌면 다시 떠요)
-const UPD={v:'20261109',date:'11월 9일',items:[
-  ['🧰','장비 20개·텐트 6종이 추가되었어요','화로대, IGT 쇼트, 랙소토, 발할, 테라코어 등'],
-  ['✅','게시판 요청이 반영되었어요','요청해 주신 장비 25건'],
-  ['📐','텐트 제원을 공식 도면으로 다시 맞췄어요','입체 보기 이너텐트 넘침도 고쳤어요']]};
+const UPD={v:'20261115',date:'11월 15일',items:[
+  ['📷','새로 넣은 장비 19개에 제품 사진이 생겼어요','화로대 S·M·L·LL, 오이스터 템포, 헬리녹스 사이드테이블 등'],
+  ['📐','텐트 제원을 공식 도면으로 다시 맞췄어요','아틀란틱 오션 2.0, 아케디아 맥스+, 알베르게, 노나돔, 도크돔 Pro.6 등'],
+  ['✨','사진 카드·게시판·텐트 설정이 편해졌어요','요청 전송이 실패해도 보관했다가 자동으로 다시 보내요']]};
 const UPD_KEY='camUpd';
 function updSeen(){try{return localStorage.getItem(UPD_KEY)===UPD.v;}catch(e){return true;}}
 function updDone(){try{localStorage.setItem(UPD_KEY,UPD.v);}catch(e){}}
