@@ -218,10 +218,9 @@ function tourPlace(){const o=document.getElementById('tour');if(!o)return;const 
   const ch=c.offsetHeight||170,below=top+hh+12;c.style.top=(below+ch<vh-8?below:Math.max(8,top-ch-12))+'px';}
 // ===== 업데이트 알림 팝업: 다시 온 사람에게 한 번만 =====
 // 업데이트할 때마다 UPD만 바꾸면 돼요 (v가 바뀌면 다시 떠요)
-const UPD={v:'20261115',date:'11월 15일',items:[
-  ['📷','새로 넣은 장비 19개에 제품 사진이 생겼어요','화로대 S·M·L·LL, 오이스터 템포, 헬리녹스 사이드테이블 등'],
-  ['📐','텐트 제원을 공식 도면으로 다시 맞췄어요','아틀란틱 오션 2.0, 아케디아 맥스+, 알베르게, 노나돔, 도크돔 Pro.6 등'],
-  ['✨','사진 카드·게시판·텐트 설정이 편해졌어요','요청 전송이 실패해도 보관했다가 자동으로 다시 보내요']]};
+const UPD={v:'20261117',date:'11월 17일',items:[
+  ['⛺','헬스포츠 발할 아우터가 추가됐어요','게시판 요청 반영 · 공식 도면 780×300cm, 이너 2개(별매)까지 배치해 볼 수 있어요'],
+  ['📮','게시판 요청에 답글을 달았어요','모델명이 필요한 요청은 답글로 알려 주시면 바로 찾아 넣어 드려요']]};
 const UPD_KEY='camUpd';
 function updSeen(){try{return localStorage.getItem(UPD_KEY)===UPD.v;}catch(e){return true;}}
 function updDone(){try{localStorage.setItem(UPD_KEY,UPD.v);}catch(e){}}
