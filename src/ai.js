@@ -33,7 +33,7 @@ const AI_ALIAS={reg3:['IGT 3유닛','IGT 프레임 3유닛','아이지티 3유�
   hx_side:['사이드 테이블','사이드테이블','스타벅스 사이드 테이블','헬리녹스 사이드 테이블'],hx_side_m:['사이드 테이블 M','사이드테이블 M'],uf_kitchen3:['키친스탠드','키친 스탠드','유니프레임 키친스탠드'],
   kzm_basketbag:['멀티 바스켓 백','바스켓 백','바스켓백'],zebec_king:['에어리스 킹','제백 킹','에어리스 킹 더블'],thor75:['토르박스','토르 박스','토르 75','토르박스 75리터'],oyster_tempo:['오이스터','오이스터 쿨러','템포 쿨러'],
   hb_nammatj3gt:['나마츠','나마츠 3 GT','나마츠3GT','남마츠'],tfs_stars3:['스타3','스타 3','TFS 스타3','스타즈3'],te_terracore:['테라코어','테라 코어','디얼스 테라코어'],
-  nd_valhal35:['발할 35','발할35','발할'],nd_valhal60:['발할 60','발할60'],kv_cabana:['카바나','코베아 카바나'],
+  nd_valhal35:['발할 35','발할35','발할'],nd_valhal60:['발할 60','발할60'],kv_cabana:['카바나','코베아 카바나'],hs_valhall:['헬스포츠 발할','헬스포츠발할','발할 아우터','발할 8인','Valhall'],
   merak_pro:['메락'],landlock:['랜드락'],living_shell_long_pro:['리빙쉘 롱 프로','리빙쉘롱'],living_shell:['리빙쉘']};
 const AI_INNER_AL={shell_duo:['쉘이너','쉘이너 듀오','쉘 이너'],geoair2:['지오에어','지오 에어','지오에어2','지오 에어2'],godong:['고동','고동텐트','고동 텐트','고동 이너','고동이너텐트']};
 const aiTentName=id=>{const T=TENTS[id];return ((T.brand?T.brand+' ':'')+T.name).trim();};

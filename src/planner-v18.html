@@ -2006,6 +2006,17 @@ T2.add('mw_glamour',{brand:'미니멀웍스',name:'글래머 쉘터',model:'Glam
   doors:[T2.door(o,'front','출입문',true),{a:L2([D-c,0],[D,c],.15),b:L2([D-c,0],[D,c],.85),label:'출입문',zone:false},{a:L2([D,D-c],[D-c,D],.15),b:L2([D,D-c],[D-c,D],.85),label:'출입문',zone:false}],
   living:[1100,2175],color:'#5E6B44',prof:T2.PROF.dome});}
 
+/* 헬스포츠 발할 아우터 (Valhall Outer Tent 152-890-V): 공식 도면 그림(780×300cm, 양 끝 침실 210 + 가운데 거실 290, 높이 210). 이너 2개 별매 */
+{const L=7800,W=3000,c=500,o=T2.tun(L,W,c,2000,c,2000),inL=[[60,550],[500,175],[2160,175],[2160,2825],[500,2825],[60,2450]],inR=inL.map(q=>[L-q[0],q[1]]);
+ T2.add('hs_valhall',{brand:'헬스포츠',name:'발할 아우터',model:'Valhall Outer Tent (152-890-V)',size:[780,300,210],weight:'10.7kg (공식) · 10.5kg (판매처)',cap:'8명 (제조사 표기, 이너 2개)',
+  href:'https://helsport.com/eu/tents/all-tents/4-person/valhall-outer-tent--152-890-V',srcName:'제조사 공식 페이지',drawn:true,
+  est:'제조사 공식 도면 그림(바닥 780×300cm, 양 끝 침실 각 210cm + 가운데 거실 290cm, 높이 210cm·이너 쪽 180cm)으로 그렸어요. 출처 엇갈림: 높이는 공식 그림 210cm / 판매처 \'실내 높이 180cm\', 무게는 공식 10.7kg / 판매처 10.5kg. 도면의 끝 폭(200cm)·모서리 각도와 옆문 4곳(양옆 2곳씩)의 위치는 사진 비율 추정이에요. 노르디스크 발할과는 다른 텐트예요.',
+  outer:o,inners:{front:{label:'이너 4인 (앞쪽, 별매)',model:'Valhall Inner Tent',size:'265×210',poly:inL,posEst:true},
+          rear:{label:'이너 4인 (뒤쪽, 별매)',model:'Valhall Inner Tent',size:'265×210',poly:inR,posEst:true}},innerDefault:'front',
+  doors:[T2.side(2650,3800,0,'옆 출입문'),T2.side(4000,5150,0,' ',false),T2.side(2650,3800,W,'옆 출입문',false),T2.side(4000,5150,W,' ',false),
+   T2.front(W,2000,'앞 끝 출입문'),T2.rear(L,W,2000,'뒤 끝 출입문')],
+  living:[3900,1500],h3d:2100,inH3:1800,color:'#5B6346',prof:T2.PROF.tunnel});}
+
 /* ===== 스노우피크 타프 익스텐션 텐트 (FES-433): 타프 윙폴(280cm)에 이어 쓰는 텐트. 앞(x=0)이 타프 쪽 ===== */
 {const o=[[0,1000],[1100,0],[3250,350],[3250,3650],[1100,4000],[0,3000]];
  T2.add('sp_tarp_ext',{brand:'스노우피크',name:'타프 익스텐션 텐트',model:'FES-433',size:[325,400,280],weight:'7.5kg',cap:'4명 (제조사 표기)',href:'https://snowpeak.com/products/tarp-extentioin-tent-4',srcName:'제조사 공식 페이지',drawn:true,
