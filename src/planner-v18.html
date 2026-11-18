@@ -2147,9 +2147,9 @@ function circPoly(r,n){const v=[];for(let k=0;k<n;k++){const a=k/n*Math.PI*2;v.p
 const gearShape=(w,d)=>shape(rect(w,d),[]);
 const HEAT_NOTE='이격 거리는 플래너 권장값이에요(천·가구에서 1m). 제품 설명서가 우선이에요.';
 const GEAR={
-  sc25:{gtype:'box',group:'쉘프컨테이너',name:'쉘프컨테이너 25',model:'UG-025G',conf:'official',href:'https://www.snowpeak.co.kr/products/detail?godCd=UG-025G',srcName:'스노우피크 공식몰',w:520,d:325,h:210,kg:3.6,sw:'#6B6E68',
+  sc25:{gtype:'box',shelfc:true,group:'쉘프컨테이너',name:'쉘프컨테이너 25',model:'UG-025G',conf:'official',href:'https://www.snowpeak.co.kr/products/detail?godCd=UG-025G',srcName:'스노우피크 공식몰',w:520,d:325,h:210,kg:3.6,sw:'#6B6E68',
     note:'안쪽 405×290×195mm. 같은 크기끼리 쌓을 수 있어요. 올리브 FES-037-OL도 같은 크기',src:'3357'},
-  sc50:{gtype:'box',group:'쉘프컨테이너',name:'쉘프컨테이너 50',model:'UG-055G',conf:'retailer',w:625,d:405,h:270,kg:5.5,sw:'#6B6E68',
+  sc50:{gtype:'box',shelfc:true,group:'쉘프컨테이너',name:'쉘프컨테이너 50',model:'UG-055G',conf:'retailer',w:625,d:405,h:270,kg:5.5,sw:'#6B6E68',
     note:'안쪽 500×370×255mm. 같은 크기끼리 쌓을 수 있어요. 올리브 FES-038-OL도 같은 크기',src:'3356'},
   mytable:{gtype:'table',top:'bamboo',group:'마이테이블',name:'마이테이블',model:'LV-034TR',conf:'official',href:'https://www.snowpeak.co.kr/products/detail?godCd=LV-034TR',srcName:'스노우피크 공식몰',w:450,d:335,h:385,kg:1.8,sw:'#CFA265',
     note:'상판 450×300mm, 대나무',src:'4878'},
@@ -2759,6 +2759,11 @@ function gearBody(p,fine){const c=CATALOG[p.type],w=c.w,d=c.d;let o='';
     o+=`<rect x="${ar}" y="0" width="${w-ar*2}" height="${bk}" rx="16" fill="${c.sw}" stroke="rgba(20,22,20,.5)" stroke-width="4"/>`;
     const n=c.seats||Math.max(1,Math.round((w-ar*2)/750)),sw=(w-ar*2)/n;for(let k=0;k<n;k++)o+=`<rect x="${ar+sw*k+6}" y="${bk+6}" width="${sw-12}" height="${d-bk-12}" rx="18" fill="${c.sw}" stroke="rgba(20,22,20,.45)" stroke-width="4"/>`;
     if(ar)[0,w-ar].forEach(x=>{o+=`<rect x="${x}" y="0" width="${ar}" height="${d}" rx="14" fill="${c.sw}" stroke="rgba(20,22,20,.55)" stroke-width="4"/>`;});return o;}
+  if(c.gtype==='box'&&c.shelfc){// 스노우피크 쉘프컨테이너: 뚜껑 없는 은색 금속 상자, 긴 쪽 위 가운데 나무 손잡이, 모서리 회색 발
+    o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="10" fill="#C3C8CC" stroke="#7F868C" stroke-width="5"/><rect x="14" y="14" width="${w-28}" height="${d-28}" rx="6" fill="#A9AFB4" stroke="#8A9096" stroke-width="2"/>`;
+    for(let x=w*.14;x<w*.9;x+=w*.12)o+=`<line x1="${x}" y1="20" x2="${x}" y2="${d-20}" stroke="rgba(255,255,255,.28)" stroke-width="3"/>`;
+    [[0,0],[w,0],[0,d],[w,d]].forEach(([x,y])=>{o+=`<rect x="${x?x-34:-4}" y="${y?y-34:-4}" width="38" height="38" rx="8" fill="#8E9398" stroke="#62676C" stroke-width="2"/>`;});
+    [6,d-6].forEach(y=>{o+=`<rect x="${w/2-60}" y="${y-9}" width="120" height="18" rx="9" fill="#C69A5B" stroke="#8C6630" stroke-width="3"/>`;});return o;}
   if(c.gtype==='box'){const bf=c.alu?'#C9CDD0':'#6B6E68',bs=c.alu?'#8C9196':'#3E403C',bi=c.alu?'#DADDE0':'#7E827B';
     o+=`<rect x="0" y="0" width="${w}" height="${d}" rx="16" fill="${bf}" stroke="${bs}" stroke-width="5"/><rect x="26" y="26" width="${w-52}" height="${d-52}" rx="10" fill="${bi}" stroke="${bs}" stroke-width="3"/>`;
     [[0,d/2],[w,d/2]].forEach(([x,y])=>{o+=`<rect x="${x-14}" y="${y-48}" width="28" height="96" rx="12" fill="#C9CDD0" stroke="#7F8489" stroke-width="3"/>`;});return o;}
@@ -3583,7 +3588,7 @@ function legPoints(p){const c=CATALOG[p.type],vs=c.verts,ce=centroid(vs),n=p.par
   return pick.map(v=>{const d=dist(v,ce),k=Math.min(1,45/(d||1));return applyT(p._T,[v[0]+(ce[0]-v[0])*k,v[1]+(ce[1]-v[1])*k]);});}
 function igt3(THREE){
   const GRP=new THREE.Group(),SM=o=>new THREE.MeshStandardMaterial(o);
-  const M={alu:SM({color:'#C9CDD0',metalness:.55,roughness:.38}),dark:SM({color:'#2B2E31',metalness:.3,roughness:.6}),cap:SM({color:'#26292B',roughness:.7}),
+  const M={alu:SM({color:'#C9CDD0',metalness:.55,roughness:.38}),foot:SM({color:'#8A8F94',roughness:.75}),dark:SM({color:'#2B2E31',metalness:.3,roughness:.6}),cap:SM({color:'#26292B',roughness:.7}),
     bamboo:SM({color:'#C99A5B',roughness:.72}),steel:SM({color:'#C3C7CA',metalness:.6,roughness:.33}),mesh:SM({color:'#9EA3A7',metalness:.5,roughness:.5,transparent:true,opacity:.55}),
     burner:SM({color:'#55595D',metalness:.4,roughness:.5}),grill:SM({color:'#3E3B38',roughness:.8}),leg:SM({color:'#B7BBBE',metalness:.6,roughness:.33}),
     cont:SM({color:'#6B6E68',metalness:.35,roughness:.55}),cont2:SM({color:'#5A5D57',metalness:.35,roughness:.55}),stove:SM({color:'#3B3F3A',metalness:.3,roughness:.55}),
@@ -3607,7 +3612,11 @@ function igt3(THREE){
         shelves.forEach(sh=>grp.add(extrudePoly(THREE,[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(X),sh-4,sh,M.steel)));
         [x0,x1-6].forEach(xx=>grp.add(extrudePoly(THREE,[[xx,y0],[xx+6,y0],[xx+6,y1],[xx,y1]].map(X),shelves[shelves.length-1],Hh-30,M.steel)));}
     }else if(c.kind==='gear'){const h=c.h,w=c.w,d=c.d,R=(x0,y0,x1,y1)=>[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(X);
-      if(c.gtype==='box'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h-8,c.alu?M.alu:M.cont));grp.add(extrudePoly(THREE,R(-6,-6,w+6,d+6),h-8,h,c.alu?M.alu:M.cont2));}
+      if(c.gtype==='box'&&c.shelfc){const t=12,f=28;// 뚜껑 없는 은색 상자 + 나무 손잡이 + 회색 모서리 발
+        grp.add(extrudePoly(THREE,R(0,0,w,d),f,f+8,M.alu));[[0,0,w,t],[0,d-t,w,d],[0,0,t,d],[w-t,0,w,d]].forEach(([a,b,c2,e])=>grp.add(extrudePoly(THREE,R(a,b,c2,e),f,h,M.alu)));
+        [[0,0],[w-60,0],[0,d-60],[w-60,d-60]].forEach(([a,b])=>grp.add(extrudePoly(THREE,R(a,b,a+60,b+60),0,f+30,M.foot)));
+        [-8,d-14].forEach(b=>grp.add(extrudePoly(THREE,R(w/2-70,b,w/2+70,b+22),h-4,h+18,M.bamboo)));}
+      else if(c.gtype==='box'){grp.add(extrudePoly(THREE,R(0,0,w,d),0,h-8,c.alu?M.alu:M.cont));grp.add(extrudePoly(THREE,R(-6,-6,w+6,d+6),h-8,h,c.alu?M.alu:M.cont2));}
       else if(c.frame){const fm=M.dark,rim=(y0,y1)=>[[0,0,w,24],[0,d-24,w,d],[0,0,24,d],[w-24,0,w,d]].forEach(([a,b,c2,e])=>grp.add(extrudePoly(THREE,R(a,b,c2,e),y0,y1,fm)));
         rim(h-30,h);rim(130,160);[[w*.3,d/2],[w*.7,d/2]].forEach(([x])=>grp.add(extrudePoly(THREE,R(x-15,24,x+15,d-24),h-24,h-8,fm)));
         [[0,0],[w,0],[0,d],[w,d]].forEach(([x,y])=>{const a=X([x,y]),b=X([w-x,y]);grp.add(lineOf(THREE,[[mm(a[0]),0,mm(a[1])],[mm(b[0]),mm(h),mm(b[1])]],'#232527',1));});}
