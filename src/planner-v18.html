@@ -2394,7 +2394,10 @@ function stackBaseAt(p){const c=CATALOG[p.type];if(!STACK_TOP(c)||p.parent!=null
 function stackPreferUnder(p,q){const c=CATALOG[p.type],cq=CATALOG[q.type];const top=pieceH(q);
   if(cq.frame)return (c.gtype==='box'||c.gtype==='fridge')&&c.h<=top-60&&stackKids(q.uid).length>0;// 2단 랙: 위 칸이 차 있으면 아래 칸
   return (c.gtype==='box'||c.gtype==='fridge')&&(cq.kind!=='gear'||cq.gtype==='table')&&top>=500&&c.h<=top-60&&!q.on;}
-function stackSet(p,q){p.on=q.uid;p.onC=invT(q._T,centroid(p._v)).map(v=>Math.round(v));p.onR=Math.round((p.rot||0)-Math.atan2(q._T.sin,q._T.cos)*180/Math.PI);p.floor=false;}
+// 같은 크기 박스(쉘프컨테이너 등)끼리는 딱 맞춰 쌓음: 가운데·방향을 받침에 맞춤
+const STACK_SAME=(c,cq)=>c.gtype==='box'&&cq.gtype==='box'&&!cq.frame&&((c.group&&c.group===cq.group&&c.w===cq.w&&c.d===cq.d)||(Math.abs(c.w-cq.w)<=15&&Math.abs(c.d-cq.d)<=15));
+function stackSet(p,q){p.on=q.uid;p.onC=invT(q._T,centroid(p._v)).map(v=>Math.round(v));p.onR=Math.round((p.rot||0)-Math.atan2(q._T.sin,q._T.cos)*180/Math.PI);p.floor=false;
+  if(STACK_SAME(CATALOG[p.type],CATALOG[q.type])){p.onC=invT(q._T,centroid(q._v)).map(v=>Math.round(v));const r=((p.onR%360)+360)%360;p.onR=(r>90&&r<270)?180:0;}}
 function stackAuto(p){if(!p||p.floor||p.parent!=null)return false;const q=stackBaseAt(p);if(!q||stackPreferUnder(p,q))return false;stackSet(p,q);return true;}
 function stackAfterMove(r){if(!r||r.parent!=null)return;const was=r.on;if(r.on!=null){delete r.on;}computeAll();
   if(stackAuto(r)){const b=byId(r.on);showToast(`${CATALOG[b.type].short||CATALOG[b.type].name} 위에 올렸어요`);}else if(was!=null)showToast('바닥에 내려놨어요');}
@@ -2563,7 +2566,7 @@ function checkRules(){
     P._ov=Q._ov=true;W.push(`<b>겹침</b> ${pName(P)}와 ${pName(Q)}, 약 ${Math.round(d/10)}cm`);}
   // 위에 올린 장비: 받침보다 크면 경고, 나무 상판 위 화기는 주의
   state.pieces.forEach(p=>{if(p.on==null)return;const b=byId(p.on);if(!b)return;const cb=CATALOG[b.type],c=CATALOG[p.type];
-    const isl=b.parent!=null||cb.kind!=='gear'?rootOf(b)._isl||[b]:[b],out=p._v.filter(v=>!isl.some(q=>pointInPoly(v,q._v))).length;
+    const isl=b.parent!=null||cb.kind!=='gear'?rootOf(b)._isl||[b]:[b],out=p._v.filter(v=>!isl.some(q=>pointInPoly(v,q._v)||q._v.some((a,i)=>segDist(v,a,q._v[(i+1)%q._v.length])<=15))).length;
     if(out&&cb.round&&(c.gtype==='jug'||c.round)){// 둥근 받침 위 둥근 장비: 지름 2cm까지 넘침은 그대로 둠 (발이 받침 안쪽에 닿음)
       const cp=centroid(p._v),cq=centroid(b._v);if(Math.hypot(cp[0]-cq[0],cp[1]-cq[1])+c.w/2<=cb.w/2+20)return;}
     if(out){p._ov=true;W.push(`<b>올림</b> ${pName(p)}가 ${pName(b)}보다 커서 밖으로 나가요`);}
