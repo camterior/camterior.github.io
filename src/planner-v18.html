@@ -2148,9 +2148,9 @@ const gearShape=(w,d)=>shape(rect(w,d),[]);
 const HEAT_NOTE='이격 거리는 플래너 권장값이에요(천·가구에서 1m). 제품 설명서가 우선이에요.';
 const GEAR={
   sc25:{gtype:'box',shelfc:true,group:'쉘프컨테이너',name:'쉘프컨테이너 25',model:'UG-025G',conf:'official',href:'https://www.snowpeak.co.kr/products/detail?godCd=UG-025G',srcName:'스노우피크 공식몰',w:520,d:325,h:210,kg:3.6,sw:'#6B6E68',
-    note:'안쪽 405×290×195mm. 같은 크기끼리 쌓을 수 있어요. 올리브 FES-037-OL도 같은 크기',src:'3357'},
-  sc50:{gtype:'box',shelfc:true,group:'쉘프컨테이너',name:'쉘프컨테이너 50',model:'UG-055G',conf:'retailer',w:625,d:405,h:270,kg:5.5,sw:'#6B6E68',
-    note:'안쪽 500×370×255mm. 같은 크기끼리 쌓을 수 있어요. 올리브 FES-038-OL도 같은 크기',src:'3356'},
+    note:'안쪽 405×290×195mm. 같은 크기끼리 최대 3단까지 쌓을 수 있어요(개당 최대 20kg). 올리브 FES-037-OL도 같은 크기',src:'3357'},
+  sc50:{gtype:'box',shelfc:true,group:'쉘프컨테이너',name:'쉘프컨테이너 50',model:'UG-055G',conf:'official',href:'https://www.snowpeak.co.kr/products/detail?godCd=UG-055G',srcName:'스노우피크 공식몰',w:625,d:405,h:270,kg:5.5,sw:'#6B6E68',
+    note:'안쪽 500×370×255mm. 같은 크기끼리 최대 3단까지 쌓을 수 있어요(개당 최대 20kg). 갈바늄 강판·스테인리스·대나무 손잡이. 올리브 FES-038-OL도 같은 크기',src:'3356'},
   mytable:{gtype:'table',top:'bamboo',group:'마이테이블',name:'마이테이블',model:'LV-034TR',conf:'official',href:'https://www.snowpeak.co.kr/products/detail?godCd=LV-034TR',srcName:'스노우피크 공식몰',w:450,d:335,h:385,kg:1.8,sw:'#CFA265',
     note:'상판 450×300mm, 대나무',src:'4878'},
   mytable_s:{gtype:'table',top:'steel',group:'마이테이블',name:'스테인리스 마이테이블',model:'LV-039',conf:'retailer',w:496,d:332,h:400,kg:2.9,sw:'#B9BDC1',
@@ -2570,6 +2570,7 @@ function checkRules(){
     if(out&&cb.round&&(c.gtype==='jug'||c.round)){// 둥근 받침 위 둥근 장비: 지름 2cm까지 넘침은 그대로 둠 (발이 받침 안쪽에 닿음)
       const cp=centroid(p._v),cq=centroid(b._v);if(Math.hypot(cp[0]-cq[0],cp[1]-cq[1])+c.w/2<=cb.w/2+20)return;}
     if(out){p._ov=true;W.push(`<b>올림</b> ${pName(p)}가 ${pName(b)}보다 커서 밖으로 나가요`);}
+    if(c.shelfc&&cb.shelfc&&stackLevel(p)>=3){p._ov=true;W.push(`<b>쌓기</b> ${pName(p)}: 쉘프컨테이너는 제조사 기준 최대 3단까지예요`);}
     else I.push(`올림: ${pName(p)}, ${pName(b)} 위 (바닥에서 ${Math.round((p._z||0)/10)}cm)`);
     if(STACK_FIRE(c)&&(cb.top==='bamboo'||cb.wood||cb.kind==='ext'))I.push(`${pName(p)}: 나무 상판 위 화기예요. 열판이나 스테인리스 상판 위에서 쓰세요`);});
   // heaters: keep 1m from fabric and gear
