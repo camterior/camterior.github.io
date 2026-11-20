@@ -33,7 +33,10 @@ const DEFAULT_EFFORT = "low";
 export const LIMIT_PACK_NOCODE = 3; // 내 코드 없이: IP당
 export const LIMIT_PACK_CODE = 10; // 내 코드 있으면: 코드당
 export const LIMIT_PACK_ADMIN = 1000; // 관리자 계정
+const LIMIT_PACK_ALL = 300; // 모든 사람 합쳐 하루 최대 (요금 상한 약 16,500원). 동시에 몰려도 이 이상은 안 나감
 const LIMIT_WEATHER_IP = 60; // 날씨: IP당 (무료 서비스 보호)
+const MAX_INFLIGHT = 8; // 이 서버 인스턴스에서 동시에 만드는 추천 최대 수
+const INFLIGHT = new Set(); // 지금 추천을 만드는 중인 횟수 키 (같은 코드·IP는 한 번에 하나)
 const LIMIT_CODE_MISS = 30; // 없는 코드 넣기: IP당 (캠테리어 acct()와 같은 'am:' 키를 같이 씀)
 
 const CODE_RE = /^[A-HJKMNP-Z2-9]{4}-[A-HJKMNP-Z2-9]{4}$/;
@@ -59,7 +62,7 @@ class PackError extends Error {
   constructor(error, message, status = 400) { super(message); this.error = error; this.status = status; }
 }
 async function count(env, key) { return env.RL ? parseInt(await env.RL.get(key)) || 0 : 0; }
-async function bumpKey(env, key) { if (env.RL) await env.RL.put(key, String((await count(env, key)) + 1), { expirationTtl: 172800 }); }
+async function bumpKey(env, key, by = 1) { if (env.RL) await env.RL.put(key, String(Math.max(0, (await count(env, key)) + by)), { expirationTtl: 172800 }); }
 
 // ───────── 입구 ─────────
 export async function pack(p, env, request, reply) {
@@ -381,6 +384,7 @@ async function callClaude(env, body) {
 
 async function opRecommend(p, env, request) {
   if (!env.ANTHROPIC_API_KEY) throw new PackError("key", "AI 설정이 아직 안 됐어요.", 500);
+  if (!env.RL) throw new PackError("acct-off", "지금은 추천을 쓸 수 없어요.", 503); // 횟수를 셀 수 없으면 요금이 무제한으로 나갈 수 있어 막음
   const trip = cleanTrip(p.trip);
   const weather = cleanWeather(p.weather);
   const acc = await accountOf(env, request, p.code);
@@ -400,10 +404,18 @@ async function opRecommend(p, env, request) {
     if (items.length) plan = { name: String(p.plan.name || "세팅").slice(0, 40), items };
   }
 
-  // 하루 횟수 확인 (성공했을 때만 1 올림)
-  const q = quotaOf(acc, request);
+  // 하루 횟수: Claude를 부르기 **전에** 1 올려 두고, 실패하면 돌려줌.
+  // KV는 '읽고 1 더하기'를 한 번에 못 해서 동시에 여러 번 보내면 셈이 틀릴 수 있음 → 같은 코드·IP는 한 번에 하나만 (이 서버 인스턴스 안)
+  const q = quotaOf(acc, request), allKey = `pka:${kstDay()}`;
+  if (INFLIGHT.has(q.key) || INFLIGHT.size >= MAX_INFLIGHT) throw new PackError("busy", "이미 추천을 만드는 중이에요. 끝난 뒤 다시 눌러 주세요.", 429);
+  INFLIGHT.add(q.key);
+  try {
   const used = await count(env, q.key);
   if (used >= q.limit) throw new PackError("quota", `오늘 추천 횟수(${q.limit}번)를 다 썼어요. 내일 다시 시도해 주세요.`, 429);
+  if ((await count(env, allKey)) >= LIMIT_PACK_ALL) throw new PackError("quota", "오늘은 추천을 쓰는 사람이 많아 마감됐어요. 내일 다시 시도해 주세요.", 429);
+  await bumpKey(env, q.key); await bumpKey(env, allKey);
+  let ok = false;
+  try {
 
   // 고를 수 있는 장비 = 내 장비 + 세팅 장비
   const owned = new Map(myGear.map((g) => [g.key, { ...g }]));
@@ -448,8 +460,7 @@ async function opRecommend(p, env, request) {
     if (f) f.count = Math.max(f.count, c); else forced.push({ key, count: c, why: "", fromPlan: true });
   });
   pick.unshift(...forced);
-
-  await bumpKey(env, q.key);
+  ok = true;
 
   const mine = new Map(myGear.map((g) => [g.key, g.count]));
   return {
@@ -464,6 +475,10 @@ async function opRecommend(p, env, request) {
     })),
     left: Math.max(0, q.limit - used - 1), limit: q.limit,
   };
+  } finally {
+    if (!ok) { await bumpKey(env, q.key, -1); await bumpKey(env, allKey, -1); } // 실패한 추천은 횟수에서 뺌
+  }
+  } finally { INFLIGHT.delete(q.key); }
 }
 
 // 시험용으로 꺼내 둠 (worker.js에서는 pack만 쓰면 됨)
