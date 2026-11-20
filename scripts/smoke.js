@@ -24,9 +24,16 @@ const srv=http.createServer((q,r)=>{let u=decodeURIComponent(q.url.split('?')[0]
   // 캠핑 챙김(/pack): 휴대폰 폭에서 오류 없이 장비 목록이 불러와지고 넘치지 않는지
   const pk=await b.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});const pe=[];pk.on('pageerror',e=>pe.push(e.message));
   await pk.route('https://camterior-ai.ghdwnd2.workers.dev/**',q=>q.abort());await pk.goto('http://127.0.0.1:8799/pack/');await pk.waitForTimeout(900);
-  const pack=await pk.evaluate(()=>{const q=document.getElementById('q');q.value='랜드록';q.dispatchEvent(new Event('input'));
-    return {chips:document.querySelectorAll('#chips button').length,hit:document.querySelectorAll('#res [data-act=add]').length,w:document.documentElement.scrollWidth};}).catch(e=>({err:e.message}));
-  const packBad=pe.length||!(pack.chips>5&&pack.hit>0&&pack.w<=392);await pk.close();
+  const pack=await pk.evaluate(async()=>{const home=!document.getElementById('v-home').hidden;
+    // 캠핑 만들기 → 장비 고르기 → 체크 (장비 하나 넣고)
+    location.hash='#gear';await new Promise(r=>setTimeout(r,200));
+    const q=document.getElementById('q');q.value='랜드록';q.dispatchEvent(new Event('input'));const hit=document.querySelectorAll('#res [data-act=add]').length;
+    const add=document.querySelector('#res [data-act=add]');add&&add.click();
+    location.hash='#';await new Promise(r=>setTimeout(r,200));document.getElementById('newTrip').click();document.getElementById('tdOk').click();await new Promise(r=>setTimeout(r,300));
+    const pick=document.querySelector('#tripBody label.pk');pick&&pick.click();document.querySelector('#tripFoot [data-go=check]').click();
+    const ck=document.querySelector('#tripBody button.ck');ck&&ck.click();
+    return {home,chips:document.querySelectorAll('#chips button').length,hit,checked:document.querySelectorAll('#tripBody button.ck[aria-pressed=true]').length,w:document.documentElement.scrollWidth};}).catch(e=>({err:e.message}));
+  const packBad=pe.length||!(pack.home&&pack.chips>5&&pack.hit>0&&pack.checked===1&&pack.w<=392);await pk.close();
   console.log('캠핑 챙김',packBad?'문제 '+JSON.stringify(pack)+' '+pe.join(' | '):'정상');
   console.log('JS 오류',errs.length,JSON.stringify(r),'휴대폰 넘침',wide.length?wide.join(','):'없음','주소로 바로 열기',direct.length?direct.join(' | '):'모두 정상');await b.close();srv.close();
   if(packBad||errs.length||wide.length||direct.length||!r.intro||!r.plan||!r.hub||r.gear<40||!r.svg||r.tents<10){console.log(errs.join('\n'));process.exit(1);}})();

@@ -3,53 +3,92 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>캠핑 챙김 · 내 장비함</title>
-<meta name="description" content="캠테리어 내 장비를 그대로 불러와서 캠핑 갈 때 챙길 장비를 정리해요.">
+<title>캠핑 챙김</title>
+<meta name="description" content="캠테리어 내 장비로 캠핑 갈 때 챙길 장비를 골라 하나씩 체크해요.">
 <meta name="theme-color" content="#0C1813">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://camterior-ai.ghdwnd2.workers.dev; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <link rel="icon" href="../assets/icon-64.png" type="image/png">
 <link rel="apple-touch-icon" href="../assets/icon-180.png">
-<link rel="stylesheet" href="pack.css">
+<link rel="stylesheet" href="pack.css?v=5">
 </head>
 <body>
 <header class="top">
   <div class="top-in">
-    <a class="brand" href="./" aria-label="캠핑 챙김 처음으로"><span class="brand-mark" aria-hidden="true">✓</span>캠핑 챙김</a>
-    <a class="back" href="../#mine">캠테리어로</a>
+    <a class="brand" href="#" aria-label="캠핑 챙김 처음으로"><span class="brand-mark" aria-hidden="true">✓</span>캠핑 챙김</a>
+    <nav class="tabs" aria-label="화면">
+      <a href="#" data-tab="home">캠핑</a>
+      <a href="#gear" data-tab="gear">내 장비함</a>
+    </nav>
   </div>
 </header>
 
 <main class="wrap" id="main">
-  <section class="hero" aria-labelledby="hT">
-    <p class="kicker">내 장비함</p>
-    <h1 id="hT">가진 장비를 한곳에</h1>
-    <p class="sub">캠테리어의 <b>내 장비</b>와 같은 목록이에요. 여기서 넣거나 빼면 캠테리어에도 똑같이 바뀌어요.</p>
-    <div class="stat"><span id="cnt">불러오는 중…</span><span class="sync" id="sync" role="status"></span></div>
-  </section>
+  <!-- ============ 캠핑 목록 ============ -->
+  <div class="view" id="v-home" hidden>
+    <section class="hero" aria-labelledby="homeT">
+      <p class="kicker">캠핑 챙김</p>
+      <h1 id="homeT">이번 캠핑, 빠짐없이</h1>
+      <p class="sub">캠핑을 만들고 <b>내 장비</b>에서 가져갈 것을 고른 뒤, 차에 실을 때마다 하나씩 체크해요.</p>
+      <button type="button" class="btn-main wide" id="newTrip">+ 새 캠핑 만들기</button>
+    </section>
+    <div id="tripList"></div>
+  </div>
 
-  <section class="card add" aria-labelledby="aT">
-    <h2 id="aT">장비 넣기</h2>
-    <form class="search" onsubmit="return false" role="search">
-      <label class="sr-only" for="q">장비 이름으로 찾기</label>
-      <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="예: 랜드록, IGT, 원액션테이블, 랜턴">
-    </form>
-    <div class="chips" id="chips" role="group" aria-label="분류별로 보기"></div>
-    <ul class="results" id="res" aria-live="polite"></ul>
-    <button type="button" class="ghost-btn" id="selfBtn">+ 목록에 없는 장비 직접 넣기</button>
-  </section>
+  <!-- ============ 캠핑 하나: 체크리스트 ============ -->
+  <div class="view" id="v-trip" hidden>
+    <div class="trip-top">
+      <a class="back-link" href="#">← 캠핑 목록</a>
+      <button type="button" class="link" id="tripEdit">일정 고치기</button>
+    </div>
+    <section class="trip-head" aria-labelledby="tripT">
+      <p class="kicker" id="tripWhen"></p>
+      <h1 id="tripT"></h1>
+      <p class="sub" id="tripPlace" hidden></p>
+      <div class="prog" id="tripProg"></div>
+    </section>
+    <div class="seg" role="group" aria-label="보기" id="tripSeg">
+      <button type="button" data-mode="check" aria-pressed="true">체크하기</button>
+      <button type="button" data-mode="pick" aria-pressed="false">장비 고르기</button>
+    </div>
+    <div class="filter" id="tripFilter"><label><input type="checkbox" id="onlyLeft"> 안 챙긴 것만 보기</label></div>
+    <div id="tripBody"></div>
+    <div class="trip-foot" id="tripFoot"></div>
+  </div>
 
-  <section aria-labelledby="lT">
-    <div class="list-head"><h2 id="lT">내 장비</h2><button type="button" class="link" id="foldAll" hidden>모두 접기</button></div>
-    <div id="list"></div>
-  </section>
+  <!-- ============ 내 장비함 ============ -->
+  <div class="view" id="v-gear" hidden>
+    <section class="hero" aria-labelledby="hT">
+      <p class="kicker">내 장비함</p>
+      <h1 id="hT">가진 장비를 한곳에</h1>
+      <p class="sub">캠테리어의 <b>내 장비</b>와 같은 목록이에요. 여기서 넣거나 빼면 캠테리어에도 똑같이 바뀌어요. <a class="inline" href="../#mine">캠테리어 열기</a></p>
+      <div class="stat"><span id="cnt">불러오는 중…</span><span class="sync" id="sync" role="status"></span></div>
+    </section>
 
-  <section class="card acct" aria-labelledby="cT">
-    <h2 id="cT">다른 기기와 같이 쓰기</h2>
-    <div id="acct"></div>
-  </section>
+    <section class="card add" aria-labelledby="aT">
+      <h2 id="aT">장비 넣기</h2>
+      <form class="search" id="searchForm" role="search">
+        <label class="sr-only" for="q">장비 이름으로 찾기</label>
+        <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="예: 랜드록, IGT, 원액션테이블, 랜턴">
+      </form>
+      <div class="chips" id="chips" role="group" aria-label="분류별로 보기"></div>
+      <ul class="results" id="res" aria-live="polite"></ul>
+      <button type="button" class="ghost-btn" id="selfBtn">+ 목록에 없는 장비 직접 넣기</button>
+    </section>
+
+    <section aria-labelledby="lT">
+      <div class="list-head"><h2 id="lT">내 장비</h2><button type="button" class="link" id="foldAll" hidden>모두 접기</button></div>
+      <div id="list"></div>
+    </section>
+
+    <section class="card acct" aria-labelledby="cT">
+      <h2 id="cT">다른 기기와 같이 쓰기</h2>
+      <div id="acct"></div>
+    </section>
+  </div>
 </main>
 
+<!-- 직접 넣기 -->
 <dialog class="sheet" id="selfDlg" aria-labelledby="sT">
   <form method="dialog" class="sheet-in" id="selfForm">
     <h2 id="sT">직접 넣기</h2>
@@ -62,7 +101,27 @@
   </form>
 </dialog>
 
+<!-- 캠핑 만들기 / 고치기 -->
+<dialog class="sheet" id="tripDlg" aria-labelledby="tdT">
+  <form method="dialog" class="sheet-in" id="tripForm">
+    <h2 id="tdT">새 캠핑</h2>
+    <label class="field"><span>이름</span><input id="tdName" maxlength="30" autocomplete="off" placeholder="예: 가평 계곡 캠핑"></label>
+    <div class="field two">
+      <label><span>가는 날</span><input id="tdDate" type="date" required></label>
+      <div><span>며칠</span><div class="step big"><button type="button" id="tdMinus" aria-label="하루 줄이기">−</button><b id="tdNights">1박</b><button type="button" id="tdPlus" aria-label="하루 늘리기">+</button></div></div>
+    </div>
+    <label class="field"><span>장소 <small>(적지 않아도 돼요)</small></span><input id="tdPlace" maxlength="30" autocomplete="off" placeholder="예: 자라섬 캠핑장"></label>
+    <fieldset class="field" id="tdFromBox"><legend>챙길 장비</legend>
+      <div class="from" id="tdFrom"></div>
+    </fieldset>
+    <p class="err" id="tdErr" role="alert"></p>
+    <div class="sheet-btns"><button type="button" class="btn-line" id="tdCancel">닫기</button><button type="submit" class="btn-main" id="tdOk">만들기</button></div>
+    <button type="button" class="danger-link" id="tdDel" hidden>이 캠핑 지우기</button>
+  </form>
+</dialog>
+
 <div class="toast" id="toast" role="status" hidden></div>
-<script src="pack.js"></script>
+<script src="pack.js?v=5"></script>
+<script src="trips.js?v=5"></script>
 </body>
 </html>

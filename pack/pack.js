@@ -1,5 +1,5 @@
 /* =====================================================================
-   캠핑 챙김 · 내 장비함 (2단계)
+   캠핑 챙김 · 내 장비함 (2단계) — 캠핑 일정·체크리스트는 trips.js
    - 캠테리어 '내 장비'와 같은 저장소를 씀
      · 이 기기: localStorage 'camMine' = {"분류:장비번호": 개수}  (캠테리어와 같은 키)
      · 서버: 워커 acct 'get'/'save' (내 코드 = localStorage 'camAcct')
@@ -109,6 +109,7 @@ async function pull() {
 
 /* ---------- 내 장비 목록 ---------- */
 function render() {
+  if (typeof tripsRefresh === 'function') tripsRefresh(); // 캠핑 체크리스트도 같은 장비 목록을 씀 (trips.js)
   const keys = Object.keys(MYG);
   const kinds = keys.length, total = keys.reduce((a, k) => a + MYG[k], 0);
   $('cnt').innerHTML = kinds ? `<b>${kinds}</b>종 · <b>${total}</b>개` : '아직 장비가 없어요';
@@ -247,6 +248,7 @@ async function codeLoad(e) {
 /* ---------- 시작 ---------- */
 function bind() {
   $('q').addEventListener('input', search);
+  $('searchForm').addEventListener('submit', e => e.preventDefault());
   $('chips').addEventListener('click', e => {
     const b = e.target.closest('button[data-sec]'); if (!b) return;
     SEC_PICK = SEC_PICK === b.dataset.sec ? null : b.dataset.sec; chipsUI(); search();
@@ -302,6 +304,8 @@ async function start() {
     });
     BY = new Map(ITEMS.map(x => [x.key, x]));
   } catch (e) { $('res').innerHTML = '<li class="self"><span>장비 목록을 불러오지 못했어요. 새로고침해 주세요.</span></li>'; }
+  if (typeof tripsInit === 'function') tripsInit();
   chipsUI(); render(); pull();
 }
-start();
+// trips.js까지 다 읽은 뒤 시작 (먼저 시작하면 캠핑 화면이 빈 채로 남을 수 있음)
+if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start); else start();

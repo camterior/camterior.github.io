@@ -149,3 +149,108 @@ h2{margin:0 0 12px;font-size:18px;letter-spacing:-.03em;font-weight:800}
   .card{padding:22px 22px}
   .chips{margin:0;padding-left:0;padding-right:0;flex-wrap:wrap;overflow:visible}
 }
+
+/* ===== 3단계: 탭 · 캠핑 목록 · 체크리스트 ===== */
+.tabs{display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(233,240,234,.14)}
+.tabs a{color:var(--on-night-2);text-decoration:none;font-size:14px;font-weight:650;padding:6px 13px;border-radius:999px;white-space:nowrap}
+.tabs a[aria-current]{background:var(--on-night);color:var(--night)}
+.view[hidden]{display:none}
+.btn-main.wide{width:100%;height:52px;font-size:16px;border-radius:14px}
+a.btn-main{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.inline{color:var(--ink);font-weight:650;text-underline-offset:3px}
+.muted{color:var(--ink-3)}
+.pad{padding:4px 2px}
+.sec-t{font-size:16px;margin:4px 2px 10px;color:var(--ink-2)}
+
+/* 캠핑 카드 */
+.trips{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:10px}
+.trip-card{display:flex;flex-direction:column;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-decoration:none;color:inherit;transition:border-color .2s,transform .2s var(--ease)}
+.trip-card:hover{border-color:var(--ink-3)}
+.trip-card:active{transform:scale(.99)}
+.tc-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tc-n{font-size:17px;font-weight:800;letter-spacing:-.03em;overflow-wrap:anywhere;word-break:keep-all}
+.tc-w{color:var(--ink-2);font-size:13.5px}
+.tc-p{display:flex;align-items:center;gap:10px;margin-top:6px}
+.tc-p small{font-size:13px;color:var(--ink-2);white-space:nowrap}
+.dd{flex:none;font-size:12.5px;font-weight:750;padding:3px 9px;border-radius:999px;background:var(--paper-2);color:var(--ink-2);white-space:nowrap}
+.dd[data-k="soon"]{background:rgba(255,90,31,.12);color:var(--accent-2)}
+.dd[data-k="today"]{background:var(--accent);color:#fff}
+.dd[data-k="past"]{background:none;color:var(--ink-3);padding-right:0}
+.kicker .dd{margin-left:6px;vertical-align:1px}
+.bar{flex:1;height:6px;border-radius:99px;background:var(--line-2);overflow:hidden;display:block}
+.bar i{display:block;height:100%;width:0;border-radius:inherit;background:var(--ok);transition:width .4s var(--ease)}
+.bar.big{height:10px}
+.past{margin-bottom:22px}
+.past summary{cursor:pointer;color:var(--ink-2);font-weight:700;font-size:15px;padding:6px 2px 12px;list-style:none}
+.past summary::-webkit-details-marker{display:none}
+.past summary::before{content:"▸ ";color:var(--ink-3)}
+.past[open] summary::before{content:"▾ "}
+.past summary small{color:var(--ink-3);font-weight:600}
+.past .trip-card{opacity:.82}
+
+/* 캠핑 하나 */
+.trip-top{display:flex;justify-content:space-between;align-items:center;padding:16px 2px 0}
+.back-link{color:var(--ink-2);text-decoration:none;font-size:14.5px;font-weight:600;padding:4px 0}
+.trip-head{padding:14px 2px 16px}
+.trip-head h1{margin:0;font-size:clamp(24px,6.5vw,30px);line-height:1.25;letter-spacing:-.04em;font-weight:850;word-break:keep-all;overflow-wrap:anywhere}
+.trip-head .kicker{color:var(--ink-2);font-weight:600;font-size:13.5px;margin-bottom:6px}
+.trip-head .sub{margin:6px 0 0}
+.prog{margin-top:14px}
+.prog:empty{display:none}
+.prog-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
+.prog-row b{font-size:20px;font-weight:850;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.prog-row span{color:var(--ink-2);font-size:14px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:14px;background:var(--paper-2);margin-bottom:12px}
+.seg button{border:0;background:none;border-radius:11px;height:42px;font-weight:700;font-size:15px;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.filter{margin:0 2px 10px;font-size:14px;color:var(--ink-2)}
+.filter[hidden]{display:none}
+.filter label{display:inline-flex;align-items:center;gap:8px;cursor:pointer;padding:4px 0}
+.filter input{width:18px;height:18px;accent-color:var(--night)}
+
+.ck-grp{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.ck-grp h3{display:flex;justify-content:space-between;align-items:center;margin:0;padding:12px 16px 4px;font-size:14.5px;font-weight:750;color:var(--ink-2)}
+.ck-grp h3 small{font-size:13px;color:var(--ink-3);font-weight:650;font-variant-numeric:tabular-nums}
+.ck-grp h3 small.ok{color:var(--ok)}
+.ck-grp ul{list-style:none;margin:0;padding:0 8px 6px}
+.ck-grp li{border-top:1px solid var(--line-2)}
+.ck-grp li:first-child{border-top:0}
+.ck,.pk{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;text-align:left;padding:10px 8px;border-radius:12px;cursor:pointer}
+.ck:active,.pk:active{background:var(--paper-2)}
+.box{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;transition:background .15s,border-color .15s}
+.ck[aria-pressed="true"] .box,.pk input:checked+.box{background:var(--ok);border-color:var(--ok)}
+.ck[aria-pressed="true"] .box::after,.pk input:checked+.box::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:translateY(-1px) rotate(45deg)}
+.ck[aria-pressed="true"] .nm b{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1.5px}
+.ck[aria-pressed="true"] .th{opacity:.5}
+.qty{flex:none;font-weight:800;font-size:14px;color:var(--ink-2);background:var(--paper-2);border-radius:999px;padding:3px 9px;font-variant-numeric:tabular-nums}
+.pk input{position:absolute;opacity:0;width:1px;height:1px}
+.pk input:focus-visible+.box{outline:2px solid var(--accent);outline-offset:2px}
+.ck-grp.pick li{display:flex;align-items:center;gap:4px;padding-right:8px}
+.ck-grp.pick li .pk{flex:1;min-width:0}
+.ck-grp.pick li:not(.on) .th{opacity:.7}
+.pick-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin:0 2px 10px;font-size:14px;color:var(--ink-2)}
+.pick-bar b{color:var(--ink)}
+.trip-foot{margin:6px 0 22px;text-align:center}
+.trip-foot:empty{display:none}
+.btn-main.sticky{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));box-shadow:0 12px 28px -12px rgba(12,24,19,.55)}
+.empty .btn-main{margin-top:12px}
+
+/* 캠핑 만들기 창 */
+.field.two{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}
+.field.two label,.field.two>div{display:block;min-width:0}
+.field.two span{display:block;font-size:13.5px;font-weight:700;color:var(--ink-2);margin-bottom:6px}
+.field small{font-weight:500;color:var(--ink-3)}
+.field.two .step{display:flex}
+.field.two .step b{min-width:44px;font-size:15px}
+.field input[type=date]{min-height:48px;-webkit-appearance:none;appearance:none;display:block}
+.from{display:grid;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer}
+.opt:has(input:checked){border-color:var(--night);background:var(--bg)}
+.opt input{margin:3px 0 0;width:18px;height:18px;accent-color:var(--night);flex:none}
+.opt span{display:flex;flex-direction:column;min-width:0}
+.opt b{font-size:14.5px;font-weight:700;overflow-wrap:anywhere}
+.opt small{font-size:12.5px;color:var(--ink-3)}
+.sheet-in{max-height:92vh;overflow-y:auto}
+.danger-link{display:block;margin:14px auto 0;border:0;background:none;color:var(--accent-2);font-size:14px;font-weight:650;text-decoration:underline;text-underline-offset:3px}
+.danger-link[hidden]{display:none}
+.from[hidden],fieldset[hidden]{display:none}
