@@ -1,7 +1,7 @@
 {
   "id": "/pack/",
-  "name": "캠핑 챙김",
-  "short_name": "캠핑 챙김",
+  "name": "Camping Check",
+  "short_name": "Camping Check",
   "description": "캠테리어 내 장비로 캠핑 갈 때 챙길 장비를 골라 하나씩 체크해요.",
   "lang": "ko",
   "start_url": "./",

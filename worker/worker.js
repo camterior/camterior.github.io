@@ -1,9 +1,11 @@
+import { pack } from "./pack-ai.js";
 // 캠테리어 AI 중계 서버 v3 (Cloudflare Worker) — 2026-10-30: 몰릴 때 한 번 더 시도, 오류 이유 기록
 // - Gemini 키: Secret GEMINI_API_KEY
 // - 초대 코드: Secret INVITE_CODE (여러 개면 쉼표로: abc,def)
 // - 하루 횟수 세기: KV 바인딩 RL (없으면 제한 없이 동작)
 // - 내 코드(계정): 같은 KV의 'acct:XXXX-XXXX' 키 (내 장비 목록, 초대 회원 여부)
 // - 장비 추가요청 게시판: 같은 KV(RL)의 'reqs' 키에 저장. 관리용 Secret ADMIN_KEY
+// - Camping Check(/pack) AI: pack-ai.js (Secret ANTHROPIC_API_KEY, 하루 횟수는 pack-ai.js 맨 위)
 const MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 앞에서부터 시도
 const MODELS_IMAGE = ["gemini-flash-lite-latest", "gemini-flash-latest"]; // 사진도 lite 먼저 (flash는 긴 장비 목록+사진에 20초 넘게 걸려서 실사용 불가, 2026-10-30 측정)
 const ALLOWED_ORIGINS = ["https://camterior.github.io"];
@@ -318,10 +320,13 @@ export default {
     if (request.method === "GET") return reviewImg(new URL(request.url), env);
     if (request.method !== "POST") return json({ error: "method" }, 405, origin);
     if (!ALLOWED_ORIGINS.includes(origin)) return json({ error: "origin" }, 403, origin);
-    if (!env.GEMINI_API_KEY) return json({ error: "key" }, 500, origin);
 
     let body;
     try { body = await request.json(); } catch { return json({ error: "bad" }, 400, origin); }
+    // Camping Check(/pack) 날씨·저장한 세팅·Claude 추천 (pack-ai.js). Gemini 키와 상관없이 동작
+    if (body.pack && typeof body.pack === "object") return pack(body.pack, env, request, (d, s) => json(d, s, origin));
+
+    if (!env.GEMINI_API_KEY) return json({ error: "key" }, 500, origin);
 
     if (body.board) return board(body.board, env, request, origin);
     if (body.review) return review(body.review, env, request, origin);

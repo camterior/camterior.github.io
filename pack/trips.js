@@ -75,7 +75,7 @@ function route() {
   document.querySelectorAll('.tabs a[aria-current]').forEach(a => a.setAttribute('aria-current', 'page'));
   if (v === 'trip') { if (CUR !== m[1]) { CUR = m[1]; const t = tripById(CUR); MODE = Object.keys(t.items).length ? 'check' : 'pick'; } tripUI(); }
   else { CUR = null; if (v === 'home') homeUI(); else if (changed) render(); }
-  document.title = v === 'trip' ? `${tripById(m[1]).name} · 캠핑 챙김` : v === 'gear' ? '내 장비함 · 캠핑 챙김' : '캠핑 챙김';
+  document.title = v === 'trip' ? `${tripById(m[1]).name} · Camping Check` : v === 'gear' ? '내 장비함 · Camping Check' : 'Camping Check';
   if (changed) scrollTo(0, 0);
 }
 
