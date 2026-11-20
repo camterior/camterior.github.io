@@ -82,12 +82,12 @@ function route() {
 /* ---------- 캠핑 목록 ---------- */
 function cardT(t) {
   const st = tripStat(t), dd = dday(t), pct = st.n ? Math.round(st.d / st.n * 100) : 0;
-  return `<li><a class="trip-card" href="#t/${t.id}">
+  return `<li class="tc-li"><a class="trip-card" href="#t/${t.id}">
     <span class="tc-top"><b class="tc-n">${esc(t.name)}</b><span class="dd" data-k="${dd.k}">${dd.t}</span></span>
     <span class="tc-w">${esc(whenT(t))}${t.place ? ' · ' + esc(t.place) : ''}</span>
     ${st.n ? `<span class="tc-p"><span class="bar"><i data-pct="${pct}"></i></span><small>${st.d === st.n ? '다 챙겼어요' : `${st.d} / ${st.n} 챙김`}</small></span>`
       : '<span class="tc-p"><small class="muted">아직 고른 장비가 없어요</small></span>'}
-  </a></li>`;
+  </a><button type="button" class="tc-del" data-del="${t.id}" aria-label="${esc(t.name)} 지우기" title="지우기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/></svg></button></li>`;
 }
 function homeUI() {
   const box = $('tripList');
@@ -147,12 +147,16 @@ function tripSubmit(e) {
   location.hash = '#t/' + t.id;
   if (f === 'ai' && typeof aiOpen === 'function') setTimeout(() => aiOpen(t.id), 250);
 }
-function tripDelete() {
-  const t = tripById(TD.edit); if (!t || !confirm(`이 캠핑을 지울까요? (${t.name})
-고른 장비와 체크한 내용도 같이 지워져요.`)) return;
-  const i = TRIPS.indexOf(t), tomb = { id: t.id, del: 1 }; TRIPS.splice(i, 1); TDELS.push(tomb); saveTrips(tomb); closeTripDlg(); location.hash = '#';
-  toast(`‘${t.name}’ 지웠어요`, () => { TDELS = TDELS.filter(x => x !== tomb); TRIPS.splice(i, 0, t); saveTrips(t); location.hash = '#t/' + t.id; });
+// 캠핑 지우기 (캠핑 목록의 휴지통 버튼, 일정 고치기 창의 '이 캠핑 지우기' 둘 다). 지운 뒤 되돌리기 가능
+function tripRemove(t, fromList) {
+  if (!t || !confirm(`이 캠핑을 지울까요? (${t.name})
+고른 장비와 체크한 내용도 같이 지워져요.`)) return false;
+  const i = TRIPS.indexOf(t), tomb = { id: t.id, del: 1 }; TRIPS.splice(i, 1); TDELS.push(tomb); saveTrips(tomb);
+  if (fromList) homeUI(); else location.hash = '#';
+  toast(`‘${t.name}’ 지웠어요`, () => { TDELS = TDELS.filter(x => x !== tomb); TRIPS.splice(i, 0, t); saveTrips(t); if (fromList) homeUI(); else location.hash = '#t/' + t.id; });
+  return true;
 }
+function tripDelete() { if (tripRemove(tripById(TD.edit), false)) closeTripDlg(); }
 
 /* ---------- 캠핑 하나: 체크하기 / 장비 고르기 ---------- */
 function tripUI() {
@@ -233,6 +237,7 @@ function tripChange(e) {
 function tripsInit() {
   loadTrips();
   $('newTrip').addEventListener('click', () => tripFormOpen());
+  $('tripList').addEventListener('click', e => { const b = e.target.closest('button[data-del]'); if (b) tripRemove(tripById(b.dataset.del), true); });
   $('tripEdit').addEventListener('click', () => tripFormOpen(CUR));
   $('tripForm').addEventListener('submit', tripSubmit);
   $('tdCancel').addEventListener('click', closeTripDlg);

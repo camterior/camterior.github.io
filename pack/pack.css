@@ -343,3 +343,10 @@ a.btn-main{display:inline-flex;align-items:center;justify-content:center;text-de
 .push .btn-main{flex:none;background:var(--accent)}
 .pu-b{display:flex;gap:14px;margin-left:52px;width:100%}
 .pu-b .link{padding:0}
+
+/* 캠핑 목록에서 바로 지우기 */
+.tc-li{position:relative}
+.tc-li .tc-p{padding-right:40px;min-height:24px}
+.tc-del{position:absolute;right:8px;bottom:8px;width:40px;height:40px;border:0;border-radius:12px;background:none;color:var(--ink-3);display:grid;place-items:center}
+.tc-del svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tc-del:hover,.tc-del:focus-visible{background:rgba(226,70,26,.08);color:var(--accent-2)}
