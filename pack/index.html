@@ -8,9 +8,14 @@
 <meta name="theme-color" content="#0C1813">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://camterior-ai.ghdwnd2.workers.dev; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<link rel="icon" href="../assets/icon-64.png" type="image/png">
-<link rel="apple-touch-icon" href="../assets/icon-180.png">
-<link rel="stylesheet" href="pack.css?v=5">
+<link rel="icon" href="icons/icon-64.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="캠핑 챙김">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="pack.css?v=7">
 </head>
 <body>
 <header class="top">
@@ -32,6 +37,7 @@
       <p class="sub">캠핑을 만들고 <b>내 장비</b>에서 가져갈 것을 고른 뒤, 차에 실을 때마다 하나씩 체크해요.</p>
       <button type="button" class="btn-main wide" id="newTrip">+ 새 캠핑 만들기</button>
     </section>
+    <aside class="install" id="install" hidden aria-labelledby="insT"></aside>
     <div id="tripList"></div>
   </div>
 
@@ -121,7 +127,7 @@
 </dialog>
 
 <div class="toast" id="toast" role="status" hidden></div>
-<script src="pack.js?v=5"></script>
-<script src="trips.js?v=5"></script>
+<script src="pack.js?v=7"></script>
+<script src="trips.js?v=7"></script>
 </body>
 </html>

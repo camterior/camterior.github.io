@@ -27,7 +27,7 @@ jobs:
         run: |
           mkdir _site
           cp -r index.html admin.html sw.js manifest.webmanifest robots.txt .nojekyll img assets _site/
-          mkdir _site/pack && cp pack/*.html pack/*.js pack/*.css pack/*.json _site/pack/
+          mkdir _site/pack && cp -r pack/*.html pack/*.js pack/*.css pack/*.json pack/*.webmanifest pack/icons _site/pack/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

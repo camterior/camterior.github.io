@@ -227,7 +227,7 @@ function tripsInit() {
   $('tripBody').addEventListener('change', tripChange);
   addEventListener('hashchange', route);
   addEventListener('storage', e => { if (e.key === K_TRIPS) { loadTrips(); tripsRefresh(); } });
-  TRIPS_READY = true; route();
+  TRIPS_READY = true; route(); installUI();
 }
 // 장비 목록이 바뀌면 (서버에서 불러옴·다른 탭에서 고침) 지금 화면 다시 그리기
 function tripsRefresh() {
@@ -235,3 +235,28 @@ function tripsRefresh() {
   const v = document.body.dataset.view;
   if (v === 'trip') tripUI(); else if (v === 'home') homeUI();
 }
+
+/* ---------- 홈 화면 설치 (5단계) ---------- */
+const K_INST = 'packInstallHide';
+let installEvt = null;
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+function installUI() {
+  const box = $('install'); if (!box) return;
+  let hide = false; try { hide = !!localStorage.getItem(K_INST); } catch (e) {}
+  const ios = isIOS(), can = !!installEvt;
+  if (isStandalone() || hide || (!ios && !can)) { box.hidden = true; return; }
+  box.hidden = false;
+  box.innerHTML = `<img src="icons/icon-64.png" alt="" width="44" height="44">
+    <div class="ins-t"><b id="insT">홈 화면에 두고 앱처럼 쓰세요</b>
+    ${ios ? '<span>Safari 아래쪽 <b>공유 버튼</b>(네모에 위 화살표)을 누르고 <b>‘홈 화면에 추가’</b>를 고르세요.</span>'
+          : '<span>캠핑장에서 인터넷이 약해도 체크리스트가 열려요.</span>'}</div>
+    ${can ? '<button type="button" class="btn-main sm" id="insGo">설치</button>' : ''}
+    <button type="button" class="ins-x" id="insX" aria-label="설치 안내 닫기">×</button>`;
+  const go = $('insGo');
+  if (go) go.onclick = async () => { installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if (r && r.outcome === 'accepted') toast('홈 화면에 설치했어요'); installUI(); };
+  $('insX').onclick = () => { try { localStorage.setItem(K_INST, '1'); } catch (e) {} box.hidden = true; };
+}
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; installUI(); });
+addEventListener('appinstalled', () => { installEvt = null; installUI(); });
+if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));

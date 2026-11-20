@@ -254,3 +254,16 @@ a.btn-main{display:inline-flex;align-items:center;justify-content:center;text-de
 .danger-link{display:block;margin:14px auto 0;border:0;background:none;color:var(--accent-2);font-size:14px;font-weight:650;text-decoration:underline;text-underline-offset:3px}
 .danger-link[hidden]{display:none}
 .from[hidden],fieldset[hidden]{display:none}
+
+/* ===== 5단계: 홈 화면 설치 안내 ===== */
+.install{display:flex;align-items:center;gap:12px;background:var(--night);color:var(--on-night);border-radius:var(--r);padding:14px 12px 14px 14px;margin:-4px 0 22px;position:relative}
+.install[hidden]{display:none}
+.install img{flex:none;border-radius:11px;box-shadow:0 0 0 1px rgba(233,240,234,.22)}
+.ins-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--on-night-2);line-height:1.45;word-break:keep-all}
+.ins-t>b{color:var(--on-night);font-size:15px;font-weight:750}
+.ins-t span b{color:var(--on-night)}
+.install .btn-main{background:var(--accent);flex:none}
+.ins-x{flex:none;align-self:flex-start;border:0;background:none;color:var(--on-night-2);font-size:20px;line-height:1;width:28px;height:28px;border-radius:8px;margin:-4px -2px 0 0}
+.ins-x:hover{color:var(--on-night)}
+/* 홈 화면 앱으로 열었을 때: 위 막대가 상태 표시줄 아래로 */
+@media (display-mode: standalone){.top{padding-top:env(safe-area-inset-top,0px)}}

@@ -1,0 +1,18 @@
+{
+  "id": "/pack/",
+  "name": "캠핑 챙김",
+  "short_name": "캠핑 챙김",
+  "description": "캠테리어 내 장비로 캠핑 갈 때 챙길 장비를 골라 하나씩 체크해요.",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F4EF",
+  "theme_color": "#0C1813",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
