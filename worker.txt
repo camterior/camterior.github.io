@@ -6,9 +6,9 @@ binding kv_namespace RL
 binding secret_text VAPID_PRIVATE_JWK
 crons ["0 0 * * *"]
 compat 2026-10-26 flags [] usage standard observability True
-schedules [{"cron": "0 22 * * *", "created_on": "2026-11-20T05:47:12.655395Z", "modified_on": "2026-11-20T05:47:12.655395Z"}]
+schedules [{"cron": "0 0 * * *", "created_on": "2026-11-20T05:59:31.529246Z", "modified_on": "2026-11-20T05:59:31.529246Z"}]
 OK
 before 77
 deploy OK
 after 77 (before 77)
-ref refs/heads/main sha 074a459277e44c6608f1112befbbf720b0f001b5 run 44684619155
+ref refs/heads/main sha 473cf91a73e24613d4d44169690d5263171fcd32 run 44689276538
