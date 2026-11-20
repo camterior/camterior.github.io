@@ -1,7 +1,7 @@
 // 배포 전 검사: 실제 브라우저로 모든 탭을 열어 JS 오류 없이 그려지는지, 휴대폰 폭에서 가로로 넘치지 않는지, 주소(#탭)로 바로 열어도 되는지 확인
 const {chromium}=require('playwright');const http=require('http');const fs=require('fs');const path=require('path');
 const ROOT=path.resolve(__dirname,'..');const TYPES={'.html':'text/html','.js':'text/javascript','.webp':'image/webp','.woff2':'font/woff2','.svg':'image/svg+xml','.png':'image/png','.webmanifest':'application/manifest+json'};
-const srv=http.createServer((q,r)=>{let f=path.join(ROOT,decodeURIComponent(q.url.split('?')[0]));if(f.endsWith('/'))f+='index.html';
+const srv=http.createServer((q,r)=>{let u=decodeURIComponent(q.url.split('?')[0]);if(u.endsWith('/'))u+='index.html';const f=path.join(ROOT,u);
   fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);r.end();return;}r.writeHead(200,{'content-type':TYPES[path.extname(f)]||'application/octet-stream'});r.end(d);});}).listen(8799);
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1280,height:860}});const errs=[];
   p.on('pageerror',e=>errs.push(e.message));
@@ -21,5 +21,12 @@ const srv=http.createServer((q,r)=>{let f=path.join(ROOT,decodeURIComponent(q.ur
     await d.route('https://cdn.jsdelivr.net/**',q=>q.abort());await d.goto('http://127.0.0.1:8799/#'+v);await d.waitForTimeout(700);
     const ok=await d.evaluate(v=>!document.getElementById('v-'+v).hidden&&typeof mineAll==='function'&&mineAll().length>0,v).catch(()=>false);
     if(de.length||!ok)direct.push(v+(de.length?':'+de[0]:''));await d.close();}
+  // 캠핑 챙김(/pack): 휴대폰 폭에서 오류 없이 장비 목록이 불러와지고 넘치지 않는지
+  const pk=await b.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});const pe=[];pk.on('pageerror',e=>pe.push(e.message));
+  await pk.route('https://camterior-ai.ghdwnd2.workers.dev/**',q=>q.abort());await pk.goto('http://127.0.0.1:8799/pack/');await pk.waitForTimeout(900);
+  const pack=await pk.evaluate(()=>{const q=document.getElementById('q');q.value='랜드록';q.dispatchEvent(new Event('input'));
+    return {chips:document.querySelectorAll('#chips button').length,hit:document.querySelectorAll('#res [data-act=add]').length,w:document.documentElement.scrollWidth};}).catch(e=>({err:e.message}));
+  const packBad=pe.length||!(pack.chips>5&&pack.hit>0&&pack.w<=392);await pk.close();
+  console.log('캠핑 챙김',packBad?'문제 '+JSON.stringify(pack)+' '+pe.join(' | '):'정상');
   console.log('JS 오류',errs.length,JSON.stringify(r),'휴대폰 넘침',wide.length?wide.join(','):'없음','주소로 바로 열기',direct.length?direct.join(' | '):'모두 정상');await b.close();srv.close();
-  if(errs.length||wide.length||direct.length||!r.intro||!r.plan||!r.hub||r.gear<40||!r.svg||r.tents<10){console.log(errs.join('\n'));process.exit(1);}})();
+  if(packBad||errs.length||wide.length||direct.length||!r.intro||!r.plan||!r.hub||r.gear<40||!r.svg||r.tents<10){console.log(errs.join('\n'));process.exit(1);}})();

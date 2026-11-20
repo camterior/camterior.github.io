@@ -22,7 +22,7 @@ function mineThumb(it){if(!it)return '';const ph=it.k!=='tent'&&typeof GEAR_ART!
   if(!(it.key in MINE_PV)){let svg='';try{const s=GSEC.find(x=>x.k===it.k),g=s&&s.items().find(i=>i.id===it.id);const m=g&&g.html.match(/<svg[\s\S]*?<\/svg>/);svg=m?m[0]:'';}catch(e){}MINE_PV[it.key]=svg;}
   return `<span class="mn-th">${MINE_PV[it.key]}</span>`;}
 const mineByKey=k=>mineAll().find(x=>x.key===k);
-const mineCount=()=>Object.values(MYG).reduce((a,b)=>a+b,0);
+const mineCount=()=>Object.keys(MYG).filter(k=>mineByKey(k)).reduce((a,k)=>a+MYG[k],0);
 function mineAdd(key,n){const pk=document.getElementById('minePick'),t0=pk?pk.getBoundingClientRect().top:null;
   MYG[key]=Math.max(0,Math.min(20,(MYG[key]||0)+(n||1)));if(!MYG[key])delete MYG[key];mineSave();mineRender();if(pk)minePickUI();
   if(pk&&t0!=null){const d=pk.getBoundingClientRect().top-t0;if(Math.abs(d)>1)window.scrollBy(0,d);}}
@@ -253,8 +253,8 @@ let MINE_ONLY=false;try{MINE_ONLY=localStorage.getItem('camMineOnly')==='1';}cat
 function mineOnlyBtns(){['tentQ','catQ'].forEach(id=>{const inp=document.getElementById(id);if(!inp)return;const lab=inp.closest('label')||inp;
   let b=lab.previousElementSibling&&lab.previousElementSibling.classList.contains('mine-only')?lab.previousElementSibling:null;
   if(!b){b=document.createElement('button');b.type='button';b.className='mine-only';b.onclick=mineOnlyToggle;lab.parentNode.insertBefore(b,lab);}
-  const n=Object.keys(MYG).length;b.setAttribute('aria-pressed',MINE_ONLY&&n?'true':'false');b.innerHTML=`<span class="mo-dot"></span>내 장비만 보기${n?` <small>${n}</small>`:''}`;});}
-function mineOnlyToggle(){if(!Object.keys(MYG).length){if(confirm('아직 등록한 장비가 없어요. 내 장비 탭에서 등록할까요?'))go('mine');return;}
+  const n=Object.keys(MYG).filter(k=>mineByKey(k)).length;b.setAttribute('aria-pressed',MINE_ONLY&&n?'true':'false');b.innerHTML=`<span class="mo-dot"></span>내 장비만 보기${n?` <small>${n}</small>`:''}`;});}
+function mineOnlyToggle(){if(!Object.keys(MYG).filter(k=>mineByKey(k)).length){if(confirm('아직 등록한 장비가 없어요. 내 장비 탭에서 등록할까요?'))go('mine');return;}
   MINE_ONLY=!MINE_ONLY;try{localStorage.setItem('camMineOnly',MINE_ONLY?'1':'0');}catch(e){}mineOnlyBtns();renderTentList();renderCatalog();}
 (function(){const _r=mineRender;mineRender=function(){_r();mineOnlyBtns();if(MINE_ONLY){renderTentList();renderCatalog();}};
   mineOnlyBtns();if(MINE_ONLY){renderTentList();renderCatalog();}

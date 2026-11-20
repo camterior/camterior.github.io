@@ -52,11 +52,18 @@ async function acct(a, env, request, origin) {
   if ((parseInt(await env.RL.get(`am:${day}:${ip}`)) || 0) >= 30) return json({ error: "quota" }, 429, origin); // 코드 맞히기 막기
   const o = await getAcct(env, code);
   if (!o) { await bump(`am:${day}:${ip}`, 30); return json({ error: "nocode" }, 404, origin); }
-  if (a.op === "get") return json({ code, gear: o.gear || {}, vip: !!o.vip, admin: !!o.admin }, 200, origin);
+  if (a.op === "get") return json({ code, gear: o.gear || {}, custom: o.custom || {}, vip: !!o.vip, admin: !!o.admin }, 200, origin);
   if (a.op === "save") {
     const g = a.gear && typeof a.gear === "object" ? a.gear : {}, out = {};
     Object.keys(g).slice(0, 300).forEach(k => { const n = Math.round(+g[k]); if (/^[a-z]+:[a-z0-9_]{1,40}$/.test(k) && n >= 1 && n <= 20) out[k] = n; });
     o.gear = out; o.up = day;
+    // 캠핑 챙김(/pack)에서 직접 넣은 장비 이름: gear의 'my:<id>' 키와 짝. custom을 안 보내는 캠테리어 저장은 그대로 둠
+    if (a.custom && typeof a.custom === "object") {
+      const cu = {};
+      Object.keys(a.custom).slice(0, 200).forEach(id => { const v = a.custom[id] || {}, n = String(v.n || "").trim().slice(0, 40);
+        if (/^[a-z0-9]{4,12}$/.test(id) && n && out["my:" + id]) cu[id] = { n, c: String(v.c || "etc").replace(/[^a-z]/g, "").slice(0, 12) || "etc" }; });
+      o.custom = cu;
+    }
     await env.RL.put("acct:" + code, JSON.stringify(o));
     return json({ ok: true, vip: !!o.vip, admin: !!o.admin }, 200, origin);
   }

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>캠핑 챙김 · 내 장비함</title>
+<meta name="description" content="캠테리어 내 장비를 그대로 불러와서 캠핑 갈 때 챙길 장비를 정리해요.">
+<meta name="theme-color" content="#0C1813">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://camterior-ai.ghdwnd2.workers.dev; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="../assets/icon-64.png" type="image/png">
+<link rel="apple-touch-icon" href="../assets/icon-180.png">
+<link rel="stylesheet" href="pack.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="./" aria-label="캠핑 챙김 처음으로"><span class="brand-mark" aria-hidden="true">✓</span>캠핑 챙김</a>
+    <a class="back" href="../#mine">캠테리어로</a>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <section class="hero" aria-labelledby="hT">
+    <p class="kicker">내 장비함</p>
+    <h1 id="hT">가진 장비를 한곳에</h1>
+    <p class="sub">캠테리어의 <b>내 장비</b>와 같은 목록이에요. 여기서 넣거나 빼면 캠테리어에도 똑같이 바뀌어요.</p>
+    <div class="stat"><span id="cnt">불러오는 중…</span><span class="sync" id="sync" role="status"></span></div>
+  </section>
+
+  <section class="card add" aria-labelledby="aT">
+    <h2 id="aT">장비 넣기</h2>
+    <form class="search" onsubmit="return false" role="search">
+      <label class="sr-only" for="q">장비 이름으로 찾기</label>
+      <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="예: 랜드록, IGT, 원액션테이블, 랜턴">
+    </form>
+    <div class="chips" id="chips" role="group" aria-label="분류별로 보기"></div>
+    <ul class="results" id="res" aria-live="polite"></ul>
+    <button type="button" class="ghost-btn" id="selfBtn">+ 목록에 없는 장비 직접 넣기</button>
+  </section>
+
+  <section aria-labelledby="lT">
+    <div class="list-head"><h2 id="lT">내 장비</h2><button type="button" class="link" id="foldAll" hidden>모두 접기</button></div>
+    <div id="list"></div>
+  </section>
+
+  <section class="card acct" aria-labelledby="cT">
+    <h2 id="cT">다른 기기와 같이 쓰기</h2>
+    <div id="acct"></div>
+  </section>
+</main>
+
+<dialog class="sheet" id="selfDlg" aria-labelledby="sT">
+  <form method="dialog" class="sheet-in" id="selfForm">
+    <h2 id="sT">직접 넣기</h2>
+    <p class="hint">캠테리어 목록에 없는 장비예요. 체크리스트에는 나오지만 캠테리어 도면에는 나오지 않아요.</p>
+    <label class="field"><span>이름</span><input id="sName" maxlength="40" autocomplete="off" required placeholder="예: 베어본즈 랜턴, 팩 망치"></label>
+    <fieldset class="field"><legend>분류</legend><div class="cats" id="sCats"></div></fieldset>
+    <div class="field row"><span>개수</span><div class="step big"><button type="button" id="sMinus" aria-label="하나 빼기">−</button><b id="sN">1</b><button type="button" id="sPlus" aria-label="하나 더">+</button></div></div>
+    <p class="err" id="sErr" role="alert"></p>
+    <div class="sheet-btns"><button type="button" class="btn-line" id="sCancel">닫기</button><button type="submit" class="btn-main" id="sOk">넣기</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+<script src="pack.js"></script>
+</body>
+</html>
