@@ -1,4 +1,5 @@
 binding secret_text ADMIN_KEY
+binding secret_text ANTHROPIC_API_KEY
 binding secret_text GEMINI_API_KEY
 binding secret_text INVITE_CODE
 binding kv_namespace RL
@@ -8,4 +9,4 @@ OK
 before 77
 deploy OK
 after 77 (before 77)
-ref refs/heads/main sha a64431bc582e76a4570a34cf9a745715279e4d7f run 44679423138
+ref refs/heads/main sha 5df842ed18cafd865f50c3ff33c92ca34303fe8a run 44681426709
