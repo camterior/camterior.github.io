@@ -299,9 +299,9 @@ async function start() {
     const cat = await (await fetch('catalog.json', { cache: 'no-cache' })).json();
     SECS = cat.secs;
     const secT = Object.fromEntries(SECS);
-    ITEMS = cat.items.map(([key, name, model, ph]) => {
+    ITEMS = cat.items.map(([key, name, model, ph, fuel]) => {
       const k = key.split(':')[0], id = key.slice(k.length + 1);
-      return { key, k, id, name, model: model || '', ph: !!ph, grp: k, grpT: secT[k], secT: secT[k], icon: SEC_ICON[k], hay: norm([name, model, secT[k]].join(' ')) };
+      return { key, k, id, name, model: model || '', ph: !!ph, fuel: fuel || null, grp: k, grpT: secT[k], secT: secT[k], icon: SEC_ICON[k], hay: norm([name, model, secT[k]].join(' ')) };
     });
     BY = new Map(ITEMS.map(x => [x.key, x]));
   } catch (e) { $('res').innerHTML = '<li class="self"><span>장비 목록을 불러오지 못했어요. 새로고침해 주세요.</span></li>'; }

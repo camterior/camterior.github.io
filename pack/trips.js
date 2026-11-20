@@ -173,6 +173,7 @@ function tripUI() {
   document.querySelectorAll('#tripSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === MODE)));
   $('tripFilter').hidden = MODE !== 'check' || !st.n;
   if (typeof aiCardUI === 'function') aiCardUI(t);
+  fuelUI(t);
   MODE === 'pick' ? pickUI(t) : checkUI(t);
 }
 function grouped(keys) {
@@ -358,3 +359,38 @@ async function tripsPull(force) {
 }
 addEventListener('online', () => { if (tDirty()) tripsPush(); else tripsPull(true); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && TRIPS_READY) tripsPull(); });
+
+/* ---------- 등유 계산 ----------
+   캠테리어 제원(catalog.json의 fuel = {t:탱크 L, a:약 L/h, b:강 L/h, c:'official'|'retailer'|'mixed', n:메모})으로
+   이번 캠핑에 고른 등유 난방기의 필요한 양을 계산. 하루 켜는 시간은 이 기기에 저장(packFuelH, 기본 15시간 = 저녁 6시~아침 9시)
+   세기: AI 날씨가 있으면 가장 추운 밤 최저기온으로 (10° 이상 = 약, -5° 이하 = 강, 사이는 비례), 없으면 중간 */
+const K_FUELH = 'packFuelH';
+const fuelH = () => { const v = Number(lsGet(K_FUELH, 15)); return v >= 4 && v <= 24 ? v : 15; };
+const l1 = v => (Math.round(v * 10) / 10).toLocaleString('ko-KR');
+function fuelUI(t) {
+  const box = $('fuelCard'); if (!box) return;
+  const hs = tripKeys(t).map(k => ({ it: info(k), q: t.items[k] })).filter(x => x.it.fuel && x.it.fuel.a);
+  if (!hs.length) { box.hidden = true; box.innerHTML = ''; return; }
+  const H = fuelH(), N = Math.max(1, t.nights || 0);
+  const lows = t.ai && Array.isArray(t.ai.days) ? t.ai.days.map(d => Number(d.low)).filter(Number.isFinite) : [];
+  const lo = lows.length ? Math.min(...lows) : null;
+  const f = lo == null ? 0.5 : Math.max(0, Math.min(1, (10 - lo) / 15));
+  let tot = 0, min = 0, max = 0, unsure = false;
+  const rows = hs.map(({ it, q }) => {
+    const F = it.fuel, b = F.b || F.a, lph = F.a + (b - F.a) * f, need = lph * H * N * q;
+    tot += need; min += F.a * H * N * q; max += b * H * N * q; if (F.c !== 'official') unsure = true;
+    const run = F.t ? F.t / lph : 0, refill = run && run < H ? Math.ceil(H / run) - 1 : 0;
+    return `<li><span class="fu-t"><b>${esc(it.name)}${q > 1 ? ` ×${q}` : ''}</b><small>시간당 ${l1(F.a)}${F.b && F.b !== F.a ? `~${l1(F.b)}` : ''}L${F.t ? ` · 연료통 ${l1(F.t)}L, 가득 채우면 약 ${Math.floor(run)}시간` : ''}${refill ? ` → 밤마다 ${refill}번쯤 더 넣기` : ''}</small>${F.c !== 'official' ? `<small class="fu-warn">${F.c === 'mixed' ? '출처 엇갈림' : '판매처 제원'} · 추정</small>` : ''}</span><span class="fu-n">${Math.ceil(need)}L</span></li>`;
+  }).join('');
+  const cans = Math.ceil(tot / 20);
+  box.hidden = false;
+  box.innerHTML = `<div class="fu-head"><b>🛢 등유 약 ${Math.ceil(tot)}L</b><small>말통(20L) ${cans}개${min !== max ? ` · 범위 ${Math.ceil(min)}~${Math.ceil(max)}L` : ''}</small></div>
+    <ul class="fu-list">${rows}</ul>
+    <div class="fu-opt"><span>하루 켜는 시간</span><div class="step"><button type="button" data-fh="-1" aria-label="한 시간 줄이기">−</button><b>${H}시간</b><button type="button" data-fh="1" aria-label="한 시간 늘리기">+</button></div></div>
+    <p class="fu-note">${N}밤 × ${H}시간 · ${lo == null ? '날씨를 몰라 중간 세기로 계산 (AI 추천을 받으면 기온으로 맞춰요)' : `가장 추운 밤 ${lo}° 기준 ${f >= .85 ? '강하게' : f <= .15 ? '약하게' : '중간 세기로'}`}. 실제 소비는 텐트·바람에 따라 달라요.${unsure ? ' 일부 장비는 공식 제원을 못 찾아 추정이에요.' : ''}</p>`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-fh]'); if (!b) return;
+  lsSet(K_FUELH, Math.max(4, Math.min(24, fuelH() + Number(b.dataset.fh))));
+  const t = tripById(CUR); if (t) fuelUI(t);
+});
