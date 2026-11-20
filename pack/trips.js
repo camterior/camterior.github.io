@@ -100,6 +100,7 @@ function homeUI() {
   box.innerHTML = (up.length ? `<h2 class="sec-t">다가오는 캠핑</h2><ul class="trips">${up.map(cardT).join('')}</ul>` : '<p class="muted pad">다가오는 캠핑이 없어요.</p>') +
     (past.length ? `<details class="past"${up.length ? '' : ' open'}><summary>지난 캠핑 <small>${past.length}</small></summary><ul class="trips">${past.map(cardT).join('')}</ul></details>` : '');
   fillBars(box);
+  if (typeof pushUI === 'function') pushUI();
 }
 
 /* ---------- 캠핑 만들기·고치기 ---------- */

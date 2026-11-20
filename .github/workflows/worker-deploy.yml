@@ -46,6 +46,12 @@ jobs:
             elif t in ('secret_text','plain_text'): pass
             else: bad.append(f'{t}:{n}')
           if kv: toml.append('kv_namespaces = ['+', '.join(kv)+']')
+          # 크론: 지금 있는 것 + Camping Check 아침 알림(매일 07:00 KST = 22:00 UTC)
+          try: ex=[x.get('cron') for x in ((json.load(open('sched.json')).get('result') or {}).get('schedules') or []) if x.get('cron')]
+          except Exception: ex=[]
+          crons=sorted(set(ex+['0 22 * * *']))
+          toml+=['','[triggers]','crons = '+json.dumps(crons)]
+          info.append('crons '+json.dumps(crons))
           if ob.get('enabled'): toml+=['','[observability]','enabled = true']
           info.append(f'compat {cd} flags {fl} usage {r.get("usage_model")} observability {ob.get("enabled")}')
           try: info.append('schedules '+json.dumps((json.load(open('sched.json')).get('result') or {}).get('schedules')))

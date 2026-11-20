@@ -331,3 +331,15 @@ a.btn-main{display:inline-flex;align-items:center;justify-content:center;text-de
 .ai-card>.link{margin-top:10px}
 .nm small.why{color:var(--ink-2);font-size:12px;line-height:1.4;margin-top:1px;word-break:keep-all}
 .ck[aria-pressed="true"] .nm small.why{display:none}
+
+/* ===== 7단계: 캠핑 날 아침 알림 ===== */
+.push{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:-4px 0 22px;flex-wrap:wrap}
+.push[hidden]{display:none}
+.pu-ic{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--paper-2);font-size:19px}
+.pu-ic.on{background:rgba(47,122,79,.12)}
+.pu-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--ink-2);line-height:1.45;word-break:keep-all}
+.pu-t>b{color:var(--ink);font-size:15px;font-weight:750}
+.pu-t span b{color:var(--ink)}
+.push .btn-main{flex:none;background:var(--accent)}
+.pu-b{display:flex;gap:14px;margin-left:52px;width:100%}
+.pu-b .link{padding:0}

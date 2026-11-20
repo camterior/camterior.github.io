@@ -94,7 +94,7 @@ async function accountOf(env, request, rawCode) {
 
 // ───────── 장비 목록 (캠테리어 catalog.json) ─────────
 let CATALOG = null, CATALOG_AT = 0;
-async function getCatalog() {
+export async function getCatalog() {
   if (CATALOG && Date.now() - CATALOG_AT < 3600e3) return CATALOG;
   const res = await fetch(CATALOG_URL, { cf: { cacheTtl: 3600 } });
   if (!res.ok) { if (CATALOG) return CATALOG; throw new PackError("catalog", "장비 목록을 불러오지 못했어요.", 502); }

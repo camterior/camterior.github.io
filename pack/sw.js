@@ -3,8 +3,8 @@
 // - 버전 붙은 파일(?v=)·아이콘·글꼴·장비 사진: 저장해 둔 것 먼저
 // - 서버(워커) 요청은 건드리지 않음
 // 파일을 고치면 index.html의 ?v= 숫자와 아래 V를 같이 올려 주세요.
-const V = 'pack-v13';
-const SHELL = ['./', 'pack.css?v=13', 'pack.js?v=13', 'trips.js?v=13', 'ai.js?v=13', 'catalog.json', 'manifest.webmanifest',
+const V = 'pack-v14';
+const SHELL = ['./', 'pack.css?v=14', 'pack.js?v=14', 'trips.js?v=14', 'ai.js?v=14', 'push.js?v=14', 'catalog.json', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-180.png', 'icons/icon-64.png', '../assets/pretendard.woff2'];
 
 self.addEventListener('install', e => {
@@ -29,4 +29,21 @@ self.addEventListener('fetch', e => {
     if (res.ok && (/\/pack\//.test(u.pathname) || /\/img\/gear\/|\/assets\//.test(u.pathname))) { const c = res.clone(); caches.open(V).then(x => x.put(r, c)); }
     return res;
   })));
+});
+
+// 7단계: 캠핑 날 아침 알림 받기 (서버 worker/pack-push.js가 보냄)
+self.addEventListener('push', e => {
+  let m = {}; try { m = e.data ? e.data.json() : {}; } catch (x) { m = { body: e.data && e.data.text() }; }
+  e.waitUntil(self.registration.showNotification(m.title || 'Camping Check', {
+    body: m.body || '오늘 챙길 장비를 확인해 보세요.', tag: m.tag || 'pack', icon: 'icons/icon-192.png', badge: 'icons/icon-64.png',
+    data: { url: m.url || '/pack/' } }));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = new URL((e.notification.data && e.notification.data.url) || '/pack/', self.location.origin).href;
+  e.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then(ws => {
+    const w = ws.find(c => c.url.includes('/pack/'));
+    if (w) { w.navigate(url).catch(() => {}); return w.focus(); }
+    return clients.openWindow(url);
+  }));
 });
