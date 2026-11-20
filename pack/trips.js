@@ -117,8 +117,9 @@ function tripFormOpen(editId) {
   if (!t) {
     const prev = TRIPS.filter(x => Object.keys(x.items).length).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
     const nGear = Object.keys(MYG).length;
-    TD.from = prev.length ? 'trip:' + prev[0].id : 'empty';
-    const opts = [['empty', '빈 목록에서 고르기', '다음 화면에서 내 장비를 하나씩 골라요'],
+    TD.from = nGear ? 'ai' : prev.length ? 'trip:' + prev[0].id : 'empty';
+    const opts = [...(nGear ? [['ai', '✨ AI가 날씨·환경 보고 골라주기', '지역·바닥·주변 환경을 넣으면 내 장비에서 골라요']] : []),
+      ['empty', '빈 목록에서 고르기', '다음 화면에서 내 장비를 하나씩 골라요'],
       ...(nGear ? [['all', `내 장비 전부 (${nGear}종)`, '다 넣어 두고 안 가져갈 것만 빼요']] : []),
       ...prev.map(x => ['trip:' + x.id, `‘${x.name}’ 목록 그대로`, `${whenT(x)} · ${Object.keys(x.items).length}종`])];
     $('tdFrom').innerHTML = opts.map(([v, a, b]) => `<label class="opt"><input type="radio" name="tdFrom" value="${esc(v)}"${v === TD.from ? ' checked' : ''}><span><b>${esc(a)}</b><small>${esc(b)}</small></span></label>`).join('');
@@ -143,6 +144,7 @@ function tripSubmit(e) {
   const t = { id: tripId(), name, date, nights: TD.nights, place, items, done: {}, at: Date.now() };
   TRIPS.push(t); saveTrips(t); closeTripDlg();
   location.hash = '#t/' + t.id;
+  if (f === 'ai' && typeof aiOpen === 'function') setTimeout(() => aiOpen(t.id), 250);
 }
 function tripDelete() {
   const t = tripById(TD.edit); if (!t || !confirm(`이 캠핑을 지울까요? (${t.name})
@@ -165,6 +167,7 @@ function tripUI() {
   fillBars($('tripProg'));
   document.querySelectorAll('#tripSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === MODE)));
   $('tripFilter').hidden = MODE !== 'check' || !st.n;
+  if (typeof aiCardUI === 'function') aiCardUI(t);
   MODE === 'pick' ? pickUI(t) : checkUI(t);
 }
 function grouped(keys) {
@@ -183,7 +186,8 @@ function checkUI(t) {
     const all = grouped(keys).find(x => x.k === g.k).list, d = all.filter(it => t.done[it.key]).length;
     return `<section class="ck-grp"><h3><span>${esc(g.t)}</span><small${d === all.length ? ' class="ok"' : ''}>${d}/${all.length}</small></h3><ul>${g.list.map(it => {
       const on = !!t.done[it.key], q = t.items[it.key];
-      return `<li><button type="button" class="ck" data-k="${esc(it.key)}" aria-pressed="${on}"><span class="box" aria-hidden="true"></span>${thumb(it)}<span class="nm"><b>${esc(it.name)}</b>${!MYG[it.key] && !it.gone ? '<small class="tag">내 장비함에서 빠진 장비</small>' : it.my ? '<small class="tag">직접 넣음</small>' : ''}</span>${q > 1 ? `<span class="qty">×${q}</span>` : ''}</button></li>`;
+      const why = t.ai && t.ai.why && t.ai.why[it.key];
+      return `<li><button type="button" class="ck" data-k="${esc(it.key)}" aria-pressed="${on}"><span class="box" aria-hidden="true"></span>${thumb(it)}<span class="nm"><b>${esc(it.name)}</b>${!MYG[it.key] && !it.gone ? (t.ai && (t.ai.fp || []).includes(it.key) ? '<small class="tag">캠테리어 세팅의 장비 · 내 장비함엔 없음</small>' : '<small class="tag">내 장비함에서 빠진 장비</small>') : it.my ? '<small class="tag">직접 넣음</small>' : ''}${why ? `<small class="why">${esc(why)}</small>` : ''}</span>${q > 1 ? `<span class="qty">×${q}</span>` : ''}</button></li>`;
     }).join('')}</ul></section>`;
   }).join('') : `<div class="empty"><p><b>다 챙겼어요 🎉</b></p><p>‘안 챙긴 것만 보기’를 끄면 전체 목록이 보여요.</p></div>`;
   const st = tripStat(t);

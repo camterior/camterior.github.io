@@ -275,3 +275,59 @@ a.btn-main{display:inline-flex;align-items:center;justify-content:center;text-de
 .tsync[data-s="ok"]::before{background:var(--ok)}
 .tsync[data-s="wait"]::before,.tsync[data-s="pull"]::before{background:var(--warn)}
 .tsync[data-s="off"]{color:var(--accent-2)}.tsync[data-s="off"]::before{background:var(--accent-2)}
+
+/* ===== 4단계: AI 추천 ===== */
+.field.two.eq{grid-template-columns:1fr 1fr}
+.field select{width:100%;height:48px;border:1.5px solid var(--line);border-radius:12px;padding:0 10px;font-size:15px;background:var(--bg);color:var(--ink)}
+.plan-note{display:block;margin-top:6px;color:var(--ok);font-size:12.5px;font-weight:600}
+.plan-note:empty{display:none}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pills button{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600;color:var(--ink-2);display:inline-flex;align-items:center;gap:5px}
+.pills button[aria-pressed="true"]{background:var(--night);border-color:var(--night);color:#fff}
+.pills.env{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.pills.env button{flex-direction:column;border-radius:12px;padding:8px 2px;font-size:12.5px;gap:1px;white-space:nowrap}
+.pills.env button span{font-size:18px}
+.ai-left{margin:12px 0 0;font-size:13px;color:var(--ink-3)}
+.ai-left:empty{display:none}
+.ai-wait{display:flex;flex-direction:column;align-items:center;gap:6px;padding:36px 0 26px;text-align:center}
+.ai-wait[hidden]{display:none}
+.ai-wait b{font-size:16px}
+.ai-wait small{color:var(--ink-3);font-size:13px}
+.spin{width:34px;height:34px;border-radius:50%;border:3px solid var(--line-2);border-top-color:var(--accent);animation:spin .8s linear infinite;margin-bottom:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:2.4s}}
+.sheet-btns button:disabled{opacity:.5}
+
+.ai-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:0 0 14px}
+.ai-card[hidden]{display:none}
+.ai-card.cta{padding:0;border:0;background:none}
+.ai-cta{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-radius:var(--r);padding:14px 16px;background:var(--night);color:var(--on-night)}
+.ai-cta b{display:block;font-size:15.5px;font-weight:750;color:#fff}
+.ai-cta small{display:block;font-size:12.5px;color:var(--on-night-2);margin-top:2px;line-height:1.4;word-break:keep-all}
+.ai-spark{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--accent);font-size:19px}
+.ai-head{display:flex;flex-direction:column;gap:2px;margin-bottom:10px}
+.ai-head b{font-size:15px;font-weight:800}
+.ai-head small{color:var(--ink-3);font-size:12.5px;line-height:1.4;word-break:keep-all}
+.wx{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}
+.wx::-webkit-scrollbar{display:none}
+.wx-d{flex:1 0 96px;display:flex;flex-direction:column;gap:1px;background:var(--bg);border-radius:12px;padding:9px 10px;font-size:13px}
+.wx-d>span:first-child{color:var(--ink-3);font-size:12px;font-weight:650}
+.wx-d b{font-size:14px}
+.wx-d>span:nth-child(3){font-weight:750;font-variant-numeric:tabular-nums}
+.wx-d small{color:var(--ink-3);font-size:11.5px;white-space:nowrap}
+.wx-src{margin:8px 0 0;font-size:12px;color:var(--ink-3)}
+.advice{margin:10px 0 0;padding:10px 12px;border-left:3px solid var(--accent);background:rgba(255,90,31,.06);border-radius:0 10px 10px 0;font-size:14px;line-height:1.55;color:var(--ink);word-break:keep-all}
+.missing{margin-top:10px;border:1px dashed var(--line);border-radius:12px;padding:0 12px}
+.missing summary{cursor:pointer;padding:10px 0;font-weight:750;font-size:14px;list-style:none}
+.missing summary::-webkit-details-marker{display:none}
+.missing summary::before{content:"▸ ";color:var(--ink-3)}
+.missing[open] summary::before{content:"▾ "}
+.missing summary small{font-weight:500;color:var(--ink-3);font-size:12.5px;margin-left:4px}
+.missing ul{list-style:none;margin:0;padding:0 0 8px}
+.missing li{display:flex;flex-direction:column;gap:1px;padding:8px 0;border-top:1px solid var(--line-2);font-size:13.5px}
+.missing li b{font-weight:700}
+.missing li small{color:var(--ink-2);font-size:12.5px;line-height:1.45;word-break:keep-all}
+.missing li small.alt{color:var(--ok)}
+.ai-card>.link{margin-top:10px}
+.nm small.why{color:var(--ink-2);font-size:12px;line-height:1.4;margin-top:1px;word-break:keep-all}
+.ck[aria-pressed="true"] .nm small.why{display:none}

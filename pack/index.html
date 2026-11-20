@@ -15,7 +15,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Camping Check">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="pack.css?v=11">
+<link rel="stylesheet" href="pack.css?v=13">
 </head>
 <body>
 <header class="top">
@@ -54,6 +54,7 @@
       <p class="sub" id="tripPlace" hidden></p>
       <div class="prog" id="tripProg"></div>
     </section>
+    <section class="ai-card" id="aiCard" hidden aria-label="날씨와 AI 조언"></section>
     <div class="seg" role="group" aria-label="보기" id="tripSeg">
       <button type="button" data-mode="check" aria-pressed="true">체크하기</button>
       <button type="button" data-mode="pick" aria-pressed="false">장비 고르기</button>
@@ -127,8 +128,32 @@
   </form>
 </dialog>
 
+<!-- AI로 챙길 장비 고르기 -->
+<dialog class="sheet" id="aiDlg" aria-labelledby="aiT">
+  <form method="dialog" class="sheet-in" id="aiForm" novalidate>
+    <h2 id="aiT">✨ AI로 챙길 장비 고르기</h2>
+    <p class="hint" id="aiTrip"></p>
+    <div id="aiFields">
+      <div class="field two eq">
+        <label><span>지역</span><input id="aiRegion" maxlength="50" autocomplete="off" placeholder="예: 경기 가평"></label>
+        <label><span>캠핑장 <small>(선택)</small></span><input id="aiSite" maxlength="50" autocomplete="off" placeholder="예: 자라섬 캠핑장"></label>
+      </div>
+      <fieldset class="field"><legend>사이트 바닥</legend><div class="pills" id="aiGround"></div></fieldset>
+      <fieldset class="field"><legend>주변 환경 <small>(최대 3개)</small></legend><div class="pills env" id="aiEnv"></div></fieldset>
+      <label class="field"><span>사이트 특징 <small>(선택)</small></span><input id="aiNote" maxlength="80" autocomplete="off" placeholder="예: 그늘 없음, 개수대 멀다"></label>
+      <label class="field" id="aiPlanBox" hidden><span>캠테리어에 저장한 세팅 <small>(있으면 그 장비를 기준으로)</small></span>
+        <select id="aiPlan"><option value="">세팅 없이</option></select><small class="plan-note" id="aiPlanNote"></small></label>
+      <p class="ai-left" id="aiLeft"></p>
+    </div>
+    <div class="ai-wait" id="aiWait" hidden><span class="spin" aria-hidden="true"></span><b id="aiStep">날씨 확인 중…</b><small>15~30초쯤 걸려요</small></div>
+    <p class="err" id="aiErr" role="alert"></p>
+    <div class="sheet-btns"><button type="button" class="btn-line" id="aiCancel">닫기</button><button type="submit" class="btn-main" id="aiGo">추천 받기</button></div>
+  </form>
+</dialog>
+
 <div class="toast" id="toast" role="status" hidden></div>
-<script src="pack.js?v=11"></script>
-<script src="trips.js?v=11"></script>
+<script src="pack.js?v=13"></script>
+<script src="trips.js?v=13"></script>
+<script src="ai.js?v=13"></script>
 </body>
 </html>

@@ -106,8 +106,19 @@ async function acct(a, env, request, origin) {
         Object.keys(t.done && typeof t.done === "object" ? t.done : {}).forEach(k => { if (items[k]) done[k] = 1; });
         const dt = {}, ts = v => Math.min(now + 6e4, Math.max(0, +v || 0));
         Object.keys(t.dt && typeof t.dt === "object" ? t.dt : {}).slice(0, 300).forEach(k => { if (keyRe.test(k) && +t.dt[k] > 0) dt[k] = ts(t.dt[k]); });
+        // AI 추천 결과(날씨·조언·없음 목록·장비별 이유·조건)도 같이 보관 (크기 제한)
+        let ai;
+        if (t.ai && typeof t.ai === "object") {
+          const S = (v, n) => String(v == null ? "" : v).slice(0, n), N = v => (typeof v === "number" && isFinite(v) ? Math.round(v * 10) / 10 : null), A = t.ai, why = {};
+          Object.keys(A.why && typeof A.why === "object" ? A.why : {}).slice(0, 300).forEach(k => { if (items[k]) why[k] = S(A.why[k], 200); });
+          const c = A.cond && typeof A.cond === "object" ? A.cond : {};
+          ai = { at: ts(A.at), advice: S(A.advice, 400), plan: S(A.plan, 40), place: S(A.place, 40), source: A.source === "forecast" ? "forecast" : "last-year",
+            days: (Array.isArray(A.days) ? A.days : []).slice(0, 15).map(d => ({ date: S(d && d.date, 10), sky: S(d && d.sky, 10), high: N(d && d.high), low: N(d && d.low), rainChance: N(d && d.rainChance), rain: N(d && d.rain), wind: N(d && d.wind) })),
+            missing: (Array.isArray(A.missing) ? A.missing : []).slice(0, 8).map(m => ({ name: S(m && m.name, 60), why: S(m && m.why, 200), alt: S(m && m.alt, 200) })),
+            why, fp: (Array.isArray(A.fp) ? A.fp : []).filter(k => items[k]).slice(0, 100), cond: { region: S(c.region, 50), ground: S(c.ground, 10), env: (Array.isArray(c.env) ? c.env : []).slice(0, 3).map(x => S(x, 10)), note: S(c.note, 80) } };
+        }
         return { id: t.id, name: String(t.name || "캠핑").slice(0, 30), date: t.date, nights: Math.max(0, Math.min(14, Math.round(+t.nights || 0))),
-          place: String(t.place || "").slice(0, 30), items, done, dt, at: Math.max(0, +t.at || 0), up, mu: ts(t.mu) };
+          place: String(t.place || "").slice(0, 30), items, done, dt, at: Math.max(0, +t.at || 0), up, mu: ts(t.mu), ...(ai ? { ai } : {}) };
       };
       const merge = (a, b) => {
         if (a.del || b.del) return (b.up || 0) > (a.up || 0) ? b : a;
