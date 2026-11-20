@@ -158,6 +158,26 @@ function tripRemove(t, fromList) {
 }
 function tripDelete() { if (tripRemove(tripById(TD.edit), false)) closeTripDlg(); }
 
+/* ---------- 지도 바로가기: 카카오맵 검색 (키·서버 없이) ---------- */
+const KMAP = q => 'https://map.kakao.com/link/search/' + encodeURIComponent(q);
+function gasQuery(t) {
+  // 캠핑장 이름을 통째로 넣으면 카카오맵이 못 찾아서, 지역(AI) → 장소 첫 단어 순으로 짧게
+  const region = ((t.ai && t.ai.cond && t.ai.cond.region) || '').trim();
+  if (region) return region + ' 주유소';
+  let w = (t.place || '').trim().split(/\s+/)[0] || '';
+  const cut = w.replace(/(오토)?캠핑장$|글램핑장?$|야영장$/, '');   // 자라섬캠핑장 → 자라섬
+  if (cut.length >= 2) w = cut;
+  return w ? w + ' 주유소' : '';
+}
+function mapsUI(t) {
+  const box = $('tripMaps'); if (!box) return;
+  const where = (t.place || (t.ai && t.ai.cond && t.ai.cond.region) || '').trim(), gas = gasQuery(t);
+  box.hidden = !where;
+  if (!where) { box.innerHTML = ''; return; }
+  const a = (href, ico, txt, sub) => `<a class="map-btn" href="${esc(href)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">${ico}</span><b>${txt}</b><small>${sub}</small></a>`;
+  box.innerHTML = a(KMAP(where), '🗺️', '지도·길찾기', '카카오맵') + (gas ? a(KMAP(gas), '⛽', '근처 주유소', '휘발유·경유 가격') : '');
+}
+
 /* ---------- 캠핑 하나: 체크하기 / 장비 고르기 ---------- */
 function tripUI() {
   const t = tripById(CUR); if (!t) return;
@@ -165,6 +185,7 @@ function tripUI() {
   $('tripWhen').innerHTML = `${esc(whenT(t))} <span class="dd" data-k="${dd.k}">${dd.t}</span>`;
   $('tripT').textContent = t.name;
   $('tripPlace').hidden = !t.place; $('tripPlace').textContent = t.place ? '📍 ' + t.place : '';
+  mapsUI(t);
   const pct = st.n ? Math.round(st.d / st.n * 100) : 0;
   $('tripProg').innerHTML = st.n
     ? `<div class="prog-row"><b>${st.d === st.n ? '다 챙겼어요 🎉' : `${st.d} / ${st.n}`}</b><span>${st.d === st.n ? '즐거운 캠핑 되세요' : `남은 장비 ${st.n - st.d}가지`}</span></div><span class="bar big"><i data-pct="${pct}"></i></span>`
