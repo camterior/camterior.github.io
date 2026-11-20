@@ -3,10 +3,11 @@
 // - {pack:{op:'oil', campsite, region}} → 캠핑장(없으면 지역) 위치 반경 5km 안 등유 파는 주유소(가까운 순)
 //   5km 안에 없으면 그 시·군에서 등유가 싼 주유소 10곳(거리 같이)
 // - 오피넷 좌표는 KATEC(TM128, 베셀 타원체) → 위경도와 서로 바꿔 씀 (아래 toKatec/fromKatec)
-// - IP당 하루 LIMIT_OIL_IP번, 같은 위치 결과는 3시간 저장
+// - IP당 하루 LIMIT_OIL_IP번, 오피넷 호출은 모두 합쳐 하루 LIMIT_OIL_ALL번(무료 키 300건), 같은 위치 결과는 6시간 저장
 import { geocode, count, bumpKey, ipOf, kstDay, PackError } from "./pack-ai.js";
 
 export const LIMIT_OIL_IP = 40;
+export const LIMIT_OIL_ALL = 250; // 오피넷 무료 키는 하루 300건 → 모두 합쳐 250건에서 멈춤 (남는 50건은 여유)
 const API = "https://www.opinet.co.kr/api/";
 const BRAND = { SKE: "SK에너지", GSC: "GS칼텍스", HDO: "HD현대오일뱅크", SOL: "S-OIL", RTE: "자영알뜰", RTX: "고속도로알뜰", NHO: "농협알뜰", ETC: "자가상표", E1G: "E1", SKG: "SK가스" };
 
@@ -52,6 +53,9 @@ export function fromKatec(x, y) { const [la, lo] = tmInv(x, y, BES); const [a, b
 
 // ───────── 오피넷 ─────────
 async function opinet(env, path, q) {
+  const ak = `po:all:${kstDay()}`; // 오피넷 실제 호출 수 (모든 사람 합계)
+  if ((await count(env, ak)) >= LIMIT_OIL_ALL) throw new PackError("quota", "오늘 주유소 찾기가 많아 마감됐어요. 내일 다시 시도해 주세요.", 429);
+  await bumpKey(env, ak);
   const url = new URL(API + path);
   url.search = new URLSearchParams({ code: env.OPINET_KEY, out: "json", ...q });
   const res = await fetch(url, { cf: { cacheTtl: 600 } });
@@ -115,6 +119,6 @@ export async function opOil(p, env, request) {
     }
   }
   const out = { place: place.name, mode, list, at: Date.now() };
-  if (env.RL) await env.RL.put(ck, JSON.stringify(out), { expirationTtl: 3 * 3600 });
+  if (env.RL) await env.RL.put(ck, JSON.stringify(out), { expirationTtl: 6 * 3600 });
   return out;
 }
