@@ -3,10 +3,12 @@ binding secret_text ANTHROPIC_API_KEY
 binding secret_text GEMINI_API_KEY
 binding secret_text INVITE_CODE
 binding kv_namespace RL
+binding secret_text VAPID_PRIVATE_JWK
+crons ["0 22 * * *"]
 compat 2026-10-26 flags [] usage standard observability True
 schedules []
 OK
 before 77
 deploy OK
 after 77 (before 77)
-ref refs/heads/main sha 5df842ed18cafd865f50c3ff33c92ca34303fe8a run 44681426709
+ref refs/heads/main sha 27c01c8c1206409441dbb91d2c83f9703b8f3b07 run 44683279226
