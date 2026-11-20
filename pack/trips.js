@@ -367,6 +367,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 const K_FUELH = 'packFuelH';
 const fuelH = () => { const v = Number(lsGet(K_FUELH, 15)); return v >= 4 && v <= 24 ? v : 15; };
 const l1 = v => (Math.round(v * 10) / 10).toLocaleString('ko-KR');
+const l2 = v => String(Math.round(v * 100) / 100);
 function fuelUI(t) {
   const box = $('fuelCard'); if (!box) return;
   const hs = tripKeys(t).map(k => ({ it: info(k), q: t.items[k] })).filter(x => x.it.fuel && x.it.fuel.a);
@@ -380,14 +381,14 @@ function fuelUI(t) {
     const F = it.fuel, b = F.b || F.a, lph = F.a + (b - F.a) * f, need = lph * H * N * q;
     tot += need; min += F.a * H * N * q; max += b * H * N * q; if (F.c !== 'official') unsure = true;
     const run = F.t ? F.t / lph : 0, refill = run && run < H ? Math.ceil(H / run) - 1 : 0;
-    return `<li><span class="fu-t"><b>${esc(it.name)}${q > 1 ? ` ×${q}` : ''}</b><small>시간당 ${l1(F.a)}${F.b && F.b !== F.a ? `~${l1(F.b)}` : ''}L${F.t ? ` · 연료통 ${l1(F.t)}L, 가득 채우면 약 ${Math.floor(run)}시간` : ''}${refill ? ` → 밤마다 ${refill}번쯤 더 넣기` : ''}</small>${F.c !== 'official' ? `<small class="fu-warn">${F.c === 'mixed' ? '출처 엇갈림' : '판매처 제원'} · 추정</small>` : ''}</span><span class="fu-n">${Math.ceil(need)}L</span></li>`;
+    return `<li><span class="fu-t"><b>${esc(it.name)}${q > 1 ? ` ×${q}` : ''}</b><small>시간당 ${l2(F.a)}${F.b && F.b !== F.a ? `~${l2(F.b)}` : ''}L${F.t ? ` · 연료통 ${l1(F.t)}L, 가득 채우면 약 ${Math.floor(run)}시간` : ''}${refill ? ` → 밤마다 ${refill}번쯤 더 넣기` : ''}</small>${F.c !== 'official' ? `<small class="fu-warn">${F.c === 'mixed' ? '출처 엇갈림' : '판매처 제원'} · 추정</small>` : ''}</span><span class="fu-n">${Math.ceil(need)}L</span></li>`;
   }).join('');
   const cans = Math.ceil(tot / 20);
   box.hidden = false;
   box.innerHTML = `<div class="fu-head"><b>🛢 등유 약 ${Math.ceil(tot)}L</b><small>말통(20L) ${cans}개${min !== max ? ` · 범위 ${Math.ceil(min)}~${Math.ceil(max)}L` : ''}</small></div>
     <ul class="fu-list">${rows}</ul>
     <div class="fu-opt"><span>하루 켜는 시간</span><div class="step"><button type="button" data-fh="-1" aria-label="한 시간 줄이기">−</button><b>${H}시간</b><button type="button" data-fh="1" aria-label="한 시간 늘리기">+</button></div></div>
-    <p class="fu-note">${N}밤 × ${H}시간 · ${lo == null ? '날씨를 몰라 중간 세기로 계산 (AI 추천을 받으면 기온으로 맞춰요)' : `가장 추운 밤 ${lo}° 기준 ${f >= .85 ? '강하게' : f <= .15 ? '약하게' : '중간 세기로'}`}. 실제 소비는 텐트·바람에 따라 달라요.${unsure ? ' 일부 장비는 공식 제원을 못 찾아 추정이에요.' : ''}</p>`;
+    <p class="fu-note">${N}밤 × ${H}시간 · ${lo == null ? '날씨를 몰라 중간 세기로 계산 (AI 추천을 받으면 기온으로 맞춰요)' : `가장 추운 밤 ${lo}° 기준 ${f >= .85 ? '강하게' : f <= .15 ? '약하게' : '중간 세기로'}`}. 실제 소비는 텐트·바람에 따라 달라요.${unsure ? ' ‘추정’ 표시는 제조사 공식 제원으로 아직 확인하지 못한 값이에요.' : ''}</p>`;
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-fh]'); if (!b) return;
