@@ -221,8 +221,8 @@ function acctUI() {
   const c = codeGet();
   $('acct').innerHTML = `${c
     ? `<div class="code-row"><span>내 코드</span><b class="code">${esc(c)}</b><button type="button" class="btn-line sm" id="copy">복사</button></div>
-       <p class="hint">캠테리어와 같은 코드예요. 다른 기기에서 이 코드를 넣으면 같은 장비가 나와요.</p>`
-    : `<p class="hint">장비를 넣으면 내 코드가 자동으로 만들어져요. 다른 기기에서 쓰던 코드가 있으면 아래에 넣어 주세요.</p>`}
+       <p class="hint">캠테리어와 같은 코드예요. 다른 기기에서 이 코드를 넣으면 같은 장비와 캠핑 일정이 나와요.</p>`
+    : `<p class="hint">장비를 넣거나 캠핑을 만들면 내 코드가 자동으로 만들어져요. 다른 기기에서 쓰던 코드가 있으면 아래에 넣어 주세요.</p>`}
     <form class="code-form" id="codeForm"><label class="sr-only" for="codeIn">다른 기기의 내 코드</label>
       <input id="codeIn" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="예: 7KQ2-X9MD"><button type="submit" class="btn-main sm">불러오기</button></form>
     <p class="msg" id="codeMsg" role="status"></p>`;
@@ -243,6 +243,7 @@ async function codeLoad(e) {
   MYG = {}; CUS = {}; adopt(d); saveLocal();
   render(); search(); acctUI(); syncUI('idle');
   $('codeMsg').textContent = '불러왔어요. 이제 이 기기도 같은 코드를 써요';
+  if (typeof tripsPull === 'function') tripsPull(true); // 그 코드의 캠핑 일정도
 }
 
 /* ---------- 시작 ---------- */

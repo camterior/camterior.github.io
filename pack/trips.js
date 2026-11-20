@@ -1,13 +1,14 @@
 /* =====================================================================
    캠핑 챙김 · 캠핑 일정 + 체크리스트 (3단계)
    - 캠핑 목록: localStorage 'packTrips' = [{id, name, date:'YYYY-MM-DD', nights, place, items:{장비키:가져갈 개수}, done:{장비키:1}, at}]
-     (아직 이 기기에만 저장. 기기 간 동기화는 6단계)
+     + 지운 캠핑 packTripsDel=[{id,del:1,up}] (서버와 합칠 때 다시 살아나지 않게)
    - 장비 이름·사진·분류는 pack.js의 info()/groups()/thumb()를 같이 씀 (같은 '내 장비' 목록)
    - 화면 주소: #(캠핑 목록) · #t/<id>(체크리스트) · #gear(내 장비함)
+   - 6단계: 내 코드로 서버에 저장·합치기 (아래 '캠핑 일정 동기화')
    ===================================================================== */
 'use strict';
-const K_TRIPS = 'packTrips';
-let TRIPS = [], CUR = null, MODE = 'check', TRIPS_READY = false;
+const K_TRIPS = 'packTrips', K_TDEL = 'packTripsDel', K_TCODE = 'packTripsCode', K_TDIRTY = 'packTripsDirty';
+let TRIPS = [], TDELS = [], CUR = null, MODE = 'check', TRIPS_READY = false;
 const WD = ['일', '월', '화', '수', '목', '금', '토'];
 
 /* ---------- 날짜 ---------- */
@@ -37,8 +38,22 @@ function dday(t) {
 function nextSat() { const t = today0(); return addD(t, ((6 - t.getDay()) + 7) % 7 || 7); }
 
 /* ---------- 저장 ---------- */
-function loadTrips() { const v = lsGet(K_TRIPS, []); TRIPS = Array.isArray(v) ? v.filter(t => t && t.id) : []; TRIPS.forEach(t => { t.items = t.items || {}; t.done = t.done || {}; }); }
-const saveTrips = () => lsSet(K_TRIPS, TRIPS);
+function loadTrips() {
+  const v = lsGet(K_TRIPS, []); TRIPS = Array.isArray(v) ? v.filter(t => t && t.id && !t.del) : [];
+  TRIPS.forEach(t => { t.items = t.items || {}; t.done = t.done || {}; t.up = t.up || t.at || 0; });
+  const d = lsGet(K_TDEL, []); TDELS = Array.isArray(d) ? d.filter(x => x && x.id) : [];
+}
+// t를 주면 '고친 시각'을 남기고 서버에도 저장 (6단계 동기화)
+// kind: 'meta'(이름·날짜·고른 장비 → mu), 'done'(체크 → 장비마다 dt), 'both'. 두 기기가 같은 캠핑을 고쳐도 체크는 장비별로 합쳐짐
+function saveTrips(t, kind = 'meta', keys) {
+  if (t) {
+    const now = Date.now(); t.up = now;
+    if (!t.del && kind !== 'done') t.mu = now;
+    if (!t.del && kind !== 'meta') { t.dt = t.dt || {}; (keys || Object.keys(t.items || {})).forEach(k => { t.dt[k] = now; }); }
+  }
+  lsSet(K_TRIPS, TRIPS); lsSet(K_TDEL, TDELS);
+  if (t) tripsQueue();
+}
 const tripById = id => TRIPS.find(t => t.id === id);
 const tripStat = t => { const ks = Object.keys(t.items); return { n: ks.length, d: ks.filter(k => t.done[k]).length }; };
 function tripId() { const A = 'abcdefghijkmnpqrstuvwxyz23456789'; let s; do { s = ''; crypto.getRandomValues(new Uint8Array(6)).forEach(x => s += A[x % A.length]); } while (tripById(s)); return s; }
@@ -59,7 +74,7 @@ function route() {
   document.querySelectorAll('.tabs a').forEach(a => a.toggleAttribute('aria-current', a.dataset.tab === (v === 'gear' ? 'gear' : 'home')));
   document.querySelectorAll('.tabs a[aria-current]').forEach(a => a.setAttribute('aria-current', 'page'));
   if (v === 'trip') { if (CUR !== m[1]) { CUR = m[1]; const t = tripById(CUR); MODE = Object.keys(t.items).length ? 'check' : 'pick'; } tripUI(); }
-  else { CUR = null; if (v === 'home') homeUI(); }
+  else { CUR = null; if (v === 'home') homeUI(); else if (changed) render(); }
   document.title = v === 'trip' ? `${tripById(m[1]).name} · 캠핑 챙김` : v === 'gear' ? '내 장비함 · 캠핑 챙김' : '캠핑 챙김';
   if (changed) scrollTo(0, 0);
 }
@@ -120,20 +135,20 @@ function tripSubmit(e) {
   const place = $('tdPlace').value.trim().slice(0, 30);
   if (TD.edit) {
     Object.assign(tripById(TD.edit), { name, date, nights: TD.nights, place });
-    saveTrips(); closeTripDlg(); tripUI(); toast('일정을 고쳤어요'); return;
+    saveTrips(tripById(TD.edit)); closeTripDlg(); tripUI(); toast('일정을 고쳤어요'); return;
   }
   const f = (document.querySelector('input[name=tdFrom]:checked') || {}).value || 'empty', items = {};
   if (f === 'all') Object.keys(MYG).forEach(k => { items[k] = MYG[k]; });
   else if (f.startsWith('trip:')) { const src = tripById(f.slice(5)); if (src) Object.keys(src.items).forEach(k => { if (MYG[k]) items[k] = Math.min(src.items[k], 20); }); }
   const t = { id: tripId(), name, date, nights: TD.nights, place, items, done: {}, at: Date.now() };
-  TRIPS.push(t); saveTrips(); closeTripDlg();
+  TRIPS.push(t); saveTrips(t); closeTripDlg();
   location.hash = '#t/' + t.id;
 }
 function tripDelete() {
   const t = tripById(TD.edit); if (!t || !confirm(`이 캠핑을 지울까요? (${t.name})
 고른 장비와 체크한 내용도 같이 지워져요.`)) return;
-  const i = TRIPS.indexOf(t); TRIPS.splice(i, 1); saveTrips(); closeTripDlg(); location.hash = '#';
-  toast(`‘${t.name}’ 지웠어요`, () => { TRIPS.splice(i, 0, t); saveTrips(); location.hash = '#t/' + t.id; });
+  const i = TRIPS.indexOf(t), tomb = { id: t.id, del: 1 }; TRIPS.splice(i, 1); TDELS.push(tomb); saveTrips(tomb); closeTripDlg(); location.hash = '#';
+  toast(`‘${t.name}’ 지웠어요`, () => { TDELS = TDELS.filter(x => x !== tomb); TRIPS.splice(i, 0, t); saveTrips(t); location.hash = '#t/' + t.id; });
 }
 
 /* ---------- 캠핑 하나: 체크하기 / 장비 고르기 ---------- */
@@ -194,19 +209,19 @@ function tripClick(e) {
   const go = e.target.closest('[data-go]');
   if (go) { MODE = go.dataset.go; tripUI(); scrollTo(0, 0); return; }
   const ck = e.target.closest('button.ck');
-  if (ck) { const k = ck.dataset.k; if (t.done[k]) delete t.done[k]; else t.done[k] = 1; saveTrips(); tripUI(); return; }
+  if (ck) { const k = ck.dataset.k; if (t.done[k]) delete t.done[k]; else t.done[k] = 1; saveTrips(t, 'done', [k]); tripUI(); return; }
   const qb = e.target.closest('button[data-q]');
-  if (qb) { const k = qb.dataset.k; t.items[k] = Math.max(1, Math.min(20, (t.items[k] || 1) + +qb.dataset.q)); saveTrips(); tripUI(); return; }
+  if (qb) { const k = qb.dataset.k; t.items[k] = Math.max(1, Math.min(20, (t.items[k] || 1) + +qb.dataset.q)); saveTrips(t); tripUI(); return; }
   const a = e.target.closest('button[data-act]'); if (!a) return;
-  if (a.dataset.act === 'reset') { const was = t.done; t.done = {}; saveTrips(); tripUI(); toast('체크를 모두 풀었어요', () => { t.done = was; saveTrips(); tripUI(); }); }
-  if (a.dataset.act === 'all') { Object.keys(MYG).forEach(k => { if (!t.items[k]) t.items[k] = MYG[k]; }); saveTrips(); tripUI(); }
-  if (a.dataset.act === 'none') { const was = { items: t.items, done: t.done }; t.items = {}; t.done = {}; saveTrips(); tripUI(); toast('고른 장비를 모두 뺐어요', () => { Object.assign(t, was); saveTrips(); tripUI(); }); }
+  if (a.dataset.act === 'reset') { const was = t.done; t.done = {}; saveTrips(t, 'done', Object.keys(was)); tripUI(); toast('체크를 모두 풀었어요', () => { t.done = was; saveTrips(t, 'done', Object.keys(was)); tripUI(); }); }
+  if (a.dataset.act === 'all') { Object.keys(MYG).forEach(k => { if (!t.items[k]) t.items[k] = MYG[k]; }); saveTrips(t); tripUI(); }
+  if (a.dataset.act === 'none') { const was = { items: t.items, done: t.done }; t.items = {}; t.done = {}; saveTrips(t); tripUI(); toast('고른 장비를 모두 뺐어요', () => { Object.assign(t, was); saveTrips(t, 'both', Object.keys(was.done)); tripUI(); }); }
 }
 function tripChange(e) {
   const c = e.target.closest('input[type=checkbox][data-k]'); if (!c) return;
   const t = tripById(CUR), k = c.dataset.k;
   if (c.checked) t.items[k] = Math.max(1, MYG[k] || 1); else { delete t.items[k]; delete t.done[k]; }
-  saveTrips(); tripUI();
+  saveTrips(t); tripUI();
 }
 
 /* ---------- 시작 (pack.js가 장비 목록을 불러온 뒤 부름) ---------- */
@@ -226,8 +241,8 @@ function tripsInit() {
   $('tripFoot').addEventListener('click', tripClick);
   $('tripBody').addEventListener('change', tripChange);
   addEventListener('hashchange', route);
-  addEventListener('storage', e => { if (e.key === K_TRIPS) { loadTrips(); tripsRefresh(); } });
-  TRIPS_READY = true; route(); installUI();
+  addEventListener('storage', e => { if (e.key === K_TRIPS || e.key === K_TDEL) { loadTrips(); tripsRefresh(); } if (e.key === K_ACCT) tripsPull(true); });
+  TRIPS_READY = true; route(); installUI(); tSyncUI(); tripsPull(true);
 }
 // 장비 목록이 바뀌면 (서버에서 불러옴·다른 탭에서 고침) 지금 화면 다시 그리기
 function tripsRefresh() {
@@ -260,3 +275,76 @@ function installUI() {
 addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; installUI(); });
 addEventListener('appinstalled', () => { installEvt = null; installUI(); });
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+
+/* ---------- 6단계: 캠핑 일정 동기화 (캠테리어와 같은 '내 코드') ----------
+   서버: 워커 acct 'trips'(읽기) / 'trips_save'(합쳐서 저장). 캠핑마다 up(고친 시각)이 더 큰 쪽이 남음.
+   인터넷이 안 되면 이 기기에 저장해 두고(packTripsDirty), 연결되면 자동으로 다시 보냄. */
+let tTimer = null, tState = 'idle', tLastPull = 0, tBusy = null;
+function tSyncUI(s) {
+  if (s) tState = s;
+  const el = $('tsync'); if (!el) return;
+  const has = TRIPS.length > 0;
+  const T = { idle: has ? '이 기기에 저장돼요' : '', wait: '저장하는 중…', pull: '다른 기기 일정 불러오는 중…',
+    ok: '다른 기기와 맞췄어요', off: '인터넷이 안 돼 이 기기에만 저장했어요 · 연결되면 자동으로 맞춰요' };
+  el.textContent = T[tState] || ''; el.dataset.s = tState; el.hidden = !el.textContent;
+}
+// 같은 캠핑 둘 합치기 (워커 worker.js의 mergeTrip과 같은 규칙)
+// 이름·날짜·고른 장비는 mu가 늦은 쪽, 체크는 장비마다 dt가 늦은 쪽, 지운 것(del)은 up으로 비교
+function mergeTrip(a, b) {
+  if (a.del || b.del) return (b.up || 0) > (a.up || 0) ? b : a;
+  const base = (b.mu || b.up || 0) > (a.mu || a.up || 0) ? b : a, dt = {}, done = {};
+  const ad = a.dt || {}, bd = b.dt || {};
+  [...new Set([...Object.keys(ad), ...Object.keys(bd)])].forEach(k => { dt[k] = Math.max(ad[k] || 0, bd[k] || 0); });
+  Object.keys(base.items || {}).forEach(k => {
+    const src = !(k in dt) ? base : (bd[k] || 0) > (ad[k] || 0) ? b : a;
+    if ((src.done || {})[k]) done[k] = 1;
+  });
+  return { ...base, done, dt, up: Math.max(a.up || 0, b.up || 0), mu: Math.max(a.mu || 0, b.mu || 0) };
+}
+// 서버 목록과 이 기기 목록 합치기. 이 기기 쪽에 서버에 없는 변경이 있으면 다시 보내야 함
+function tripsMerge(srv) {
+  const by = new Map(), mine = [...TRIPS, ...TDELS]; let push = false;
+  (srv || []).forEach(t => t && t.id && by.set(t.id, t));
+  // 이 기기 쪽 시각이 하나라도 서버보다 늦으면 서버가 모르는 변경
+  const newer = (t, o) => !o || (t.up || 0) > (o.up || 0) || (t.mu || 0) > (o.mu || 0) || Object.keys(t.dt || {}).some(k => t.dt[k] > ((o.dt || {})[k] || 0));
+  mine.forEach(t => { const o = by.get(t.id); if (newer(t, o)) push = true; by.set(t.id, o ? mergeTrip(o, t) : t); });
+  const all = [...by.values()];
+  TRIPS = all.filter(t => !t.del).map(t => ({ ...t, items: t.items || {}, done: t.done || {} }));
+  TDELS = all.filter(t => t.del);
+  lsSet(K_TRIPS, TRIPS); lsSet(K_TDEL, TDELS);
+  return push;
+}
+const tDirty = v => { try { v === undefined ? 0 : v ? localStorage.setItem(K_TDIRTY, '1') : localStorage.removeItem(K_TDIRTY); return !!localStorage.getItem(K_TDIRTY); } catch (e) { return false; } };
+function tripsQueue() {
+  tDirty(true); clearTimeout(tTimer); tSyncUI('wait');
+  tTimer = setTimeout(tripsPush, 1500);
+}
+async function tripsPush() {
+  if (tBusy) { await tBusy.catch(() => {}); }
+  tBusy = (async () => {
+    const c = await ensureCode(); if (!c) { tSyncUI('off'); return; }
+    const d = await call({ op: 'trips_save', code: c, trips: [...TRIPS, ...TDELS] });
+    if (!d.ok) { tSyncUI('off'); return; }
+    lsSet(K_TCODE, c); tDirty(false);
+    tripsMerge(d.trips); tSyncUI('ok'); route(); acctUI();
+  })();
+  try { await tBusy; } finally { tBusy = null; }
+}
+async function tripsPull(force) {
+  const c = codeGet();
+  if (!c) { if (tDirty() && TRIPS.length) tripsPush(); else tSyncUI('idle'); return; }
+  if (!force && Date.now() - tLastPull < 20000) return;
+  tLastPull = Date.now();
+  if (tBusy) return;
+  tSyncUI('pull');
+  const d = await call({ op: 'trips', code: c });
+  if (!d.ok) { tSyncUI('off'); return; }
+  // 다른 사람(다른 코드)의 일정이 섞이지 않게: 코드를 바꿔 불러왔으면 이 기기 목록을 그 코드 것으로 바꿈
+  const was = lsGet(K_TCODE, '');
+  if (was && was !== c) { TRIPS = []; TDELS = []; tDirty(false); }
+  const push = tripsMerge(d.trips); lsSet(K_TCODE, c);
+  route();
+  if (push || tDirty()) tripsPush(); else tSyncUI('ok');
+}
+addEventListener('online', () => { if (tDirty()) tripsPush(); else tripsPull(true); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && TRIPS_READY) tripsPull(); });

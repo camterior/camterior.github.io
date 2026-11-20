@@ -85,6 +85,44 @@ async function acct(a, env, request, origin) {
     if (a.op === "plan_del") { L = L.filter(x => x.id !== String(a.id || "")); await env.RL.put(pk, JSON.stringify(L)); }
     return json({ ok: true, plans: L }, 200, origin);
   }
+  // 캠핑 챙김(/pack) 캠핑 일정: 같은 코드면 휴대폰·PC 어디서든 같은 목록.
+  // 같은 캠핑을 두 기기가 고치면: 이름·날짜·고른 장비는 mu가 늦은 쪽, 체크는 장비마다 dt가 늦은 쪽 (pack/trips.js의 mergeTrip과 같은 규칙).
+  // 지운 캠핑은 {id, del:1, up}로 60일 남겨 다시 살아나지 않게.
+  if (a.op === "trips" || a.op === "trips_save") {
+    const tk = "trips:" + code;
+    let L = []; try { L = JSON.parse(await env.RL.get(tk) || "[]"); if (!Array.isArray(L)) L = []; } catch (e) { L = []; }
+    if (a.op === "trips_save") {
+      if (!(await bump(`tw:${day}:${ip}`, 600))) return json({ error: "quota" }, 429, origin);
+      const now = Date.now(), keyRe = /^[a-z]+:[a-z0-9_]{1,40}$/, dateRe = /^\d{4}-\d{2}-\d{2}$/;
+      const clean = t => {
+        if (!t || typeof t !== "object" || !/^[a-z0-9]{2,20}$/.test(String(t.id || ""))) return null;
+        const up = Math.min(now + 6e4, Math.max(0, +t.up || 0));
+        if (t.del) return { id: t.id, del: 1, up };
+        if (!dateRe.test(String(t.date || ""))) return null;
+        const items = {}, done = {};
+        Object.keys(t.items && typeof t.items === "object" ? t.items : {}).slice(0, 300).forEach(k => { const n = Math.round(+t.items[k]); if (keyRe.test(k) && n >= 1 && n <= 20) items[k] = n; });
+        Object.keys(t.done && typeof t.done === "object" ? t.done : {}).forEach(k => { if (items[k]) done[k] = 1; });
+        const dt = {}, ts = v => Math.min(now + 6e4, Math.max(0, +v || 0));
+        Object.keys(t.dt && typeof t.dt === "object" ? t.dt : {}).slice(0, 300).forEach(k => { if (keyRe.test(k) && +t.dt[k] > 0) dt[k] = ts(t.dt[k]); });
+        return { id: t.id, name: String(t.name || "캠핑").slice(0, 30), date: t.date, nights: Math.max(0, Math.min(14, Math.round(+t.nights || 0))),
+          place: String(t.place || "").slice(0, 30), items, done, dt, at: Math.max(0, +t.at || 0), up, mu: ts(t.mu) };
+      };
+      const merge = (a, b) => {
+        if (a.del || b.del) return (b.up || 0) > (a.up || 0) ? b : a;
+        const base = (b.mu || b.up || 0) > (a.mu || a.up || 0) ? b : a, ad = a.dt || {}, bd = b.dt || {}, dt = {}, done = {};
+        [...new Set([...Object.keys(ad), ...Object.keys(bd)])].forEach(k => { dt[k] = Math.max(ad[k] || 0, bd[k] || 0); });
+        Object.keys(base.items || {}).forEach(k => { const src = !(k in dt) ? base : (bd[k] || 0) > (ad[k] || 0) ? b : a; if ((src.done || {})[k]) done[k] = 1; });
+        return { ...base, done, dt, up: Math.max(a.up || 0, b.up || 0), mu: Math.max(a.mu || 0, b.mu || 0) };
+      };
+      const by = new Map(L.map(t => [t.id, t]));
+      (Array.isArray(a.trips) ? a.trips : []).slice(0, 80).forEach(x => { const t = clean(x); if (!t) return; const o = by.get(t.id); by.set(t.id, o ? merge(o, t) : t); });
+      L = [...by.values()].filter(t => !t.del || now - (t.up || 0) < 60 * 864e5)
+        .sort((x, y) => (y.up || 0) - (x.up || 0)).slice(0, 120);
+      while (JSON.stringify(L).length > 400000 && L.length > 1) L.pop();
+      await env.RL.put(tk, JSON.stringify(L));
+    }
+    return json({ ok: true, trips: L }, 200, origin);
+  }
   if (a.op === "invite") {
     // 관리 키(ADMIN_KEY)를 초대 코드 칸에 넣으면 이 코드가 관리자 계정(AI 제한 없음)이 됨
     if (env.ADMIN_KEY && String(a.invite || "").trim() === env.ADMIN_KEY) {

@@ -15,7 +15,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="캠핑 챙김">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="pack.css?v=7">
+<link rel="stylesheet" href="pack.css?v=10">
 </head>
 <body>
 <header class="top">
@@ -36,6 +36,7 @@
       <h1 id="homeT">이번 캠핑, 빠짐없이</h1>
       <p class="sub">캠핑을 만들고 <b>내 장비</b>에서 가져갈 것을 고른 뒤, 차에 실을 때마다 하나씩 체크해요.</p>
       <button type="button" class="btn-main wide" id="newTrip">+ 새 캠핑 만들기</button>
+      <p class="tsync" id="tsync" role="status" hidden></p>
     </section>
     <aside class="install" id="install" hidden aria-labelledby="insT"></aside>
     <div id="tripList"></div>
@@ -127,7 +128,7 @@
 </dialog>
 
 <div class="toast" id="toast" role="status" hidden></div>
-<script src="pack.js?v=7"></script>
-<script src="trips.js?v=7"></script>
+<script src="pack.js?v=10"></script>
+<script src="trips.js?v=10"></script>
 </body>
 </html>

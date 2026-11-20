@@ -267,3 +267,11 @@ a.btn-main{display:inline-flex;align-items:center;justify-content:center;text-de
 .ins-x:hover{color:var(--on-night)}
 /* 홈 화면 앱으로 열었을 때: 위 막대가 상태 표시줄 아래로 */
 @media (display-mode: standalone){.top{padding-top:env(safe-area-inset-top,0px)}}
+
+/* ===== 6단계: 캠핑 일정 동기화 표시 ===== */
+.tsync{margin:10px 2px 0;font-size:13px;color:var(--ink-3);display:flex;align-items:center;gap:7px;line-height:1.4}
+.tsync[hidden]{display:none}
+.tsync::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--ink-3)}
+.tsync[data-s="ok"]::before{background:var(--ok)}
+.tsync[data-s="wait"]::before,.tsync[data-s="pull"]::before{background:var(--warn)}
+.tsync[data-s="off"]{color:var(--accent-2)}.tsync[data-s="off"]::before{background:var(--accent-2)}
