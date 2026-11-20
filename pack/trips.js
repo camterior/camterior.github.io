@@ -388,10 +388,46 @@ function fuelUI(t) {
   box.innerHTML = `<div class="fu-head"><b>🛢 등유 약 ${Math.ceil(tot)}L</b><small>말통(20L) ${cans}개${min !== max ? ` · 범위 ${Math.ceil(min)}~${Math.ceil(max)}L` : ''}</small></div>
     <ul class="fu-list">${rows}</ul>
     <div class="fu-opt"><span>하루 켜는 시간</span><div class="step"><button type="button" data-fh="-1" aria-label="한 시간 줄이기">−</button><b>${H}시간</b><button type="button" data-fh="1" aria-label="한 시간 늘리기">+</button></div></div>
-    <p class="fu-note">${N}밤 × ${H}시간 · ${lo == null ? '날씨를 몰라 중간 세기로 계산 (AI 추천을 받으면 기온으로 맞춰요)' : `가장 추운 밤 ${lo}° 기준 ${f >= .85 ? '강하게' : f <= .15 ? '약하게' : '중간 세기로'}`}. 실제 소비는 텐트·바람에 따라 달라요.${unsure ? ' ‘추정’ 표시는 제조사 공식 제원으로 아직 확인하지 못한 값이에요.' : ''}</p>`;
+    <p class="fu-note">${N}밤 × ${H}시간 · ${lo == null ? '날씨를 몰라 중간 세기로 계산 (AI 추천을 받으면 기온으로 맞춰요)' : `가장 추운 밤 ${lo}° 기준 ${f >= .85 ? '강하게' : f <= .15 ? '약하게' : '중간 세기로'}`}. 실제 소비는 텐트·바람에 따라 달라요.${unsure ? ' ‘추정’ 표시는 제조사 공식 제원으로 아직 확인하지 못한 값이에요.' : ''}</p>
+    ${oilUI(t)}`;
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-fh]'); if (!b) return;
   lsSet(K_FUELH, Math.max(4, Math.min(24, fuelH() + Number(b.dataset.fh))));
   const t = tripById(CUR); if (t) fuelUI(t);
 });
+
+/* ---------- 근처 등유 주유소 (오피넷, 워커 pack-oil.js) ----------
+   캠핑장(일정의 장소) → 없으면 AI 추천 때 넣은 지역. 버튼을 눌러야 찾음(무료 API 횟수 아끼기), 결과는 이 기기에 3시간 저장 */
+const K_OIL = 'packOil', OIL = { busy: '', err: {} };
+const oilQ = t => ({ campsite: (t.place || '').trim(), region: ((t.ai && t.ai.cond && t.ai.cond.region) || '').trim() });
+const oilKey = q => q.campsite + '|' + q.region;
+function oilHit(q) { const c = lsGet(K_OIL, {}) || {}, h = c[oilKey(q)]; return h && Date.now() - h.at < 3 * 3600e3 ? h : null; }
+const won = n => Number(n).toLocaleString('ko-KR');
+const km = m => m == null ? '' : m < 1000 ? `${Math.round(m / 10) * 10}m` : `${(m / 1000).toFixed(1)}km`;
+function oilUI(t) {
+  const q = oilQ(t), key = oilKey(q);
+  if (!q.campsite && !q.region) return `<div class="oil"><p class="oil-hint">⛽ 일정에 캠핑장(장소)을 넣으면 근처 등유 파는 주유소를 찾아 드려요.</p></div>`;
+  const h = oilHit(q), where = esc(q.campsite || q.region);
+  if (OIL.busy === key) return `<div class="oil"><p class="oil-hint"><span class="spin sm" aria-hidden="true"></span> ${where} 근처 주유소 찾는 중…</p></div>`;
+  if (OIL.err[key]) return `<div class="oil"><p class="oil-hint">⛽ ${esc(OIL.err[key])}</p><button type="button" class="link" data-oil="go">다시 찾기</button></div>`;
+  if (!h) return `<div class="oil"><button type="button" class="btn-line wide" data-oil="go">⛽ ${where} 근처 등유 주유소 찾기</button></div>`;
+  const d = h.d;
+  if (!d.list.length) return `<div class="oil"><p class="oil-hint">⛽ ${where} 근처에서 등유 파는 주유소를 찾지 못했어요. 가는 길에 미리 넣어 가세요.</p></div>`;
+  return `<div class="oil"><div class="oil-head"><b>⛽ ${d.mode === 'near' ? `${where} 5km 안 등유 주유소` : `5km 안에 없어 ${esc(d.place || where)}에서 등유가 싼 곳`}</b></div>
+    <ul class="oil-list">${d.list.map(s => `<li><span class="oil-t"><b>${esc(s.name)}</b><small>${[s.brand, km(s.dist)].filter(Boolean).map(esc).join(' · ')}</small></span><span class="oil-p">${won(s.price)}<small>원/L</small></span>${s.lat ? `<a class="oil-go" href="https://map.kakao.com/link/to/${encodeURIComponent(s.name)},${s.lat},${s.lon}" target="_blank" rel="noopener">길찾기</a>` : ''}</li>`).join('')}</ul>
+    <p class="fu-note">오피넷(한국석유공사) 가격 · ${new Date(h.at).getHours()}시 ${pad(new Date(h.at).getMinutes())}분 기준. 영업시간은 주유소에 확인하세요.</p></div>`;
+}
+async function oilFind() {
+  const t = tripById(CUR); if (!t) return;
+  const q = oilQ(t), key = oilKey(q); if (OIL.busy) return;
+  OIL.busy = key; delete OIL.err[key]; fuelUI(t);
+  try {
+    const d = await aiApi({ op: 'oil', ...q });
+    const c = lsGet(K_OIL, {}) || {}; Object.keys(c).forEach(k => { if (Date.now() - c[k].at > 3 * 3600e3) delete c[k]; });
+    c[key] = { at: Date.now(), d }; lsSet(K_OIL, c);
+  } catch (e) { OIL.err[key] = e.message || '주유소를 찾지 못했어요.'; }
+  OIL.busy = '';
+  const n = tripById(CUR); if (n) fuelUI(n);
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-oil="go"]')) oilFind(); });

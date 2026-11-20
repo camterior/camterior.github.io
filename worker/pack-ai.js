@@ -50,19 +50,21 @@ const CUSTOM_CATS = {
 const SEC_ICON = { tent: "⛺", tarp: "⛱", inner: "🏕", igt: "🍽", parts: "🔩", gear: "📦", sleep: "🛏", chair: "💺", heat: "🔥", fire: "🍳", cool: "❄️" };
 
 // ───────── 작은 도우미 ─────────
-const kstDay = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+export const kstDay = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
 const addDays = (iso, n) => { const d = new Date(`${iso}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400e3);
 const minusOneYear = (iso) => `${Number(iso.slice(0, 4)) - 1}${iso.slice(4)}`.replace("-02-29", "-02-28");
 const round1 = (n) => (n == null ? null : Math.round(n * 10) / 10);
 const num = (v) => (typeof v === "number" && Number.isFinite(v) ? v : null);
-const ipOf = (request) => request.headers.get("CF-Connecting-IP") || "0";
+export const ipOf = (request) => request.headers.get("CF-Connecting-IP") || "0";
 
-class PackError extends Error {
+export class PackError extends Error {
   constructor(error, message, status = 400) { super(message); this.error = error; this.status = status; }
 }
-async function count(env, key) { return env.RL ? parseInt(await env.RL.get(key)) || 0 : 0; }
-async function bumpKey(env, key, by = 1) { if (env.RL) await env.RL.put(key, String(Math.max(0, (await count(env, key)) + by)), { expirationTtl: 172800 }); }
+export async function count(env, key) { return env.RL ? parseInt(await env.RL.get(key)) || 0 : 0; }
+export async function bumpKey(env, key, by = 1) { if (env.RL) await env.RL.put(key, String(Math.max(0, (await count(env, key)) + by)), { expirationTtl: 172800 }); }
+
+import { opOil } from "./pack-oil.js";
 
 // ───────── 입구 ─────────
 export async function pack(p, env, request, reply) {
@@ -71,6 +73,7 @@ export async function pack(p, env, request, reply) {
     if (p.op === "plans") return reply(await opPlans(p, env, request), 200);
     if (p.op === "recommend") return reply(await opRecommend(p, env, request), 200);
     if (p.op === "left") return reply(await opLeft(p, env, request), 200);
+    if (p.op === "oil") return reply(await opOil(p, env, request), 200); // 근처 등유 주유소 (pack-oil.js)
     return reply({ error: "op", message: "알 수 없는 요청이에요." }, 400);
   } catch (e) {
     if (e instanceof PackError) return reply({ error: e.error, message: e.message }, e.status);
@@ -187,9 +190,9 @@ async function opPlans(p, env, request) {
 }
 
 // ───────── 날씨 ─────────
-async function geocode(env, query) {
+export async function geocode(env, query) {
   const q = query.trim().slice(0, 50);
-  const ck = "geo:" + q;
+  const ck = "geo2:" + q; // geo2: 시·도·시·군(sido·sigun)까지 저장 (주유소 찾기용)
   if (env.RL) { const hit = await env.RL.get(ck); if (hit) return JSON.parse(hit); }
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.search = new URLSearchParams({ q, format: "jsonv2", countrycodes: "kr", limit: "1", addressdetails: "1", "accept-language": "ko" });
@@ -199,6 +202,8 @@ async function geocode(env, query) {
   const place = hit ? {
     lat: Number(hit.lat), lon: Number(hit.lon),
     name: [hit.address && hit.address.state, hit.address && (hit.address.county || hit.address.city || hit.address.town)].filter(Boolean).join(" ") || hit.name,
+    sido: (hit.address && (hit.address.state || hit.address.province || hit.address.city)) || "",
+    sigun: (hit.address && (hit.address.county || (hit.address.state ? hit.address.city : "") || hit.address.borough || hit.address.town)) || "",
   } : null;
   if (env.RL) await env.RL.put(ck, JSON.stringify(place), { expirationTtl: place ? 30 * 86400 : 86400 }); // 같은 지명은 다시 묻지 않음
   return place;

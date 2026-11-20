@@ -397,3 +397,19 @@ a.btn-main{display:inline-flex;align-items:center;justify-content:center;text-de
 .fu-n{flex:none;font-weight:800;font-variant-numeric:tabular-nums}
 .fu-opt{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;font-size:13.5px;font-weight:650}
 .fu-note{margin:8px 0 0;font-size:12px;color:var(--ink-3);line-height:1.5;word-break:keep-all}
+
+/* 근처 등유 주유소 */
+.oil{margin-top:10px;padding-top:10px;border-top:1px solid var(--line-2)}
+.oil .btn-line.wide{width:100%;white-space:normal;height:auto;min-height:46px;padding:10px 14px;line-height:1.35;word-break:keep-all}
+.oil-hint{margin:0;font-size:13px;color:var(--ink-2);line-height:1.5;word-break:keep-all;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.oil-head b{font-size:14px;word-break:keep-all}
+.oil-list{list-style:none;margin:6px 0 0;padding:0}
+.oil-list li{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line-2)}
+.oil-list li:first-child{border-top:0}
+.oil-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.oil-t b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.oil-t small{color:var(--ink-3);font-size:12px}
+.oil-p{flex:none;font-weight:800;font-variant-numeric:tabular-nums;font-size:14px}
+.oil-p small{font-weight:500;color:var(--ink-3);font-size:11px;margin-left:1px}
+.oil-go{flex:none;font-size:12.5px;font-weight:700;color:var(--accent);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 10px}
+.spin.sm{width:14px;height:14px;border-width:2px;margin:0}
