@@ -115,7 +115,7 @@ function render() {
   $('cnt').innerHTML = kinds ? `<b>${kinds}</b>종 · <b>${total}</b>개` : '아직 장비가 없어요';
   const box = $('list');
   if (!kinds) {
-    box.innerHTML = `<div class="empty"><p><b>아직 등록한 장비가 없어요</b></p><p>위에서 이름으로 찾거나 분류를 눌러 넣어 보세요. 캠테리어에서 넣은 장비도 여기에 그대로 나와요.</p></div>`;
+    box.innerHTML = `<div class="empty"><img class="empty-art" src="img/empty-gear.webp" alt="" width="140" height="140"><p><b>아직 등록한 장비가 없어요</b></p><p>위에서 이름으로 찾거나 분류를 눌러 넣어 보세요. 캠테리어에서 넣은 장비도 여기에 그대로 나와요.</p></div>`;
     $('foldAll').hidden = true; return;
   }
   const by = {};

@@ -107,3 +107,9 @@
 - 크론: `.github/workflows/worker-deploy.yml`이 wrangler.toml에 `[triggers] crons`를 넣음(지금 있는 크론 + '0 0 * * *', 예전 '0 22 * * *'는 지움).
 - 키: 비밀 키는 Cloudflare Secret `VAPID_PRIVATE_JWK`(홍중이 등록), 공개 키는 `pack/push.js`의 `PUSH_PUBLIC_KEY`. 둘은 한 쌍이라 바꾸면 같이 바꿔야 하고, 바꾸면 기존 기기는 알림을 다시 켜야 함.
 - 화면: `pack/push.js` 캠핑 목록의 알림 카드(켜기·시험 알림·끄기). 아이폰은 홈 화면에 설치한 앱에서만(iOS 16.4+). 알림을 누르면 그 캠핑 체크리스트로.
+
+## 디자인 손보기 (Higgsfield, 2026-11-20)
+- 그림: Higgsfield `gpt_image_2_6`로 만듦(짙은 초록 밤 숲 + 주황 텐트, 글자 없음). 원본 PNG는 저장소 밖 `../디자인-후보/`, 사이트에는 WebP로 줄여서 `pack/img/`
+  - `hero.webp`(첫 화면, 후보 2번 — 홍중 선택), `empty-trips.webp`(캠핑·고른 장비 없을 때), `empty-gear.webp`(장비함 비었을 때)
+- 첫 화면: 그림 위 왼쪽 하늘에 'Camping Check / 이번 캠핑, 빠짐없이' 글자. PC에서는 높이 360px로 가로 꽉 채움
+- 색·글꼴·버튼은 그대로(짙은 초록 + 주황). 배포 파일 목록에 `pack/img` 추가, 서비스워커가 그림도 미리 저장(오프라인)

@@ -94,7 +94,7 @@ function homeUI() {
   const up = TRIPS.filter(t => !isPast(t)).sort((a, b) => a.date.localeCompare(b.date));
   const past = TRIPS.filter(isPast).sort((a, b) => b.date.localeCompare(a.date));
   if (!TRIPS.length) {
-    box.innerHTML = `<div class="empty"><p><b>아직 만든 캠핑이 없어요</b></p><p>‘새 캠핑 만들기’를 누르고 가는 날을 넣어 보세요.${Object.keys(MYG).length ? '' : ' 먼저 <a class="inline" href="#gear">내 장비함</a>에 가진 장비를 넣어 두면 고르기 쉬워요.'}</p></div>`;
+    box.innerHTML = `<div class="empty"><img class="empty-art" src="img/empty-trips.webp" alt="" width="140" height="140"><p><b>아직 만든 캠핑이 없어요</b></p><p>‘새 캠핑 만들기’를 누르고 가는 날을 넣어 보세요.${Object.keys(MYG).length ? '' : ' 먼저 <a class="inline" href="#gear">내 장비함</a>에 가진 장비를 넣어 두면 고르기 쉬워요.'}</p></div>`;
     return;
   }
   box.innerHTML = (up.length ? `<h2 class="sec-t">다가오는 캠핑</h2><ul class="trips">${up.map(cardT).join('')}</ul>` : '<p class="muted pad">다가오는 캠핑이 없어요.</p>') +
@@ -182,7 +182,7 @@ function grouped(keys) {
 function checkUI(t) {
   const box = $('tripBody'), keys = tripKeys(t);
   if (!keys.length) {
-    box.innerHTML = `<div class="empty"><p><b>아직 고른 장비가 없어요</b></p><p>‘장비 고르기’에서 이번 캠핑에 가져갈 장비를 골라 주세요.</p><button type="button" class="btn-main" data-go="pick">장비 고르기</button></div>`;
+    box.innerHTML = `<div class="empty"><img class="empty-art" src="img/empty-trips.webp" alt="" width="140" height="140"><p><b>아직 고른 장비가 없어요</b></p><p>‘장비 고르기’에서 이번 캠핑에 가져갈 장비를 골라 주세요.</p><button type="button" class="btn-main" data-go="pick">장비 고르기</button></div>`;
     $('tripFoot').innerHTML = ''; return;
   }
   const only = $('onlyLeft').checked;
@@ -201,7 +201,7 @@ function checkUI(t) {
 function pickUI(t) {
   const box = $('tripBody'), keys = [...new Set([...Object.keys(MYG), ...tripKeys(t)])];
   if (!keys.length) {
-    box.innerHTML = `<div class="empty"><p><b>내 장비함이 비어 있어요</b></p><p>먼저 가진 장비를 넣어 주세요. 캠테리어에서 넣은 장비도 그대로 나와요.</p><a class="btn-main" href="#gear">내 장비함으로</a></div>`;
+    box.innerHTML = `<div class="empty"><img class="empty-art" src="img/empty-gear.webp" alt="" width="140" height="140"><p><b>내 장비함이 비어 있어요</b></p><p>먼저 가진 장비를 넣어 주세요. 캠테리어에서 넣은 장비도 그대로 나와요.</p><a class="btn-main" href="#gear">내 장비함으로</a></div>`;
     $('tripFoot').innerHTML = ''; return;
   }
   const n = tripKeys(t).length;
