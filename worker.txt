@@ -4,11 +4,11 @@ binding secret_text GEMINI_API_KEY
 binding secret_text INVITE_CODE
 binding kv_namespace RL
 binding secret_text VAPID_PRIVATE_JWK
-crons ["0 22 * * *"]
+crons ["0 0 * * *"]
 compat 2026-10-26 flags [] usage standard observability True
-schedules []
+schedules [{"cron": "0 22 * * *", "created_on": "2026-11-20T05:47:12.655395Z", "modified_on": "2026-11-20T05:47:12.655395Z"}]
 OK
 before 77
 deploy OK
 after 77 (before 77)
-ref refs/heads/main sha 27c01c8c1206409441dbb91d2c83f9703b8f3b07 run 44683279226
+ref refs/heads/main sha 074a459277e44c6608f1112befbbf720b0f001b5 run 44684619155
