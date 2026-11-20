@@ -113,3 +113,8 @@
   - `hero.webp`(첫 화면, 후보 2번 — 홍중 선택), `empty-trips.webp`(캠핑·고른 장비 없을 때), `empty-gear.webp`(장비함 비었을 때)
 - 첫 화면: 그림 위 왼쪽 하늘에 'Camping Check / 이번 캠핑, 빠짐없이' 글자. PC에서는 높이 360px로 가로 꽉 채움
 - 색·글꼴·버튼은 그대로(짙은 초록 + 주황). 배포 파일 목록에 `pack/img` 추가, 서비스워커가 그림도 미리 저장(오프라인)
+
+## AI 추천 개선 2가지 (camping-app `ai-improve-ready`, 2026-11-20)
+- 인원: AI 창에 어른(기본 2)·아이(기본 0). 요청 `trip.people`, 지시문에 '사람마다 쓰는 장비는 인원 수만큼'. 캠핑 `ai.cond.people`에 저장.
+- 이번엔 빼도 됨: 결과 모양에 `pick[].skip`. 세팅 장비인데 이번 조건에 필요 없으면 skip → 체크 목록에 안 넣고 '세팅에 있지만 이번엔 빼도 돼요'로 따로(+ '그래도 챙기기'). 세팅이 아닌 장비에 skip이 오면 아예 뺌. 캠핑 `ai.skip=[{key,count,why}]` (동기화됨).
+- 시험: camping-app `eval/run-eval.mjs --new`로 실제 Claude 채점 가능(약 470원, 저장소는 읽기만).

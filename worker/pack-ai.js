@@ -276,7 +276,8 @@ const SYSTEM_PROMPT = `너는 한국 오토캠핑 경험이 많은 장비 전문
 
 고르는 법:
 - pick에는 <내_장비>나 <저장한_세팅>에 있는 키만 쓰고, 개수는 가진 개수 이하로. 같은 종류가 여러 개면 조건에 가장 맞는 것을 골라. 예: 텐트가 여러 동이면 날씨와 인원에 맞는 한 동.
-- <저장한_세팅>이 있으면 사용자가 이번 캠핑 사이트에 배치해 둔 장비야. 세팅 장비는 모두 pick에 넣고, 날씨·환경상 걱정되는 점이 있으면 why에 짧게 적어. 그다음 세팅에 없지만 함께 챙겨야 할 것을 <내_장비>에서 더 골라. 예: 세팅에 난로가 있으면 연료통, 텐트가 있으면 팩·망치 같은 설치 도구.
+- <저장한_세팅>이 있으면 사용자가 이번 캠핑 사이트에 배치해 둔 장비야. 세팅 장비는 모두 pick에 넣되, 이번 날씨·환경에 필요 없으면 skip을 true로 하고 why에 이유를 짧게 적어(예: 밤 최저 24°라 난로는 필요 없어요). 필요하면 skip은 false. 그다음 세팅에 없지만 함께 챙겨야 할 것을 <내_장비>에서 더 골라. 예: 세팅에 난로가 있으면 연료통, 텐트가 있으면 팩·망치 같은 설치 도구.
+- 의자·매트·침낭처럼 사람마다 하나씩 쓰는 장비는 <캠핑_조건>의 인원 수만큼(가진 개수까지) 골라. 모자라면 missing에 적어.
 - 이번 조건에 필요 없는 장비는 빼. 예: 영하 날씨에 냉장고·아이스박스는 대부분 필요 없고, 한여름에 난로는 빼.
 - 날씨 숫자(최저·최고 기온, 비, 바람)에 근거해서 고르고, 이유에 그 숫자를 연결해. 예: "밤 최저 -9°라 난로가 필요해요"
 - 사이트 바닥(데크/파쇄석), 계절, 주변 환경을 함께 따져. 주변 환경은 여러 개일 수 있어(예: 산+계곡, 강+들판). 환경마다 다른 점을 생각해:
@@ -294,6 +295,10 @@ function cleanTrip(t) {
     startDate: String(t.startDate || ""), endDate: String(t.endDate || ""), ground: t.ground,
     environments: [...new Set((Array.isArray(t.environments) ? t.environments : []).filter((e) => ENVIRONMENTS.includes(e)))].slice(0, 3),
     siteNote: String(t.siteNote || "").replace(/\s+/g, " ").trim().slice(0, 80),
+    people: {
+      adults: Math.min(20, Math.max(1, Math.floor(Number(t.people && t.people.adults)) || 2)),
+      kids: Math.min(20, Math.max(0, Math.floor(Number(t.people && t.people.kids)) || 0)),
+    },
   };
   if (!trip.region) throw new PackError("empty", "지역을 입력해 주세요.");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(trip.startDate) || !/^\d{4}-\d{2}-\d{2}$/.test(trip.endDate)) throw new PackError("date", "날짜 형식이 올바르지 않아요.");
@@ -323,6 +328,7 @@ function buildSchema(keys) {
         key: keys.length ? { type: "string", enum: keys, description: "내 장비 목록의 키" } : { type: "string", description: "내 장비 목록의 키" },
         count: { type: "integer", description: "가져갈 개수. 가진 개수 이하" },
         why: { type: "string", description: "이 조건에서 챙기는 이유 한 줄. 누구나 챙기는 기본 장비면 빈 문자열" },
+        skip: { type: "boolean", description: "<저장한_세팅> 장비인데 이번 날씨·환경에선 필요 없으면 true. 세팅이 아닌 장비는 항상 false" },
       }),
     },
     missing: {
@@ -346,6 +352,7 @@ function buildUserMessage(trip, weather, myGear, plan) {
 지역: ${trip.region}
 캠핑장: ${trip.campsite || "(입력 안 함)"}
 일정: ${trip.startDate} ~ ${trip.endDate}
+인원: 어른 ${trip.people.adults}명${trip.people.kids ? `, 아이 ${trip.people.kids}명` : ""}
 사이트 바닥: ${trip.ground}
 주변 환경: ${trip.environments.join(", ")}
 </캠핑_조건>${trip.siteNote ? `\n\n<사이트_특징>\n${trip.siteNote}\n</사이트_특징>` : ""}
@@ -452,13 +459,15 @@ async function opRecommend(p, env, request) {
     const g = owned.get(it && it.key);
     if (!g || seen.has(it.key)) continue;
     seen.add(it.key);
-    pick.push({ key: it.key, count: Math.min(g.count, Math.max(1, Math.floor(it.count) || 1)), why: String(it.why || "").slice(0, 200), fromPlan: planKeys.has(it.key) });
+    const fromPlan = planKeys.has(it.key);
+    if (!fromPlan && it.skip === true) continue; // 세팅이 아닌 장비에 '빼도 됨'이면 필요 없다는 뜻 → 목록에서 뺌
+    pick.push({ key: it.key, count: Math.min(g.count, Math.max(1, Math.floor(it.count) || 1)), why: String(it.why || "").slice(0, 200), fromPlan, skip: fromPlan && it.skip === true });
   }
   // 세팅 장비는 Claude가 빠뜨려도 맨 앞에 넣음
   const forced = [];
   planKeys.forEach((c, key) => {
     const f = pick.find((x) => x.key === key);
-    if (f) f.count = Math.max(f.count, c); else forced.push({ key, count: c, why: "", fromPlan: true });
+    if (f) f.count = Math.max(f.count, c); else forced.push({ key, count: c, why: "", fromPlan: true, skip: false });
   });
   pick.unshift(...forced);
 

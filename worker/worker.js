@@ -117,7 +117,10 @@ async function acct(a, env, request, origin) {
           ai = { at: ts(A.at), advice: S(A.advice, 400), plan: S(A.plan, 40), place: S(A.place, 40), source: A.source === "forecast" ? "forecast" : "last-year",
             days: (Array.isArray(A.days) ? A.days : []).slice(0, 15).map(d => ({ date: S(d && d.date, 10), sky: S(d && d.sky, 10), high: N(d && d.high), low: N(d && d.low), rainChance: N(d && d.rainChance), rain: N(d && d.rain), wind: N(d && d.wind) })),
             missing: (Array.isArray(A.missing) ? A.missing : []).slice(0, 8).map(m => ({ name: S(m && m.name, 60), why: S(m && m.why, 200), alt: S(m && m.alt, 200) })),
-            why, fp: (Array.isArray(A.fp) ? A.fp : []).filter(k => items[k]).slice(0, 100), cond: { region: S(c.region, 50), ground: S(c.ground, 10), env: (Array.isArray(c.env) ? c.env : []).slice(0, 3).map(x => S(x, 10)), note: S(c.note, 80) } };
+            why, fp: (Array.isArray(A.fp) ? A.fp : []).filter(k => items[k]).slice(0, 100),
+            skip: (Array.isArray(A.skip) ? A.skip : []).filter(x => x && keyRe.test(String(x.key))).slice(0, 50).map(x => ({ key: String(x.key), count: Math.max(1, Math.min(20, Math.round(+x.count) || 1)), why: S(x.why, 200) })),
+            cond: { region: S(c.region, 50), ground: S(c.ground, 10), env: (Array.isArray(c.env) ? c.env : []).slice(0, 3).map(x => S(x, 10)), note: S(c.note, 80),
+              people: { adults: Math.max(1, Math.min(20, Math.round(+(c.people && c.people.adults)) || 2)), kids: Math.max(0, Math.min(20, Math.round(+(c.people && c.people.kids)) || 0)) } } };
         }
         return { id: t.id, name: String(t.name || "캠핑").slice(0, 30), date: t.date, nights: Math.max(0, Math.min(14, Math.round(+t.nights || 0))),
           place: String(t.place || "").slice(0, 30), items, done, dt, at: Math.max(0, +t.at || 0), up, mu: ts(t.mu), ...(ai ? { ai } : {}) };

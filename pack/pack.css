@@ -363,3 +363,18 @@ a.btn-main{display:inline-flex;align-items:center;justify-content:center;text-de
 .hero-act .tsync{margin-top:10px}
 .empty-art{display:block;width:140px;height:140px;margin:2px auto 12px;border-radius:26px;box-shadow:0 12px 26px -18px rgba(12,24,19,.7)}
 @media (min-width:720px){.hero.art{aspect-ratio:auto;height:360px;max-height:none}.hero-txt{padding:30px 30px 0;max-width:58%}.hero.art .sub{font-size:15px}}
+
+/* ===== AI 개선: 인원 · 이번엔 빼도 됨 ===== */
+.field.people{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.field.people>span{margin:0;flex:1 0 100%}
+.pp{display:flex;align-items:center;gap:8px}
+.pp small{font-size:13.5px;color:var(--ink-2);font-weight:650}
+.pp .step b{min-width:26px}
+.skip{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg)}
+.skip>b{display:block;font-size:13.5px;font-weight:750;color:var(--ink-2);margin-bottom:4px}
+.skip ul{list-style:none;margin:0;padding:0}
+.skip li{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line-2)}
+.skip li:first-child{border-top:0}
+.sk-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;font-size:14px}
+.sk-t small{color:var(--ink-3);font-size:12.5px;line-height:1.4;word-break:keep-all}
+.skip .btn-line.sm{flex:none;height:36px;padding:0 12px;font-size:13px}

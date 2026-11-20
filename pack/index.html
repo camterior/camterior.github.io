@@ -15,7 +15,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Camping Check">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="pack.css?v=17">
+<link rel="stylesheet" href="pack.css?v=18">
 </head>
 <body>
 <header class="top">
@@ -144,6 +144,10 @@
         <label><span>지역</span><input id="aiRegion" maxlength="50" autocomplete="off" placeholder="예: 경기 가평"></label>
         <label><span>캠핑장 <small>(선택)</small></span><input id="aiSite" maxlength="50" autocomplete="off" placeholder="예: 자라섬 캠핑장"></label>
       </div>
+      <div class="field people"><span>인원</span>
+        <div class="pp"><small>어른</small><div class="step"><button type="button" data-pp="a-" aria-label="어른 한 명 빼기">−</button><b id="aiAdults">2</b><button type="button" data-pp="a+" aria-label="어른 한 명 더">+</button></div></div>
+        <div class="pp"><small>아이</small><div class="step"><button type="button" data-pp="k-" aria-label="아이 한 명 빼기">−</button><b id="aiKids">0</b><button type="button" data-pp="k+" aria-label="아이 한 명 더">+</button></div></div>
+      </div>
       <fieldset class="field"><legend>사이트 바닥</legend><div class="pills" id="aiGround"></div></fieldset>
       <fieldset class="field"><legend>주변 환경 <small>(최대 3개)</small></legend><div class="pills env" id="aiEnv"></div></fieldset>
       <label class="field"><span>사이트 특징 <small>(선택)</small></span><input id="aiNote" maxlength="80" autocomplete="off" placeholder="예: 그늘 없음, 개수대 멀다"></label>
@@ -158,9 +162,9 @@
 </dialog>
 
 <div class="toast" id="toast" role="status" hidden></div>
-<script src="pack.js?v=17"></script>
-<script src="trips.js?v=17"></script>
-<script src="ai.js?v=17"></script>
-<script src="push.js?v=17"></script>
+<script src="pack.js?v=18"></script>
+<script src="trips.js?v=18"></script>
+<script src="ai.js?v=18"></script>
+<script src="push.js?v=18"></script>
 </body>
 </html>
