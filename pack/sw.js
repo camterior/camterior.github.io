@@ -3,8 +3,8 @@
 // - 버전 붙은 파일(?v=)·아이콘·글꼴·장비 사진: 저장해 둔 것 먼저
 // - 서버(워커) 요청은 건드리지 않음
 // 파일을 고치면 index.html의 ?v= 숫자와 아래 V를 같이 올려 주세요.
-const V = 'pack-v14';
-const SHELL = ['./', 'pack.css?v=14', 'pack.js?v=14', 'trips.js?v=14', 'ai.js?v=14', 'push.js?v=14', 'catalog.json', 'manifest.webmanifest',
+const V = 'pack-v15';
+const SHELL = ['./', 'pack.css?v=15', 'pack.js?v=15', 'trips.js?v=15', 'ai.js?v=15', 'push.js?v=15', 'catalog.json', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-180.png', 'icons/icon-64.png', '../assets/pretendard.woff2'];
 
 self.addEventListener('install', e => {

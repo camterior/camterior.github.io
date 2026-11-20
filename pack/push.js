@@ -1,6 +1,6 @@
 /* =====================================================================
    Camping Check · 캠핑 당일 아침 알림 (7단계) — 서버는 worker/pack-push.js
-   - '알림 켜기' → 브라우저 알림 허용 → 이 기기의 알림 주소를 내 코드에 등록 → 매일 아침 7시(한국 시간)
+   - '알림 켜기' → 브라우저 알림 허용 → 이 기기의 알림 주소를 내 코드에 등록 → 매일 아침 9시(한국 시간)
      오늘 출발하는 캠핑에 안 챙긴 장비가 있으면 서버가 보냄 (캠핑 일정은 6단계 동기화로 서버에 있음)
    - 아이폰은 홈 화면에 설치한 앱에서만 됨 (iOS 16.4+)
    ===================================================================== */
@@ -27,8 +27,8 @@ async function pushUI() {
   } else {
     const sub = await pushCurrent(), on = !!(sub && saved && saved.endpoint === sub.endpoint);
     html = on
-      ? '<span class="pu-ic on" aria-hidden="true">🔔</span><div class="pu-t"><b>캠핑 날 아침 알림 켜짐</b><span>출발하는 날 아침 7시에 안 챙긴 장비를 알려드려요.</span></div><div class="pu-b"><button type="button" class="link" data-pu="test">시험 알림</button><button type="button" class="link" data-pu="off">끄기</button></div>'
-      : '<span class="pu-ic" aria-hidden="true">🔔</span><div class="pu-t"><b>캠핑 날 아침에 알려드릴까요?</b><span>출발하는 날 아침 7시, 안 챙긴 장비가 있으면 알림을 보내요.</span></div><button type="button" class="btn-main sm" data-pu="on">알림 켜기</button>';
+      ? '<span class="pu-ic on" aria-hidden="true">🔔</span><div class="pu-t"><b>캠핑 날 아침 알림 켜짐</b><span>출발하는 날 아침 9시에 안 챙긴 장비를 알려드려요.</span></div><div class="pu-b"><button type="button" class="link" data-pu="test">시험 알림</button><button type="button" class="link" data-pu="off">끄기</button></div>'
+      : '<span class="pu-ic" aria-hidden="true">🔔</span><div class="pu-t"><b>캠핑 날 아침에 알려드릴까요?</b><span>출발하는 날 아침 9시, 안 챙긴 장비가 있으면 알림을 보내요.</span></div><button type="button" class="btn-main sm" data-pu="on">알림 켜기</button>';
   }
   box.innerHTML = html;
 }
@@ -42,7 +42,7 @@ async function pushOn() {
   await aiApi({ op: 'push_sub', code, sub: sub.toJSON() });
   lsSet(K_PUSH, { endpoint: sub.endpoint, code });
   if (TRIPS.length) tripsPush(); // 서버가 캠핑 일정을 알아야 아침에 보낼 수 있음
-  toast('알림을 켰어요 · 캠핑 날 아침 7시');
+  toast('알림을 켰어요 · 캠핑 날 아침 9시');
 }
 async function pushOff() {
   const sub = await pushCurrent(), saved = lsGet(K_PUSH, null);

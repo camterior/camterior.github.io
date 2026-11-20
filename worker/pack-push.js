@@ -2,7 +2,7 @@
 // - 알림 등록:  {pack:{op:'push_sub', code, sub:{endpoint, keys:{p256dh, auth}}}}  → KV 'push:<코드>' (기기 최대 5대)
 // - 알림 끄기:  {pack:{op:'push_unsub', code, endpoint}}
 // - 시험 알림:  {pack:{op:'push_test', code}}  (코드당 하루 5번)
-// - 매일 아침 7시(한국 시간, 크론 '0 22 * * *' UTC): 오늘 출발하는 캠핑에 안 챙긴 장비가 있으면 알림
+// - 매일 아침 9시(한국 시간, 크론 '0 0 * * *' UTC): 오늘 출발하는 캠핑에 안 챙긴 장비가 있으면 알림
 // 필요한 설정: Secret VAPID_PRIVATE_JWK (홍중이 Cloudflare에 넣음, 공개 키는 pack/push.js의 PUSH_PUBLIC_KEY)
 import { getCatalog } from "./pack-ai.js";
 
@@ -116,7 +116,7 @@ export async function pushOp(p, env, request, reply) {
       await bump(env, tk);
       const L = await subsOf(env, code);
       if (!L.length) throw new PushError("nodevice", "알림을 켠 기기가 없어요.", 404);
-      const msg = { title: "🔔 알림이 켜졌어요", body: "캠핑 가는 날 아침 7시에 안 챙긴 장비를 알려드릴게요.", url: "/pack/", tag: "pack-test" };
+      const msg = { title: "🔔 알림이 켜졌어요", body: "캠핑 가는 날 아침 9시에 안 챙긴 장비를 알려드릴게요.", url: "/pack/", tag: "pack-test" };
       const results = await Promise.all(L.map((s) => sendPush(env, s, msg)));
       await dropGone(env, code, L, results);
       return reply({ ok: true, sent: results.filter((r) => r >= 200 && r < 300).length, results }, 200);
