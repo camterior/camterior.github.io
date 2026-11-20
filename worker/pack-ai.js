@@ -414,7 +414,7 @@ async function opRecommend(p, env, request) {
   if (used >= q.limit) throw new PackError("quota", `오늘 추천 횟수(${q.limit}번)를 다 썼어요. 내일 다시 시도해 주세요.`, 429);
   if ((await count(env, allKey)) >= LIMIT_PACK_ALL) throw new PackError("quota", "오늘은 추천을 쓰는 사람이 많아 마감됐어요. 내일 다시 시도해 주세요.", 429);
   await bumpKey(env, q.key); await bumpKey(env, allKey);
-  let ok = false;
+  let billed = false; // Claude가 답을 돌려줬으면(거절·끊김 포함) 요금이 나간 것 → 횟수를 돌려주지 않음
   try {
 
   // 고를 수 있는 장비 = 내 장비 + 세팅 장비
@@ -434,6 +434,7 @@ async function opRecommend(p, env, request) {
     output_config: { effort: env.PACK_EFFORT || DEFAULT_EFFORT, format: { type: "json_schema", schema: buildSchema([...owned.keys()]) } },
     fallbacks: "default",
   });
+  billed = true;
 
   const u = data.usage || {};
   console.log("claude", data.model, "in", u.input_tokens, "out", u.output_tokens, data.stop_reason);
@@ -460,7 +461,6 @@ async function opRecommend(p, env, request) {
     if (f) f.count = Math.max(f.count, c); else forced.push({ key, count: c, why: "", fromPlan: true });
   });
   pick.unshift(...forced);
-  ok = true;
 
   const mine = new Map(myGear.map((g) => [g.key, g.count]));
   return {
@@ -476,7 +476,7 @@ async function opRecommend(p, env, request) {
     left: Math.max(0, q.limit - used - 1), limit: q.limit,
   };
   } finally {
-    if (!ok) { await bumpKey(env, q.key, -1); await bumpKey(env, allKey, -1); } // 실패한 추천은 횟수에서 뺌
+    if (!billed) { await bumpKey(env, q.key, -1); await bumpKey(env, allKey, -1); } // Claude까지 못 간 실패(연결·키·과부하)만 횟수를 돌려줌
   }
   } finally { INFLIGHT.delete(q.key); }
 }
