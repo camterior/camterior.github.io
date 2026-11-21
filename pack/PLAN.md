@@ -128,6 +128,8 @@
 - 계산: 시간당 소비량 × 하루 켜는 시간(기본 15시간, 기기마다 `packFuelH`) × 밤 수 × 개수. 세기는 AI 날씨의 가장 추운 밤 최저기온(10° 이상 약 ~ -5° 이하 강), 날씨 없으면 중간.
 - 6종 모두 공식 상세페이지를 직접 못 읽음(사이트 접속 막힘) → 화면에 '추정' 표시. 옴니 230(수출형 7.5L vs 국내 KS-67H 6.3L)·파세코 캠프 5000(최소값 블로그만)은 '출처 엇갈림', 옴니는 탱크 비워 둠.
 - 할 일: toyotomi.jp Omni230.pdf·LC-L53C.pdf, 파세코 공식몰, 신일 공식으로 확인 후 conf를 'official'로.
+- ✅ 2026-11-21 공식 확인 배포(`09d6159`, 재배포 `54f79fb`): 옴니 230(탱크 7.5L 추가)·토요토미 LC-L53·신일 300·신일 900 → official. 파세코 캠프 5000은 공식 제원표 없음 → mixed 유지. 신일 1200은 숫자는 공식 6.6kW 칸과 같지만 판매처 모델 SFH-1200MG가 공식 목록에 없어 retailer 유지(홍중 결정 대기). 자세한 근거: `../camping-app/fuel-spec-ready/README.md`.
+- 배포 메모: GitHub Pages 'deploy-pages'가 가끔 'No artifacts named github-pages' 오류로 실패(검사는 통과) → 빈 커밋으로 다시 올리면 됨 (2026-11-21 두 번).
 
 ## 근처 등유 주유소 (오피넷, 2026-11-20)
 - 서버: `worker/pack-oil.js` `{pack:{op:'oil', campsite, region}}` (pack-ai.js의 pack()에서 연결). 키는 Cloudflare Secret `OPINET_KEY`(홍중 등록). 키가 없으면 'nokey'(503) → 화면에 '준비 중'.
