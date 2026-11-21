@@ -136,6 +136,10 @@
   .hubgrid.two{grid-template-columns:1.35fr 1fr;grid-template-rows:none}
   .hubgrid.two .hubcard,.hubgrid.two .hubcard.big{grid-row:auto;min-height:440px}
   @media (max-width:640px){.hubgrid.two{grid-template-columns:1fr}.hubgrid.two .hubcard,.hubgrid.two .hubcard.big{min-height:300px}}
+  .hubgrid.three{grid-template-rows:1fr 1fr}
+  .hubgrid.three .hubcard.big{grid-row:span 2;min-height:560px}
+  .hubgrid.three .hubcard:not(.big){min-height:273px}
+  @media (max-width:640px){.hubgrid.three{grid-template-rows:none}.hubgrid.three .hubcard.big{grid-row:auto;min-height:300px}.hubgrid.three .hubcard:not(.big){min-height:260px}}
   #v-hub .hub-band{margin-top:0}
   .site-foot{position:relative;z-index:2}
   body[data-view="plan"] .site-foot{display:none}

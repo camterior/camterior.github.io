@@ -256,4 +256,12 @@
 .upd-l b{display:block;font-size:14.5px;line-height:1.4}.upd-l small{display:block;margin-top:2px;color:var(--ink-3,#6b6f66);font-size:12.5px;line-height:1.45}
 .upd-btns{display:flex;gap:8px;margin-top:2px}.upd-btns button{flex:1;min-height:46px;border-radius:12px;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
 .upd-more{border:1px solid var(--line,#ddd);background:#fff}.upd-ok{border:0;background:#0F120D;color:#fff}
+/* 내 장비 → Camping Check 바로가기 */
+.mn-cc{display:flex;align-items:center;gap:12px;margin:10px 0 14px;padding:12px 14px;border-radius:14px;background:#0C1813;color:#ECF1EC;text-decoration:none;transition:transform .2s}
+.mn-cc:hover{transform:translateY(-1px)}
+.mn-cc-i{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#FF5A1F;color:#fff;font-weight:900;font-size:18px}
+.mn-cc-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.mn-cc-t b{font-size:15px}
+.mn-cc-t small{font-size:12.5px;color:#A9B6AE;line-height:1.45}
+.mn-cc-go{flex:none;font-weight:800;color:#FFB48F;font-size:18px}
 </style>
