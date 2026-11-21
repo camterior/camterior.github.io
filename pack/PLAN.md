@@ -158,3 +158,4 @@
   - 내 장비: '캠핑 갈 때 이 장비로 챙기기' 바로가기(`.mn-cc`, `src/ai.css`).
   - 실제 사이트에서 카드 → Camping Check 열림 확인.
 - 빌드 메모(Windows): `src/build.py`의 symlink가 권한 오류 → `src/img`·`src/assets`를 junction(`New-Item -ItemType Junction`)으로 만들어 두면 됨. ai.css는 `</style>`로 끝나야 함.
+- ✅ 2026-11-21 CLAUDE.md 규칙 추가(`752cf2c`): 장비·텐트(난방기 fuel 포함) 고친 뒤 `node scripts/pack-catalog.js`로 catalog.json 다시 만들기 · '7. Camping Check' 절(PLAN.md 먼저 읽기, ?v=/sw 버전 같이 올리기, camping-app 분담, 키 4개는 Worker Secret에만).
