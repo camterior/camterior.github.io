@@ -163,3 +163,12 @@
   - 실제 사이트에서 카드 → Camping Check 열림 확인.
 - 빌드 메모(Windows): `src/build.py`의 symlink가 권한 오류 → `src/img`·`src/assets`를 junction(`New-Item -ItemType Junction`)으로 만들어 두면 됨. ai.css는 `</style>`로 끝나야 함.
 - ✅ 2026-11-21 CLAUDE.md 규칙 추가(`752cf2c`): 장비·텐트(난방기 fuel 포함) 고친 뒤 `node scripts/pack-catalog.js`로 catalog.json 다시 만들기 · '7. Camping Check' 절(PLAN.md 먼저 읽기, ?v=/sw 버전 같이 올리기, camping-app 분담, 키 4개는 Worker Secret에만).
+
+## 장소 칸 안내 + 내 장비함에 없는 것 직접 넣기 (2026-11-21, 이 세션에서 만듦)
+- ✅ 배포 `66bfbca` (사이트 + 워커, ?v=26 · sw pack-v27). 다음 pack 수정은 ?v=27 / pack-v28부터.
+- 장소 칸(`8215670`): '(적지 않아도 돼요)' → '(캠핑장 이름을 적고 목록에서 골라 주세요)'. 칸 아래 단계별 안내(목록에서 찾는 중 / 목록에서 골라 주세요 / ⏳ 위치 찾는 중… 잠시만 기다려 주세요 / 주소 / 목록에 없음). `trips.js` placeNote·`AC.st`.
+- 직접 넣기(`66bfbca`): 캠핑 화면 '+ 목록에 없는 것 직접 넣기' → 직접 넣기 창(pack.js selfOpen(name, editId, tripId)).
+  - '내 장비함에도 넣기'(기본 켬) → my: 장비 + 이번 캠핑. 끄면 이번 캠핑에만: 키 `x:<id>`, 이름은 캠핑의 `ex` = {id:{n,c}} (워커 trips_save가 정리해서 저장, x: 키와 짝만).
+  - '캠테리어에 이 장비 등록 요청' → 게시판 장비 요청 `{board:{op:'add',kind:'gear',name,note,from:'pack'}}` (IP당 하루 10번, 같은 이름이면 +1). 내 장비함 직접 넣기에도 있음.
+  - AI 추천 다시 받아도 x: 항목 유지. 고르기 화면에서 빼면 ex도 지움.
+  - 시험: 브라우저 + 실제 워커 코드(가짜 KV) 11/11 — 이번 캠핑에만·내 장비함에도·게시판 도착(from pack)·서버 ex 저장·다른 기기에서 보임·JS 오류 없음. 실제 서버엔 가짜 요청을 남기지 않으려고 시험 안 보냄.
