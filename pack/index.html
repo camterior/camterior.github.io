@@ -15,7 +15,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Camping Check">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="pack.css?v=23">
+<link rel="stylesheet" href="pack.css?v=24">
 </head>
 <body>
 <header class="top">
@@ -125,7 +125,12 @@
       <label><span>가는 날</span><input id="tdDate" type="date" required></label>
       <div><span>며칠</span><div class="step big"><button type="button" id="tdMinus" aria-label="하루 줄이기">−</button><b id="tdNights">1박</b><button type="button" id="tdPlus" aria-label="하루 늘리기">+</button></div></div>
     </div>
-    <label class="field"><span>장소 <small>(적지 않아도 돼요)</small></span><input id="tdPlace" maxlength="30" autocomplete="off" placeholder="예: 자라섬 캠핑장"></label>
+    <div class="field place">
+      <label for="tdPlace"><span>장소 <small>(적지 않아도 돼요)</small></span></label>
+      <input id="tdPlace" maxlength="30" autocomplete="off" placeholder="예: 자라섬 캠핑장" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="tdPlaceAc">
+      <ul class="ac" id="tdPlaceAc" role="listbox" aria-label="캠핑장 찾기" hidden></ul>
+      <p class="ac-note" id="tdPlaceNote" aria-live="polite"></p>
+    </div>
     <fieldset class="field" id="tdFromBox"><legend>챙길 장비</legend>
       <div class="from" id="tdFrom"></div>
     </fieldset>
@@ -163,9 +168,9 @@
 </dialog>
 
 <div class="toast" id="toast" role="status" hidden></div>
-<script src="pack.js?v=23"></script>
-<script src="trips.js?v=23"></script>
-<script src="ai.js?v=23"></script>
-<script src="push.js?v=23"></script>
+<script src="pack.js?v=24"></script>
+<script src="trips.js?v=24"></script>
+<script src="ai.js?v=24"></script>
+<script src="push.js?v=24"></script>
 </body>
 </html>

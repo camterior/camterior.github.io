@@ -1,6 +1,7 @@
 /* =====================================================================
    캠핑 챙김 · 캠핑 일정 + 체크리스트 (3단계)
-   - 캠핑 목록: localStorage 'packTrips' = [{id, name, date:'YYYY-MM-DD', nights, place, items:{장비키:가져갈 개수}, done:{장비키:1}, at}]
+   - 캠핑 목록: localStorage 'packTrips' = [{id, name, date:'YYYY-MM-DD', nights, place, loc?, items:{장비키:가져갈 개수}, done:{장비키:1}, at}]
+     loc = CARO에서 고른 캠핑장 위치 {lat, lng, name, addr, src:'kakao'|'geo', sd:시도, sg:시군구} (아래 '장소')
      + 지운 캠핑 packTripsDel=[{id,del:1,up}] (서버와 합칠 때 다시 살아나지 않게)
    - 장비 이름·사진·분류는 pack.js의 info()/groups()/thumb()를 같이 씀 (같은 '내 장비' 목록)
    - 화면 주소: #(캠핑 목록) · #t/<id>(체크리스트) · #gear(내 장비함)
@@ -103,16 +104,74 @@ function homeUI() {
   if (typeof pushUI === 'function') pushUI();
 }
 
+/* ---------- 장소: CARO 캠핑장 목록에서 고르기 → 정확한 좌표 (워커 pack-place.js) ----------
+   2글자부터 0.3초 기다렸다 찾기. 고르면 TD.loc = {lat, lng, name, addr, src:'kakao'|'geo', sd, sg} (+ label: 칸에 넣은 이름)
+   고른 뒤 글자를 고치면 위치는 지우고 지금처럼 글자로만 저장 */
+const AC = { timer: 0, seq: 0, list: [], idx: -1 };
+function placeNote() {
+  const n = $('tdPlaceNote'), L = TD.loc;
+  n.textContent = TD.locBusy ? '📍 캠핑장 위치 찾는 중…' : L ? (L.src === 'kakao' ? `📍 ${L.addr || L.name}` : `📍 대략적인 위치만 찾았어요${L.addr ? ` (${L.addr})` : ''}`) : TD.locMsg || '';
+  n.dataset.k = L ? L.src : '';
+}
+function acClose() {
+  const u = $('tdPlaceAc'), i = $('tdPlace'); u.hidden = true; u.innerHTML = ''; AC.list = []; AC.idx = -1;
+  i.setAttribute('aria-expanded', 'false'); i.removeAttribute('aria-activedescendant');
+}
+function acShow() {
+  const u = $('tdPlaceAc'), i = $('tdPlace');
+  if (!AC.list.length) { acClose(); return; }
+  u.innerHTML = AC.list.map((c, n) => `<li role="option" id="ac${n}" data-ac="${n}" aria-selected="${n === AC.idx}"><b>${esc(c[0])}</b><small>${esc(c[1] + ' ' + c[2])}</small></li>`).join('');
+  u.hidden = false; i.setAttribute('aria-expanded', 'true');
+  if (AC.idx >= 0) { i.setAttribute('aria-activedescendant', 'ac' + AC.idx); const el = $('ac' + AC.idx); if (el) el.scrollIntoView({ block: 'nearest' }); } else i.removeAttribute('aria-activedescendant');
+}
+function acInput() {
+  const v = $('tdPlace').value.trim();
+  if (TD.loc && v !== TD.loc.label) TD.loc = null;
+  TD.locMsg = ''; placeNote();
+  clearTimeout(AC.timer); const my = ++AC.seq;
+  if (v.length < 2 || (TD.loc && v === TD.loc.label)) { acClose(); return; }
+  AC.timer = setTimeout(async () => {
+    try { const d = await aiApi({ op: 'caro', q: v }); if (my !== AC.seq) return; AC.list = d.list || []; AC.idx = -1; acShow(); }
+    catch (e) { if (my === AC.seq) acClose(); }
+  }, 300);
+}
+function acPick(n) {
+  const c = AC.list[n]; if (!c) return;
+  const label = c[0].slice(0, 30), my = ++AC.seq;
+  $('tdPlace').value = label; acClose(); clearTimeout(AC.timer);
+  TD.loc = null; TD.locMsg = ''; TD.locBusy = true; placeNote();
+  TD.locP = aiApi({ op: 'place', name: c[0], sido: c[1], sigungu: c[2] })
+    .then(d => { if (my === AC.seq) TD.loc = { lat: d.lat, lng: d.lng, name: d.name, addr: d.addr, src: d.src, sd: d.sd || c[1], sg: d.sg || c[2], label }; })
+    .catch(e => { if (my === AC.seq) TD.locMsg = (e && e.message) || '위치를 찾지 못했어요. 장소 이름만 저장할게요.'; })
+    .finally(() => { if (my === AC.seq) { TD.locBusy = false; TD.locP = null; placeNote(); } });
+}
+function acKey(e) {
+  if ($('tdPlaceAc').hidden || !AC.list.length) return;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); AC.idx = (AC.idx + (e.key === 'ArrowDown' ? 1 : -1) + AC.list.length) % AC.list.length; acShow(); }
+  else if (e.key === 'Enter' && AC.idx >= 0) { e.preventDefault(); acPick(AC.idx); }
+  else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); acClose(); }
+}
+function placeInit() {
+  const i = $('tdPlace'), u = $('tdPlaceAc');
+  i.addEventListener('input', acInput);
+  i.addEventListener('keydown', acKey);
+  i.addEventListener('blur', () => setTimeout(acClose, 150));
+  u.addEventListener('pointerdown', e => e.preventDefault()); // 고르는 동안 입력칸 포커스 유지
+  u.addEventListener('click', e => { const li = e.target.closest('[data-ac]'); if (li) acPick(Number(li.dataset.ac)); });
+}
+
 /* ---------- 캠핑 만들기·고치기 ---------- */
-let TD = { edit: null, nights: 1, from: 'empty' };
+let TD = { edit: null, nights: 1, from: 'empty', loc: null };
 function tripFormOpen(editId) {
   const t = editId ? tripById(editId) : null;
-  TD = { edit: editId || null, nights: t ? t.nights || 0 : 1, from: 'empty' };
+  TD = { edit: editId || null, nights: t ? t.nights || 0 : 1, from: 'empty', loc: t && t.loc && t.place ? { ...t.loc, label: t.place } : null, locBusy: false, locMsg: '', locP: null };
+  ++AC.seq; acClose();
   $('tdT').textContent = t ? '일정 고치기' : '새 캠핑';
   $('tdOk').textContent = t ? '저장' : '만들기';
   $('tdName').value = t ? t.name : '';
   $('tdDate').value = t ? t.date : ymd(nextSat());
   $('tdPlace').value = t ? t.place || '' : '';
+  placeNote();
   $('tdDel').hidden = !t; $('tdFromBox').hidden = !!t; $('tdErr').textContent = '';
   nightsUI();
   if (!t) {
@@ -129,20 +188,25 @@ function tripFormOpen(editId) {
 }
 const nightsUI = () => { $('tdNights').textContent = TD.nights ? `${TD.nights}박` : '당일'; };
 const closeTripDlg = () => { const d = $('tripDlg'); if (d.open) d.close(); };
-function tripSubmit(e) {
+async function tripSubmit(e) {
   e.preventDefault();
+  acClose();
+  if (TD.locP) { $('tdOk').disabled = true; await TD.locP; $('tdOk').disabled = false; } // 캠핑장 위치 찾는 중이면 기다렸다 저장
   const date = $('tdDate').value;
   if (!parseD(date)) { $('tdErr').textContent = '가는 날을 골라 주세요'; return; }
   const s = parseD(date), name = $('tdName').value.trim().replace(/\s+/g, ' ').slice(0, 30) || `${s.getMonth() + 1}월 ${s.getDate()}일 캠핑`;
   const place = $('tdPlace').value.trim().slice(0, 30);
+  // CARO에서 고른 이름 그대로일 때만 위치 저장 (label은 저장 안 함)
+  const loc = TD.loc && place && place === TD.loc.label ? (({ label, ...L }) => L)(TD.loc) : null;
+  const setLoc = t => { if (loc) t.loc = loc; else delete t.loc; };
   if (TD.edit) {
-    Object.assign(tripById(TD.edit), { name, date, nights: TD.nights, place });
+    Object.assign(tripById(TD.edit), { name, date, nights: TD.nights, place }); setLoc(tripById(TD.edit));
     saveTrips(tripById(TD.edit)); closeTripDlg(); tripUI(); toast('일정을 고쳤어요'); return;
   }
   const f = (document.querySelector('input[name=tdFrom]:checked') || {}).value || 'empty', items = {};
   if (f === 'all') Object.keys(MYG).forEach(k => { items[k] = MYG[k]; });
   else if (f.startsWith('trip:')) { const src = tripById(f.slice(5)); if (src) Object.keys(src.items).forEach(k => { if (MYG[k]) items[k] = Math.min(src.items[k], 20); }); }
-  const t = { id: tripId(), name, date, nights: TD.nights, place, items, done: {}, at: Date.now() };
+  const t = { id: tripId(), name, date, nights: TD.nights, place, items, done: {}, at: Date.now() }; setLoc(t);
   TRIPS.push(t); saveTrips(t); closeTripDlg();
   location.hash = '#t/' + t.id;
   if (f === 'ai' && typeof aiOpen === 'function') setTimeout(() => aiOpen(t.id), 250);
@@ -164,7 +228,8 @@ function tripUI() {
   const dd = dday(t), st = tripStat(t);
   $('tripWhen').innerHTML = `${esc(whenT(t))} <span class="dd" data-k="${dd.k}">${dd.t}</span>`;
   $('tripT').textContent = t.name;
-  $('tripPlace').hidden = !t.place; $('tripPlace').textContent = t.place ? '📍 ' + t.place : '';
+  const addr = t.loc && t.loc.src === 'kakao' ? t.loc.addr : '';
+  $('tripPlace').hidden = !t.place; $('tripPlace').innerHTML = t.place ? `📍 ${esc(t.place)}${addr ? `<small class="addr">${esc(addr)}</small>` : ''}` : '';
   const pct = st.n ? Math.round(st.d / st.n * 100) : 0;
   $('tripProg').innerHTML = st.n
     ? `<div class="prog-row"><b>${st.d === st.n ? '다 챙겼어요 🎉' : `${st.d} / ${st.n}`}</b><span>${st.d === st.n ? '즐거운 캠핑 되세요' : `남은 장비 ${st.n - st.d}가지`}</span></div><span class="bar big"><i data-pct="${pct}"></i></span>`
@@ -241,6 +306,7 @@ function tripsInit() {
   $('tripList').addEventListener('click', e => { const b = e.target.closest('button[data-del]'); if (b) tripRemove(tripById(b.dataset.del), true); });
   $('tripEdit').addEventListener('click', () => tripFormOpen(CUR));
   $('tripForm').addEventListener('submit', tripSubmit);
+  placeInit();
   $('tdCancel').addEventListener('click', closeTripDlg);
   $('tdDel').addEventListener('click', tripDelete);
   $('tripDlg').addEventListener('click', e => { if (e.target === $('tripDlg')) closeTripDlg(); });
@@ -398,36 +464,80 @@ document.addEventListener('click', e => {
 });
 
 /* ---------- 근처 등유 주유소 (오피넷, 워커 pack-oil.js) ----------
-   캠핑장(일정의 장소) → 없으면 AI 추천 때 넣은 지역. 버튼을 눌러야 찾음(무료 API 횟수 아끼기), 결과는 이 기기에 3시간 저장 */
-const K_OIL = 'packOil', OIL = { busy: '', err: {} };
-const oilQ = t => ({ campsite: (t.place || '').trim(), region: ((t.ai && t.ai.cond && t.ai.cond.region) || '').trim() });
-const oilKey = q => q.campsite + '|' + q.region;
-function oilHit(q) { const c = lsGet(K_OIL, {}) || {}, h = c[oilKey(q)]; return h && Date.now() - h.at < 3 * 3600e3 ? h : null; }
+   캠핑장을 CARO 목록에서 골랐으면 그 좌표(t.loc)에서, 아니면 일정의 장소 글자 → AI 추천 때 넣은 지역으로.
+   버튼을 눌러야 찾음(무료 API 횟수 아끼기), 결과는 이 기기에 3시간 저장.
+   '지금 내 위치': 누를 때만 위치를 물어보고, 약 100m(소수 셋째 자리)로 깎아서 보냄. 일정에는 저장하지 않고 결과만 30분('gps') */
+const K_OIL = 'packOil', OIL = { busy: '', err: {} }, GPS_TTL = 30 * 60e3;
+const oilQ = t => t.loc
+  ? { lat: t.loc.lat, lng: t.loc.lng, name: t.place || t.loc.name, sd: t.loc.sd || '', sg: t.loc.sg || '', approx: t.loc.src !== 'kakao' }
+  : { campsite: (t.place || '').trim(), region: ((t.ai && t.ai.cond && t.ai.cond.region) || '').trim() };
+const oilKey = q => q.lat != null ? `@${q.lat.toFixed(4)},${q.lng.toFixed(4)}` : q.campsite + '|' + q.region;
+function oilHit(key, ttl = 3 * 3600e3) { const c = lsGet(K_OIL, {}) || {}, h = c[key]; return h && Date.now() - h.at < ttl ? h : null; }
+function oilKeep(key, d) {
+  const c = lsGet(K_OIL, {}) || {}; Object.keys(c).forEach(k => { if (!c[k] || Date.now() - c[k].at > 3 * 3600e3) delete c[k]; });
+  c[key] = { at: Date.now(), d }; lsSet(K_OIL, c);
+}
 const won = n => Number(n).toLocaleString('ko-KR');
 const km = m => m == null ? '' : m < 1000 ? `${Math.round(m / 10) * 10}m` : `${(m / 1000).toFixed(1)}km`;
-function oilUI(t) {
-  const q = oilQ(t), key = oilKey(q);
-  if (!q.campsite && !q.region) return `<div class="oil"><p class="oil-hint">⛽ 일정에 캠핑장(장소)을 넣으면 근처 등유 파는 주유소를 찾아 드려요.</p></div>`;
-  const h = oilHit(q), where = esc(q.campsite || q.region);
-  if (OIL.busy === key) return `<div class="oil"><p class="oil-hint"><span class="spin sm" aria-hidden="true"></span> ${where} 근처 주유소 찾는 중…</p></div>`;
-  if (OIL.err[key]) return `<div class="oil"><p class="oil-hint">⛽ ${esc(OIL.err[key])}</p><button type="button" class="link" data-oil="go">다시 찾기</button></div>`;
-  if (!h) return `<div class="oil"><button type="button" class="btn-line wide" data-oil="go">⛽ ${where} 근처 등유 주유소 찾기</button></div>`;
+// 결과 목록 하나 (캠핑장 기준 / 내 위치 기준 같이 씀)
+function oilList(h, where, again) {
   const d = h.d;
-  if (!d.list.length) return `<div class="oil"><p class="oil-hint">⛽ ${where} 근처에서 등유 파는 주유소를 찾지 못했어요. 가는 길에 미리 넣어 가세요.</p></div>`;
-  return `<div class="oil"><div class="oil-head"><b>⛽ ${d.mode === 'near' ? `${where} 5km 안 등유 주유소` : `5km 안에 없어 ${esc(d.place || where)}에서 등유가 싼 곳`}</b></div>
+  if (!d.list.length) return `<p class="oil-hint">⛽ ${where} 근처에서 등유 파는 주유소를 찾지 못했어요. 가는 길에 미리 넣어 가세요.</p>${again}`;
+  const area = esc(d.area || d.place || where);
+  return `<div class="oil-head"><b>⛽ ${d.mode === 'near' ? `${where} 5km 안 등유 주유소` : `5km 안에 없어 ${area}에서 등유가 싼 곳`}</b>${again}</div>
+    ${d.approx ? `<p class="oil-approx">대략적인 위치(시·군 중심일 수 있어요) 기준이에요. 일정 고치기에서 캠핑장을 목록에서 고르면 정확해져요.</p>` : ''}
     <ul class="oil-list">${d.list.map(s => `<li><span class="oil-t"><b>${esc(s.name)}</b><small>${[s.brand, km(s.dist)].filter(Boolean).map(esc).join(' · ')}</small></span><span class="oil-p">${won(s.price)}<small>원/L</small></span>${s.lat ? `<a class="oil-go" href="https://map.kakao.com/link/to/${encodeURIComponent(s.name)},${s.lat},${s.lon}" target="_blank" rel="noopener">길찾기</a>` : ''}</li>`).join('')}</ul>
-    <p class="fu-note">오피넷(한국석유공사) 가격 · ${new Date(h.at).getHours()}시 ${pad(new Date(h.at).getMinutes())}분 기준. 영업시간은 주유소에 확인하세요.</p></div>`;
+    <p class="fu-note">오피넷(한국석유공사) 가격 · ${new Date(h.at).getHours()}시 ${pad(new Date(h.at).getMinutes())}분 기준. 영업시간은 주유소에 확인하세요.</p>`;
 }
+function oilUI(t) {
+  const q = oilQ(t), key = oilKey(q), hasQ = q.lat != null || q.campsite || q.region;
+  let top;
+  if (!hasQ) top = `<p class="oil-hint">⛽ 일정에 캠핑장(장소)을 넣으면 근처 등유 파는 주유소를 찾아 드려요.</p>`;
+  else {
+    const h = oilHit(key), where = esc(q.name || q.campsite || q.region);
+    if (OIL.busy === key) top = `<p class="oil-hint"><span class="spin sm" aria-hidden="true"></span> ${where} 근처 주유소 찾는 중…</p>`;
+    else if (OIL.err[key]) top = `<p class="oil-hint">⛽ ${esc(OIL.err[key])}</p><button type="button" class="link" data-oil="go">다시 찾기</button>`;
+    else if (!h) top = `<button type="button" class="btn-line wide" data-oil="go">⛽ ${where} 근처 등유 주유소 찾기</button>`;
+    else top = oilList(h, where, '');
+  }
+  return `<div class="oil">${top}</div><div class="oil oil-gps">${gpsUI()}</div>`;
+}
+function gpsUI() {
+  if (OIL.busy === 'gps') return `<p class="oil-hint"><span class="spin sm" aria-hidden="true"></span> 지금 내 위치 근처 주유소 찾는 중…</p>`;
+  if (OIL.err.gps) return `<p class="oil-hint">📍 ${esc(OIL.err.gps)}</p><button type="button" class="link" data-oil="gps">다시 찾기</button>`;
+  const h = oilHit('gps', GPS_TTL);
+  if (h) return oilList(h, '지금 내 위치', `<button type="button" class="link sm" data-oil="gps">다시 찾기</button>`);
+  return `<button type="button" class="btn-line wide gps" data-oil="gps">📍 지금 내 위치 근처에서 찾기</button>`;
+}
+const oilRedraw = () => { const n = tripById(CUR); if (n) fuelUI(n); };
 async function oilFind() {
   const t = tripById(CUR); if (!t) return;
   const q = oilQ(t), key = oilKey(q); if (OIL.busy) return;
   OIL.busy = key; delete OIL.err[key]; fuelUI(t);
-  try {
-    const d = await aiApi({ op: 'oil', ...q });
-    const c = lsGet(K_OIL, {}) || {}; Object.keys(c).forEach(k => { if (Date.now() - c[k].at > 3 * 3600e3) delete c[k]; });
-    c[key] = { at: Date.now(), d }; lsSet(K_OIL, c);
-  } catch (e) { OIL.err[key] = e.message || '주유소를 찾지 못했어요.'; }
-  OIL.busy = '';
-  const n = tripById(CUR); if (n) fuelUI(n);
+  try { oilKeep(key, await aiApi({ op: 'oil', ...q })); }
+  catch (e) { OIL.err[key] = e.message || '주유소를 찾지 못했어요.'; }
+  OIL.busy = ''; oilRedraw();
 }
-document.addEventListener('click', e => { if (e.target.closest('[data-oil="go"]')) oilFind(); });
+// 위치 → 약 100m로 깎기 (소수 셋째 자리)
+const r3 = v => Math.round(v * 1000) / 1000;
+function gpsFind() {
+  if (OIL.busy) return;
+  delete OIL.err.gps;
+  if (!navigator.geolocation) { OIL.err.gps = '이 브라우저에서는 위치를 쓸 수 없어요.'; oilRedraw(); return; }
+  OIL.busy = 'gps'; oilRedraw();
+  const done = msg => { if (msg) OIL.err.gps = msg; OIL.busy = ''; oilRedraw(); };
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const lat = r3(pos.coords.latitude), lng = r3(pos.coords.longitude);
+    if (!(lat >= 33 && lat <= 39 && lng >= 124 && lng <= 132)) { done('한국 안에서만 찾을 수 있어요.'); return; }
+    try { oilKeep('gps', await aiApi({ op: 'oil', lat, lng, name: '지금 내 위치' })); done(); }
+    catch (e) { done(e.message || '주유소를 찾지 못했어요.'); }
+  }, err => {
+    done(err && err.code === 1
+      ? '위치 사용을 허용하지 않아 찾을 수 없어요. 아이폰은 설정 → 개인정보 보호 및 보안 → 위치 서비스에서 Safari(또는 홈 화면 앱)를 "앱을 사용하는 동안"으로 바꿔 주세요.'
+      : '지금 위치를 알 수 없었어요. 잠시 후 다시 해 주세요.');
+  }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 5 * 60e3 });
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-oil]'); if (!b) return;
+  if (b.dataset.oil === 'go') oilFind(); else if (b.dataset.oil === 'gps') gpsFind();
+});

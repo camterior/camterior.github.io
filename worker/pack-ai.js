@@ -65,6 +65,7 @@ export async function count(env, key) { return env.RL ? parseInt(await env.RL.ge
 export async function bumpKey(env, key, by = 1) { if (env.RL) await env.RL.put(key, String(Math.max(0, (await count(env, key)) + by)), { expirationTtl: 172800 }); }
 
 import { opOil } from "./pack-oil.js";
+import { opCaro, opPlace } from "./pack-place.js";
 
 // ───────── 입구 ─────────
 export async function pack(p, env, request, reply) {
@@ -74,6 +75,8 @@ export async function pack(p, env, request, reply) {
     if (p.op === "recommend") return reply(await opRecommend(p, env, request), 200);
     if (p.op === "left") return reply(await opLeft(p, env, request), 200);
     if (p.op === "oil") return reply(await opOil(p, env, request), 200); // 근처 등유 주유소 (pack-oil.js)
+    if (p.op === "caro") return reply(await opCaro(p, env, request), 200); // CARO 캠핑장 이름 찾기 (pack-place.js)
+    if (p.op === "place") return reply(await opPlace(p, env, request), 200); // 캠핑장 정확한 좌표 (카카오, pack-place.js)
     return reply({ error: "op", message: "알 수 없는 요청이에요." }, 400);
   } catch (e) {
     if (e instanceof PackError) return reply({ error: e.error, message: e.message }, e.status);

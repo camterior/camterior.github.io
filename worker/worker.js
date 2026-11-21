@@ -122,8 +122,15 @@ async function acct(a, env, request, origin) {
             cond: { region: S(c.region, 50), ground: S(c.ground, 10), env: (Array.isArray(c.env) ? c.env : []).slice(0, 3).map(x => S(x, 10)), note: S(c.note, 80),
               people: { adults: Math.max(1, Math.min(20, Math.round(+(c.people && c.people.adults)) || 2)), kids: Math.max(0, Math.min(20, Math.round(+(c.people && c.people.kids)) || 0)) } } };
         }
+        // 캠핑장 정확한 위치 (CARO에서 고르면 카카오 좌표, 못 찾으면 대략 위치 src:'geo'). 한국 밖 좌표는 버림
+        let loc;
+        if (t.loc && typeof t.loc === "object") {
+          const L = t.loc, la = +L.lat, ln = +L.lng, S = (v, n) => String(v == null ? "" : v).replace(/[<>\u0000-\u001f]/g, " ").slice(0, n);
+          if (la >= 33 && la <= 39 && ln >= 124 && ln <= 132)
+            loc = { lat: Math.round(la * 1e6) / 1e6, lng: Math.round(ln * 1e6) / 1e6, name: S(L.name, 40), addr: S(L.addr, 80), src: L.src === "kakao" ? "kakao" : "geo", sd: S(L.sd, 10), sg: S(L.sg, 15) };
+        }
         return { id: t.id, name: String(t.name || "캠핑").slice(0, 30), date: t.date, nights: Math.max(0, Math.min(14, Math.round(+t.nights || 0))),
-          place: String(t.place || "").slice(0, 30), items, done, dt, at: Math.max(0, +t.at || 0), up, mu: ts(t.mu), ...(ai ? { ai } : {}) };
+          place: String(t.place || "").slice(0, 30), items, done, dt, at: Math.max(0, +t.at || 0), up, mu: ts(t.mu), ...(loc ? { loc } : {}), ...(ai ? { ai } : {}) };
       };
       const merge = (a, b) => {
         if (a.del || b.del) return (b.up || 0) > (a.up || 0) ? b : a;

@@ -1,10 +1,12 @@
 // Camping Check(/pack) 근처 등유(실내등유) 주유소 — 오피넷(한국석유공사) 무료 API
 // - 키: Cloudflare Secret OPINET_KEY (홍중이 등록). 코드·GitHub에 넣지 않음
 // - {pack:{op:'oil', campsite, region}} → 캠핑장(없으면 지역) 위치 반경 5km 안 등유 파는 주유소(가까운 순)
+//   {lat, lng, name, sd, sg}가 오면(CARO+카카오로 고른 캠핑장 · 지금 내 위치) 위치 검색 없이 그 좌표에서 바로
 //   5km 안에 없으면 그 시·군에서 등유가 싼 주유소 10곳(거리 같이)
 // - 오피넷 좌표는 KATEC(TM128, 베셀 타원체) → 위경도와 서로 바꿔 씀 (아래 toKatec/fromKatec)
 // - IP당 하루 LIMIT_OIL_IP번, 오피넷 호출은 모두 합쳐 하루 LIMIT_OIL_ALL번(무료 키 300건), 같은 위치 결과는 6시간 저장
 import { geocode, count, bumpKey, ipOf, kstDay, PackError } from "./pack-ai.js";
+import { inKorea, regionOf } from "./pack-place.js";
 
 export const LIMIT_OIL_IP = 40;
 export const LIMIT_OIL_ALL = 250; // 오피넷 무료 키는 하루 300건 → 모두 합쳐 250건에서 멈춤 (남는 50건은 여유)
@@ -97,28 +99,35 @@ const station = (o, x0, y0) => {
 export async function opOil(p, env, request) {
   if (!env.OPINET_KEY) throw new PackError("nokey", "근처 주유소 찾기는 준비 중이에요.", 503);
   const region = String(p.region || "").trim().slice(0, 50), campsite = String(p.campsite || "").trim().slice(0, 50);
-  if (!region && !campsite) throw new PackError("empty", "캠핑장이나 지역을 알려 주세요.");
+  const lat = Number(p.lat), lng = Number(p.lng), exact = p.lat != null && p.lng != null && inKorea(lat, lng);
+  if (!exact && !region && !campsite) throw new PackError("empty", "캠핑장이나 지역을 알려 주세요.");
   const k = `po:${kstDay()}:${ipOf(request)}`;
   if ((await count(env, k)) >= LIMIT_OIL_IP) throw new PackError("quota", "오늘 주유소 찾기 횟수를 다 썼어요. 내일 다시 시도해 주세요.", 429);
   await bumpKey(env, k);
 
-  const place = (campsite && (await geocode(env, campsite))) || (region && (await geocode(env, region)));
+  // 정확한 좌표(캠핑장·내 위치)면 그대로, 아니면 이름으로 위치 검색(대략적인 위치)
+  const place = exact
+    ? { lat, lon: lng, name: String(p.name || "").trim().slice(0, 40) || "고른 위치", sido: String(p.sd || "").slice(0, 15), sigun: String(p.sg || "").slice(0, 15) }
+    : (campsite && (await geocode(env, campsite))) || (region && (await geocode(env, region)));
   if (!place) throw new PackError("noplace", "캠핑장 위치를 찾지 못했어요. 지역을 시·군 이름으로 넣어 주세요.", 404);
-  const ck = `oil:${place.lat.toFixed(2)}:${place.lon.toFixed(2)}`;
-  if (env.RL) { const hit = await env.RL.get(ck); if (hit) return JSON.parse(hit); }
+  // 정확한 좌표는 약 100m 칸(소수 셋째 자리), 이름 검색은 약 1km 칸으로 결과 저장
+  const ck = exact ? `oil:${lat.toFixed(3)}:${lng.toFixed(3)}` : `oil:${place.lat.toFixed(2)}:${place.lon.toFixed(2)}`;
+  if (env.RL) { const hit = await env.RL.get(ck); if (hit) return { ...JSON.parse(hit), place: place.name, approx: !exact || p.approx === true }; }
 
   const [x0, y0] = toKatec(place.lat, place.lon);
   let mode = "near", list = (await opinet(env, "aroundAll.do", { x: x0.toFixed(1), y: y0.toFixed(1), radius: "5000", prodcd: "C004", sort: "2" })).map((o) => station(o, x0, y0));
   list = list.filter((s) => s.price).sort((a, b) => a.dist - b.dist).slice(0, 5);
   if (!list.length) {
-    const area = await sigunCode(env, place);
+    // 시·군을 모르면(내 위치) 카카오로 좌표 → 시·군
+    if (!place.sido || !place.sigun) { const r = await regionOf(env, request, place.lat, place.lon); if (r) Object.assign(place, r); }
+    const area = place.sido && place.sigun ? await sigunCode(env, place) : null;
     if (area) {
       mode = "area";
       list = (await opinet(env, "lowTop10.do", { prodcd: "C004", area, cnt: "10" })).map((o) => station(o, x0, y0)).filter((s) => s.price)
         .sort((a, b) => (a.dist ?? 1e9) - (b.dist ?? 1e9)).slice(0, 5);
     }
   }
-  const out = { place: place.name, mode, list, at: Date.now() };
+  const out = { place: place.name, area: place.sigun || "", mode, list, at: Date.now(), approx: !exact || p.approx === true };
   if (env.RL) await env.RL.put(ck, JSON.stringify(out), { expirationTtl: 6 * 3600 });
   return out;
 }
