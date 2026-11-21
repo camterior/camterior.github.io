@@ -107,7 +107,7 @@ export async function opOil(p, env, request) {
 
   // 정확한 좌표(캠핑장·내 위치)면 그대로, 아니면 이름으로 위치 검색(대략적인 위치)
   const place = exact
-    ? { lat, lon: lng, name: String(p.name || "").trim().slice(0, 40) || "고른 위치", sido: String(p.sd || "").slice(0, 15), sigun: String(p.sg || "").slice(0, 15) }
+    ? { lat, lon: lng, name: String(p.name || "").trim().slice(0, 40) || "고른 위치", sido: "", sigun: "" }
     : (campsite && (await geocode(env, campsite))) || (region && (await geocode(env, region)));
   if (!place) throw new PackError("noplace", "캠핑장 위치를 찾지 못했어요. 지역을 시·군 이름으로 넣어 주세요.", 404);
   // 정확한 좌표는 약 100m 칸(소수 셋째 자리), 이름 검색은 약 1km 칸으로 결과 저장
@@ -117,9 +117,14 @@ export async function opOil(p, env, request) {
   const [x0, y0] = toKatec(place.lat, place.lon);
   let mode = "near", list = (await opinet(env, "aroundAll.do", { x: x0.toFixed(1), y: y0.toFixed(1), radius: "5000", prodcd: "C004", sort: "2" })).map((o) => station(o, x0, y0));
   list = list.filter((s) => s.price).sort((a, b) => a.dist - b.dist).slice(0, 5);
+  let shared = true; // 다른 사람과 같이 쓰는 저장(oil:)에 넣어도 되는지
   if (!list.length) {
-    // 시·군을 모르면(내 위치) 카카오로 좌표 → 시·군
-    if (!place.sido || !place.sigun) { const r = await regionOf(env, request, place.lat, place.lon); if (r) Object.assign(place, r); }
+    // 좌표로 찾았으면 시·군은 서버가 카카오로 직접 (보낸 sd·sg는 공유 저장에 섞지 않음). 카카오가 안 되면 보낸 값을 쓰되 저장은 안 함
+    if (exact) {
+      const r = await regionOf(env, request, place.lat, place.lon);
+      if (r) Object.assign(place, r);
+      else { Object.assign(place, { sido: String(p.sd || "").slice(0, 15), sigun: String(p.sg || "").slice(0, 15) }); shared = false; }
+    }
     const area = place.sido && place.sigun ? await sigunCode(env, place) : null;
     if (area) {
       mode = "area";
@@ -128,6 +133,6 @@ export async function opOil(p, env, request) {
     }
   }
   const out = { place: place.name, area: place.sigun || "", mode, list, at: Date.now(), approx: !exact || p.approx === true };
-  if (env.RL) await env.RL.put(ck, JSON.stringify(out), { expirationTtl: 6 * 3600 });
+  if (env.RL && shared) await env.RL.put(ck, JSON.stringify(out), { expirationTtl: 6 * 3600 });
   return out;
 }

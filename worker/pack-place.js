@@ -3,11 +3,11 @@
 //   /pack은 CSP 때문에 CARO 파일을 직접 못 읽어서 워커가 받아 옴 (KV 'caro:list' 하루 저장 + 워커 메모리)
 // - {pack:{op:'place', name, sido, sigungu}} → 카카오 키워드 검색으로 정확한 좌표 {lat, lng, name, addr, src:'kakao'}
 //   키(Secret KAKAO_REST_KEY)가 없거나 못 찾으면 Nominatim(대략적인 위치, src:'geo')
-//   같은 캠핑장은 KV 'kp:' 30일 저장. 카카오 실제 호출만 IP당·전체 하루 상한에 셈 (KV 쓰기 아끼기)
+//   같은 캠핑장은 KV 'kp:' 30일 저장. 저장분이 없을 때(카카오·Nominatim을 실제로 부를 때)만 IP당 하루 상한에 셈, 카카오는 전체 하루 상한도
 // - regionOf(env, lat, lng): 좌표 → 시·도/시·군 (내 위치 주유소 찾기에서 5km 안에 없을 때 시·군 최저가로 넘어가려고)
 import { geocode, count, bumpKey, ipOf, kstDay, PackError } from "./pack-ai.js";
 
-export const LIMIT_PLACE_IP = 60; // 카카오 실제 호출, IP당 하루
+export const LIMIT_PLACE_IP = 60; // 위치 찾기(저장분 없을 때), IP당 하루
 export const LIMIT_PLACE_ALL = 3000; // 카카오 실제 호출, 모두 합쳐 하루 (무료 한도보다 훨씬 아래)
 const CARO_URL = "https://caro-camp.github.io/data.js";
 const KAKAO = "https://dapi.kakao.com/v2/local/";
@@ -58,11 +58,16 @@ export async function opCaro(p, env) {
 }
 
 // ───────── 카카오 로컬 ─────────
-async function kakao(env, request, path, q) {
-  const ak = `kp:all:${kstDay()}`, ik = `kp:${kstDay()}:${ipOf(request)}`;
-  if ((await count(env, ak)) >= LIMIT_PLACE_ALL) return null; // 마감되면 조용히 Nominatim로
+// IP당 하루 상한 (카카오든 Nominatim이든 바깥 서비스를 부르기 전에)
+async function ipQuota(env, request) {
+  const ik = `kp:${kstDay()}:${ipOf(request)}`;
   if ((await count(env, ik)) >= LIMIT_PLACE_IP) throw new PackError("quota", "오늘 캠핑장 위치 찾기 횟수를 다 썼어요. 내일 다시 시도해 주세요.", 429);
-  await bumpKey(env, ak); await bumpKey(env, ik);
+  await bumpKey(env, ik);
+}
+async function kakao(env, request, path, q) {
+  const ak = `kp:all:${kstDay()}`;
+  if ((await count(env, ak)) >= LIMIT_PLACE_ALL) return null; // 마감되면 조용히 Nominatim로 (IP당 상한은 이미 셈)
+  await bumpKey(env, ak);
   const url = new URL(KAKAO + path); url.search = new URLSearchParams(q);
   const res = await fetch(url, { headers: { Authorization: "KakaoAK " + env.KAKAO_REST_KEY } }).catch(() => null);
   if (!res || !res.ok) { console.log("kakao 오류", res && res.status); return null; }
@@ -90,6 +95,7 @@ export async function opPlace(p, env, request) {
   if (name.length < 2) throw new PackError("empty", "캠핑장 이름을 알려 주세요.");
   const ck = "kp:" + sigungu + "|" + nk(name);
   if (env.RL) { const hit = await env.RL.get(ck); if (hit) return { ...JSON.parse(hit), sd: sido, sg: sigungu }; }
+  await ipQuota(env, request);
   let place = env.KAKAO_REST_KEY ? await kakaoPlace(env, request, name, sido, sigungu) : null;
   if (place) {
     if (env.RL) await env.RL.put(ck, JSON.stringify(place), { expirationTtl: 30 * 86400 });
