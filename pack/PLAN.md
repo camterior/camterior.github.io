@@ -150,4 +150,4 @@
 - 새 `worker/pack-place.js`: op `caro`(CARO 목록 이름 찾기, KV `caro:list`) · op `place`(카카오 로컬 좌표, KV `kp:` 30일, Secret `KAKAO_REST_KEY`) · `regionOf`. pack-oil은 `{lat,lng}` 받으면 그 좌표 반경 5km. 일정에 `t.loc` 저장(워커 trips_save 정리 포함). 내 위치 버튼(소수 셋째 자리로 깎아 보냄, 저장 안 함). 자세한 건 `../camping-app/caro-loc-ready/README.md`.
 - ✅ 배포 `ff740a3` (?v=24 · sw pack-v25). 다음 pack 수정은 ?v=25 / pack-v26부터.
 - ✅ 진짜 카카오 확인: '자라섬' → CARO `자라섬캠핑장 · 경기 가평군` → place `37.820878, 127.521056` **'경기 가평군 가평읍 자라섬로 60'** (src kakao) → oil near 5곳, 캠핑장 기준 가평주유소 0.6km · 명보 2.0km · 이화 2.1km · 송정 3.5km · 농협하나로 4.2km (예전엔 가평군 중심 기준이었음). 실제 사이트 휴대폰 화면에서 자동완성 → 주소 표시까지 확인.
-- 남은 확인: 아이폰 위치 권한 창(홈 화면 앱·Safari).
+- ✅ 2026-11-21 홍중: 아이폰에서 '지금 내 위치 근처' 위치 권한 창 확인 완료.
