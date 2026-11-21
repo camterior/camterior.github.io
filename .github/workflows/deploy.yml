@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url || steps.deploy2.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - name: 브라우저로 4개 탭 열어보기
@@ -32,5 +32,13 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+      # GitHub Pages가 가끔 방금 올린 파일을 못 찾음('No artifacts named github-pages') → 45초 뒤 한 번 더
       - id: deploy
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - name: 배포 다시 시도 전 기다리기
+        if: steps.deploy.outcome == 'failure'
+        run: sleep 45
+      - id: deploy2
+        if: steps.deploy.outcome == 'failure'
         uses: actions/deploy-pages@v4
