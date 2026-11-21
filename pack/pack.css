@@ -441,3 +441,11 @@ a.btn-main{display:inline-flex;align-items:center;justify-content:center;text-de
 .chk b{font-size:14.5px}
 .chk small{font-size:12.5px;color:var(--ink-3);line-height:1.45;word-break:keep-all}
 .chk[hidden]{display:none}
+/* 캠핑 화면 '목록에 없는 것 직접 넣기' — 눈에 띄게 */
+.add-self{display:flex;align-items:center;gap:12px;width:100%;margin:14px 0 4px;padding:14px 16px;border:1.5px solid var(--accent);border-radius:16px;background:rgba(255,90,31,.07);color:var(--ink);text-align:left;font:inherit;cursor:pointer;transition:background .2s,transform .15s}
+.add-self:hover{background:rgba(255,90,31,.13)}
+.add-self:active{transform:scale(.99)}
+.as-i{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:var(--accent);color:#fff;font-size:24px;font-weight:700;line-height:1}
+.as-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.as-t b{font-size:15.5px;font-weight:750;color:var(--accent-2)}
+.as-t small{font-size:12.5px;color:var(--ink-2);line-height:1.4;word-break:keep-all}

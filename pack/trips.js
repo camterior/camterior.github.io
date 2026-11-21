@@ -285,14 +285,14 @@ function checkUI(t) {
       return `<li><button type="button" class="ck" data-k="${esc(it.key)}" aria-pressed="${on}"><span class="box" aria-hidden="true"></span>${thumb(it)}<span class="nm"><b>${esc(it.name)}</b>${it.x ? '<small class="tag">이번 캠핑에만 넣은 것</small>' : !MYG[it.key] && !it.gone ? (t.ai && (t.ai.fp || []).includes(it.key) ? '<small class="tag">캠테리어 세팅의 장비 · 내 장비함엔 없음</small>' : '<small class="tag">내 장비함에서 빠진 장비</small>') : it.my ? '<small class="tag">직접 넣음</small>' : ''}${why ? `<small class="why">${esc(why)}</small>` : ''}</span>${q > 1 ? `<span class="qty">×${q}</span>` : ''}</button></li>`;
     }).join('')}</ul></section>`;
   }).join('') : `<div class="empty"><p><b>다 챙겼어요 🎉</b></p><p>‘안 챙긴 것만 보기’를 끄면 전체 목록이 보여요.</p></div>`;
-  box.insertAdjacentHTML('beforeend', '<button type="button" class="ghost-btn" data-act="self">+ 목록에 없는 것 직접 넣기</button>');
+  box.insertAdjacentHTML('beforeend', '<button type="button" class="add-self" data-act="self"><span class="as-i" aria-hidden="true">+</span><span class="as-t"><b>목록에 없는 것 직접 넣기</b><small>장작·얼음처럼 내 장비함에 없는 것도 체크할 수 있어요</small></span></button>');
   const st = tripStat(t);
   $('tripFoot').innerHTML = st.d ? '<button type="button" class="link" data-act="reset">체크 모두 풀기</button>' : '';
 }
 function pickUI(t) {
   const box = $('tripBody'), keys = [...new Set([...Object.keys(MYG), ...tripKeys(t)])];
   if (!keys.length) {
-    box.innerHTML = `<div class="empty"><img class="empty-art" src="img/empty-gear.webp" alt="" width="140" height="140"><p><b>내 장비함이 비어 있어요</b></p><p>먼저 가진 장비를 넣어 주세요. 캠테리어에서 넣은 장비도 그대로 나와요.</p><a class="btn-main" href="#gear">내 장비함으로</a></div><button type="button" class="ghost-btn" data-act="self">+ 목록에 없는 것 직접 넣기</button>`;
+    box.innerHTML = `<div class="empty"><img class="empty-art" src="img/empty-gear.webp" alt="" width="140" height="140"><p><b>내 장비함이 비어 있어요</b></p><p>먼저 가진 장비를 넣어 주세요. 캠테리어에서 넣은 장비도 그대로 나와요.</p><a class="btn-main" href="#gear">내 장비함으로</a></div><button type="button" class="add-self" data-act="self"><span class="as-i" aria-hidden="true">+</span><span class="as-t"><b>목록에 없는 것 직접 넣기</b><small>장작·얼음처럼 내 장비함에 없는 것도 체크할 수 있어요</small></span></button>`;
     $('tripFoot').innerHTML = ''; return;
   }
   const n = tripKeys(t).length;
@@ -301,7 +301,7 @@ function pickUI(t) {
       const q = t.items[it.key] || 0, own = MYG[it.key] || 0;
       return `<li class="${q ? 'on' : ''}"><label class="pk"><input type="checkbox" data-k="${esc(it.key)}"${q ? ' checked' : ''}><span class="box" aria-hidden="true"></span>${thumb(it)}<span class="nm"><b>${esc(it.name)}</b><small>${own ? `가진 개수 ${own}` : it.x ? '이번 캠핑에만 넣은 것' : '내 장비함에서 빠진 장비'}</small></span></label>
         ${q ? `<span class="step"><button type="button" data-q="-1" data-k="${esc(it.key)}" aria-label="${esc(it.name)} 하나 덜">−</button><b>${q}</b><button type="button" data-q="1" data-k="${esc(it.key)}" aria-label="${esc(it.name)} 하나 더">+</button></span>` : ''}</li>`;
-    }).join('')}</ul></section>`).join('') + '<button type="button" class="ghost-btn" data-act="self">+ 목록에 없는 것 직접 넣기</button>';
+    }).join('')}</ul></section>`).join('') + '<button type="button" class="add-self" data-act="self"><span class="as-i" aria-hidden="true">+</span><span class="as-t"><b>목록에 없는 것 직접 넣기</b><small>장작·얼음처럼 내 장비함에 없는 것도 체크할 수 있어요</small></span></button>';
   $('tripFoot').innerHTML = `<button type="button" class="btn-main wide sticky" data-go="check">${n ? `다 골랐어요 · ${n}가지 체크하러 가기` : '체크하러 가기'}</button>`;
 }
 function tripClick(e) {
