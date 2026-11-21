@@ -449,3 +449,7 @@ a.btn-main{display:inline-flex;align-items:center;justify-content:center;text-de
 .as-t{display:flex;flex-direction:column;gap:2px;min-width:0}
 .as-t b{font-size:15.5px;font-weight:750;color:var(--accent-2)}
 .as-t small{font-size:12.5px;color:var(--ink-2);line-height:1.4;word-break:keep-all}
+/* 알림 시간 바꾸기 */
+.pu-cfg{flex:1 0 100%;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;padding-top:12px;border-top:1px solid var(--line-2)}
+.pu-cfg .seg{flex:1 1 100%;margin:0}
+.pu-h{flex:1}.pu-h select{width:100%;height:40px;border:1.5px solid var(--line);border-radius:10px;padding:0 10px;font-size:15px;background:var(--bg);color:var(--ink)}

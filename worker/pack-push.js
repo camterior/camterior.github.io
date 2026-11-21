@@ -2,7 +2,9 @@
 // - 알림 등록:  {pack:{op:'push_sub', code, sub:{endpoint, keys:{p256dh, auth}}}}  → KV 'push:<코드>' (기기 최대 5대)
 // - 알림 끄기:  {pack:{op:'push_unsub', code, endpoint}}
 // - 시험 알림:  {pack:{op:'push_test', code}}  (코드당 하루 5번)
-// - 매일 아침 9시(한국 시간, 크론 '0 0 * * *' UTC): 오늘 출발하는 캠핑에 안 챙긴 장비가 있으면 알림
+// - 알림 시간:  {pack:{op:'push_cfg', code, d, h}}  d: 0 = 캠핑 가는 날, 1 = 전날 / h: 5~22시(한국 시간) → KV 'pcfg:<코드>'
+//               d·h 없이 보내면 지금 설정만 돌려줌. 설정이 없으면 '캠핑 가는 날 오전 9시'(예전과 같음)
+// - 매시 정각(크론 '0 * * * *' UTC): 그 시각을 고른 코드에만, 그날(또는 내일) 출발하는 캠핑에 안 챙긴 장비가 있으면 알림
 // 필요한 설정: Secret VAPID_PRIVATE_JWK (홍중이 Cloudflare에 넣음, 공개 키는 pack/push.js의 PUSH_PUBLIC_KEY)
 import { getCatalog } from "./pack-ai.js";
 
@@ -10,7 +12,15 @@ const CODE_RE = /^[A-HJKMNP-Z2-9]{4}-[A-HJKMNP-Z2-9]{4}$/;
 const SUBJECT = "https://camterior.github.io/pack/"; // VAPID 'sub' (연락처 대신 사이트 주소)
 // 알림을 보낼 수 있는 곳: 브라우저 회사의 푸시 서버만 (다른 주소로 요청을 보내는 데 쓰이지 않게)
 const PUSH_HOSTS = [/^fcm\.googleapis\.com$/, /^updates\.push\.services\.mozilla\.com$/, /(^|\.)push\.apple\.com$/, /\.notify\.windows\.com$/];
-const MAX_DEVICES = 5, LIMIT_TEST = 5, LIMIT_SUB_IP = 30;
+const MAX_DEVICES = 5, LIMIT_TEST = 5, LIMIT_SUB_IP = 30, LIMIT_CFG = 30;
+const H_MIN = 5, H_MAX = 22, CFG_DEFAULT = { d: 0, h: 9 };
+export const kstHour = (ms = Date.now()) => new Date(ms + 9 * 3600e3).getUTCHours();
+const hourText = (h) => (h < 12 ? "오전 " : "오후 ") + ((h % 12) || 12) + "시";
+export const whenText = (c) => (c.d ? "출발 전날 " : "캠핑 가는 날 ") + hourText(c.h);
+function cleanCfg(c) {
+  const d = Number(c && c.d), h = Number(c && c.h);
+  return (d === 0 || d === 1) && Number.isInteger(h) && h >= H_MIN && h <= H_MAX ? { d, h } : null;
+}
 
 const kstDay = (ms = Date.now()) => new Date(ms + 9 * 3600e3).toISOString().slice(0, 10);
 const ipOf = (request) => request.headers.get("CF-Connecting-IP") || "0";
@@ -89,6 +99,7 @@ async function codeOf(env, request, raw) {
   if (!(await env.RL.get("acct:" + code))) { await bump(env, miss); throw new PushError("nocode", "이 코드를 찾지 못했어요.", 404); }
   return code;
 }
+export const cfgOf = async (env, code) => { try { return cleanCfg(JSON.parse((await env.RL.get("pcfg:" + code)) || "null")) || CFG_DEFAULT; } catch { return CFG_DEFAULT; } };
 const subsOf = async (env, code) => { try { const L = JSON.parse((await env.RL.get("push:" + code)) || "[]"); return Array.isArray(L) ? L : []; } catch { return []; } };
 
 export async function pushOp(p, env, request, reply) {
@@ -103,12 +114,22 @@ export async function pushOp(p, env, request, reply) {
       const L = (await subsOf(env, code)).filter((x) => x.endpoint !== s.endpoint);
       L.unshift({ ...s, at: Date.now() });
       await env.RL.put("push:" + code, JSON.stringify(L.slice(0, MAX_DEVICES)));
-      return reply({ ok: true, devices: Math.min(L.length, MAX_DEVICES) }, 200);
+      return reply({ ok: true, devices: Math.min(L.length, MAX_DEVICES), cfg: await cfgOf(env, code) }, 200);
     }
     if (p.op === "push_unsub") {
       const L = (await subsOf(env, code)).filter((x) => x.endpoint !== String(p.endpoint || ""));
       if (L.length) await env.RL.put("push:" + code, JSON.stringify(L)); else await env.RL.delete("push:" + code);
       return reply({ ok: true, devices: L.length }, 200);
+    }
+    if (p.op === "push_cfg") {
+      if (p.d === undefined && p.h === undefined) return reply({ ok: true, cfg: await cfgOf(env, code) }, 200);
+      const c = cleanCfg(p);
+      if (!c) throw new PushError("bad", `알림 시간은 ${H_MIN}시~${H_MAX}시 사이로 골라 주세요.`, 400);
+      const ck = `pc:${kstDay()}:${code}`;
+      if ((await count(env, ck)) >= LIMIT_CFG) throw new PushError("quota", "오늘은 알림 시간을 더 바꿀 수 없어요.", 429);
+      await bump(env, ck);
+      await env.RL.put("pcfg:" + code, JSON.stringify(c));
+      return reply({ ok: true, cfg: c }, 200);
     }
     if (p.op === "push_test") {
       const tk = `pt:${kstDay()}:${code}`;
@@ -116,7 +137,7 @@ export async function pushOp(p, env, request, reply) {
       await bump(env, tk);
       const L = await subsOf(env, code);
       if (!L.length) throw new PushError("nodevice", "알림을 켠 기기가 없어요.", 404);
-      const msg = { title: "🔔 알림이 켜졌어요", body: "캠핑 가는 날 아침 9시에 안 챙긴 장비를 알려드릴게요.", url: "/pack/", tag: "pack-test" };
+      const msg = { title: "🔔 알림이 켜졌어요", body: `${whenText(await cfgOf(env, code))}에 안 챙긴 장비를 알려드릴게요.`, url: "/pack/", tag: "pack-test" };
       const results = await Promise.all(L.map((s) => sendPush(env, s, msg)));
       await dropGone(env, code, L, results);
       return reply({ ok: true, sent: results.filter((r) => r >= 200 && r < 300).length, results }, 200);
@@ -134,26 +155,27 @@ async function dropGone(env, code, L, results) {
   if (keep.length !== L.length) { if (keep.length) await env.RL.put("push:" + code, JSON.stringify(keep)); else await env.RL.delete("push:" + code); }
 }
 
-/* ---------- 매일 아침: 오늘 출발하는 캠핑 ---------- */
-export async function tripMessages(trips, nameOf, today) {
+/* ---------- 매시: 그 시각을 고른 코드에, 오늘(또는 내일) 출발하는 캠핑 ---------- */
+// day: 캠핑 날짜(YYYY-MM-DD), before: 전날 알림이면 true
+export async function tripMessages(trips, nameOf, day, before = false) {
   const out = [];
   (Array.isArray(trips) ? trips : []).forEach((t) => {
-    if (!t || t.del || t.date !== today) return;
+    if (!t || t.del || t.date !== day) return;
     const keys = Object.keys(t.items || {}), left = keys.filter((k) => !(t.done || {})[k]);
     if (keys.length && !left.length) return; // 다 챙겼으면 안 보냄
     const names = left.slice(0, 3).map(nameOf).filter(Boolean);
     out.push({
-      title: `⛺ 오늘 ${t.name}`,
-      body: !keys.length ? "아직 챙길 장비를 고르지 않았어요. 출발 전에 체크리스트를 만들어 보세요."
+      title: `⛺ ${before ? "내일" : "오늘"} ${t.name}`,
+      body: !keys.length ? `아직 챙길 장비를 고르지 않았어요. ${before ? "오늘" : "출발 전에"} 체크리스트를 만들어 보세요.`
         : `아직 안 챙긴 장비 ${left.length}가지: ${names.join(", ")}${left.length > names.length ? " 외" : ""}`,
-      url: `/pack/#t/${t.id}`, tag: `pack-${t.id}-${today}`,
+      url: `/pack/#t/${t.id}`, tag: `pack-${t.id}-${day}`,
     });
   });
   return out;
 }
-export async function pushDaily(env) {
+export async function pushDaily(env, now = Date.now()) {
   if (!env.RL || !env.VAPID_PRIVATE_JWK) return;
-  const today = kstDay();
+  const today = kstDay(now), tomorrow = kstDay(now + 86400e3), hour = kstHour(now + 5 * 60e3); // 정각 몇 분 전에 돌아도 그 시각으로
   let cat = null; try { cat = await getCatalog(); } catch { cat = null; }
   let cursor, sent = 0, codes = 0;
   do {
@@ -161,18 +183,20 @@ export async function pushDaily(env) {
     cursor = page.list_complete ? null : page.cursor;
     for (const { name } of page.keys) {
       const code = name.slice(5); codes++;
+      const cfg = await cfgOf(env, code);
+      if (cfg.h !== hour) continue; // 이 코드가 고른 시각이 아님
       const dk = `pd:${today}:${code}`;
       if (await env.RL.get(dk)) continue; // 오늘 이미 보냄 (크론이 두 번 돌아도 한 번만)
       let trips = [], custom = {};
       try { trips = JSON.parse((await env.RL.get("trips:" + code)) || "[]"); } catch {}
       try { custom = (JSON.parse((await env.RL.get("acct:" + code)) || "{}").custom) || {}; } catch {}
       const nameOf = (k) => k.startsWith("my:") ? (custom[k.slice(3)] || {}).n : cat && cat.byKey.get(k) ? cat.byKey.get(k).name : null;
-      const msgs = await tripMessages(trips, nameOf, today);
+      const msgs = await tripMessages(trips, nameOf, cfg.d ? tomorrow : today, !!cfg.d);
       if (!msgs.length) continue;
       await env.RL.put(dk, "1", { expirationTtl: 172800 });
       const L = await subsOf(env, code);
       for (const m of msgs) { const results = await Promise.all(L.map((s) => sendPush(env, s, m))); sent += results.filter((r) => r >= 200 && r < 300).length; await dropGone(env, code, L, results); }
     }
   } while (cursor);
-  console.log("pushDaily", today, "codes", codes, "sent", sent);
+  console.log("pushDaily", today, hour + "시", "codes", codes, "sent", sent);
 }

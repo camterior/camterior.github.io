@@ -347,7 +347,7 @@ async function reviewImg(url, env) {
 
 export default {
   // 매일 아침 9시(한국 시간): 오늘 출발하는 캠핑에 안 챙긴 장비가 있으면 알림 (크론은 worker-deploy.yml에서 붙임)
-  async scheduled(event, env, ctx) { ctx.waitUntil(pushDaily(env)); },
+  async scheduled(event, env, ctx) { ctx.waitUntil(pushDaily(env, event.scheduledTime || Date.now())); },
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
     if (request.method === "OPTIONS") return new Response(null, { headers: cors(origin) });
