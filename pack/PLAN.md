@@ -180,6 +180,7 @@
 - 고침(`c4e6cbc`): 새 코드 만들 때 이 기기 장비를 바로 save(pack.js·src/mine.js) · AI 추천에 gear·custom도 같이 보냄 · 워커 opRecommend는 코드에 장비가 0개일 때만 화면 장비 사용(resolveGear로 검사).
 - ✅ 배포(사이트 + 워커 한 번에 성공, ?v=28 · sw pack-v29). 시험: 워커 3/3, 화면 2/2(캠테리어·Camping Check 새 코드에 장비 저장), 빌드 재현 같음. 다음 pack 수정은 ?v=29 / pack-v30부터.
 - 자세한 건 `../camping-app/code-gear-fix-ready/README.md`.
+- ✅ 2026-11-21 배포 후 실제 확인 완료(camping-app): 실제 사이트 pack.js·ai.js·캠테리어 index.html 반영 확인, 진짜 워커로 서버 장비가 빈 코드에서도 AI 추천이 장비를 고름(랜드록·옴니 230·로우체어 2). 녹화 중 운영 KV에 시험용 코드 몇 개(EJHX-7AX9 등, 시험 장비만) — 그냥 둠.
 
 ## 알림 시간 각자 고르기 (2026-11-21, 이 세션에서 만듦)
 - ✅ 배포 `04b3185` (사이트 + 워커, ?v=29 · sw pack-v30). 다음 pack 수정은 ?v=30 / pack-v31부터.
