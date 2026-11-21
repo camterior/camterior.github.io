@@ -131,7 +131,8 @@ async function acctCall(a){try{const r=await fetch(AI_URL,{method:'POST',headers
   if(!r.ok){if(!d.error||d.error==='acct-off'||d.error==='empty'||d.error==='bad')ACCT_OFF=true;return {fail:d.error||'error'};}ACCT_OFF=false;return d;}catch(e){ACCT_OFF=true;return {fail:'network'};}}
 let ACCT_NEW=null;
 function acctEnsure(){if(acctCode())return Promise.resolve(acctCode());if(ACCT_NEW)return ACCT_NEW;
-  ACCT_NEW=(async()=>{try{const d=await acctCall({op:'new'});if(d.code){acctSet(d.code);ACCT_VIP=false;acctUI();return d.code;}return '';}finally{ACCT_NEW=null;}})();return ACCT_NEW;}
+  // 새 코드를 만들면 이 기기 장비를 바로 같이 저장 (세팅 저장이 먼저 코드를 만들어도 장비가 빠지지 않게)
+  ACCT_NEW=(async()=>{try{const d=await acctCall({op:'new'});if(d.code){acctSet(d.code);ACCT_VIP=false;if(Object.keys(MYG||{}).length)await acctCall({op:'save',code:d.code,gear:MYG});acctUI();return d.code;}return '';}finally{ACCT_NEW=null;}})();return ACCT_NEW;}
 // 장비가 바뀌면 1.5초 뒤 한 번에 서버에 저장 (무료 저장 횟수 아끼기)
 function acctQueue(){clearTimeout(acctTimer);acctTimer=setTimeout(async()=>{const c=await acctEnsure();if(!c)return;const d=await acctCall({op:'save',code:c,gear:MYG});if(d.ok){ACCT_VIP=!!d.vip;ACCT_ADMIN=!!d.admin;acctUI();}},1500);}
 async function acctPull(){const c=acctCode();if(!c){acctUI();return;}const d=await acctCall({op:'get',code:c});

@@ -406,8 +406,11 @@ async function opRecommend(p, env, request) {
   const cat = await getCatalog();
 
   // 내 장비: 내 코드가 있으면 서버(KV)에 저장된 것만 믿음. 없으면 화면이 보낸 것(이 기기 장비)
-  const custom = acc ? (acc.custom || {}) : (p.custom && typeof p.custom === "object" ? p.custom : {});
-  const myGear = resolveGear(acc ? acc.gear : p.gear, custom, cat);
+  // 단, 코드에 장비가 하나도 없으면(새 코드가 장비 없이 만들어진 경우) 화면이 보낸 장비를 씀
+  const accHasGear = acc && acc.gear && typeof acc.gear === "object" && Object.keys(acc.gear).length > 0;
+  const useAcc = acc && accHasGear;
+  const custom = useAcc ? (acc.custom || {}) : (p.custom && typeof p.custom === "object" ? p.custom : {});
+  const myGear = resolveGear(useAcc ? acc.gear : p.gear, custom, cat);
 
   // 세팅: 내 코드가 있으면 planId로 KV에서, 없으면 화면이 보낸 {name, gear}
   let plan = null;

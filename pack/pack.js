@@ -76,7 +76,8 @@ async function call(a) {
 }
 function ensureCode() {
   if (codeGet()) return Promise.resolve(codeGet());
-  if (!creating) creating = (async () => { try { const d = await call({ op: 'new' }); if (d.code) { codeSet(d.code); return d.code; } return ''; } finally { creating = null; } })();
+  // 새 코드를 만들면 이 기기 장비를 바로 같이 저장 (안 하면 일정 동기화가 만든 빈 코드로 AI 추천이 장비 없이 돌아감)
+  if (!creating) creating = (async () => { try { const d = await call({ op: 'new' }); if (d.code) { codeSet(d.code); if (Object.keys(MYG).length) await call({ op: 'save', code: d.code, gear: MYG, custom: CUS }); return d.code; } return ''; } finally { creating = null; } })();
   return creating;
 }
 function syncUI(s) {

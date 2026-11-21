@@ -96,7 +96,7 @@ async function aiSubmit(e) {
     const weather = await aiApi({ op: 'weather', region, campsite, startDate: r.start, endDate: r.end });
     $('aiStep').textContent = steps[++si]; tick = setInterval(() => { if (si < steps.length - 1) $('aiStep').textContent = steps[++si]; }, 9000);
     const planId = $('aiPlan').value || undefined;
-    const req = code ? { op: 'recommend', code, trip, weather, planId } : { op: 'recommend', gear: MYG, custom: CUS, trip, weather };
+    const req = code ? { op: 'recommend', code, trip, weather, planId, gear: MYG, custom: CUS } : { op: 'recommend', gear: MYG, custom: CUS, trip, weather };
     const rec = await aiApi(req);
     aiApply(t, trip, weather, rec, planId);
     AI.busy = false; aiClose();
