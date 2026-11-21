@@ -180,3 +180,12 @@
 - 고침(`c4e6cbc`): 새 코드 만들 때 이 기기 장비를 바로 save(pack.js·src/mine.js) · AI 추천에 gear·custom도 같이 보냄 · 워커 opRecommend는 코드에 장비가 0개일 때만 화면 장비 사용(resolveGear로 검사).
 - ✅ 배포(사이트 + 워커 한 번에 성공, ?v=28 · sw pack-v29). 시험: 워커 3/3, 화면 2/2(캠테리어·Camping Check 새 코드에 장비 저장), 빌드 재현 같음. 다음 pack 수정은 ?v=29 / pack-v30부터.
 - 자세한 건 `../camping-app/code-gear-fix-ready/README.md`.
+
+## 알림 시간 각자 고르기 (2026-11-21, 이 세션에서 만듦)
+- ✅ 배포 `04b3185` (사이트 + 워커, ?v=29 · sw pack-v30). 다음 pack 수정은 ?v=30 / pack-v31부터.
+- 화면(push.js): 알림 카드 '시간 바꾸기' → 캠핑 가는 날/출발 전날 + 오전 5시~오후 10시 → 저장. 이 기기 `packPush.cfg`는 보여주기용, 10분마다 서버 값으로 맞춤.
+- 워커(pack-push.js): op `push_cfg {code, d, h}` → KV `pcfg:<코드>` (d·h 없으면 조회, 하루 30번 상한). 설정 없으면 캠핑 가는 날 오전 9시(예전과 같음). push_sub 응답·시험 알림 문구에 반영.
+  - pushDaily(env, scheduledTime): 매시 정각 크론, 그 시각(KST)을 고른 코드에만. 전날이면 내일 캠핑으로 '⛺ 내일 …'. 하루 한 번(pd:) 그대로.
+- 크론: `0 0 * * *` → **`0 * * * *`** (worker-deploy.yml). ci-info 브랜치 worker.txt에서 `crons ["0 * * * *"]` 확인.
+- 시험: 서버 11/11(시각별 발송·중복 없음·범위 밖 거절), 화면 8/8(휴대폰·PC). 이름 겹침(whenT) 버그를 시험에서 잡음.
+- 남은 확인: 실제 휴대폰에서 가까운 정각으로 바꿔 알림 오는지(오늘·내일 캠핑 있어야).
