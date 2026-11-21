@@ -107,11 +107,18 @@ function homeUI() {
 /* ---------- 장소: CARO 캠핑장 목록에서 고르기 → 정확한 좌표 (워커 pack-place.js) ----------
    2글자부터 0.3초 기다렸다 찾기. 고르면 TD.loc = {lat, lng, name, addr, src:'kakao'|'geo', sd, sg} (+ label: 칸에 넣은 이름)
    고른 뒤 글자를 고치면 위치는 지우고 지금처럼 글자로만 저장 */
-const AC = { timer: 0, seq: 0, list: [], idx: -1 };
+const AC = { timer: 0, seq: 0, list: [], idx: -1, st: '' }; // st: '' | search(찾는 중) | list(목록 나옴) | none(목록에 없음)
 function placeNote() {
-  const n = $('tdPlaceNote'), L = TD.loc;
-  n.textContent = TD.locBusy ? '📍 캠핑장 위치 찾는 중…' : L ? (L.src === 'kakao' ? `📍 ${L.addr || L.name}` : `📍 대략적인 위치만 찾았어요${L.addr ? ` (${L.addr})` : ''}`) : TD.locMsg || '';
-  n.dataset.k = L ? L.src : '';
+  const n = $('tdPlaceNote'), L = TD.loc, v = $('tdPlace').value.trim();
+  let h = '', k = '';
+  if (TD.locBusy) { h = '⏳ 캠핑장 위치 찾는 중… 잠시만 기다려 주세요'; k = 'wait'; }
+  else if (L) { h = L.src === 'kakao' ? `📍 ${esc(L.addr || L.name)}` : `📍 대략적인 위치만 찾았어요${L.addr ? ` (${esc(L.addr)})` : ''}`; k = L.src; }
+  else if (TD.locMsg) h = esc(TD.locMsg);
+  else if (AC.st === 'search') { h = '🔎 캠핑장 목록에서 찾는 중…'; k = 'wait'; }
+  else if (AC.st === 'list') { h = '👆 목록에서 캠핑장을 골라 주세요. 골라야 정확한 위치로 근처 주유소를 찾아요.'; k = 'tip'; }
+  else if (AC.st === 'none') h = '목록에 없는 캠핑장이에요. 이름만 저장되고, 주유소는 대략적인 지역으로 찾아요.';
+  else if (!v) h = '캠핑장 이름을 두 글자 이상 적으면 목록이 나와요. 몰라도 비워 두고 만들 수 있어요.';
+  n.innerHTML = h; n.dataset.k = k;
 }
 function acClose() {
   const u = $('tdPlaceAc'), i = $('tdPlace'); u.hidden = true; u.innerHTML = ''; AC.list = []; AC.idx = -1;
@@ -127,18 +134,20 @@ function acShow() {
 function acInput() {
   const v = $('tdPlace').value.trim();
   if (TD.loc && v !== TD.loc.label) TD.loc = null;
-  TD.locMsg = ''; placeNote();
+  TD.locMsg = '';
   clearTimeout(AC.timer); const my = ++AC.seq;
-  if (v.length < 2 || (TD.loc && v === TD.loc.label)) { acClose(); return; }
+  if (v.length < 2 || (TD.loc && v === TD.loc.label)) { AC.st = ''; acClose(); placeNote(); return; }
+  AC.st = 'search'; placeNote();
   AC.timer = setTimeout(async () => {
-    try { const d = await aiApi({ op: 'caro', q: v }); if (my !== AC.seq) return; AC.list = d.list || []; AC.idx = -1; acShow(); }
-    catch (e) { if (my === AC.seq) acClose(); }
+    try { const d = await aiApi({ op: 'caro', q: v }); if (my !== AC.seq) return; AC.list = d.list || []; AC.idx = -1; AC.st = AC.list.length ? 'list' : 'none'; acShow(); }
+    catch (e) { if (my === AC.seq) { AC.st = ''; acClose(); } }
+    if (my === AC.seq) placeNote();
   }, 300);
 }
 function acPick(n) {
   const c = AC.list[n]; if (!c) return;
   const label = c[0].slice(0, 30), my = ++AC.seq;
-  $('tdPlace').value = label; acClose(); clearTimeout(AC.timer);
+  $('tdPlace').value = label; AC.st = ''; acClose(); clearTimeout(AC.timer);
   TD.loc = null; TD.locMsg = ''; TD.locBusy = true; placeNote();
   TD.locP = aiApi({ op: 'place', name: c[0], sido: c[1], sigungu: c[2] })
     .then(d => { if (my === AC.seq) TD.loc = { lat: d.lat, lng: d.lng, name: d.name, addr: d.addr, src: d.src, sd: d.sd || c[1], sg: d.sg || c[2], label }; })
@@ -155,7 +164,7 @@ function placeInit() {
   const i = $('tdPlace'), u = $('tdPlaceAc');
   i.addEventListener('input', acInput);
   i.addEventListener('keydown', acKey);
-  i.addEventListener('blur', () => setTimeout(acClose, 150));
+  i.addEventListener('blur', () => setTimeout(() => { acClose(); if (AC.st === 'list' || AC.st === 'search') { ++AC.seq; AC.st = ''; placeNote(); } }, 150));
   u.addEventListener('pointerdown', e => e.preventDefault()); // 고르는 동안 입력칸 포커스 유지
   u.addEventListener('click', e => { const li = e.target.closest('[data-ac]'); if (li) acPick(Number(li.dataset.ac)); });
 }
@@ -165,7 +174,7 @@ let TD = { edit: null, nights: 1, from: 'empty', loc: null };
 function tripFormOpen(editId) {
   const t = editId ? tripById(editId) : null;
   TD = { edit: editId || null, nights: t ? t.nights || 0 : 1, from: 'empty', loc: t && t.loc && t.place ? { ...t.loc, label: t.place } : null, locBusy: false, locMsg: '', locP: null };
-  ++AC.seq; acClose();
+  ++AC.seq; AC.st = ''; acClose();
   $('tdT').textContent = t ? '일정 고치기' : '새 캠핑';
   $('tdOk').textContent = t ? '저장' : '만들기';
   $('tdName').value = t ? t.name : '';
