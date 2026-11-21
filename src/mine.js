@@ -219,10 +219,12 @@ function tourPlace(){const o=document.getElementById('tour');if(!o)return;const 
   const ch=c.offsetHeight||170,below=top+hh+12;c.style.top=(below+ch<vh-8?below:Math.max(8,top-ch-12))+'px';}
 // ===== 업데이트 알림 팝업: 다시 온 사람에게 한 번만 =====
 // 업데이트할 때마다 UPD만 바꾸면 돼요 (v가 바뀌면 다시 떠요)
-const UPD={v:'20261118',date:'11월 18일',items:[
-  ['📦','쉘프컨테이너를 2·3단으로 딱 맞춰 쌓을 수 있어요','같은 크기 위에 올리면 가운데·방향이 자동으로 맞아요 (제조사 기준 최대 3단)'],
-  ['🪵','쉘프컨테이너 모양을 실제대로 바꿨어요','뚜껑 없는 은색 금속 상자·나무 손잡이·회색 발 — 사진·평면·입체 모두'],
-  ['🛠','같은 크기를 쌓을 때 뜨던 잘못된 경고를 고쳤어요','\'밖으로 나가요\' 경고가 더 이상 나오지 않아요']]};
+const UPD={v:'20261121',date:'11월 21일',items:[
+  ['✅','Camping Check를 새로 열었어요','캠핑 갈 때 챙길 장비를 고르고, 차에 실을 때마다 하나씩 체크해요 — 캠핑 허브에서 열 수 있어요'],
+  ['🎒','내 장비가 그대로 이어져요','내 장비 → ‘캠핑 갈 때 이 장비로 챙기기’. 장작·얼음처럼 목록에 없는 것도 넣을 수 있어요'],
+  ['✨','AI가 날씨 보고 챙길 장비를 골라줘요','지역·바닥·주변 환경·인원에 맞춰 내 장비에서 골라요'],
+  ['🛢','등유 양 계산 + 캠핑장 근처 등유 주유소','난로 6종 공식 제원으로 계산하고, 주유소는 거리·가격까지'],
+  ['🔔','캠핑 날 알림','홈 화면에 추가하면 원하는 시간에 안 챙긴 장비를 알려줘요']]};
 const UPD_KEY='camUpd';
 function updSeen(){try{return localStorage.getItem(UPD_KEY)===UPD.v;}catch(e){return true;}}
 function updDone(){try{localStorage.setItem(UPD_KEY,UPD.v);}catch(e){}}
