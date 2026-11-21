@@ -433,3 +433,11 @@ a.btn-main{display:inline-flex;align-items:center;justify-content:center;text-de
 .oil-approx{margin:4px 0 0;font-size:12px;color:var(--accent);line-height:1.45;word-break:keep-all}
 .oil-gps{border-top-style:dashed}
 .oil .btn-line.wide.gps{min-height:40px;font-size:13.5px}
+/* 직접 넣기 옵션 */
+.self-opt{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer}
+.chk input{flex:none;width:20px;height:20px;margin:1px 0 0;accent-color:var(--accent)}
+.chk span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.chk b{font-size:14.5px}
+.chk small{font-size:12.5px;color:var(--ink-3);line-height:1.45;word-break:keep-all}
+.chk[hidden]{display:none}

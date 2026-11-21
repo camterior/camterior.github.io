@@ -231,6 +231,21 @@ function tripRemove(t, fromList) {
 }
 function tripDelete() { if (tripRemove(tripById(TD.edit), false)) closeTripDlg(); }
 
+/* ---------- 내 장비함에 없는 것 직접 넣기 (pack.js 직접 넣기 창에서 부름) ----------
+   '내 장비함에도 넣기'를 끄면 키 'x:<id>', 이름은 그 캠핑의 ex = {id:{n, c}} (서버 trips_save가 같이 저장) */
+const tripEx = () => { const t = CUR && tripById(CUR); return (t && t.ex) || {}; };
+function tripAddKey(id, key, q) {
+  const t = tripById(id); if (!t) return;
+  t.items[key] = Math.min(20, (t.items[key] || 0) + q); saveTrips(t); if (CUR === id) tripUI();
+}
+function tripAddEx(id, n, c, q) {
+  const t = tripById(id); if (!t) return;
+  t.ex = t.ex || {};
+  let x = Object.keys(t.ex).find(k => norm(t.ex[k].n) === norm(n) && t.items['x:' + k]);
+  if (!x) { const A = 'abcdefghijkmnpqrstuvwxyz23456789'; do { x = ''; crypto.getRandomValues(new Uint8Array(8)).forEach(v => { x += A[v % A.length]; }); } while (t.ex[x]); t.ex[x] = { n, c }; }
+  tripAddKey(id, 'x:' + x, q);
+}
+
 /* ---------- 캠핑 하나: 체크하기 / 장비 고르기 ---------- */
 function tripUI() {
   const t = tripById(CUR); if (!t) return;
@@ -267,25 +282,26 @@ function checkUI(t) {
     return `<section class="ck-grp"><h3><span>${esc(g.t)}</span><small${d === all.length ? ' class="ok"' : ''}>${d}/${all.length}</small></h3><ul>${g.list.map(it => {
       const on = !!t.done[it.key], q = t.items[it.key];
       const why = t.ai && t.ai.why && t.ai.why[it.key];
-      return `<li><button type="button" class="ck" data-k="${esc(it.key)}" aria-pressed="${on}"><span class="box" aria-hidden="true"></span>${thumb(it)}<span class="nm"><b>${esc(it.name)}</b>${!MYG[it.key] && !it.gone ? (t.ai && (t.ai.fp || []).includes(it.key) ? '<small class="tag">캠테리어 세팅의 장비 · 내 장비함엔 없음</small>' : '<small class="tag">내 장비함에서 빠진 장비</small>') : it.my ? '<small class="tag">직접 넣음</small>' : ''}${why ? `<small class="why">${esc(why)}</small>` : ''}</span>${q > 1 ? `<span class="qty">×${q}</span>` : ''}</button></li>`;
+      return `<li><button type="button" class="ck" data-k="${esc(it.key)}" aria-pressed="${on}"><span class="box" aria-hidden="true"></span>${thumb(it)}<span class="nm"><b>${esc(it.name)}</b>${it.x ? '<small class="tag">이번 캠핑에만 넣은 것</small>' : !MYG[it.key] && !it.gone ? (t.ai && (t.ai.fp || []).includes(it.key) ? '<small class="tag">캠테리어 세팅의 장비 · 내 장비함엔 없음</small>' : '<small class="tag">내 장비함에서 빠진 장비</small>') : it.my ? '<small class="tag">직접 넣음</small>' : ''}${why ? `<small class="why">${esc(why)}</small>` : ''}</span>${q > 1 ? `<span class="qty">×${q}</span>` : ''}</button></li>`;
     }).join('')}</ul></section>`;
   }).join('') : `<div class="empty"><p><b>다 챙겼어요 🎉</b></p><p>‘안 챙긴 것만 보기’를 끄면 전체 목록이 보여요.</p></div>`;
+  box.insertAdjacentHTML('beforeend', '<button type="button" class="ghost-btn" data-act="self">+ 목록에 없는 것 직접 넣기</button>');
   const st = tripStat(t);
   $('tripFoot').innerHTML = st.d ? '<button type="button" class="link" data-act="reset">체크 모두 풀기</button>' : '';
 }
 function pickUI(t) {
   const box = $('tripBody'), keys = [...new Set([...Object.keys(MYG), ...tripKeys(t)])];
   if (!keys.length) {
-    box.innerHTML = `<div class="empty"><img class="empty-art" src="img/empty-gear.webp" alt="" width="140" height="140"><p><b>내 장비함이 비어 있어요</b></p><p>먼저 가진 장비를 넣어 주세요. 캠테리어에서 넣은 장비도 그대로 나와요.</p><a class="btn-main" href="#gear">내 장비함으로</a></div>`;
+    box.innerHTML = `<div class="empty"><img class="empty-art" src="img/empty-gear.webp" alt="" width="140" height="140"><p><b>내 장비함이 비어 있어요</b></p><p>먼저 가진 장비를 넣어 주세요. 캠테리어에서 넣은 장비도 그대로 나와요.</p><a class="btn-main" href="#gear">내 장비함으로</a></div><button type="button" class="ghost-btn" data-act="self">+ 목록에 없는 것 직접 넣기</button>`;
     $('tripFoot').innerHTML = ''; return;
   }
   const n = tripKeys(t).length;
   box.innerHTML = `<div class="pick-bar"><span>${n ? `<b>${n}</b>가지 골랐어요` : '가져갈 장비를 골라 주세요'}</span><span><button type="button" class="link" data-act="all">전부 고르기</button>${n ? ' · <button type="button" class="link" data-act="none">모두 빼기</button>' : ''}</span></div>` +
     grouped(keys).map(g => `<section class="ck-grp pick"><h3><span>${esc(g.t)}</span><small>${g.list.filter(it => t.items[it.key]).length}/${g.list.length}</small></h3><ul>${g.list.map(it => {
       const q = t.items[it.key] || 0, own = MYG[it.key] || 0;
-      return `<li class="${q ? 'on' : ''}"><label class="pk"><input type="checkbox" data-k="${esc(it.key)}"${q ? ' checked' : ''}><span class="box" aria-hidden="true"></span>${thumb(it)}<span class="nm"><b>${esc(it.name)}</b><small>${own ? `가진 개수 ${own}` : '내 장비함에서 빠진 장비'}</small></span></label>
+      return `<li class="${q ? 'on' : ''}"><label class="pk"><input type="checkbox" data-k="${esc(it.key)}"${q ? ' checked' : ''}><span class="box" aria-hidden="true"></span>${thumb(it)}<span class="nm"><b>${esc(it.name)}</b><small>${own ? `가진 개수 ${own}` : it.x ? '이번 캠핑에만 넣은 것' : '내 장비함에서 빠진 장비'}</small></span></label>
         ${q ? `<span class="step"><button type="button" data-q="-1" data-k="${esc(it.key)}" aria-label="${esc(it.name)} 하나 덜">−</button><b>${q}</b><button type="button" data-q="1" data-k="${esc(it.key)}" aria-label="${esc(it.name)} 하나 더">+</button></span>` : ''}</li>`;
-    }).join('')}</ul></section>`).join('');
+    }).join('')}</ul></section>`).join('') + '<button type="button" class="ghost-btn" data-act="self">+ 목록에 없는 것 직접 넣기</button>';
   $('tripFoot').innerHTML = `<button type="button" class="btn-main wide sticky" data-go="check">${n ? `다 골랐어요 · ${n}가지 체크하러 가기` : '체크하러 가기'}</button>`;
 }
 function tripClick(e) {
@@ -297,6 +313,7 @@ function tripClick(e) {
   const qb = e.target.closest('button[data-q]');
   if (qb) { const k = qb.dataset.k; t.items[k] = Math.max(1, Math.min(20, (t.items[k] || 1) + +qb.dataset.q)); saveTrips(t); tripUI(); return; }
   const a = e.target.closest('button[data-act]'); if (!a) return;
+  if (a.dataset.act === 'self') { selfOpen('', null, t.id); return; }
   if (a.dataset.act === 'reset') { const was = t.done; t.done = {}; saveTrips(t, 'done', Object.keys(was)); tripUI(); toast('체크를 모두 풀었어요', () => { t.done = was; saveTrips(t, 'done', Object.keys(was)); tripUI(); }); }
   if (a.dataset.act === 'all') { Object.keys(MYG).forEach(k => { if (!t.items[k]) t.items[k] = MYG[k]; }); saveTrips(t); tripUI(); }
   if (a.dataset.act === 'none') { const was = { items: t.items, done: t.done }; t.items = {}; t.done = {}; saveTrips(t); tripUI(); toast('고른 장비를 모두 뺐어요', () => { Object.assign(t, was); saveTrips(t, 'both', Object.keys(was.done)); tripUI(); }); }
@@ -304,7 +321,7 @@ function tripClick(e) {
 function tripChange(e) {
   const c = e.target.closest('input[type=checkbox][data-k]'); if (!c) return;
   const t = tripById(CUR), k = c.dataset.k;
-  if (c.checked) t.items[k] = Math.max(1, MYG[k] || 1); else { delete t.items[k]; delete t.done[k]; }
+  if (c.checked) t.items[k] = Math.max(1, MYG[k] || 1); else { delete t.items[k]; delete t.done[k]; if (k.startsWith('x:') && t.ex) delete t.ex[k.slice(2)]; }
   saveTrips(t); tripUI();
 }
 

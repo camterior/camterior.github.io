@@ -111,6 +111,7 @@ function aiApply(t, trip, weather, rec, planId) {
   const items = {}, why = {}, skip = [];
   // '이번엔 빼도 됨'(세팅 장비인데 이번 조건엔 필요 없음)은 체크 목록에 넣지 않고 따로 보여줌 ('그래도 챙기기' 가능)
   rec.pick.forEach(p => { if (p.skip) { skip.push({ key: p.key, count: Math.max(1, Math.min(20, p.count)), why: p.why || '' }); return; } items[p.key] = Math.max(1, Math.min(20, p.count)); if (p.why) why[p.key] = p.why; });
+  Object.keys(t.items).forEach(k => { if (k.startsWith('x:')) items[k] = t.items[k]; }); // 이번 캠핑에만 직접 넣은 것은 그대로
   const done = {}; Object.keys(t.done).forEach(k => { if (items[k]) done[k] = 1; });
   t.items = items; t.done = done;
   if (trip.campsite && !t.place) t.place = trip.campsite.slice(0, 30);

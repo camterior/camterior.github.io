@@ -129,8 +129,17 @@ async function acct(a, env, request, origin) {
           if (la >= 33 && la <= 39 && ln >= 124 && ln <= 132)
             loc = { lat: Math.round(la * 1e6) / 1e6, lng: Math.round(ln * 1e6) / 1e6, name: S(L.name, 40), addr: S(L.addr, 80), src: L.src === "kakao" ? "kakao" : "geo", sd: S(L.sd, 10), sg: S(L.sg, 15) };
         }
+        // 이번 캠핑에만 직접 넣은 것의 이름 (items의 'x:<id>'와 짝)
+        let ex;
+        if (t.ex && typeof t.ex === "object") {
+          const E = {};
+          Object.keys(t.ex).slice(0, 100).forEach(id => { const v = t.ex[id]; if (/^[a-z0-9_]{1,40}$/.test(id) && items["x:" + id] && v && typeof v === "object") {
+            const n = String(v.n == null ? "" : v.n).replace(/[<>\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40);
+            if (n) E[id] = { n, c: String(v.c || "etc").replace(/[^a-z]/g, "").slice(0, 12) || "etc" }; } });
+          if (Object.keys(E).length) ex = E;
+        }
         return { id: t.id, name: String(t.name || "캠핑").slice(0, 30), date: t.date, nights: Math.max(0, Math.min(14, Math.round(+t.nights || 0))),
-          place: String(t.place || "").slice(0, 30), items, done, dt, at: Math.max(0, +t.at || 0), up, mu: ts(t.mu), ...(loc ? { loc } : {}), ...(ai ? { ai } : {}) };
+          place: String(t.place || "").slice(0, 30), items, done, dt, at: Math.max(0, +t.at || 0), up, mu: ts(t.mu), ...(loc ? { loc } : {}), ...(ex ? { ex } : {}), ...(ai ? { ai } : {}) };
       };
       const merge = (a, b) => {
         if (a.del || b.del) return (b.up || 0) > (a.up || 0) ? b : a;
@@ -185,7 +194,7 @@ async function board(b, env, request, origin) {
       r = list.find(x => (x.kind || "gear") === kind && norm(x.name) === norm(name) && x.st !== "hide");
       if (!r) {
         if (list.length >= 800) return json({ error: "full" }, 507, origin);
-        r = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), kind, name, link: /^https?:\/\//.test(b.link || "") ? clip(b.link, 300) : "", note: clip(b.note, 300), n: 0, st: "new", at: today(), from: b.from === "ai" ? "ai" : "form" };
+        r = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), kind, name, link: /^https?:\/\//.test(b.link || "") ? clip(b.link, 300) : "", note: clip(b.note, 300), n: 0, st: "new", at: today(), from: b.from === "ai" ? "ai" : b.from === "pack" ? "pack" : "form" };
         list.unshift(r);
       }
     }

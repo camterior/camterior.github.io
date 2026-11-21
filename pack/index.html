@@ -15,7 +15,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Camping Check">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="pack.css?v=25">
+<link rel="stylesheet" href="pack.css?v=26">
 </head>
 <body>
 <header class="top">
@@ -107,10 +107,14 @@
 <dialog class="sheet" id="selfDlg" aria-labelledby="sT">
   <form method="dialog" class="sheet-in" id="selfForm">
     <h2 id="sT">직접 넣기</h2>
-    <p class="hint">캠테리어 목록에 없는 장비예요. 체크리스트에는 나오지만 캠테리어 도면에는 나오지 않아요.</p>
+    <p class="hint" id="sHint">캠테리어 목록에 없는 장비예요. 체크리스트에는 나오지만 캠테리어 도면에는 나오지 않아요.</p>
     <label class="field"><span>이름</span><input id="sName" maxlength="40" autocomplete="off" required placeholder="예: 베어본즈 랜턴, 팩 망치"></label>
     <fieldset class="field"><legend>분류</legend><div class="cats" id="sCats"></div></fieldset>
     <div class="field row"><span>개수</span><div class="step big"><button type="button" id="sMinus" aria-label="하나 빼기">−</button><b id="sN">1</b><button type="button" id="sPlus" aria-label="하나 더">+</button></div></div>
+    <div class="self-opt">
+      <label class="chk" id="sMineBox" hidden><input type="checkbox" id="sMine" checked><span><b>내 장비함에도 넣기</b><small>가진 장비면 켜 두세요. 끄면 이번 캠핑에만 들어가요 (장작·얼음 같은 것).</small></span></label>
+      <label class="chk" id="sReqBox"><input type="checkbox" id="sReq"><span><b>캠테리어에 이 장비 등록 요청</b><small>캠테리어 게시판 ‘장비 요청’으로 가요. 등록되면 캠테리어 도면에서도 쓸 수 있어요.</small></span></label>
+    </div>
     <p class="err" id="sErr" role="alert"></p>
     <div class="sheet-btns"><button type="button" class="btn-line" id="sCancel">닫기</button><button type="submit" class="btn-main" id="sOk">넣기</button></div>
   </form>
@@ -168,9 +172,9 @@
 </dialog>
 
 <div class="toast" id="toast" role="status" hidden></div>
-<script src="pack.js?v=25"></script>
-<script src="trips.js?v=25"></script>
-<script src="ai.js?v=25"></script>
-<script src="push.js?v=25"></script>
+<script src="pack.js?v=26"></script>
+<script src="trips.js?v=26"></script>
+<script src="ai.js?v=26"></script>
+<script src="push.js?v=26"></script>
 </body>
 </html>

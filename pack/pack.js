@@ -40,11 +40,17 @@ function info(key) {
     const cat = CAT[(c && c.c)] ? c.c : 'etc';
     return { key, my: true, id, name: (c && c.n) || '이름 없는 장비', grp: 'my-' + cat, grpT: CAT[cat].t, icon: CAT[cat].i, cat };
   }
+  // 이번 캠핑에만 직접 넣은 것 ('x:<id>', 이름은 그 캠핑의 ex에)
+  if (key.startsWith('x:')) {
+    const id = key.slice(2), c = (typeof tripEx === 'function' ? tripEx() : {})[id];
+    const cat = CAT[(c && c.c)] ? c.c : 'etc';
+    return { key, x: true, id, name: (c && c.n) || '이름 없는 것', grp: 'x', grpT: '이번 캠핑에만 넣은 것', icon: CAT[cat].i, cat };
+  }
   // 캠테리어 목록이 바뀌어 지금은 없는 장비
   return { key, gone: true, id: key.split(':').pop(), name: key.split(':').pop(), grp: 'gone', grpT: '목록에서 찾지 못한 장비', icon: '❔' };
 }
 function groups() {
-  return [...SECS.map(([k, t]) => ({ k, t })), ...CATS.map(([k, t]) => ({ k: 'my-' + k, t })), { k: 'gone', t: '목록에서 찾지 못한 장비' }];
+  return [...SECS.map(([k, t]) => ({ k, t })), ...CATS.map(([k, t]) => ({ k: 'my-' + k, t })), { k: 'x', t: '이번 캠핑에만 넣은 것' }, { k: 'gone', t: '목록에서 찾지 못한 장비' }];
 }
 const thumb = it => it.ph
   ? `<span class="th"><img src="../img/gear/${esc(it.id)}.webp" alt="" loading="lazy" decoding="async"></span>`
@@ -167,9 +173,12 @@ function search() {
 }
 
 /* ---------- 직접 넣기 / 고치기 ---------- */
-let selfEdit = null, selfCat = 'etc', selfN = 1, catTouched = false;
-function selfOpen(name, editId) {
-  selfEdit = editId || null; catTouched = !!editId;
+let selfEdit = null, selfCat = 'etc', selfN = 1, catTouched = false, selfTrip = null;
+// trip: 캠핑 화면에서 열면 그 캠핑 id → '내 장비함에도 넣기'(끄면 이번 캠핑에만) 보임
+function selfOpen(name, editId, trip) {
+  selfEdit = editId || null; catTouched = !!editId; selfTrip = (!editId && trip) || null;
+  $('sMineBox').hidden = !selfTrip; $('sMine').checked = true; $('sReqBox').hidden = !!editId; $('sReq').checked = false;
+  $('sHint').textContent = selfTrip ? '내 장비함에 없는 것을 이번 캠핑 체크리스트에 넣어요.' : '캠테리어 목록에 없는 장비예요. 체크리스트에는 나오지만 캠테리어 도면에는 나오지 않아요.';
   const c = editId ? CUS[editId] || {} : {};
   $('sName').value = editId ? c.n || '' : (name || '');
   selfCat = editId ? (CAT[c.c] ? c.c : 'etc') : guessCat(name || '');
@@ -196,12 +205,32 @@ function selfSubmit(e) {
   e.preventDefault();
   const n = $('sName').value.trim().replace(/\s+/g, ' ').slice(0, 40);
   if (!n) { $('sErr').textContent = '이름을 적어 주세요'; return; }
-  const dup = Object.keys(CUS).find(id => id !== selfEdit && norm(CUS[id].n) === norm(n));
-  if (dup && !selfEdit) { setCount('my:' + dup, (MYG['my:' + dup] || 0) + selfN); closeSelf(); toast(`이미 있는 ‘${n}’에 ${selfN}개 더했어요`); return; }
-  const id = selfEdit || newId();
-  CUS[id] = { n, c: selfCat }; MYG['my:' + id] = selfN;
-  save(); closeSelf(); render(); search();
-  toast(selfEdit ? '고쳤어요' : `‘${n}’ 넣었어요`);
+  const req = !selfEdit && $('sReq').checked, trip = selfTrip, mine = !trip || $('sMine').checked;
+  let msg;
+  if (!mine) { tripAddEx(trip, n, selfCat, selfN); msg = `‘${n}’ 이번 캠핑에 넣었어요`; }
+  else {
+    const dup = Object.keys(CUS).find(id => id !== selfEdit && norm(CUS[id].n) === norm(n));
+    let key;
+    if (dup && !selfEdit) { key = 'my:' + dup; setCount(key, (MYG[key] || 0) + selfN); msg = `이미 있는 ‘${n}’에 ${selfN}개 더했어요`; }
+    else {
+      const id = selfEdit || newId(); key = 'my:' + id;
+      CUS[id] = { n, c: selfCat }; MYG[key] = selfN; save();
+      msg = selfEdit ? '고쳤어요' : `‘${n}’ 넣었어요`;
+    }
+    if (trip) { tripAddKey(trip, key, selfN); msg = `‘${n}’ 내 장비함과 이번 캠핑에 넣었어요`; }
+  }
+  closeSelf(); render(); search(); toast(msg);
+  if (req) reqSend(n, selfCat);
+}
+// 캠테리어 게시판 '장비 요청'으로 보내기 (같은 이름이 있으면 +1)
+async function reqSend(n, cat) {
+  try {
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ board: { op: 'add', kind: 'gear', name: n, note: `Camping Check에서 요청 · 분류: ${CAT[cat] ? CAT[cat].t : '기타'}`, from: 'pack' } }) });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok && d.ok) toast(`캠테리어에 ‘${n}’ 등록 요청을 보냈어요`);
+    else toast(d.error === 'quota' ? '오늘 요청을 많이 보냈어요. 내일 다시 보내 주세요' : '요청을 보내지 못했어요. 잠시 후 다시 해 주세요');
+  } catch (e) { toast('인터넷이 연결되지 않아 요청을 보내지 못했어요'); }
 }
 const closeSelf = () => { const d = $('selfDlg'); if (d.open) d.close(); };
 function newId() { const A = 'abcdefghijkmnpqrstuvwxyz23456789'; let s; do { s = ''; const b = crypto.getRandomValues(new Uint8Array(8)); b.forEach(x => s += A[x % A.length]); } while (CUS[s] || MYG['my:' + s]); return s; }
