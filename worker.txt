@@ -2,13 +2,15 @@ binding secret_text ADMIN_KEY
 binding secret_text ANTHROPIC_API_KEY
 binding secret_text GEMINI_API_KEY
 binding secret_text INVITE_CODE
+binding secret_text KAKAO_REST_KEY
+binding secret_text OPINET_KEY
 binding kv_namespace RL
 binding secret_text VAPID_PRIVATE_JWK
 crons ["0 0 * * *"]
 compat 2026-10-26 flags [] usage standard observability True
 schedules [{"cron": "0 0 * * *", "created_on": "2026-11-20T05:59:31.529246Z", "modified_on": "2026-11-20T05:59:31.529246Z"}]
 OK
-before 77
+before 78
 deploy OK
-after 77 (before 77)
-ref refs/heads/main sha febd6e7ad927c9bc07914cf609808e53f876ada6 run 44713915615
+after 78 (before 78)
+ref refs/heads/main sha ff740a374b958f392198c61ed2bb620ac9ce5360 run 44854030206
