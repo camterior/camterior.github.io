@@ -45,6 +45,7 @@
 - 새 장비·텐트를 넣거나 고칠 때마다 `node scripts/spec-check.js`(도면 외곽·이너·출처 일관성 검사)를 통과해야 함.
 - 점검 결과의 '틀림'은 후보일 뿐 — 고치기 전에 공식 상세 그림으로 다시 확인.
 - 장비·텐트 등록과 재등록은 홍중이 시킬 때만 합니다. 카테고리 하나씩 진행합니다(목록 정리 → 홍중이 고름 → 등록).
+- 장비·텐트를 넣거나 고친 뒤(난방기 `fuel` 제원 포함)에는 빌드 다음에 `node scripts/pack-catalog.js`(Windows는 `PW_CHANNEL=chrome`)로 `pack/catalog.json`을 다시 만들어 같이 올립니다. 안 하면 Camping Check 장비 목록·등유 계산에 반영되지 않아요.
 - 난방 장비 안전거리 표시(구역·주의 문구)는 삭제하기로 결정한 기능입니다. 다시 넣지 않습니다.
 
 ## 6. AI 기능 (Gemini + Cloudflare Worker)
@@ -53,3 +54,9 @@
 - 사용 제한은 로그인 없이 초대 코드 방식입니다. 하루 횟수는 `worker.js`의 `LIMIT_*` 값이 기준입니다(한국 시간 기준).
 - 횟수를 다 쓰면 기본 배치로 바꾸지 않고 **마지막 배치를 그대로 유지**합니다.
 - 다음 단계 계획: 세팅 사진 → 장비 인식 → 캠테리어 카탈로그 장비로 띄우기.
+
+## 7. Camping Check (`/pack`, 홍중 2026-11-20~)
+- 작업 전에 `pack/PLAN.md`를 먼저 읽고, 단계가 끝날 때마다 거기에 완료 표시와 기록을 남깁니다.
+- 작업 브랜치는 `work/pack`. 화면 파일을 고치면 `pack/index.html`의 `?v=` 숫자와 `pack/sw.js`의 `V`·SHELL을 같이 올립니다(다음은 `?v=25` · `pack-v26`).
+- 주 기능 개발은 `camping-app` 폴더(파워셸 쪽)에서 하고, 이 저장소에는 통합·배포만 합니다. 서로 전할 말은 `../camping-app/통합-안내.md`에 적습니다.
+- 키는 Cloudflare Worker Secret에만: `ANTHROPIC_API_KEY`(AI 추천), `VAPID_PRIVATE_JWK`(알림), `OPINET_KEY`(등유 주유소), `KAKAO_REST_KEY`(캠핑장 좌표). 코드·커밋·문서에 넣지 않습니다.
