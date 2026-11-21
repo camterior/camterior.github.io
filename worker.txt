@@ -6,11 +6,11 @@ binding secret_text KAKAO_REST_KEY
 binding secret_text OPINET_KEY
 binding kv_namespace RL
 binding secret_text VAPID_PRIVATE_JWK
-crons ["0 0 * * *"]
+crons ["0 * * * *"]
 compat 2026-10-26 flags [] usage standard observability True
 schedules [{"cron": "0 0 * * *", "created_on": "2026-11-20T05:59:31.529246Z", "modified_on": "2026-11-20T05:59:31.529246Z"}]
 OK
 before 78
 deploy OK
 after 78 (before 78)
-ref refs/heads/main sha c4e6cbc3708e08bd7d698c260036d1fbb28ed043 run 44866186524
+ref refs/heads/main sha 04b318560ad01d47c39124fa6e5fc7ac16212aa3 run 44869294596
