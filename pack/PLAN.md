@@ -151,3 +151,10 @@
 - ✅ 배포 `ff740a3` (?v=24 · sw pack-v25). 다음 pack 수정은 ?v=25 / pack-v26부터.
 - ✅ 진짜 카카오 확인: '자라섬' → CARO `자라섬캠핑장 · 경기 가평군` → place `37.820878, 127.521056` **'경기 가평군 가평읍 자라섬로 60'** (src kakao) → oil near 5곳, 캠핑장 기준 가평주유소 0.6km · 명보 2.0km · 이화 2.1km · 송정 3.5km · 농협하나로 4.2km (예전엔 가평군 중심 기준이었음). 실제 사이트 휴대폰 화면에서 자동완성 → 주소 표시까지 확인.
 - ✅ 2026-11-21 홍중: 아이폰에서 '지금 내 위치 근처' 위치 권한 창 확인 완료.
+
+## 8단계: 캠테리어에서 가는 길 (2026-11-21)
+- ✅ 배포 `079bfec`(+ 재배포 `89e6690` — 첫 번째는 검사 통과 후 GitHub Pages 올리기 단계만 실패):
+  - 캠핑 허브: Camping Check 카드(`https://camterior.github.io/pack/`, 그림 `pack/img/hero.webp`), 흐름 '③ 챙김 · Camping Check', 소개 문장. `src/shell.html`·`src/tabs.css`(`.hubgrid.three`).
+  - 내 장비: '캠핑 갈 때 이 장비로 챙기기' 바로가기(`.mn-cc`, `src/ai.css`).
+  - 실제 사이트에서 카드 → Camping Check 열림 확인.
+- 빌드 메모(Windows): `src/build.py`의 symlink가 권한 오류 → `src/img`·`src/assets`를 junction(`New-Item -ItemType Junction`)으로 만들어 두면 됨. ai.css는 `</style>`로 끝나야 함.
