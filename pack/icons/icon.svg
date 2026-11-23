@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0C1813"/>
+  <!-- 텐트 실루엣 -->
+  <path d="M256 118 L408 380 H104 Z" fill="#1D3529" stroke="#5E8370" stroke-width="14" stroke-linejoin="round"/>
+  <!-- 체크 표시 배지 -->
+  <rect x="166" y="206" width="180" height="180" rx="44" fill="#FF5A1F"/>
+  <path d="M208 298 L244 334 L308 262" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

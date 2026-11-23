@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Camping Check</title>
+<meta name="description" content="캠테리어 내 장비로 캠핑 갈 때 챙길 장비를 골라 하나씩 체크해요.">
+<meta name="theme-color" content="#0C1813">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://camterior-ai.ghdwnd2.workers.dev; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="icons/icon-64.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Camping Check">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="pack.css?v=29">
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#" aria-label="Camping Check 처음으로"><span class="brand-mark" aria-hidden="true">✓</span>Camping Check</a>
+    <nav class="tabs" aria-label="화면">
+      <a href="#" data-tab="home">캠핑</a>
+      <a href="#gear" data-tab="gear">내 장비함</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <!-- ============ 캠핑 목록 ============ -->
+  <div class="view" id="v-home" hidden>
+    <section class="hero art" aria-labelledby="homeT">
+      <img class="hero-img" src="img/hero.webp" alt="" width="1024" height="688" decoding="async" fetchpriority="high">
+      <div class="hero-txt">
+        <p class="kicker">Camping Check</p>
+        <h1 id="homeT">이번 캠핑,<br>빠짐없이</h1>
+        <p class="sub"><b>내 장비</b>에서 고르고, 차에 실을 때마다 하나씩 체크해요.</p>
+      </div>
+    </section>
+    <div class="hero-act">
+      <button type="button" class="btn-main wide" id="newTrip">+ 새 캠핑 만들기</button>
+      <p class="tsync" id="tsync" role="status" hidden></p>
+    </div>
+    <aside class="install" id="install" hidden aria-labelledby="insT"></aside>
+    <aside class="push" id="pushCard" hidden aria-label="캠핑 날 아침 알림"></aside>
+    <div id="tripList"></div>
+  </div>
+
+  <!-- ============ 캠핑 하나: 체크리스트 ============ -->
+  <div class="view" id="v-trip" hidden>
+    <div class="trip-top">
+      <a class="back-link" href="#">← 캠핑 목록</a>
+      <button type="button" class="link" id="tripEdit">일정 고치기</button>
+    </div>
+    <section class="trip-head" aria-labelledby="tripT">
+      <p class="kicker" id="tripWhen"></p>
+      <h1 id="tripT"></h1>
+      <p class="sub" id="tripPlace" hidden></p>
+      <div class="prog" id="tripProg"></div>
+    </section>
+    <section class="ai-card" id="aiCard" hidden aria-label="날씨와 AI 조언"></section>
+    <section class="fuel" id="fuelCard" hidden aria-label="등유 계산"></section>
+    <div class="seg" role="group" aria-label="보기" id="tripSeg">
+      <button type="button" data-mode="check" aria-pressed="true">체크하기</button>
+      <button type="button" data-mode="pick" aria-pressed="false">장비 고르기</button>
+    </div>
+    <div class="filter" id="tripFilter"><label><input type="checkbox" id="onlyLeft"> 안 챙긴 것만 보기</label></div>
+    <div id="tripBody"></div>
+    <div class="trip-foot" id="tripFoot"></div>
+  </div>
+
+  <!-- ============ 내 장비함 ============ -->
+  <div class="view" id="v-gear" hidden>
+    <section class="hero" aria-labelledby="hT">
+      <p class="kicker">내 장비함</p>
+      <h1 id="hT">가진 장비를 한곳에</h1>
+      <p class="sub">캠테리어의 <b>내 장비</b>와 같은 목록이에요. 여기서 넣거나 빼면 캠테리어에도 똑같이 바뀌어요. <a class="inline" href="../#mine">캠테리어 열기</a></p>
+      <div class="stat"><span id="cnt">불러오는 중…</span><span class="sync" id="sync" role="status"></span></div>
+    </section>
+
+    <section class="card add" aria-labelledby="aT">
+      <h2 id="aT">장비 넣기</h2>
+      <form class="search" id="searchForm" role="search">
+        <label class="sr-only" for="q">장비 이름으로 찾기</label>
+        <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="예: 랜드록, IGT, 원액션테이블, 랜턴">
+      </form>
+      <div class="chips" id="chips" role="group" aria-label="분류별로 보기"></div>
+      <ul class="results" id="res" aria-live="polite"></ul>
+      <button type="button" class="ghost-btn" id="selfBtn">+ 목록에 없는 장비 직접 넣기</button>
+    </section>
+
+    <section aria-labelledby="lT">
+      <div class="list-head"><h2 id="lT">내 장비</h2><button type="button" class="link" id="foldAll" hidden>모두 접기</button></div>
+      <div id="list"></div>
+    </section>
+
+    <section class="card acct" aria-labelledby="cT">
+      <h2 id="cT">다른 기기와 같이 쓰기</h2>
+      <div id="acct"></div>
+    </section>
+  </div>
+</main>
+
+<!-- 직접 넣기 -->
+<dialog class="sheet" id="selfDlg" aria-labelledby="sT">
+  <form method="dialog" class="sheet-in" id="selfForm">
+    <h2 id="sT">직접 넣기</h2>
+    <p class="hint" id="sHint">캠테리어 목록에 없는 장비예요. 체크리스트에는 나오지만 캠테리어 도면에는 나오지 않아요.</p>
+    <label class="field"><span>이름</span><input id="sName" maxlength="40" autocomplete="off" required placeholder="예: 베어본즈 랜턴, 팩 망치"></label>
+    <fieldset class="field"><legend>분류</legend><div class="cats" id="sCats"></div></fieldset>
+    <div class="field row"><span>개수</span><div class="step big"><button type="button" id="sMinus" aria-label="하나 빼기">−</button><b id="sN">1</b><button type="button" id="sPlus" aria-label="하나 더">+</button></div></div>
+    <div class="self-opt">
+      <label class="chk" id="sMineBox" hidden><input type="checkbox" id="sMine" checked><span><b>내 장비함에도 넣기</b><small>가진 장비면 켜 두세요. 끄면 이번 캠핑에만 들어가요 (장작·얼음 같은 것).</small></span></label>
+      <label class="chk" id="sReqBox"><input type="checkbox" id="sReq"><span><b>캠테리어에 이 장비 등록 요청</b><small>캠테리어 게시판 ‘장비 요청’으로 가요. 등록되면 캠테리어 도면에서도 쓸 수 있어요.</small></span></label>
+    </div>
+    <p class="err" id="sErr" role="alert"></p>
+    <div class="sheet-btns"><button type="button" class="btn-line" id="sCancel">닫기</button><button type="submit" class="btn-main" id="sOk">넣기</button></div>
+  </form>
+</dialog>
+
+<!-- 캠핑 만들기 / 고치기 -->
+<dialog class="sheet" id="tripDlg" aria-labelledby="tdT">
+  <form method="dialog" class="sheet-in" id="tripForm">
+    <h2 id="tdT">새 캠핑</h2>
+    <label class="field"><span>이름</span><input id="tdName" maxlength="30" autocomplete="off" placeholder="예: 가평 계곡 캠핑"></label>
+    <div class="field two">
+      <label><span>가는 날</span><input id="tdDate" type="date" required></label>
+      <div><span>며칠</span><div class="step big"><button type="button" id="tdMinus" aria-label="하루 줄이기">−</button><b id="tdNights">1박</b><button type="button" id="tdPlus" aria-label="하루 늘리기">+</button></div></div>
+    </div>
+    <div class="field place">
+      <label for="tdPlace"><span>장소 <small>(캠핑장 이름을 적고 목록에서 골라 주세요)</small></span></label>
+      <input id="tdPlace" maxlength="30" autocomplete="off" placeholder="예: 자라섬 캠핑장" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="tdPlaceAc">
+      <ul class="ac" id="tdPlaceAc" role="listbox" aria-label="캠핑장 찾기" hidden></ul>
+      <p class="ac-note" id="tdPlaceNote" aria-live="polite"></p>
+    </div>
+    <fieldset class="field" id="tdFromBox"><legend>챙길 장비</legend>
+      <div class="from" id="tdFrom"></div>
+    </fieldset>
+    <p class="err" id="tdErr" role="alert"></p>
+    <div class="sheet-btns"><button type="button" class="btn-line" id="tdCancel">닫기</button><button type="submit" class="btn-main" id="tdOk">만들기</button></div>
+    <button type="button" class="danger-link" id="tdDel" hidden>이 캠핑 지우기</button>
+  </form>
+</dialog>
+
+<!-- AI로 챙길 장비 고르기 -->
+<dialog class="sheet" id="aiDlg" aria-labelledby="aiT">
+  <form method="dialog" class="sheet-in" id="aiForm" novalidate>
+    <h2 id="aiT">✨ AI로 챙길 장비 고르기</h2>
+    <p class="hint" id="aiTrip"></p>
+    <div id="aiFields">
+      <div class="field two eq">
+        <label><span>지역</span><input id="aiRegion" maxlength="50" autocomplete="off" placeholder="예: 경기 가평"></label>
+        <label><span>캠핑장 <small>(선택)</small></span><input id="aiSite" maxlength="50" autocomplete="off" placeholder="예: 자라섬 캠핑장"></label>
+      </div>
+      <div class="field people"><span>인원</span>
+        <div class="pp"><small>어른</small><div class="step"><button type="button" data-pp="a-" aria-label="어른 한 명 빼기">−</button><b id="aiAdults">2</b><button type="button" data-pp="a+" aria-label="어른 한 명 더">+</button></div></div>
+        <div class="pp"><small>아이</small><div class="step"><button type="button" data-pp="k-" aria-label="아이 한 명 빼기">−</button><b id="aiKids">0</b><button type="button" data-pp="k+" aria-label="아이 한 명 더">+</button></div></div>
+      </div>
+      <fieldset class="field"><legend>사이트 바닥</legend><div class="pills" id="aiGround"></div></fieldset>
+      <fieldset class="field"><legend>주변 환경 <small>(최대 3개)</small></legend><div class="pills env" id="aiEnv"></div></fieldset>
+      <label class="field"><span>사이트 특징 <small>(선택)</small></span><input id="aiNote" maxlength="80" autocomplete="off" placeholder="예: 그늘 없음, 개수대 멀다"></label>
+      <label class="field" id="aiPlanBox" hidden><span>캠테리어에 저장한 세팅 <small>(있으면 그 장비를 기준으로)</small></span>
+        <select id="aiPlan"><option value="">세팅 없이</option></select><small class="plan-note" id="aiPlanNote"></small></label>
+      <p class="ai-left" id="aiLeft"></p>
+    </div>
+    <div class="ai-wait" id="aiWait" hidden><span class="spin" aria-hidden="true"></span><b id="aiStep">날씨 확인 중…</b><small>15~30초쯤 걸려요</small></div>
+    <p class="err" id="aiErr" role="alert"></p>
+    <div class="sheet-btns"><button type="button" class="btn-line" id="aiCancel">닫기</button><button type="submit" class="btn-main" id="aiGo">추천 받기</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+<script src="pack.js?v=29"></script>
+<script src="trips.js?v=29"></script>
+<script src="ai.js?v=29"></script>
+<script src="push.js?v=29"></script>
+</body>
+</html>
